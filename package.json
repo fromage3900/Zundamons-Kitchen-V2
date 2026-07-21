@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "lint": "npm run lint:stylua && npm run lint:selene",
-    "lint:stylua": "npx stylua-bin --check src",
+    "lint:stylua": "npx @johnnymorganz/stylua-bin --check src",
     "lint:selene": "selene src",
     "rojo:build": "rojo build default.project.json -o build/Zundamons-kItchen.rbxl",
     "rojo:serve": "rojo serve default.project.json"
