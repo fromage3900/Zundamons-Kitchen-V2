@@ -64,55 +64,73 @@ RewardCore.companionBuff = companionBuff
 
 function RewardCore.addGold(player, amount, reason)
 	if amount <= 0 then return 0 end
-	local d = ensureProfile(player)
-	-- Apply combo multiplier on gold from "active" actions
-	local mult = 1
-	if reason == "serve" or reason == "craft" or reason == "perfect" then
-		mult = d.combo.multiplier
+	ensureProfile(player)
+	local finalAmount = 0
+	local multiplier = 1
+	local ok = PlayerDataService.mutate(player, "reward_gold", function(d)
+		-- Apply combo multiplier on gold from "active" actions
+		if reason == "serve" or reason == "craft" or reason == "perfect" then
+			multiplier = d.combo.multiplier
+		end
+		-- Apply Lucky Charm powerup
+		if d.powerups.LuckyCharm and d.powerups.LuckyCharm > os.time() then
+			multiplier = multiplier * 1.5
+		end
+		-- Companion gold buff (Ankomon)
+		if reason == "serve" then
+			multiplier = multiplier * (1 + companionBuff(player, "gold"))
+		end
+		-- Decoration gold buff
+		if d.active_decor_buffs and d.active_decor_buffs.gold > 0 then
+			multiplier = multiplier * (1 + d.active_decor_buffs.gold)
+		end
+		finalAmount = math.floor(amount * multiplier)
+		d.gold = (d.gold or 0) + finalAmount
+		d.total_gold_earned = (d.total_gold_earned or 0) + finalAmount
+		return true
+	end)
+	if not ok then
+		return 0
 	end
-	-- Apply Lucky Charm powerup
-	if d.powerups.LuckyCharm and d.powerups.LuckyCharm > os.time() then
-		mult = mult * 1.5
-	end
-	-- Companion gold buff (Ankomon)
-	if reason == "serve" then
-		mult = mult * (1 + companionBuff(player, "gold"))
-	end
-	-- Decoration gold buff
-	if d.active_decor_buffs and d.active_decor_buffs.gold > 0 then
-		mult = mult * (1 + d.active_decor_buffs.gold)
-	end
-	local finalAmount = math.floor(amount * mult)
-	d.gold = (d.gold or 0) + finalAmount
-	d.total_gold_earned = (d.total_gold_earned or 0) + finalAmount
 	popup(player, "gold", "+" .. finalAmount .. "g", Color3.fromRGB(255, 220, 90))
-	if mult > 1 then
-		popup(player, "bonus", "x" .. string.format("%.1f", mult) .. " combo!", Color3.fromRGB(255, 150, 200))
+	if multiplier > 1 then
+		popup(player, "bonus", "x" .. string.format("%.1f", multiplier) .. " combo!", Color3.fromRGB(255, 150, 200))
 	end
 	return finalAmount
 end
 
 function RewardCore.addXP(player, amount, reason)
-	if amount <= 0 then return end
-	local d = ensureProfile(player)
-	-- Companion XP buff (Sakuradamon)
-	local xpBuff = companionBuff(player, "xp")
-	if xpBuff > 0 then amount = math.floor(amount * (1 + xpBuff)) end
-	-- Decoration XP buff
-	if d.active_decor_buffs and d.active_decor_buffs.xp > 0 then
-		amount = math.floor(amount * (1 + d.active_decor_buffs.xp))
-	end
-	d.chef.xp = d.chef.xp + amount
-	popup(player, "xp", "+" .. amount .. " XP", Color3.fromRGB(180, 130, 255))
+	if amount <= 0 then return 0 end
+	ensureProfile(player)
+	local finalAmount = amount
+	local levelUps = {}
+	local ok = PlayerDataService.mutate(player, "reward_xp", function(d)
+		-- Companion XP buff (Sakuradamon)
+		local xpBuff = companionBuff(player, "xp")
+		if xpBuff > 0 then finalAmount = math.floor(finalAmount * (1 + xpBuff)) end
+		-- Decoration XP buff
+		if d.active_decor_buffs and d.active_decor_buffs.xp > 0 then
+			finalAmount = math.floor(finalAmount * (1 + d.active_decor_buffs.xp))
+		end
+		d.chef.xp = d.chef.xp + finalAmount
 
-	-- Level up check
-	while d.chef.xp >= ChefLevelConfig.xpForLevel(d.chef.level) do
-		d.chef.xp = d.chef.xp - ChefLevelConfig.xpForLevel(d.chef.level)
-		d.chef.level = d.chef.level + 1
-		local tier = ChefLevelConfig.tierForLevel(d.chef.level)
-		LevelUpEvent:FireClient(player, d.chef.level, tier.name, tier.color, tier.badge)
+		while d.chef.xp >= ChefLevelConfig.xpForLevel(d.chef.level) do
+			d.chef.xp = d.chef.xp - ChefLevelConfig.xpForLevel(d.chef.level)
+			d.chef.level = d.chef.level + 1
+			table.insert(levelUps, d.chef.level)
+		end
+		return true
+	end)
+	if not ok then
+		return 0
+	end
+	popup(player, "xp", "+" .. finalAmount .. " XP", Color3.fromRGB(180, 130, 255))
+	for _, level in ipairs(levelUps) do
+		local tier = ChefLevelConfig.tierForLevel(level)
+		LevelUpEvent:FireClient(player, level, tier.name, tier.color, tier.badge)
 	end
 	RewardCore.syncLevel(player)
+	return finalAmount
 end
 
 function RewardCore.syncLevel(player)
@@ -128,23 +146,35 @@ function RewardCore.syncCombo(player)
 end
 
 function RewardCore.bumpCombo(player)
-	local d = ensureProfile(player)
-	local now = os.clock()
-	if now - d.combo.lastActionAt > COMBO_WINDOW then
-		d.combo.count = 1
-	else
-		d.combo.count = d.combo.count + 1
+	ensureProfile(player)
+	local ok = PlayerDataService.mutate(player, "reward_combo_bump", function(d)
+		local now = os.clock()
+		if now - d.combo.lastActionAt > COMBO_WINDOW then
+			d.combo.count = 1
+		else
+			d.combo.count = d.combo.count + 1
+		end
+		d.combo.lastActionAt = now
+		d.combo.multiplier = comboMultiplier(d.combo.count)
+		return true
+	end)
+	if ok then
+		RewardCore.syncCombo(player)
 	end
-	d.combo.lastActionAt = now
-	d.combo.multiplier = comboMultiplier(d.combo.count)
-	RewardCore.syncCombo(player)
+	return ok
 end
 
 function RewardCore.breakCombo(player)
-	local d = ensureProfile(player)
-	d.combo.count = 0
-	d.combo.multiplier = 1.0
-	RewardCore.syncCombo(player)
+	ensureProfile(player)
+	local ok = PlayerDataService.mutate(player, "reward_combo_break", function(d)
+		d.combo.count = 0
+		d.combo.multiplier = 1.0
+		return true
+	end)
+	if ok then
+		RewardCore.syncCombo(player)
+	end
+	return ok
 end
 
 -- Notification hub for sub-systems
@@ -156,12 +186,13 @@ end
 function RewardCore.reward(player, opts)
 	-- opts: { gold = number, xp = number, reason = string, popupItem = string }
 	if opts.combo then RewardCore.bumpCombo(player) end
-	local gained = 0
-	if opts.gold then gained = RewardCore.addGold(player, opts.gold, opts.reason) end
-	if opts.xp then gained = RewardCore.addXP(player, opts.xp, opts.reason) end
+	local goldGained = 0
+	local xpGained = 0
+	if opts.gold then goldGained = RewardCore.addGold(player, opts.gold, opts.reason) end
+	if opts.xp then xpGained = RewardCore.addXP(player, opts.xp, opts.reason) end
 	if opts.popupItem then popup(player, "item", "+" .. opts.popupItem, Color3.fromRGB(160, 240, 170)) end
-	RewardCore.notify(player, opts.reason or "generic", { gold = gained, xp = opts.xp })
-	return gained
+	RewardCore.notify(player, opts.reason or "generic", { gold = goldGained, xp = xpGained })
+	return goldGained, xpGained
 end
 
 -- Decay loop for combo

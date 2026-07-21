@@ -142,8 +142,6 @@ local function handleServeGuest(player, guestInstance, foodItemName, quality)
 	end
 
 	playerData.guests_served = (playerData.guests_served or 0) + 1
-	playerData.total_gold_earned = (playerData.total_gold_earned or 0) + payAmount
-
     print(
         "[ServingSystem] " .. player.Name .. " served guest " .. recipe .. " (+" .. payAmount .. " gold, total guests: " .. playerData.guests_served .. ")"
     )

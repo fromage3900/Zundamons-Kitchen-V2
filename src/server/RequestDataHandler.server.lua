@@ -16,7 +16,9 @@ local HIDDEN = {
 	locations_unlocked = true,
 	owned_clothing = true,
 	owned_decorations = true,
+	recipes_cooked_count = true,
 	recipes_served_count = true,
+	data_revision = true,
 	tools = true,
 	keybinds = true,
 }
@@ -34,6 +36,13 @@ requestData.OnServerInvoke = function(player)
 		end
 	end
 	return out
+end
+
+local requestProjection = RF:FindFirstChild("RequestPlayerState") or Instance.new("RemoteFunction")
+requestProjection.Name = "RequestPlayerState"
+requestProjection.Parent = RF
+requestProjection.OnServerInvoke = function(player)
+	return PlayerDataService.getProjection(player) or {}
 end
 
 print("[RequestDataHandler] Ready")
