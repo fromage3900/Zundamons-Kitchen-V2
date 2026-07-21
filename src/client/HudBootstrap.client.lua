@@ -43,42 +43,42 @@ print("[HudBootstrap] HudButtons container created")
 
 -- Create action buttons
 local BUTTONS = {
-    { name = "HudBtn_inventory", text = "🎒", tooltip = "Inventory (I)", order = 1 },
-    { name = "HudBtn_crafting", text = "🍳", tooltip = "Crafting (K)", order = 2 },
-    { name = "HudBtn_quests", text = "📋", tooltip = "Quests (J)", order = 3 },
-    { name = "HudBtn_compendium", text = "📚", tooltip = "Compendium (C)", order = 4 },
-    { name = "HudBtn_materials", text = "🧪", tooltip = "Materials (M)", order = 5 },
-    { name = "HudBtn_settings", text = "⚙️", tooltip = "Settings", order = 6 },
-    { name = "HudBtn_shop", text = "🛒", tooltip = "Shop", order = 7 },
+	{ name = "HudBtn_inventory", text = "🎒", tooltip = "Inventory (I)", order = 1 },
+	{ name = "HudBtn_crafting", text = "🍳", tooltip = "Crafting (K)", order = 2 },
+	{ name = "HudBtn_quests", text = "📋", tooltip = "Quests (J)", order = 3 },
+	{ name = "HudBtn_compendium", text = "📚", tooltip = "Compendium (C)", order = 4 },
+	{ name = "HudBtn_materials", text = "🧪", tooltip = "Materials (M)", order = 5 },
+	{ name = "HudBtn_settings", text = "⚙️", tooltip = "Settings", order = 6 },
+	{ name = "HudBtn_shop", text = "🛒", tooltip = "Shop", order = 7 },
 }
 
 for _, btnDef in ipairs(BUTTONS) do
-    local btn = Instance.new("TextButton")
-    btn.Name = btnDef.Name
-    btn.Size = UDim2.new(0, 44, 0, 44)
-    btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
-    btn.Text = btnDef.text
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 24
-    btn.TextColor3 = UIConfig.COLORS.TextPrimary
-    btn.BorderSizePixel = 0
-    btn.LayoutOrder = btnDef.order
-    btn.Parent = hudButtons
-    
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    
-    -- Add hover effect
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = UIConfig.COLORS.Primary
-        btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
-    end)
-    
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
-        btn.TextColor3 = UIConfig.COLORS.TextPrimary
-    end)
-    
-    print("[HudBootstrap] Created button:", btnDef.Name)
+	local btn = Instance.new("TextButton")
+	btn.Name = btnDef.name
+	btn.Size = UDim2.new(0, 44, 0, 44)
+	btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
+	btn.Text = btnDef.text
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 24
+	btn.TextColor3 = UIConfig.COLORS.TextPrimary
+	btn.BorderSizePixel = 0
+	btn.LayoutOrder = btnDef.order
+	btn.Parent = hudButtons
+
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+	-- Add hover effect
+	btn.MouseEnter:Connect(function()
+		btn.BackgroundColor3 = UIConfig.COLORS.Primary
+		btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
+	end)
+
+	btn.MouseLeave:Connect(function()
+		btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
+		btn.TextColor3 = UIConfig.COLORS.TextPrimary
+	end)
+
+	print("[HudBootstrap] Created button:", btnDef.name)
 end
 
 -- Create StatBar (for XP, level, etc.)

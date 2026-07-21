@@ -84,7 +84,23 @@ if not gui or not panel or not listFrame then
 	layout.CellSize = UDim2.new(0, 118, 0, 118)
 	layout.CellPadding = UDim2.new(0, 10, 0, 10)
 end
+if not toggleBtn then
+	toggleBtn = Instance.new("TextButton", gui)
+	toggleBtn.Name = "ToggleButton"
+	toggleBtn.Size = UDim2.fromOffset(44, 44)
+	toggleBtn.Position = UDim2.new(0, 16, 0.5, -22)
+	toggleBtn.Text = "Bag"
+	toggleBtn.TextScaled = true
+end
+
 local toasts = gui:FindFirstChild("ToastContainer", true)
+if not toasts then
+	toasts = Instance.new("Frame", gui)
+	toasts.Name = "ToastContainer"
+	toasts.Size = UDim2.new(0, 280, 1, -40)
+	toasts.Position = UDim2.new(1, -300, 0, 20)
+	toasts.BackgroundTransparency = 1
+end
 
 local RE = RS:WaitForChild("RemoteEvents")
 local notify = RE:FindFirstChild("NotifyPlayer")
@@ -93,13 +109,15 @@ local requestData = RS:WaitForChild("RemoteFunctions"):FindFirstChild("RequestDa
 local UIHelper = require(RS.Shared.Modules.UIHelper)
 
 local function styleFor(name)
-	return {color = UIHelper.getItemColor(name), icon = nil}
+	return { color = UIHelper.getItemColor(name), icon = nil }
 end
 
 -- ---- MATERIAL CARDS ----
 local cards = {}
 local function getOrCreateCard(name)
-	if cards[name] then return cards[name] end
+	if cards[name] then
+		return cards[name]
+	end
 	local style = styleFor(name)
 	local card = Instance.new("Frame")
 	card.Name = "Mat_" .. name
@@ -152,9 +170,15 @@ end
 
 -- Refresh whole inventory from server
 local function refresh()
-	if not requestData then return end
-	local ok, data = pcall(function() return requestData:InvokeServer() end)
-	if not ok or type(data) ~= "table" then return end
+	if not requestData then
+		return
+	end
+	local ok, data = pcall(function()
+		return requestData:InvokeServer()
+	end)
+	if not ok or type(data) ~= "table" then
+		return
+	end
 	-- Hide cards that no longer exist
 	for name, card in pairs(cards) do
 		if not data[name] or data[name] == 0 then
@@ -193,45 +217,68 @@ local function spawnToast(text, color)
 
 	toast.BackgroundTransparency = 1
 	lbl.TextTransparency = 1
-	TweenService:Create(toast, TweenInfo.new(0.2), {BackgroundTransparency = 0.1}):Play()
-	TweenService:Create(lbl, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+	TweenService:Create(toast, TweenInfo.new(0.2), { BackgroundTransparency = 0.1 }):Play()
+	TweenService:Create(lbl, TweenInfo.new(0.2), { TextTransparency = 0 }):Play()
 	task.delay(2.5, function()
-		TweenService:Create(toast, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
-		TweenService:Create(lbl, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
-		task.delay(0.5, function() toast:Destroy() end)
+		TweenService:Create(toast, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
+		TweenService:Create(lbl, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
+		task.delay(0.5, function()
+			toast:Destroy()
+		end)
 	end)
 end
 
 -- ---- TOGGLE ----
-local function setOpen(state) panel.Visible = state end
-toggleBtn.MouseButton1Click:Connect(function() setOpen(not panel.Visible) end)
+local function setOpen(state)
+	panel.Visible = state
+end
+toggleBtn.MouseButton1Click:Connect(function()
+	setOpen(not panel.Visible)
+end)
 
 -- Also wire the ZundaHUD button if present
 task.spawn(function()
 	local pg = player:WaitForChild("PlayerGui")
 	local hud = pg:WaitForChild("ZundaHUD", 5)
-	if not hud then return end
+	if not hud then
+		return
+	end
 	local hb = hud:WaitForChild("HudButtons", 5)
-	if not hb then return end
+	if not hb then
+		return
+	end
 	local hbtn = hb:WaitForChild("HudBtn_materials", 5)
 	if hbtn then
-		hbtn.MouseButton1Click:Connect(function() setOpen(not panel.Visible) end)
+		hbtn.MouseButton1Click:Connect(function()
+			setOpen(not panel.Visible)
+		end)
 	end
 end)
-closeBtn.MouseButton1Click:Connect(function() setOpen(false) end)
+closeBtn.MouseButton1Click:Connect(function()
+	setOpen(false)
+end)
 UIS.InputBegan:Connect(function(input, processed)
-	if processed then return end
-	if input.KeyCode == Enum.KeyCode.U then setOpen(not panel.Visible) end
+	if processed then
+		return
+	end
+	if input.KeyCode == Enum.KeyCode.U then
+		setOpen(not panel.Visible)
+	end
 end)
 
 -- ---- LISTEN FOR NOTIFICATIONS ----
 if notify then
 	notify.OnClientEvent:Connect(function(kind, message)
 		local color
-		if kind == "gather_success" then color = Color3.fromRGB(180, 230, 180)
-		elseif kind == "unlock" then color = Color3.fromRGB(255, 220, 130)
-		elseif kind == "error" then color = Color3.fromRGB(255, 180, 180)
-		else color = Color3.fromRGB(255, 250, 220) end
+		if kind == "gather_success" then
+			color = Color3.fromRGB(180, 230, 180)
+		elseif kind == "unlock" then
+			color = Color3.fromRGB(255, 220, 130)
+		elseif kind == "error" then
+			color = Color3.fromRGB(255, 180, 180)
+		else
+			color = Color3.fromRGB(255, 250, 220)
+		end
 		spawnToast(message, color)
 		refresh()
 	end)

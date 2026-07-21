@@ -29,9 +29,19 @@ for _, g in ipairs(playerGui:GetChildren()) do
 		break
 	end
 end
-local toolButton = script.toolButton
+if not CustomInventoryGUI or not hotBar or not Inventory then
+	warn("[InventoryController] Custom inventory hierarchy missing; Roblox backpack remains enabled.")
+	return
+end
 
-local inventoryHandler = require(script.SETTINGS)
+local toolButton = script:FindFirstChild("toolButton")
+local settingsModule = script:FindFirstChild("SETTINGS")
+if not toolButton or not settingsModule then
+	warn("[InventoryController] Embedded templates missing; Roblox backpack remains enabled.")
+	return
+end
+
+local inventoryHandler = require(settingsModule)
 
 local function showSlots()
 	for index = 1, inventoryHandler.slotAmount do
@@ -59,7 +69,7 @@ local function removeEmptySlots()
 	end
 end
 
-local function manageInventory (_, inputState)
+local function manageInventory(_, inputState)
 	if inputState == Enum.UserInputState.Begin then
 		Inventory.Visible = not Inventory.Visible
 		local currentState = Inventory.Visible
@@ -67,13 +77,13 @@ local function manageInventory (_, inputState)
 		inventoryHandler:removeCurrentDescription()
 		if currentState then
 			showSlots()
-			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5,0.5)
+			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5, 0.5)
 			CustomInventoryGUI.openButton.info.Text = "(') close inventory"
 		else
 			if not inventoryHandler.SETTINGS.SHOW_EMPTY_TOOL_FRAMES_IN_HOTBAR then
 				removeEmptySlots()
 			end
-			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5,0.909)
+			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5, 0.909)
 			CustomInventoryGUI.openButton.info.Text = "(') open inventory"
 		end
 	elseif not inputState then
@@ -123,13 +133,23 @@ local function updateHudPosition()
 	manageInventory()
 end
 
-updateHudPosition(); updateHudPosition()
+updateHudPosition()
+updateHudPosition()
 reloadInventory(player.Character or player.CharacterAdded:Wait())
 camera:GetPropertyChangedSignal("ViewportSize"):Connect(updateHudPosition)
 player.CharacterAdded:Connect(reloadInventory)
 Inventory.SearchBox:GetPropertyChangedSignal("Text"):Connect(searchTool)
-if inventoryHandler.SETTINGS.SHOW_EMPTY_TOOL_FRAMES_IN_HOTBAR then showSlots() end
-if inventoryHandler.SETTINGS.INVENTORY_KEYBIND then ContextActionService:BindAction("manageInventory", manageInventory, false, inventoryHandler.SETTINGS.INVENTORY_KEYBIND) end
+if inventoryHandler.SETTINGS.SHOW_EMPTY_TOOL_FRAMES_IN_HOTBAR then
+	showSlots()
+end
+if inventoryHandler.SETTINGS.INVENTORY_KEYBIND then
+	ContextActionService:BindAction(
+		"manageInventory",
+		manageInventory,
+		false,
+		inventoryHandler.SETTINGS.INVENTORY_KEYBIND
+	)
+end
 if inventoryHandler.SETTINGS.OPEN_BUTTON then
 	CustomInventoryGUI.openButton.MouseButton1Down:Connect(function()
 		Inventory.Visible = not Inventory.Visible
@@ -138,13 +158,13 @@ if inventoryHandler.SETTINGS.OPEN_BUTTON then
 		inventoryHandler:removeCurrentDescription()
 		if currentState then
 			showSlots()
-			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5,0.5)
+			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5, 0.5)
 			CustomInventoryGUI.openButton.info.Text = "(') close inventory"
 		else
 			if not inventoryHandler.SETTINGS.SHOW_EMPTY_TOOL_FRAMES_IN_HOTBAR then
 				removeEmptySlots()
 			end
-			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5,0.909)
+			CustomInventoryGUI.openButton.Position = UDim2.fromScale(0.5, 0.909)
 			CustomInventoryGUI.openButton.info.Text = "(') open inventory"
 		end
 	end)
@@ -166,7 +186,7 @@ UserInputService.InputChanged:Connect(function(input)
 		local toolEquipped = getToolEquipped()
 		local toolPosition = inventoryHandler:getToolPosition(toolEquipped) or 0
 
-		for i=toolPosition + direction, direction < 0 and 1 or inventoryHandler.slotAmount, direction do
+		for i = toolPosition + direction, direction < 0 and 1 or inventoryHandler.slotAmount, direction do
 			local toolObject = inventoryHandler.OBJECTS.HotBar[i]
 			if toolObject and humanoid then
 				humanoid:EquipTool(toolObject.Tool)
