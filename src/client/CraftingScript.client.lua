@@ -7,18 +7,86 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
-local panel = script.Parent:WaitForChild("Panel")
-local closeBtn = panel:WaitForChild("TitleBar"):WaitForChild("CloseBtn")
-local scroll = panel:WaitForChild("RecipeList")
+local playerGui = player:WaitForChild("PlayerGui")
+
+local ClientGuiBootstrap = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("ClientGuiBootstrap"))
+
+local gui
+local panel
+local closeBtn
+local scroll
+
+for _, g in ipairs(playerGui:GetChildren()) do
+	if g:IsA("ScreenGui") and g:FindFirstChild("RecipeList", true) then
+		gui = g
+		gui.ResetOnSpawn = false
+		panel = gui:FindFirstChild("Panel", true)
+		closeBtn = panel:FindFirstChild("CloseBtn", true)
+		scroll = panel:FindFirstChild("RecipeList", true)
+		break
+	end
+end
+
+if not gui or not panel or not scroll then
+	gui = ClientGuiBootstrap.createScreenGui(player, "CraftingGui", 25)
+	
+	panel = Instance.new("Frame", gui)
+	panel.Name = "Panel"
+	panel.Size = UDim2.new(0, 460, 0, 520)
+	panel.Position = UDim2.new(0.5, -230, 0.5, -260)
+	panel.BackgroundColor3 = Color3.fromRGB(30, 24, 42)
+	panel.BorderSizePixel = 0
+	panel.Visible = false
+	Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 18)
+	local stroke = Instance.new("UIStroke", panel)
+	stroke.Color = Color3.fromRGB(220, 160, 230)
+	stroke.Thickness = 2.5
+
+	local title = Instance.new("TextLabel", panel)
+	title.Name = "Title"
+	title.Size = UDim2.new(1, -60, 0, 48)
+	title.Position = UDim2.new(0, 20, 0, 10)
+	title.BackgroundTransparency = 1
+	title.Text = "🍳  Crafting Kitchen"
+	title.Font = Enum.Font.FredokaOne
+	title.TextSize = 26
+	title.TextColor3 = Color3.fromRGB(255, 220, 245)
+	title.TextXAlignment = Enum.TextXAlignment.Left
+
+	closeBtn = Instance.new("TextButton", panel)
+	closeBtn.Name = "CloseBtn"
+	closeBtn.Size = UDim2.new(0, 36, 0, 36)
+	closeBtn.Position = UDim2.new(1, -48, 0, 14)
+	closeBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 100)
+	closeBtn.Text = "✕"
+	closeBtn.Font = Enum.Font.GothamBold
+	closeBtn.TextSize = 18
+	closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	closeBtn.BorderSizePixel = 0
+	Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 10)
+
+	scroll = Instance.new("ScrollingFrame", panel)
+	scroll.Name = "RecipeList"
+	scroll.Size = UDim2.new(1, -32, 1, -80)
+	scroll.Position = UDim2.new(0, 16, 0, 68)
+	scroll.BackgroundTransparency = 1
+	scroll.BorderSizePixel = 0
+	scroll.ScrollBarThickness = 6
+	scroll.ScrollBarImageColor3 = Color3.fromRGB(220, 160, 230)
+	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+	
+	local layout = Instance.new("UIListLayout", scroll)
+	layout.Padding = UDim.new(0, 8)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+end
 
 local craftFunc = RS:WaitForChild("RemoteFunctions"):WaitForChild("CraftFunction")
 local requestData = RS:WaitForChild("RemoteFunctions"):WaitForChild("RequestData")
 
--- Load recipes from server config to avoid sync issues
--- Recipes are read-only; locked recipes handled server-side
-local craftConfig = require(RS.ConfigurationFiles:WaitForChild("CraftConfig"))
-local UIHelper = require(RS.Shared.Modules.UIHelper)
-local UIConfig = require(RS.ConfigurationFiles.UIConfig)
+local craftConfig = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("CraftConfig"))
+local UIHelper = require(RS:WaitForChild("Shared"):WaitForChild("Modules"):WaitForChild("UIHelper"))
+local UIConfig = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("UIConfig"))
 
 -- Build RECIPES array from Config (format for UI display)
 local RECIPES = {}
@@ -128,47 +196,41 @@ local function buildRecipeCard(recipe)
 			return
 		end
 
-		-- Helper: send craft to server with score data for server-authoritative quality
-		local function submitCraft(quality, scores)
+		-- Helper: send craft to server (server will return "Cooking" to start minigame, or "Fail")
+		local function submitCraft()
 			craftBtn.Text = "\u{2728}" -- ✨ while server processes
 			local ok, result = pcall(function()
-				return craftFunc:InvokeServer(recipe.name, hrp.Position, scores or {})
+				return craftFunc:InvokeServer(recipe.name, hrp.Position)
 			end)
-            if ok and result == "Success" then
-                if quality == "perfect" then
-                    craftBtn.Text = "PERFECT \u{2728}"
-                    craftBtn.BackgroundColor3 = UIConfig.COLORS.ZundamonGold
-                    UIHelper.spawnSparkles(craftBtn.Parent, pos.X + sz.X / 2, pos.Y, Color3.fromRGB(255, 220, 80), 12)
-                elseif quality == "great" then
-                    craftBtn.Text = "Great \u{2713}"
-                    craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
-                    UIHelper.spawnSparkles(craftBtn.Parent, pos.X + sz.X / 2, pos.Y, Color3.fromRGB(120, 255, 120), 8)
-                else
-                    craftBtn.Text = "OK \u{2713}"
-                    craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaLight
+            if ok and result == "Cooking" then
+                if _G.TimedCooking and _G.TimedCooking.start then
+                    craftBtn.Text = "Cooking\u{2026}"
+                    _G.TimedCooking.start(recipe.name, function(quality)
+                        craftBtn.Text = quality:upper() .. "!"
+                        if quality == "perfect" then
+                            craftBtn.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+                        elseif quality == "great" then
+                            craftBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+                        else
+                            craftBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 100)
+                        end
+                        task.delay(2, function()
+                            craftBtn.Text = "Craft"
+                            craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
+                        end)
+                    end)
                 end
             else
                 craftBtn.Text = "Need more!"
                 craftBtn.BackgroundColor3 = UIConfig.COLORS.Danger
+                task.delay(1.8, function()
+                    craftBtn.Text = "Craft"
+                    craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
+                end)
             end
-            task.delay(1.8, function()
-                craftBtn.Text = "Craft"
-                craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
-            end)
 		end
 
-		-- Run the timed cooking mini-game if available, otherwise fall through
-		if _G.TimedCooking and _G.TimedCooking.start then
-			craftBtn.Text = "Cooking\u{2026}"
-			local started = _G.TimedCooking.start(recipe.name, function(quality, scores)
-				submitCraft(quality, scores)
-			end)
-			if not started then
-				craftBtn.Text = "Craft"
-			end
-		else
-			submitCraft("ok")
-		end
+		submitCraft()
 	end)
 end
 

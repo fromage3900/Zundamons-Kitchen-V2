@@ -15,6 +15,7 @@ local function CookingHUD(props)
 			Size = UDim2.fromOffset(600, 150),
 			BackgroundColor3 = Color3.fromRGB(20, 20, 25),
 			BackgroundTransparency = 0.4, -- Glassmorphism
+			Visible = props.visible == true, -- AGENTS.md Rule 2d compliance
 		}, {
 			Corner = React.createElement("UICorner", {
 				CornerRadius = UDim.new(0, 16)
