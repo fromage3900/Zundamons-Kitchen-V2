@@ -15,7 +15,7 @@ This document separates implemented source, static/build evidence, live Studio e
 | Serving | `7f62ba8`; owner/state/proximity validation, server-selected dish quality, locked atomic dish/reward settlement | Not run after implementation because Studio MCP and Rojo disconnected | Runtime pending |
 | Harvest pickup | `74af38e`; expiring player/item/position token, distance and replay validation, prompt plus touch, atomic inventory/XP | User confirmed node breaking and visual drops before pickup repair; repaired pickup contract not yet run | Runtime pending |
 | Resource authoring | `3d2248c`; mesh-independent archetypes, opt-in visual swaps, authored-geometry preservation | Static/serialization only | Runtime pending |
-| Zundarooms | Quest-gated clip entrance, isolated runtime chase, server escape settlement, persistence projection, and safe cleanup | Focused static/Selene/Rojo pass; MCP remains stuck connecting | Runtime pending |
+| Zundarooms | Quest-gated clip entrance, isolated runtime chase, server escape settlement, persistence projection, and safe cleanup | Live Studio exposed and fixed two placement defects (shared player/entity spawn and placement below `FallenPartsDestroyHeight`); entry remained active, exact exit awarded +100 gold and one escape, unlocked discovery, and removed the runtime room | Verified for entry/escape/single settlement; catch/death/timeout/rejoin remain integrated-gate work |
 
 ## Independent tool gates
 
@@ -39,13 +39,10 @@ Run these in one quota-efficient Studio session after MCP `58741` and Rojo `3487
 3. Verify `ResourceNodeBootstrap` recognizes an existing node without changing its mesh. Duplicate it, change `ResourceArchetype`, and confirm the appropriate tool/click behavior. Enable `UseRegistryMesh` only on a disposable test node and verify the selected variant.
 4. Leave during an active cooking reservation, rejoin, and confirm ingredients restore once. Rejoin after successful cooking/fishing/serving and confirm inventory, dish-quality counts, currency, XP, unlocks, and companion data persist.
 5. Complete Harvest -> Cook -> Serve -> Reward once from a fresh launch and inspect console output for duplicate listeners, duplicate rewards, missing paths, or infinite waits.
-6. Serve one guest, cross a tagged `ZundaroomsEntrance`, escape once, and confirm quest/discovery/reward persistence. Verify catch, death, timeout, and re-entry cleanup award no escape.
+6. Verify Zundarooms catch, death, timeout, and re-entry cleanup award no escape; rejoin and confirm the already verified escape/discovery state persists.
 
-## External state blocker
+## Connection status
 
-At the end of this audit, neither expected local listener was running:
+On 2026-07-21, Rojo was confirmed listening on port `34872`. The chrxxs plugin UI remained on "connecting," but the available Roblox Studio bridge successfully selected `Zundamon'sKitchenV2`, entered Play mode, executed server checks, and read console output. Runtime testing can therefore continue through that bridge while the chrxxs-specific client startup is repaired separately.
 
-- Studio MCP: `http://localhost:58741`
-- Rojo: port `34872`
-
-No runtime completion claim is made for serving, repaired pickup, resource authoring, persistence/rejoin, or the integrated loop until those gates run.
+No runtime completion claim is made yet for serving, repaired pickup, resource authoring, persistence/rejoin, or the integrated loop until those gates run.

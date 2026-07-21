@@ -1,7 +1,8 @@
 --!strict
 local ZundaroomsConfig = {
 	unlockGuestsServed = 1,
-	roomY = -900,
+	-- Keep runtime rooms above Workspace.FallenPartsDestroyHeight (commonly -500).
+	roomY = 1000,
 	roomWidth = 26,
 	roomLength = 110,
 	entitySpeed = 10,

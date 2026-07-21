@@ -211,7 +211,9 @@ function ZundaroomsService.enter(player: Player): (boolean, string)
 	local session = createRoom(player, character:GetPivot())
 	sessions[player.UserId] = session
 	local floor = session.room:FindFirstChild("Floor") :: BasePart
-	character:PivotTo(CFrame.new(floor.Position + Vector3.new(0, 3, -42)))
+	-- Begin near the room center, safely separated from the pursuer at the back wall.
+	-- This gives the player a readable first beat before the chase reaches them.
+	character:PivotTo(CFrame.new(floor.Position + Vector3.new(0, 3, 0)))
 	statusEvent:FireClient(player, "entered")
 	return true, "entered"
 end
