@@ -1,50 +1,164 @@
 # Zundamon's kItchen V2
 
-A cooperative, massively persistent, and highly interactive Roblox experience. 
+A cooperative, massively persistent kitchen life-sim Roblox experience — gather ingredients, cook dishes with rhythm minigames, serve guests, and build your restaurant empire with your Zundamon companion.
 
-This repository serves as the single source of truth for the codebase, utilizing a strictly domain-driven structure mapped for `Rojo`. It has been architected to support **Infinity Nikki** scale features: thousands of items, vast open worlds, and a seamless, lag-free UI.
+> **Status:** Active development · [MIT License](LICENSE) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
 
-## 🚀 Onboarding: Step-by-Step Developer Setup
+---
 
-Welcome to the team! To ensure a smooth, lag-free, and collision-free collaborative environment, follow these steps exactly:
+## 🎮 What Is This?
 
-### Step 1: Install the Toolchain
-We use **Mise** as our universal binary installer. This guarantees everyone on the team is using the exact same version of our tools.
-1. Install [Mise](https://mise.jdx.dev/getting-started.html).
-2. Open your terminal in the root of this repository and run:
-   ```bash
-   mise install
-   wally install
-   ```
-   *This automatically downloads Rojo, Selene, StyLua, Blink, and our Wally packages.*
+Zundamon's kItchen is a cozy Roblox experience featuring:
+- **Gathering** — Harvest ingredients from world resource nodes (berries, mushrooms, wheat, etc.)
+- **Cooking** — Rhythm-game minigames to craft recipes with combo scoring
+- **Serving** — NPC guests arrive and order dishes; serve to earn gold
+- **Companions** — Zundamon companions follow you, provide buffs, and have VN dialogues
+- **Quests** — 68+ quests across gathering, cooking, serving, and exploration
+- **Building** — Place furniture, decorate your kitchen plot
+- **AI Mentor** — Optional LLM-powered Zundapal chat (requires Studio secrets)
+- **Day/Night + Weather** — Dynamic sky, clouds, rain, aurora effects
 
-### Step 2: The Studio Workflow (Team Create Safe)
-We use a strict **Domain-Driven Architecture**. The code lives in VS Code; the map lives in Roblox Studio.
-1. Open the Team Create place in Roblox Studio.
-2. Open this repository in VS Code.
-3. In your terminal, run `rojo serve`.
-4. Connect the Rojo plugin in Studio. 
+---
 
-> [!TIP]
-> **Safe Data Testing**: When you hit "Play" in Studio, the game automatically uses a **Mock DataStore**. This means you will not lock out other developers who are testing at the same time, and you will not corrupt the live player database. 
+## 🚀 Quick Start (5 Minutes)
 
-### Step 3: UI Design with Hoarcekat
-If you are designing React-Lua UI, you do **not** need to playtest the game!
-1. Install the [Hoarcekat plugin](https://github.com/Roblox/hoarcekat) in Studio.
-2. Create a `.story.lua` file next to your component.
-3. Open Hoarcekat in Studio to view your UI update in real-time as you type in VS Code.
+```powershell
+# 1. Clone
+git clone https://github.com/fromage3900/Zundamons-kItchen-V2.git
+cd Zundamons-kItchen-V2
 
-### Step 4: The Iron Gate (Committing Code)
-You cannot push bad code to `main`. 
-1. Before committing, run `stylua src/` to auto-format your code.
-2. Remove **ALL** `print()` and `warn()` statements. Our `selene` linter will reject your Pull Request if you leave them in.
-3. Create a Pull Request and fill out the provided template. The GitHub Actions CI/CD pipeline will automatically verify your code.
+# 2. Install tools (pick one)
+mise install           # Option A: Mise (recommended — manages all tools)
+npm install            # Option B: Node.js only (Rojo + StyLua via npm)
 
-## 🛠️ The Tech Stack (2026 Professional Standard)
-- **[Mise](https://mise.jdx.dev/)**: Toolchain manager.
-- **[Rojo](https://rojo.space/)**: File sync.
-- **[Wally](https://wally.run/)**: Package manager.
-- **[Blink](https://github.com/1axen/blink)**: Ultra-fast networking compiler.
-- **Matter**: High-performance Entity-Component-System (ECS).
-- **React-Lua**: Declarative UI component rendering.
-- **ProfileService & ReplicaService**: Bulletproof stat replication.
+# 3. Install Wally packages (ECS, React, ProfileService)
+wally install
+
+# 4. Start syncing
+rojo serve
+
+# 5. Open the place file in Studio → Connect Rojo plugin → Press Play
+```
+
+> **New to all this?** See the full [Getting Started Guide](GETTING_STARTED.md) — it walks through every install step from scratch.
+
+---
+
+## 📁 Project Structure
+
+```
+Zundamons-kItchen-V2/
+├── src/
+│   ├── client/                 # StarterPlayerScripts (43 files)
+│   │   ├── Controllers/        #   HarvestController
+│   │   ├── systems/            #   Matter ECS client systems (new)
+│   │   └── ui/                 #   React-Lua components (new)
+│   ├── server/                 # ServerScriptService (41 files)
+│   │   ├── DevTools/           #   Studio command-bar dev utilities
+│   │   ├── Plugins/            #   Runtime effect plugins
+│   │   ├── Services/           #   Core services (PlayerData, Admin, LLM, etc.)
+│   │   ├── Validation/         #   Server-side harvest validation
+│   │   └── systems/            #   Matter ECS server systems (new)
+│   ├── shared/                 # ReplicatedStorage
+│   │   ├── ConfigurationFiles/ #   41 game config modules (recipes, items, quests, etc.)
+│   │   ├── Shared/Config/      #   Pipeline configs (architecture, landscape, VN)
+│   │   ├── Shared/Modules/     #   Shared utility modules (MeshProvider, ModifierStack)
+│   │   ├── RemoteEvents/       #   Remote event declarations (init.meta.json)
+│   │   ├── RemoteFunctions/    #   Remote function declarations
+│   │   ├── components/         #   Matter ECS component definitions (new)
+│   │   └── ...                 #   Loot, Meshes, Models, ToolRemotes, RewardEvents
+│   └── Workspace/              # Game world folder structure (.gitkeep hierarchy)
+├── default.project.json        # Rojo project config
+├── mise.toml                   # Toolchain versions (Rojo 7.7, Wally 0.3.2, etc.)
+├── wally.toml                  # Wally package dependencies
+├── selene.toml                 # Linter rules (print/warn = error)
+├── stylua.toml                 # Formatter settings (tabs, 120-col)
+├── package.json                # NPM scripts (lint, build, serve)
+└── docs/                       # Architecture, design system, security docs
+```
+
+### Rojo Mapping (How Disk → Studio)
+
+| Disk Path | Studio Location | What's There |
+|-----------|-----------------|--------------|
+| `src/server/` | `ServerScriptService` | All server scripts (flat) |
+| `src/client/` | `StarterPlayer.StarterPlayerScripts` | All client scripts (flat) |
+| `src/shared/ConfigurationFiles/` | `ReplicatedStorage.ConfigurationFiles` | 41 config modules |
+| `src/shared/RemoteEvents/` | `ReplicatedStorage.RemoteEvents` | Event declarations |
+| `src/shared/Shared/Config/` | `ReplicatedStorage.Shared.Config` | Pipeline configs |
+| `src/shared/Shared/Modules/` | `ReplicatedStorage.Shared.Modules` | Utility modules |
+| `src/Workspace/` | `Workspace` | World folder hierarchy |
+
+> **Why this mapping?** All scripts use `game.ReplicatedStorage.ConfigurationFiles.X` — the Rojo config maps each subdirectory individually to preserve these paths.
+
+---
+
+## 🛠️ Tech Stack
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [Mise](https://mise.jdx.dev/) | — | Universal toolchain manager (one `mise install` gets everything) |
+| [Rojo](https://rojo.space/) | 7.7.0 | File sync between VS Code and Roblox Studio (preserves Studio level design via `$ignoreUnknownInstances`) |
+| [Wally](https://wally.run/) | 0.3.2 | Roblox package manager (Matter, React, ProfileService) |
+| [StyLua](https://github.com/JohnnyMorganz/StyLua) | 1.32.0 | Lua code formatter |
+| [Selene](https://kampfkarren.github.io/selene/) | 0.27.1 | Lua linter |
+| [Blink](https://github.com/1axen/blink) | latest | Network event compiler |
+| [Matter](https://matter-ecs.github.io/matter/) | 0.8.4 | Entity-Component-System framework |
+| [React-Lua](https://github.com/jsdotlua/react-lua) | 17.1.0 | Declarative UI rendering |
+| [ProfileService](https://madstudioroblox.github.io/ProfileService/) | 1.0.4 | Player data persistence |
+| [ReplicaService](https://madstudioroblox.github.io/ReplicaService/) | 1.0.0 | State replication |
+
+---
+
+## 📋 NPM Scripts
+
+| Command | What It Does |
+|---------|--------------|
+| `npm run rojo:serve` | Start Rojo file sync (connect Studio plugin) |
+| `npm run rojo:build` | Build `.rbxl` from project config |
+| `npm run lint` | Run StyLua format check + Selene lint |
+| `npm run lint:stylua` | StyLua format check only |
+| `npm run lint:selene` | Selene lint only |
+
+---
+
+## 🔐 The Iron Gate (Code Quality)
+
+Before any code reaches `main`:
+
+1. **`stylua src/`** — Auto-format all Lua files
+2. **`selene src/`** — Lint check (⚠️ `print()`/`warn()` are **errors**, not warnings)
+3. **`rojo build`** — Verify the project compiles
+4. **PR Review** — Fill out the template, get approval
+5. **CI Pipeline** — GitHub Actions runs all checks automatically
+
+---
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide covering:
+- Branch naming conventions
+- Code style rules (naming, formatting, architecture)
+- PR checklist
+- How to report issues
+
+---
+
+## 📖 Documentation
+
+| Document | What It Covers |
+|----------|---------------|
+| [AGENT_HANDOFF.md](docs/AGENT_HANDOFF.md) | Multi-agent coordination guide for Antigravity, Cline, DeepSeek, & Ollama |
+| [GETTING_STARTED.md](GETTING_STARTED.md) | Step-by-step setup for first-timers |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Branch workflow, code style, PR process |
+| [CREDITS.md](CREDITS.md) | Asset licenses and attributions |
+| [PRIVACY.md](PRIVACY.md) | Player data handling and AI chat policy |
+| [SECURITY.md](SECURITY.md) | Vulnerability reporting and secure dev practices |
+
+---
+
+## ⚖️ License
+
+[MIT License](LICENSE) — see [CREDITS.md](CREDITS.md) for third-party asset licenses.
+
+*This is a fan project. Zundamon is a character from the ZUNKO PJ project. No commercial use is intended.*
