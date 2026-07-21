@@ -2,7 +2,8 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ProfileService = require(ReplicatedStorage.Packages.ProfileService)
+local ServerScriptService = game:GetService("ServerScriptService")
+local ProfileService = require(ServerScriptService.ServerPackages.ProfileService)
 local ReplicaService = require(ReplicatedStorage.Packages.ReplicaService)
 local DataSchema = require(ReplicatedStorage.Shared.DataSchema)
 

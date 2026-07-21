@@ -3,7 +3,7 @@
 local RS = game:GetService("ReplicatedStorage")
 local RF = RS:WaitForChild("RemoteFunctions")
 
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 local function ensureRemote(name: string)
 	local ev = RF:FindFirstChild(name)

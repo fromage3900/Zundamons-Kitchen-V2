@@ -2,7 +2,7 @@
 -- Returns a filtered copy of player materials data for client UIs.
 
 local RS = game:GetService("ReplicatedStorage")
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 local RF = RS:WaitForChild("RemoteFunctions")
 local requestData = RF:FindFirstChild("RequestData") or Instance.new("RemoteFunction")

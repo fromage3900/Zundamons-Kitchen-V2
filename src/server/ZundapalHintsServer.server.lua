@@ -6,7 +6,7 @@ local RewardEvents = RS:WaitForChild("RewardEvents")
 
 local Config = require(RS.ConfigurationFiles.ZundapalLLMConfig)
 local ContextBuilder = require(RS.ConfigurationFiles.ZundapalContextBuilder)
-local ZundapalLLMService = require(script.Parent.Services.ZundapalLLMService)
+local ZundapalLLMService = require(game:GetService("ServerScriptService").Services.ZundapalLLMService)
 
 local NotifyAction = RewardEvents:WaitForChild("NotifyAction")
 local notifyPlayer = RE:WaitForChild("NotifyPlayer")

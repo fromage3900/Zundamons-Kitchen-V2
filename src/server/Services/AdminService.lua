@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local PlayerDataService = require(script.Parent.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 local AdminService = {}
 local commands = {}

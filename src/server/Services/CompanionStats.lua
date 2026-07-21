@@ -1,7 +1,7 @@
 --!strict
 -- CompanionStats: quest counters for companion and NPC dialogue interactions.
 
-local PlayerDataService = require(script.Parent.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 local CompanionConfig = require(game.ReplicatedStorage.ConfigurationFiles.CompanionConfig)
 
 local CompanionStats = {}

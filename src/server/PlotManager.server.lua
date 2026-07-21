@@ -6,7 +6,7 @@
 local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 local RE = ReplicatedStorage:WaitForChild("RemoteEvents")
 local notifyRE = RE:FindFirstChild("NotifyPlayer") or Instance.new("RemoteEvent")

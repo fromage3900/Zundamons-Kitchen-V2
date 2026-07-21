@@ -18,7 +18,7 @@ local function triggerSideDialogue(player, key)
 end
 
 local QuestConfig = require(RS.ConfigurationFiles.QuestConfig)
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 local QUESTS = QuestConfig.quests
 for _, q in ipairs(QuestConfig.default_quests) do

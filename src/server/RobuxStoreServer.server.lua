@@ -2,7 +2,8 @@
 -- Wires MarketplaceService as the sole ProcessReceipt owner.
 local RS = game:GetService("ReplicatedStorage")
 local MPS = game:GetService("MarketplaceService")
-local MarketplaceService = require(script.Parent.Services.MarketplaceService)
+local SSS = game:GetService("ServerScriptService")
+local MarketplaceService = require(SSS.Services.MarketplaceService)
 
 -- ── PRODUCT CATALOGUE ────────────────────────────────────────────────────────
 -- Format: [productId] = { type, key, displayName }
@@ -30,7 +31,7 @@ if not purchaseEv then
     purchaseEv = Instance.new("RemoteEvent"); purchaseEv.Name="PurchaseResult"; purchaseEv.Parent=RE
 end
 
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(SSS.Services.PlayerDataService)
 
 -- ProcessReceipt delegated to MarketplaceService.lua (unified handler)
 

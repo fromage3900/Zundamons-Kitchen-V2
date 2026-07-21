@@ -8,7 +8,7 @@ local TextService = game:GetService("TextService")
 local Config = require(game.ReplicatedStorage.ConfigurationFiles.ZundapalLLMConfig)
 local ContextBuilder = require(game.ReplicatedStorage.ConfigurationFiles.ZundapalContextBuilder)
 local CompanionConfig = require(game.ReplicatedStorage.ConfigurationFiles.CompanionConfig)
-local PlayerDataService = require(script.Parent.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 export type ChatMessage = {
 	role: string,

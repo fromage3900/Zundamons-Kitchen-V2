@@ -15,11 +15,12 @@ if not executeCmd then
 	executeCmd.Parent = RF
 end
 
-local AdminService = require(script.Parent.Services.AdminService)
-local PluginLoader = require(script.Parent.Services.PluginLoader)
+local SSS = game:GetService("ServerScriptService")
+local AdminService = require(SSS.Services.AdminService)
+local PluginLoader = require(SSS.Services.PluginLoader)
 
 pcall(function()
-	require(script.Parent.Services.ModifierBootstrap)
+	require(SSS.Services.ModifierBootstrap)
 end)
 
 executeCmd.OnServerInvoke = function(player, input)

@@ -36,6 +36,11 @@ end
 function PlayerDataService.update(player: Player, mutator: ({ [string]: any }) -> ())
 	local data = PlayerDataService.getOrCreate(player)
 	mutator(data)
+	if data["Wood"] or data["Wood Log"] then
+		local syncVal = (data["Wood Log"] and data["Wood"] and math.max(data["Wood"], data["Wood Log"])) or data["Wood Log"] or data["Wood"] or 0
+		data["Wood"] = syncVal
+		data["Wood Log"] = syncVal
+	end
 end
 
 local function createDefaultData(): { [string]: any }
@@ -69,6 +74,7 @@ local function createDefaultData(): { [string]: any }
 		Apple = 5,
 		Wheat = 5,
 		Wood = 5,
+		["Wood Log"] = 5,
 		Rock = 5,
 		["Iron Ore"] = 3,
 	}
@@ -95,6 +101,11 @@ local function backfillLoadedData(loaded: { [string]: any })
 	end
 	loaded.current_gold = nil
 	loaded.Gold = nil
+	if loaded["Wood"] or loaded["Wood Log"] then
+		local syncVal = (loaded["Wood Log"] and loaded["Wood"] and math.max(loaded["Wood"], loaded["Wood Log"])) or loaded["Wood Log"] or loaded["Wood"] or 0
+		loaded["Wood"] = syncVal
+		loaded["Wood Log"] = syncVal
+	end
 	if loaded.owned_clothing == nil then
 		loaded.owned_clothing = {}
 	end
@@ -211,9 +222,12 @@ task.spawn(function()
 		for _, player in ipairs(Players:GetPlayers()) do
 			local data = store[tostring(player.UserId)]
 			if data then
-				pcall(function()
+				local ok, err = pcall(function()
 					progressionStore:SetAsync("player_" .. player.UserId, data)
 				end)
+				if not ok then
+					print("[PlayerDataService] Auto-save failed for " .. player.Name .. ": " .. tostring(err))
+				end
 			end
 		end
 	end
@@ -232,23 +246,5 @@ for _, player in ipairs(Players:GetPlayers()) do
 		PlayerDataService.loadPlayer(player)
 	end
 end
-
--- Auto-save every 60 seconds to prevent data loss
-task.spawn(function()
-	while true do
-		task.wait(60)
-		for _, player in ipairs(Players:GetPlayers()) do
-			local data = store[tostring(player.UserId)]
-			if data then
-				local ok, err = pcall(function()
-					progressionStore:SetAsync("player_" .. player.UserId, data)
-				end)
-				if not ok then
-					print("[PlayerDataService] Auto-save failed for " .. player.Name .. ": " .. tostring(err))
-				end
-			end
-		end
-	end
-end)
 
 return PlayerDataService

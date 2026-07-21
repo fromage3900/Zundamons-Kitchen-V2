@@ -3,8 +3,9 @@
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 
-local ZundapalLLMService = require(script.Parent.Services.ZundapalLLMService)
-local CompanionStats = require(script.Parent.Services.CompanionStats)
+local SSS = game:GetService("ServerScriptService")
+local ZundapalLLMService = require(SSS.Services.ZundapalLLMService)
+local CompanionStats = require(SSS.Services.CompanionStats)
 
 local RE = RS:WaitForChild("RemoteEvents")
 

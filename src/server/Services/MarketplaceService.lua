@@ -5,7 +5,7 @@
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
-local PlayerDataService = require(script.Parent.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
 local RE = RS:WaitForChild("RemoteEvents")
 
