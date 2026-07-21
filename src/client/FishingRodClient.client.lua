@@ -2,44 +2,73 @@
 local player = game.Players.LocalPlayer
 local RS = game:GetService("ReplicatedStorage")
 local FishingCast = RS:WaitForChild("ToolRemotes"):WaitForChild("FishingCast")
+local boundTools = setmetatable({}, { __mode = "k" })
 
 local function bindFishingRod(tool)
-    if tool.Name ~= "FishingRod" then return end
+	if tool.Name ~= "FishingRod" or boundTools[tool] then
+		return
+	end
+	boundTools[tool] = true
 
-    local cooldown = 0
-    tool.Activated:Connect(function()
-        local now = os.clock()
-        if now - cooldown < 3 then return end  -- can't recast for 3s
-        cooldown = now
-        -- Ask server to start a bite
-        local resp = FishingCast:InvokeServer("begin")
-        if not resp or not resp.ok then return end
-        -- Open the fishing minigame UI on the client
-        if _G.FishingMinigame and _G.FishingMinigame.start then
-            _G.FishingMinigame.start(resp.fish, resp.difficulty, function(success)
-                FishingCast:InvokeServer("result", { success = success })
-            end)
-        end
-    end)
+	local cooldown = 0
+	tool.Activated:Connect(function()
+		local now = os.clock()
+		if now - cooldown < 3 then
+			return
+		end -- can't recast for 3s
+		cooldown = now
+		-- Ask server to start a bite
+		local ok, resp = pcall(function()
+			return FishingCast:InvokeServer("begin")
+		end)
+		if not ok then
+			return
+		end
+		if not resp or not resp.ok then
+			return
+		end
+		if _G.FishingMinigame and _G.FishingMinigame.start then
+			_G.FishingMinigame.start(resp.sessionId, resp.presentation, function(reeling)
+				task.spawn(function()
+					pcall(function()
+						FishingCast:InvokeServer("input", {
+							sessionId = resp.sessionId,
+							reeling = reeling,
+						})
+					end)
+				end)
+			end)
+		else
+			FishingCast:InvokeServer("cancel", { sessionId = resp.sessionId })
+		end
+	end)
 end
 
 -- Bind existing
 if player.Character then
-    for _, child in ipairs(player.Character:GetChildren()) do
-        if child:IsA("Tool") then bindFishingRod(child) end
-    end
+	for _, child in ipairs(player.Character:GetChildren()) do
+		if child:IsA("Tool") then
+			bindFishingRod(child)
+		end
+	end
 end
 local backpack = player:WaitForChild("Backpack")
 for _, child in ipairs(backpack:GetChildren()) do
-    if child:IsA("Tool") then bindFishingRod(child) end
+	if child:IsA("Tool") then
+		bindFishingRod(child)
+	end
 end
 
 -- Bind future
 player.CharacterAdded:Connect(function(char)
-    char.ChildAdded:Connect(function(child)
-        if child:IsA("Tool") then bindFishingRod(child) end
-    end)
+	char.ChildAdded:Connect(function(child)
+		if child:IsA("Tool") then
+			bindFishingRod(child)
+		end
+	end)
 end)
 backpack.ChildAdded:Connect(function(child)
-    if child:IsA("Tool") then bindFishingRod(child) end
+	if child:IsA("Tool") then
+		bindFishingRod(child)
+	end
 end)

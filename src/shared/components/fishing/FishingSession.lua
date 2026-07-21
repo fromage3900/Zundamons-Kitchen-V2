@@ -18,11 +18,13 @@ local FishingSession = Matter.component("FishingSession")
 			hookWindow = number,
 		},
 		startTime = number,
-		lastTugTime = number,
+		lastStepTime = number,
+		nextTugAt = number,
+		lastStateSentAt = number,
 		tension = number,
 		progress = number,
 		reeling = boolean,
-		finished = boolean,
+		settled = boolean,
 	}
 ]]
 

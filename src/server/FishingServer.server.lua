@@ -1,12 +1,26 @@
 --!strict
--- FishingServer is the sole owner of the FishingCast RemoteFunction.
--- Phase 2 fails closed while the authoritative RemoteFunction-to-ECS command adapter is rebuilt.
+-- Sole network adapter for fishing. It validates the action shape and delegates
+-- to the authoritative service; no ECS system owns remotes directly.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local FishingCast = ReplicatedStorage:WaitForChild("ToolRemotes"):WaitForChild("FishingCast")
+local FishingService = require(ServerScriptService.Services.FishingService)
 
-FishingCast.OnServerInvoke = function(_player, _action, _payload)
-	return { ok = false, reason = "fishing migration unavailable" }
+FishingCast.OnServerInvoke = function(player, action, payload)
+	if type(action) ~= "string" then
+		return { ok = false, reason = "invalid_action" }
+	end
+	if action == "begin" then
+		return FishingService.begin(player)
+	end
+	if action == "input" then
+		return FishingService.input(player, payload)
+	end
+	if action == "cancel" then
+		return FishingService.cancel(player, payload)
+	end
+	return { ok = false, reason = "unsupported_action" }
 end
 
-print("[FishingServer] Adapter online; fishing is disabled until the authoritative ECS handoff is restored")
+print("[FishingServer] Authoritative fishing adapter online")

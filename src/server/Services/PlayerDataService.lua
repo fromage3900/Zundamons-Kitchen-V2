@@ -30,6 +30,7 @@ local NON_INVENTORY_NUMBER_KEYS = {
 	tier = true,
 	recipes_unlocked_count = true,
 	speed_cooks = true,
+	total_fish_caught = true,
 	data_revision = true,
 }
 
@@ -96,6 +97,8 @@ local function buildProjection(data: { [string]: any }): { [string]: any }
 		recipesUnlocked = cloneDictionary(data.recipes_unlocked) or {},
 		recipesCookedCount = cloneDictionary(data.recipes_cooked_count) or {},
 		recipesServedCount = cloneDictionary(data.recipes_served_count) or {},
+		totalFishCaught = data.total_fish_caught or 0,
+		fishCaughtCount = cloneDictionary(data.fish_caught_count) or {},
 	}
 end
 
@@ -250,6 +253,8 @@ createDefaultData = function(): { [string]: any }
 		recipes_cooked_count = {},
 		recipes_served_count = {},
 		speed_cooks = 0,
+		total_fish_caught = 0,
+		fish_caught_count = {},
 		gathered_items = {},
 		companions_set = {},
 		npc_chats = {},
@@ -289,6 +294,8 @@ local function backfillLoadedData(loaded: { [string]: any })
 	loaded.data_revision = loaded.data_revision or 0
 	loaded.recipes_cooked_count = loaded.recipes_cooked_count or {}
 	loaded.recipes_served_count = loaded.recipes_served_count or {}
+	loaded.total_fish_caught = loaded.total_fish_caught or 0
+	loaded.fish_caught_count = loaded.fish_caught_count or {}
 	if loaded.owned_clothing == nil then
 		loaded.owned_clothing = {}
 	end
