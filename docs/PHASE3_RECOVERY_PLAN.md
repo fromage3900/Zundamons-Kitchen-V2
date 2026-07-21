@@ -27,6 +27,7 @@ Restore one server-authoritative implementation for fishing and the Harvest -> C
 - 3.4 serving is implemented with guest ownership/proximity/state validation, server-selected dish quality, one atomic dish/counter/reward settlement, and replay locking. Static gates pass; the integrated Studio Cook -> Serve -> replay acceptance remains pending because both local Studio MCP and Rojo listeners disconnected before the runtime test.
 - 3.5 physical loot pickup is consolidated behind expiring owner/item/position-bound server claims. Pickup now has a zero-hold prompt plus touch fallback; successful claims atomically grant inventory and XP once. Static gates pass; live pickup/replay/distance acceptance is pending the same Studio reconnect.
 - Resource behavior is now mesh-independent through `ResourceNodeRegistry` and `ResourceNodeBootstrap`. Collaborators can tag a placed tree, rock, flower, or crop with `ResourceNode` plus `ResourceArchetype`; optional registry-driven visual swapping never replaces authored geometry unless `UseRegistryMesh` is explicitly enabled.
+- The optional Zundarooms demo encounter is integrated as a first-serve unlock and escape quest. It uses tagged clip entrances, isolated runtime geometry, a server-controlled pursuer, transactional escape rewards, and persistence-safe discovery counters; live verification awaits MCP connection.
 
 ## Architecture contract
 

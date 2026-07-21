@@ -39,6 +39,7 @@ end
 
 local QuestConfig = require(RS.ConfigurationFiles.QuestConfig)
 local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
+local RewardCore = require(game:GetService("ServerScriptService").Services.RewardCore)
 
 local QUESTS = QuestConfig.quests
 for _, q in ipairs(QuestConfig.default_quests) do
@@ -167,6 +168,8 @@ local function questCheck(d, q, player)
 		for _ in pairs(npcs) do
 			cur = cur + 1
 		end
+	elseif q.type == "zundarooms_escape" then
+		cur = d.zundarooms_escapes or 0
 	end
 	return cur, t
 end
@@ -240,7 +243,7 @@ local function eval(player)
 			end
 			if not d.quests_completed[q.id] then
 				d.quests_completed[q.id] = true
-				d.gold = (d.gold or 0) + (q.rewards.gold or 0)
+				RewardCore.addGold(player, q.rewards.gold or 0, "quest")
 				print(
 					"[QuestManager] Quest complete: "
 						.. q.id
@@ -283,7 +286,7 @@ local function eval(player)
 						if not d.chains_completed[q.chain_id] then
 							d.chains_completed[q.chain_id] = true
 							local celebrationBonus = math.floor(chainBonus * 0.3)
-							d.gold = (d.gold or 0) + celebrationBonus
+							RewardCore.addGold(player, celebrationBonus, "quest_chain")
 							print(
 								"[QuestManager] Chain complete: "
 									.. q.chain_id

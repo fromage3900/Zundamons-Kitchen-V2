@@ -15,6 +15,7 @@ This document separates implemented source, static/build evidence, live Studio e
 | Serving | `7f62ba8`; owner/state/proximity validation, server-selected dish quality, locked atomic dish/reward settlement | Not run after implementation because Studio MCP and Rojo disconnected | Runtime pending |
 | Harvest pickup | `74af38e`; expiring player/item/position token, distance and replay validation, prompt plus touch, atomic inventory/XP | User confirmed node breaking and visual drops before pickup repair; repaired pickup contract not yet run | Runtime pending |
 | Resource authoring | `3d2248c`; mesh-independent archetypes, opt-in visual swaps, authored-geometry preservation | Static/serialization only | Runtime pending |
+| Zundarooms | Quest-gated clip entrance, isolated runtime chase, server escape settlement, persistence projection, and safe cleanup | Focused static/Selene/Rojo pass; MCP remains stuck connecting | Runtime pending |
 
 ## Independent tool gates
 
@@ -38,6 +39,7 @@ Run these in one quota-efficient Studio session after MCP `58741` and Rojo `3487
 3. Verify `ResourceNodeBootstrap` recognizes an existing node without changing its mesh. Duplicate it, change `ResourceArchetype`, and confirm the appropriate tool/click behavior. Enable `UseRegistryMesh` only on a disposable test node and verify the selected variant.
 4. Leave during an active cooking reservation, rejoin, and confirm ingredients restore once. Rejoin after successful cooking/fishing/serving and confirm inventory, dish-quality counts, currency, XP, unlocks, and companion data persist.
 5. Complete Harvest -> Cook -> Serve -> Reward once from a fresh launch and inspect console output for duplicate listeners, duplicate rewards, missing paths, or infinite waits.
+6. Serve one guest, cross a tagged `ZundaroomsEntrance`, escape once, and confirm quest/discovery/reward persistence. Verify catch, death, timeout, and re-entry cleanup award no escape.
 
 ## External state blocker
 

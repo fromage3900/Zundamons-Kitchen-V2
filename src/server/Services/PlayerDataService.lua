@@ -31,6 +31,7 @@ local NON_INVENTORY_NUMBER_KEYS = {
 	recipes_unlocked_count = true,
 	speed_cooks = true,
 	total_fish_caught = true,
+	zundarooms_escapes = true,
 	data_revision = true,
 }
 
@@ -100,6 +101,8 @@ local function buildProjection(data: { [string]: any }): { [string]: any }
 		cookedDishes = deepClone(data.cooked_dishes) or {},
 		totalFishCaught = data.total_fish_caught or 0,
 		fishCaughtCount = cloneDictionary(data.fish_caught_count) or {},
+		locationsUnlocked = cloneDictionary(data.locations_unlocked) or {},
+		zundaroomsEscapes = data.zundarooms_escapes or 0,
 	}
 end
 
@@ -258,6 +261,7 @@ createDefaultData = function(): { [string]: any }
 		fish_caught_count = {},
 		cooked_dishes = {},
 		cooking_reservation = nil,
+		zundarooms_escapes = 0,
 		gathered_items = {},
 		companions_set = {},
 		npc_chats = {},
@@ -300,6 +304,7 @@ local function backfillLoadedData(loaded: { [string]: any })
 	loaded.total_fish_caught = loaded.total_fish_caught or 0
 	loaded.fish_caught_count = loaded.fish_caught_count or {}
 	loaded.cooked_dishes = loaded.cooked_dishes or {}
+	loaded.zundarooms_escapes = loaded.zundarooms_escapes or 0
 	-- A persisted reservation means the prior server ended before settlement.
 	-- Restore its ingredients once during load, then clear the journal.
 	if type(loaded.cooking_reservation) == "table" then

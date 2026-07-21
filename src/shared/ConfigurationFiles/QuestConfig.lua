@@ -127,6 +127,30 @@ local QuestConfig = {
 			},
 			difficulty = 5
 		},
+		{
+			id = "quest_zundarooms_signal",
+			name = "A Wall That Breathes",
+			description = "Serve one guest and investigate the unstable wall near the village entrance",
+			icon = "?",
+			type = "serve",
+			target = 1,
+			rewards = { gold = 25, tier_points = 5, items = {} },
+			difficulty = 1,
+			subtext = "After your first happy guest leaves, a wall near the village entrance begins humming out of rhythm.",
+			unlock_hint = "The Zundarooms can now be entered through an unstable wall.",
+		},
+		{
+			id = "quest_zundarooms_escape",
+			name = "The Rooms Without a Recipe",
+			description = "Enter the Zundarooms and escape the unidentified entity",
+			icon = "?",
+			type = "zundarooms_escape",
+			target = 1,
+			rewards = { gold = 150, tier_points = 30, items = {} },
+			difficulty = 3,
+			subtext = "No map records this place. Follow the pale doorway and do not turn around.",
+			unlock_hint = "A memory from the Zundarooms has appeared in your collection.",
+		},
 
 		-- ─────────────────────────────────────────────────────
 		-- NEW QUEST BATCH — gathering, cooking, serving, exploration, mastery
