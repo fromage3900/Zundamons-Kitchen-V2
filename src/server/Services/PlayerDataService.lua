@@ -4,14 +4,20 @@
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local CONFIG = require(ReplicatedStorage.ConfigurationFiles.ProgressionConfig)
+local ProfileService = require(ServerScriptService.ServerPackages.ProfileService)
 local playerStateChanged = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("PlayerStateChanged")
 
-local progressionStore = DataStoreService:GetDataStore("KitchenProgression")
+local legacyProgressionStore = DataStoreService:GetDataStore("KitchenProgression")
 
 local store: { [string]: { [string]: any } } = {}
 local mutationLocks: { [string]: boolean } = {}
+local profiles: { [Player]: any } = {}
+local intentionalReleases: { [Player]: boolean } = {}
+local loadingProfiles: { [Player]: boolean } = {}
 
 local PlayerDataService = {}
 
@@ -33,6 +39,7 @@ local NON_INVENTORY_NUMBER_KEYS = {
 	total_fish_caught = true,
 	zundarooms_escapes = true,
 	data_revision = true,
+	profile_schema_version = true,
 }
 
 local function cloneDictionary(value: any): any
@@ -119,10 +126,13 @@ end
 
 function PlayerDataService.getOrCreate(player: Player): { [string]: any }
 	local key = tostring(player.UserId)
-	if not store[key] then
-		store[key] = createDefaultData()
+	if not store[key] and player:IsDescendantOf(Players) and not intentionalReleases[player] then
+		PlayerDataService.loadPlayer(player)
 	end
-	return store[key]
+	if store[key] then
+		return store[key]
+	end
+	error("Player data is unavailable for " .. player.Name)
 end
 
 function PlayerDataService.set(player: Player, data: { [string]: any })
@@ -273,6 +283,8 @@ createDefaultData = function(): { [string]: any }
 		Rock = 5,
 		["Iron Ore"] = 3,
 		data_revision = 0,
+		profile_schema_version = 2,
+		legacy_import_attempted = false,
 	}
 
 	for _, recipe in ipairs(CONFIG.milestones[1].unlocks.recipes) do
@@ -290,6 +302,9 @@ createDefaultData = function(): { [string]: any }
 
 	return data
 end
+
+local liveProfileStore = ProfileService.GetProfileStore("KitchenProgression_ProfileV2", createDefaultData())
+local profileStore = if RunService:IsStudio() then liveProfileStore.Mock else liveProfileStore
 
 local function backfillLoadedData(loaded: { [string]: any })
 	if loaded.gold == nil then
@@ -333,40 +348,75 @@ local function backfillLoadedData(loaded: { [string]: any })
 end
 
 function PlayerDataService.loadPlayer(player: Player)
-	local userId = player.UserId
-	local success, playerData = pcall(function()
-		return progressionStore:GetAsync("player_" .. userId)
-	end)
-
-	if success and playerData then
-		local loaded = playerData
-		backfillLoadedData(loaded)
-		store[tostring(player.UserId)] = loaded
-		print("[PlayerDataService] Loaded progression for " .. player.Name)
-	else
-		store[tostring(player.UserId)] = createDefaultData()
-		print("[PlayerDataService] Created new progression for " .. player.Name)
+	if profiles[player] then
+		return
 	end
+	if loadingProfiles[player] then
+		repeat
+			task.wait()
+		until not loadingProfiles[player] or profiles[player] or not player:IsDescendantOf(Players)
+		return
+	end
+	loadingProfiles[player] = true
+	local key = "player_" .. player.UserId
+	local profile = profileStore:LoadProfileAsync(key, "ForceLoad")
+	if not profile then
+		loadingProfiles[player] = nil
+		player:Kick("Your kitchen data could not be loaded safely. Please rejoin.")
+		return
+	end
+	profile:AddUserId(player.UserId)
+	profile:Reconcile()
+
+	-- Import the prior raw DataStore record once in live servers. Studio always
+	-- uses ProfileService.Mock and never touches production data.
+	if not RunService:IsStudio() and profile.Data.legacy_import_attempted ~= true then
+		local success, legacyData = pcall(function()
+			return legacyProgressionStore:GetAsync(key)
+		end)
+		if success then
+			if type(legacyData) == "table" then
+				for field, value in pairs(legacyData) do
+					profile.Data[field] = value
+				end
+			end
+			profile.Data.legacy_import_attempted = true
+		end
+	end
+
+	backfillLoadedData(profile.Data)
+	profile.Data.profile_schema_version = 2
+	profiles[player] = profile
+	store[tostring(player.UserId)] = profile.Data
+	profile:ListenToRelease(function()
+		profiles[player] = nil
+		store[tostring(player.UserId)] = nil
+		mutationLocks[tostring(player.UserId)] = nil
+		loadingProfiles[player] = nil
+		if not intentionalReleases[player] and player:IsDescendantOf(Players) then
+			player:Kick("Your kitchen data was opened on another server. Please rejoin.")
+		end
+		intentionalReleases[player] = nil
+	end)
+	if not player:IsDescendantOf(Players) then
+		loadingProfiles[player] = nil
+		intentionalReleases[player] = true
+		profile:Release()
+		return
+	end
+	emitProjection(player, profile.Data)
+	loadingProfiles[player] = nil
+	print("[PlayerDataService] Profile loaded for " .. player.Name)
 end
 
 function PlayerDataService.savePlayer(player: Player)
-	local data = store[tostring(player.UserId)]
-	if not data then
+	local profile = profiles[player]
+	if not profile then
 		return
 	end
-
-	local ok, err = pcall(function()
-		progressionStore:SetAsync("player_" .. player.UserId, data)
-	end)
-
-	if ok then
-		print("[PlayerDataService] Saved progression for " .. player.Name)
-	else
-		print("[PlayerDataService] Failed to save " .. player.Name .. ": " .. tostring(err))
-	end
-
-	store[tostring(player.UserId)] = nil
-	mutationLocks[tostring(player.UserId)] = nil
+	intentionalReleases[player] = true
+	profile:Release()
+	print("[PlayerDataService] Profile released for " .. player.Name)
 end
 
 function PlayerDataService.checkAndUnlockTiers(player: Player)
@@ -423,31 +473,14 @@ if not markTut then
 	markTut.Parent = RF
 end
 markTut.OnServerInvoke = function(player)
-	local d = PlayerDataService.getOrCreate(player)
-	d.tutorial_done = true
-	return true
+	return PlayerDataService.mutate(player, "tutorial_complete", function(data)
+		data.tutorial_done = true
+		return true
+	end)
 end
 
--- Periodic auto-save every 60s to prevent data loss on server crash
-task.spawn(function()
-	while true do
-		task.wait(60)
-		for _, player in ipairs(Players:GetPlayers()) do
-			local data = store[tostring(player.UserId)]
-			if data then
-				local ok, err = pcall(function()
-					progressionStore:SetAsync("player_" .. player.UserId, data)
-				end)
-				if not ok then
-					print("[PlayerDataService] Auto-save failed for " .. player.Name .. ": " .. tostring(err))
-				end
-			end
-		end
-	end
-end)
-
 Players.PlayerAdded:Connect(function(player)
-	PlayerDataService.loadPlayer(player)
+	task.spawn(PlayerDataService.loadPlayer, player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
@@ -456,8 +489,14 @@ end)
 
 for _, player in ipairs(Players:GetPlayers()) do
 	if not store[tostring(player.UserId)] then
-		PlayerDataService.loadPlayer(player)
+		task.spawn(PlayerDataService.loadPlayer, player)
 	end
 end
+
+game:BindToClose(function()
+	for _, player in ipairs(Players:GetPlayers()) do
+		PlayerDataService.savePlayer(player)
+	end
+end)
 
 return PlayerDataService

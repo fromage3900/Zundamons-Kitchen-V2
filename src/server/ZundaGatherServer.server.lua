@@ -20,10 +20,13 @@ local GatherConfig = require(RS.ConfigurationFiles.GatherConfig)
 -- HarvestValidator for server-side validation (distance, rate limit, cooldown)
 local validateHarvest
 local ok, hvMod = pcall(require, SSS.Validation.HarvestValidator)
-if ok and hvMod then validateHarvest = hvMod.validateHarvest end
+if ok and hvMod then
+	validateHarvest = hvMod.validateHarvest
+end
 
 local RE_notify = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("NotifyPlayer")
 local RE_SideDlg = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("TriggerSideDialogue")
+local PlayerDataService = require(SSS.Services.PlayerDataService)
 
 -- Respawn timing (seconds)
 local RESPAWN_FLOWER = 25
@@ -34,9 +37,6 @@ local RESPAWN_BERRY = 20
 local RESPAWN_ROOT = 22
 local RESPAWN_MYSTERY = 90
 
--- Grant items to player using LootModule
-local PlayerDataService = require(SSS.Services.PlayerDataService)
-
 local function grantItems(player, items)
 	local char = player.Character
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -46,13 +46,6 @@ local function grantItems(player, items)
 	-- generateLoot signature: (player, lootTable, position)
 	pcall(function()
 		lootMod.generateLoot(player, items, hrp.Position)
-	end)
-	-- Track unique gathered items for quest system
-	PlayerDataService.update(player, function(d)
-		if not d.gathered_items then d.gathered_items = {} end
-		for _, item in ipairs(items) do
-			d.gathered_items[item] = true
-		end
 	end)
 end
 
@@ -66,10 +59,14 @@ end
 -- Update node mesh based on growth stage
 local function updateNodeMesh(node, stageIndex)
 	local rtype = node:GetAttribute("ResourceType")
-	if rtype ~= "CarrotPlot" then return end -- Only for CarrotPlot nodes
+	if rtype ~= "CarrotPlot" then
+		return
+	end -- Only for CarrotPlot nodes
 
 	local stages = GrowthStageConfig.getStages("CarrotPlot")
-	if not stages or not stages[stageIndex] then return end
+	if not stages or not stages[stageIndex] then
+		return
+	end
 
 	local stage = stages[stageIndex]
 	local meshId = GrowthStageConfig.getMeshId(stage)
@@ -84,7 +81,9 @@ end
 
 -- Hide the node visually + re-enable after respawn
 local function consumeNode(node, respawnSec)
-	if node:GetAttribute("Available") == false then return end
+	if node:GetAttribute("Available") == false then
+		return
+	end
 	node:SetAttribute("Available", false)
 	local cd = node:FindFirstChildOfClass("ClickDetector")
 	if cd then
@@ -122,14 +121,17 @@ local function bindNode(node)
 		local currentStage = node:GetAttribute("GrowthStage") or 1
 		updateNodeMesh(node, currentStage)
 	end
-
 end
 
 local RE_Harvest = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("HarvestNode")
 if RE_Harvest then
 	RE_Harvest.OnServerEvent:Connect(function(player, node)
-		if typeof(node) ~= "Instance" or not node:IsA("BasePart") then return end
-		if not node:GetAttribute("ResourceType") then return end
+		if typeof(node) ~= "Instance" or not node:IsA("BasePart") then
+			return
+		end
+		if not node:GetAttribute("ResourceType") then
+			return
+		end
 
 		-- Validate harvest (distance, rate limit, cooldown)
 		if validateHarvest then
@@ -157,7 +159,9 @@ if RE_Harvest then
 			grantItems(player, items)
 			notify(player, "🌼 +" .. yield .. " Zunda Flower")
 			if not had_before["Zunda Flower"] and RE_SideDlg then
-				pcall(function() RE_SideDlg:FireClient(player, "zunda_flower") end)
+				pcall(function()
+					RE_SideDlg:FireClient(player, "zunda_flower")
+				end)
 			end
 			consumeNode(node, RESPAWN_FLOWER)
 		elseif rtype == "ZundaPea" then

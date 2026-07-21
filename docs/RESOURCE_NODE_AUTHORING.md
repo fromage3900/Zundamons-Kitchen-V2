@@ -8,7 +8,7 @@ Resource gameplay is mesh-independent. A tree, rock, flower, crop, or future Ken
 2. Add the CollectionService tag `ResourceNode`.
 3. Add a string attribute `ResourceArchetype` using one supported value below.
 4. For a click-gather `Model`, set its `PrimaryPart`; the bootstrap attaches interaction to that part.
-5. Keep `UseRegistryMesh` false or absent to preserve the placed visual. Set it true only when the registry should assign the uploaded mesh from `MeshAssets.lua`.
+5. Keep `UseRegistryMesh` false or absent to preserve the placed visual. For a plain `Part` placeholder, set it true to attach a `SpecialMesh` using `MeshAssets.lua`.
 6. Optionally set `VisualVariant` to a key from `MeshAssets.lua`. Changing this key swaps visuals without changing loot, tools, health, or respawn behavior.
 
 Tool archetypes:
@@ -24,7 +24,7 @@ Click archetypes:
 
 ## Kenney and custom mesh swapping
 
-Uploaded Kenney assets belong in `MeshAssets.lua` under a stable visual key such as `Tree`, `Rock`, or `ZundaFlower`. Do not put asset IDs into harvest scripts. Add or change a variant in the registry, then set `VisualVariant` on placed nodes. Source FBX/Blender archives remain local or in an approved large-file asset store; Roblox-ready asset IDs and attribution belong in Git.
+Uploaded Kenney assets belong in `MeshAssets.lua` under a stable visual key such as `Tree`, `Rock`, or `ZundaFlower`. Do not put asset IDs into harvest scripts. A plain `Part` can opt into runtime `SpecialMesh` assignment with `UseRegistryMesh`; imported `MeshPart.MeshId` is runtime read-only and must be selected in Studio. In that case the bootstrap reports `RegistryMeshStatus = "meshpart_requires_studio_authoring"` and preserves the authored mesh. Source FBX/Blender archives remain local or in an approved large-file asset store; Roblox-ready asset IDs and attribution belong in Git.
 
 ## Overrides
 

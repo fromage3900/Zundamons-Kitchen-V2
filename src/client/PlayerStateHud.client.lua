@@ -5,6 +5,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
+local playerScripts = player:WaitForChild("PlayerScripts")
+if playerScripts:GetAttribute("PlayerStateHudStarted") then
+	return
+end
+playerScripts:SetAttribute("PlayerStateHudStarted", true)
+
 local playerGui = player:WaitForChild("PlayerGui")
 local stateChanged = ReplicatedStorage.RemoteEvents:WaitForChild("PlayerStateChanged") :: RemoteEvent
 local requestState = ReplicatedStorage.RemoteFunctions:WaitForChild("RequestPlayerState") :: RemoteFunction
@@ -61,4 +67,3 @@ end)
 if ok then
 	render(initial)
 end
-

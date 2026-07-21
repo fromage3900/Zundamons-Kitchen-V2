@@ -121,6 +121,69 @@ AdminService.registerCommand("status", function(player)
 	return table.concat(lines, "\n")
 end, "Show your player status")
 
+if RunService:IsStudio() then
+	AdminService.registerCommand("persistenceprobe", function(player, args)
+		local token = args[1] or tostring(os.clock())
+		local before = PlayerDataService.getOrCreate(player)
+		local appleBefore = before.Apple or 0
+		local goldBefore = before.gold or 0
+		local prepared = PlayerDataService.mutate(player, "studio_persistence_probe", function(data)
+			if (data.Apple or 0) < 2 then
+				data.Apple = 2
+			end
+			data.Apple -= 2
+			data.gold = (data.gold or 0) + 11
+			data.persistence_probe_token = token
+			data.locations_unlocked = data.locations_unlocked or {}
+			if not table.find(data.locations_unlocked, "PersistenceProbe") then
+				table.insert(data.locations_unlocked, "PersistenceProbe")
+			end
+			data.companions_set = data.companions_set or {}
+			data.companions_set.PersistenceProbe = true
+			data.cooked_dishes = data.cooked_dishes or {}
+			data.cooked_dishes.PersistenceProbe = { perfect = 1 }
+			data.cooking_reservation = {
+				sessionId = "persistence_probe",
+				recipe = "PersistenceProbe",
+				ingredients = { Apple = 2 },
+			}
+			return true
+		end)
+		if not prepared then
+			return "Persistence probe could not prepare data"
+		end
+		PlayerDataService.savePlayer(player)
+		PlayerDataService.loadPlayer(player)
+		local loaded = PlayerDataService.get(player)
+		local passed = loaded ~= nil
+			and loaded.persistence_probe_token == token
+			and loaded.gold == goldBefore + 11
+			and loaded.Apple == math.max(appleBefore, 2)
+			and loaded.cooking_reservation == nil
+			and table.find(loaded.locations_unlocked or {}, "PersistenceProbe") ~= nil
+			and type(loaded.companions_set) == "table"
+			and loaded.companions_set.PersistenceProbe == true
+			and type(loaded.cooked_dishes) == "table"
+			and type(loaded.cooked_dishes.PersistenceProbe) == "table"
+			and loaded.cooked_dishes.PersistenceProbe.perfect == 1
+		if loaded then
+			PlayerDataService.mutate(player, "studio_persistence_probe_cleanup", function(data)
+				data.persistence_probe_token = nil
+				data.gold = goldBefore
+				data.Apple = appleBefore > 0 and appleBefore or nil
+				local locationIndex = table.find(data.locations_unlocked or {}, "PersistenceProbe")
+				if locationIndex then
+					table.remove(data.locations_unlocked, locationIndex)
+				end
+				data.companions_set.PersistenceProbe = nil
+				data.cooked_dishes.PersistenceProbe = nil
+				return true
+			end)
+		end
+		return passed and "PASS: profile release/reload and reservation recovery" or "FAIL: persistence mismatch"
+	end, "Studio-only ProfileService release/reload verification")
+end
+
 AdminService.registerCommand("listplayers", function()
 	local lines = { "=== Players ===" }
 	for _, p in ipairs(Players:GetPlayers()) do

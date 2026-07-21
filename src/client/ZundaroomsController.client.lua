@@ -2,12 +2,16 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local player = Players.LocalPlayer
+local playerScripts = player:WaitForChild("PlayerScripts")
+if playerScripts:GetAttribute("ZundaroomsControllerStarted") then
+	return
+end
+playerScripts:SetAttribute("ZundaroomsControllerStarted", true)
+
 local UIConfig = require(ReplicatedStorage.ConfigurationFiles.UIConfig)
-local gui = require(ReplicatedStorage.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(
-	Players.LocalPlayer,
-	"ZundaroomsStatusGui",
-	110
-)
+local gui =
+	require(ReplicatedStorage.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "ZundaroomsStatusGui", 110)
 local banner = Instance.new("TextLabel")
 banner.Size = UDim2.new(0, 520, 0, 64)
 banner.Position = UDim2.new(0.5, -260, 0.12, 0)

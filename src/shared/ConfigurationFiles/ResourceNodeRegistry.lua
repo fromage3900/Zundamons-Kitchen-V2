@@ -162,10 +162,19 @@ function Registry.applyVisual(instance: Instance, archetypeId: string, variantId
 		return false, "mesh_missing"
 	end
 	local meshPart = if instance:IsA("MeshPart") then instance else instance:FindFirstChildWhichIsA("MeshPart", true)
-	if not meshPart then
-		return false, "mesh_part_missing"
+	if meshPart then
+		-- MeshPart.MeshId is NotAccessible to runtime game scripts. Designers set
+		-- imported MeshPart visuals in Studio; the runtime must preserve them.
+		return false, "meshpart_requires_studio_authoring"
 	end
-	meshPart.MeshId = meshId
+	local part = if instance:IsA("Part") then instance else instance:FindFirstChildWhichIsA("Part", true)
+	if not part then
+		return false, "visual_part_missing"
+	end
+	local specialMesh = part:FindFirstChildOfClass("SpecialMesh") or Instance.new("SpecialMesh")
+	specialMesh.MeshType = Enum.MeshType.FileMesh
+	specialMesh.MeshId = meshId
+	specialMesh.Parent = part
 	if variantId then
 		instance:SetAttribute("VisualVariant", variantId)
 	end

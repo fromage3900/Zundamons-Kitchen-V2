@@ -27,6 +27,7 @@ local ZundaroomsService = {}
 local sessions: { [number]: Session } = {}
 local entryDebounce: { [number]: number } = {}
 local boundEntries: { [Instance]: boolean } = setmetatable({}, { __mode = "k" })
+local started = false
 local runtime = workspace:FindFirstChild("ZundaroomsRuntime") or Instance.new("Folder")
 runtime.Name = "ZundaroomsRuntime"
 runtime.Parent = workspace
@@ -238,7 +239,11 @@ local function bindEntrance(entrance: Instance)
 	end)
 end
 
-function ZundaroomsService.start()
+function ZundaroomsService.start(): boolean
+	if started then
+		return false
+	end
+	started = true
 	for _, entrance in ipairs(CollectionService:GetTagged("ZundaroomsEntrance")) do
 		bindEntrance(entrance)
 	end
@@ -258,6 +263,7 @@ function ZundaroomsService.start()
 			CollectionService:AddTag(fallback, "ZundaroomsEntrance")
 		end
 	end
+	return true
 end
 
 RunService.Heartbeat:Connect(function()

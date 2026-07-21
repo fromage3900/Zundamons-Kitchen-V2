@@ -24,10 +24,12 @@ Restore one server-authoritative implementation for fishing and the Harvest -> C
 - 3.2 was committed as `3a304c5`. A real catch granted one fish and one revision, while duplicate/forged/replayed requests awarded nothing.
 - 3.3 is implemented and focused-verification complete in the current Phase 3 checkpoint. Ingredients are journaled in a rejoin-safe reservation, note timing and quality are server-derived, and completion atomically creates quality-owned dishes plus rewards.
 - A real perfect Apple Pie session consumed exactly 3 Apples and 5 Wheat, created two dishes through the configured bonus, updated `recipes_cooked_count` rather than served count, and advanced two revisions: reserve then settle.
-- 3.4 serving is implemented with guest ownership/proximity/state validation, server-selected dish quality, one atomic dish/counter/reward settlement, and replay locking. Static gates pass; the integrated Studio Cook -> Serve -> replay acceptance remains pending because both local Studio MCP and Rojo listeners disconnected before the runtime test.
-- 3.5 physical loot pickup is consolidated behind expiring owner/item/position-bound server claims. Pickup now has a zero-hold prompt plus touch fallback; successful claims atomically grant inventory and XP once. Static gates pass; live pickup/replay/distance acceptance is pending the same Studio reconnect.
-- Resource behavior is now mesh-independent through `ResourceNodeRegistry` and `ResourceNodeBootstrap`. Collaborators can tag a placed tree, rock, flower, or crop with `ResourceNode` plus `ResourceArchetype`; optional registry-driven visual swapping never replaces authored geometry unless `UseRegistryMesh` is explicitly enabled.
-- The optional Zundarooms demo encounter is integrated as a first-serve unlock and escape quest. It uses tagged clip entrances, isolated runtime geometry, a server-controlled pursuer, transactional escape rewards, and persistence-safe discovery counters; live verification awaits MCP connection.
+- 3.4 serving passed its live adapter gate: a real perfect Bread was selected from server-owned quality state, consumed once, rewarded once, removed its guest, rejected replay, and updated the canonical HUD projection.
+- 3.5 physical loot pickup is consolidated behind expiring owner/item/position-bound server claims. Forged, distant, and replay claims failed; valid direct and keyboard-prompt claims succeeded once. Collection quest state now advances only after claim settlement, not drop generation.
+- Resource behavior is mesh-independent through `ResourceNodeRegistry` and `ResourceNodeBootstrap`. Tag-first/attribute-later authoring, authored overrides, click/tool setup, Part `SpecialMesh` variants, and imported MeshPart preservation passed live tests.
+- The optional Zundarooms demo encounter is integrated and live-verified for unlock, entry, chase survival, escape settlement, discovery, and cleanup. Startup is idempotent even while the preserved Studio DataModel contains a duplicate legacy bootstrap.
+- A fixture-free fresh launch completed five real Sickle swings -> Wheat claims -> perfect Bread -> guest serving -> reward/HUD exactly once.
+- `PlayerDataService` now owns ProfileService session locks, schema reconciliation, Studio mock isolation, one-time legacy import, release handling, and projections. A mock release/reload retained progression structures and restored an interrupted cooking reservation exactly once.
 
 ## Architecture contract
 
@@ -130,6 +132,6 @@ Commit: `test(core-loop): prove authoritative phase 3 contracts`
 
 - One writer owns a domain at a time; Studio is a single-writer resource.
 - Static inventories, parity matrices, lint classification, and test drafting may be delegated read-only.
-- Do not combine ECS expansion, UI redesign, bulk formatting, or persistence replacement with Phase 3 domain commits.
+- Do not combine ECS expansion, UI redesign, or bulk formatting with Phase 3 domain commits. The persistence boundary itself was retained, but its raw DataStore lifecycle was hardened behind ProfileService after runtime audit proved session locking and safe rejoin were otherwise impossible.
 - Preserve `$ignoreUnknownInstances: true`; never regenerate or replace the authored world as part of a code migration.
 - Do not push, publish, or stage owner Blender/archive assets without explicit authorization.
