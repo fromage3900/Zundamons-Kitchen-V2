@@ -8,17 +8,19 @@ local SSS = game:GetService("ServerScriptService")
 local Debris = game:GetService("Debris")
 local TweenS = game:GetService("TweenService")
 
-local lootMod = require(game.ReplicatedStorage.ConfigurationFiles.LootModule)
+local lootMod = require(RS.ConfigurationFiles.LootModule)
 if not lootMod then
 	warn("[ZundaGatherServer] LootModule not found — gather disabled")
 	return {}
 end
 
-local GrowthStageConfig = require(game.ReplicatedStorage.ConfigurationFiles.GrowthStageConfig)
+local GrowthStageConfig = require(RS.ConfigurationFiles.GrowthStageConfig)
+local GatherConfig = require(RS.ConfigurationFiles.GatherConfig)
 
 -- HarvestValidator for server-side validation (distance, rate limit, cooldown)
-local HarvestValidator = SSS:FindFirstChild("Validation") and SSS.Validation:FindFirstChild("HarvestValidator")
-local validateHarvest = HarvestValidator and require(HarvestValidator).validateHarvest
+local validateHarvest
+local ok, hvMod = pcall(require, SSS.Validation.HarvestValidator)
+if ok and hvMod then validateHarvest = hvMod.validateHarvest end
 
 local RE_notify = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("NotifyPlayer")
 local RE_SideDlg = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("TriggerSideDialogue")
@@ -32,20 +34,8 @@ local RESPAWN_BERRY = 20
 local RESPAWN_ROOT = 22
 local RESPAWN_MYSTERY = 90
 
--- Mystery loot table
-local MYSTERY_LOOT = {
-	"Zunda Flower",
-	"Zunda Flower",
-	"Zunda Pea",
-	"Zunda Pea",
-	"Gold Ore",
-	"Marble Rock",
-	"Apple",
-	"Wheat",
-}
-
 -- Grant items to player using LootModule
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(SSS.Services.PlayerDataService)
 
 local function grantItems(player, items)
 	local char = player.Character
@@ -94,6 +84,7 @@ end
 
 -- Hide the node visually + re-enable after respawn
 local function consumeNode(node, respawnSec)
+	if node:GetAttribute("Available") == false then return end
 	node:SetAttribute("Available", false)
 	local cd = node:FindFirstChildOfClass("ClickDetector")
 	if cd then
@@ -132,7 +123,14 @@ local function bindNode(node)
 		updateNodeMesh(node, currentStage)
 	end
 
-	cd.MouseClick:Connect(function(player)
+end
+
+local RE_Harvest = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("HarvestNode")
+if RE_Harvest then
+	RE_Harvest.OnServerEvent:Connect(function(player, node)
+		if typeof(node) ~= "Instance" or not node:IsA("BasePart") then return end
+		if not node:GetAttribute("ResourceType") then return end
+
 		-- Validate harvest (distance, rate limit, cooldown)
 		if validateHarvest then
 			local valid, err = validateHarvest(player, node)
@@ -171,47 +169,11 @@ local function bindNode(node)
 			grantItems(player, items)
 			notify(player, "🝒 +" .. yield .. " Zunda Pea")
 			consumeNode(node, RESPAWN_PEA)
-		elseif rtype == "Zunda Mushroom" then
-			local yield = node:GetAttribute("Yield") or 3
-			local items = {}
-			for i = 1, yield do
-				table.insert(items, "Zunda Mushroom")
-			end
-			grantItems(player, items)
-			notify(player, "🝄 +" .. yield .. " Zunda Mushroom")
-			if not had_before["Zunda Mushroom"] and RE_SideDlg then
-				pcall(function() RE_SideDlg:FireClient(player, "zunda_mushroom") end)
-			end
-			consumeNode(node, RESPAWN_MUSHROOM)
-		elseif rtype == "Zunda Berry" then
-			local yield = node:GetAttribute("Yield") or 4
-			local items = {}
-			for i = 1, yield do
-				table.insert(items, "Zunda Berry")
-			end
-			grantItems(player, items)
-			notify(player, "🝓 +" .. yield .. " Zunda Berry")
-			if not had_before["Zunda Berry"] and RE_SideDlg then
-				pcall(function() RE_SideDlg:FireClient(player, "zunda_berry") end)
-			end
-			consumeNode(node, RESPAWN_BERRY)
-		elseif rtype == "Zunda Root" then
-			local yield = node:GetAttribute("Yield") or 3
-			local items = {}
-			for i = 1, yield do
-				table.insert(items, "Zunda Root")
-			end
-			grantItems(player, items)
-			notify(player, "🥜 +" .. yield .. " Zunda Root")
-			if not had_before["Zunda Root"] and RE_SideDlg then
-				pcall(function() RE_SideDlg:FireClient(player, "zunda_root") end)
-			end
-			consumeNode(node, RESPAWN_ROOT)
 		elseif rtype == "MysteryLoot" then
 			local items = {}
 			local n = math.random(2, 3)
 			for i = 1, n do
-				table.insert(items, MYSTERY_LOOT[math.random(1, #MYSTERY_LOOT)])
+				table.insert(items, GatherConfig.mysteryLoot[math.random(1, #GatherConfig.mysteryLoot)])
 			end
 			grantItems(player, items)
 			notify(player, "✨ Mystery loot found!")

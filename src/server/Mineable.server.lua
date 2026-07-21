@@ -10,8 +10,16 @@ local mineableConfig = require(RS:WaitForChild("ConfigurationFiles"):WaitForChil
 local mineableList = mineableConfig.Mineables
 
 -- HarvestValidator for distance + rate check
-local HarvestValidator = SSS:FindFirstChild("Validation") and SSS.Validation:FindFirstChild("HarvestValidator")
-local validateHarvest = HarvestValidator and require(HarvestValidator).validateHarvest
+local validateHarvest
+local ok, hvMod = pcall(require, SSS.Validation.HarvestValidator)
+if ok and hvMod then validateHarvest = hvMod.validateHarvest end
+
+local function getItemPos(item: Instance): Vector3
+	if not item then return Vector3.zero end
+	return if item:IsA("BasePart")
+		then item.Position
+		else (if item:IsA("Model") then (item.PrimaryPart and item.PrimaryPart.Position or item:GetPivot().Position) else Vector3.zero)
+end
 
 function hasWildcardTag(instance, prefix)
 	local tags = CollectionService:GetTags(instance)
@@ -25,14 +33,22 @@ end
 
 function itemAttributes(item)
 	local tags = CollectionService:GetTags(item)
+	local found = false
 	for _, tag in ipairs(tags) do
 		if mineableList[tag] then
 			item:SetAttribute("Health", mineableList[tag].Health)
 			item:SetAttribute("MaxHealth", mineableList[tag].MaxHealth)
 			item:SetAttribute("Respawn", mineableList[tag].Respawn)
 			item:SetAttribute("Type", tag)
+			found = true
 			break
 		end
+	end
+	if not found then
+		if item:GetAttribute("Health") == nil then item:SetAttribute("Health", 30) end
+		if item:GetAttribute("MaxHealth") == nil then item:SetAttribute("MaxHealth", 30) end
+		if item:GetAttribute("Respawn") == nil then item:SetAttribute("Respawn", 10) end
+		if item:GetAttribute("Type") == nil then item:SetAttribute("Type", "Rock") end
 	end
 end
 
@@ -40,15 +56,17 @@ function itemEvent(item)
 	item:GetAttributeChangedSignal("Health"):Connect(function()
 		local health = item:GetAttribute("Health")
 		local mined = item:GetAttribute("Mined")
-		if health <= 0 and not mined then
+		if typeof(health) == "number" and health <= 0 and not mined then
 			item:SetAttribute("Mined", true)
 
+			local itemPos = getItemPos(item)
+
 			for _, player in pairs(Players:GetPlayers()) do
-				local tag = hasWildcardTag(item, player.Name .. "|")
+				local tag = hasWildcardTag(item, tostring(player.UserId) .. "|")
 				if tag then
-					-- Validate harvest before giving loot
+					-- Validate harvest before giving loot (use node_break context to allow co-op)
 					if validateHarvest then
-						local valid, err = validateHarvest(player, item)
+						local valid, err = validateHarvest(player, item, "node_break")
 						if not valid then
 							continue
 						end
@@ -62,22 +80,38 @@ function itemEvent(item)
 						if not rootpart then
 							continue
 						end
-						local dist = (rootpart.Position - item.Position).Magnitude
+						local dist = (rootpart.Position - itemPos).Magnitude
 						if dist > 16 then
 							continue
 						end
 					end
 
 					local split_tag = string.split(tag, "|")
-					local loottable = mineableList[item:GetAttribute("Type")].loot[split_tag[2]]
+					local tierKey = (split_tag and split_tag[2]) or "Tier1"
+					local nodeType = item:GetAttribute("Type") or "Rock"
+					local mineableData = mineableList[nodeType] or mineableList["Rock"]
+					local loottable = (mineableData and mineableData.loot and mineableData.loot[tierKey])
+						or (mineableData and mineableData.loot and mineableData.loot.Tier1)
+						or {}
+
 					local rootpart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 					if rootpart then
 						loot_module.generateLoot(
 							player,
 							loottable,
-							Vector3.new(item.Position.X, rootpart.Position.Y, item.Position.Z)
+							Vector3.new(itemPos.X, rootpart.Position.Y, itemPos.Z)
 						)
 					end
+
+					-- Clean up dynamic hit tag for this player
+					CollectionService:RemoveTag(item, tag)
+				end
+			end
+
+			-- Clean up any lingering player tags on the item
+			for _, tag in ipairs(CollectionService:GetTags(item)) do
+				if string.find(tag, "|") then
+					CollectionService:RemoveTag(item, tag)
 				end
 			end
 
@@ -85,16 +119,17 @@ function itemEvent(item)
 			local obj = model or item
 
 			if item:HasTag("Destroy") then
-				item.Parent:SetAttribute("Seeded", false)
+				if item.Parent then item.Parent:SetAttribute("Seeded", false) end
 				item:Destroy()
 			elseif model and model:HasTag("Destroy") then
-				model.Parent:SetAttribute("Seeded", false)
+				if model.Parent then model.Parent:SetAttribute("Seeded", false) end
 				model:Destroy()
 			else
 				local parent = obj.Parent
 				obj.Parent = nil
-				task.wait(item:GetAttribute("Respawn"))
-				item:SetAttribute("Health", item:GetAttribute("MaxHealth"))
+				local respawnTime = item:GetAttribute("Respawn") or 10
+				task.wait(respawnTime)
+				item:SetAttribute("Health", item:GetAttribute("MaxHealth") or 30)
 				item:SetAttribute("Mined", false)
 				obj.Parent = parent
 			end
@@ -102,19 +137,22 @@ function itemEvent(item)
 	end)
 end
 
-function addAttributes()
-	for _, item in ipairs(CollectionService:GetTagged("Mineable")) do
-		itemAttributes(item)
-	end
+local boundItems = setmetatable({}, { __mode = "k" })
+
+local function setupMineableItem(item)
+	if not item or boundItems[item] then return end
+	boundItems[item] = true
+	itemAttributes(item)
+	itemEvent(item)
 end
 
-function addEvent()
+function addAttributes()
 	for _, item in ipairs(CollectionService:GetTagged("Mineable")) do
-		itemEvent(item)
+		setupMineableItem(item)
 	end
 end
 
 addAttributes()
-addEvent()
 
-CollectionService:GetInstanceAddedSignal("Mineable"):Connect(addAttributes)
+CollectionService:GetInstanceAddedSignal("Mineable"):Connect(setupMineableItem)
+

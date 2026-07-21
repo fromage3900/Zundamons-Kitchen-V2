@@ -6,9 +6,6 @@ local Debris = game:GetService("Debris")
 local RS = game.ReplicatedStorage
 local remotes = RS:WaitForChild("ToolRemotes")
 local ConnectFunction = remotes:WaitForChild("ConnectFunction")
-local SS = game.ServerStorage
-local animations = SS:FindFirstChild("ToolAnimations")
-local sounds = SS:FindFirstChild("ToolSounds")
 local configFiles = RS:WaitForChild("ConfigurationFiles")
 local toolsConfig = require(configFiles:WaitForChild("ToolsConfig"))
 local toolList = toolsConfig.tools
@@ -42,13 +39,39 @@ function swingVisual(character)
 	TweenService:Create(shoulder, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { C0 = orig }):Play()
 end
 
+local TOOL_NODE_MATCHES: { [string]: { [string]: boolean } } = {
+	["PickAxe"] = { ["Rock"] = true, ["MarbleRock"] = true, ["GoldRock"] = true },
+	["Axe"]     = { ["AppleTree"] = true, ["PineTree"] = true },
+	["Sickle"]  = { ["Wheat"] = true, ["ZundaMushroom"] = true, ["ZundaBerry"] = true, ["ZundaRoot"] = true },
+}
+
+local function canToolHitNode(node: Instance, toolType: string): boolean
+	if CollectionService:HasTag(node, toolType) then
+		return true
+	end
+	local matches = TOOL_NODE_MATCHES[toolType]
+	if matches then
+		local nodeType = node:GetAttribute("Type")
+		if nodeType and matches[nodeType] then
+			return true
+		end
+		for _, tag in ipairs(CollectionService:GetTags(node)) do
+			if matches[tag] then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function findHitTargets(handle, toolType)
 	local targets = {}
 	if not handle then return targets end
 	local origin = handle.Position
 	for _, node in pairs(CollectionService:GetTagged("Mineable")) do
-		if node.Parent and CollectionService:HasTag(node, toolType) then
-			local dist = (node.Position - origin).Magnitude
+		if node.Parent and canToolHitNode(node, toolType) then
+			local nodePos = if node:IsA("BasePart") then node.Position else (node:IsA("Model") and (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position) or Vector3.zero)
+			local dist = (nodePos - origin).Magnitude
 			if dist <= HIT_RADIUS then
 				table.insert(targets, { node = node, dist = dist })
 			end
@@ -57,6 +80,7 @@ function findHitTargets(handle, toolType)
 	table.sort(targets, function(a, b) return a.dist < b.dist end)
 	return targets
 end
+
 
 function Activated(player, toolName)
 	local character = player.Character
@@ -82,38 +106,56 @@ function Activated(player, toolName)
 	local damage = tierData and tierData.Damage or 10
 
 	mytool:SetAttribute("Swinging", true)
-	local handle = mytool:FindFirstChild("Handle")
-
-	-- Visual swing (no Animation asset needed)
-	swingVisual(character)
-
-	-- Proximity-based hit at mid-swing
-	task.wait(SWING_DURATION * 0.4)
-	local targets = findHitTargets(handle, tool_type)
 	local hitAny = false
-	for _, t in ipairs(targets) do
-		local node = t.node
-		if node.Parent then
-			hitAny = true
-			CollectionService:AddTag(node, player.Name .. "|" .. tier)
-			local health = node:GetAttribute("Health")
-			if health then
-				node:SetAttribute("Health", math.max(health - damage, 0))
-			end
-			playHitSound(handle)
-			-- Small visual nudge
-			local originCFrame = node.CFrame
-			TweenService:Create(node, TweenInfo.new(0.08), { CFrame = originCFrame * CFrame.new(0, 0.2, 0) }):Play()
-			task.delay(0.08, function()
-				if node and node.Parent then
-					TweenService:Create(node, TweenInfo.new(0.1), { CFrame = originCFrame }):Play()
-				end
-			end)
-			break -- only hit one per swing
+
+	local success, err = pcall(function()
+		local handle = mytool:FindFirstChild("Handle")
+
+		-- Visual swing (no Animation asset needed)
+		swingVisual(character)
+
+		-- Proximity-based hit at mid-swing
+		task.wait(SWING_DURATION * 0.4)
+
+		-- Verify character and tool validity after yield
+		if not player.Character or player.Character ~= character or humanoid.Health <= 0 then
+			return
 		end
-	end
-	task.wait(SWING_DURATION * 0.6)
+		if not mytool or mytool.Parent ~= character then
+			return
+		end
+
+		local targets = findHitTargets(handle, tool_type)
+		for _, t in ipairs(targets) do
+			local node = t.node
+			if node.Parent then
+				hitAny = true
+				CollectionService:AddTag(node, tostring(player.UserId) .. "|" .. tier)
+				local health = node:GetAttribute("Health")
+				if health then
+					node:SetAttribute("Health", math.max(health - damage, 0))
+				end
+				playHitSound(handle)
+				-- Small visual nudge for BasePart
+				if node:IsA("BasePart") then
+					local originCFrame = node.CFrame
+					TweenService:Create(node, TweenInfo.new(0.08), { CFrame = originCFrame * CFrame.new(0, 0.2, 0) }):Play()
+					task.delay(0.08, function()
+						if node and node.Parent and node:IsA("BasePart") then
+							TweenService:Create(node, TweenInfo.new(0.1), { CFrame = originCFrame }):Play()
+						end
+					end)
+				end
+				break -- only hit one per swing
+			end
+		end
+		task.wait(SWING_DURATION * 0.6)
+	end)
+
 	mytool:SetAttribute("Swinging", false)
+	if not success and err then
+		warn("[Tools.server] Error during tool swing: " .. tostring(err))
+	end
 	return hitAny
 end
 

@@ -1,5 +1,5 @@
 local Matter = require(game.ReplicatedStorage.Packages.Matter)
-local DataManager = require(game.ServerScriptService.Server.Services.DataManager)
+local DataManager = require(game.ServerScriptService:WaitForChild("Services"):WaitForChild("DataManager"))
 
 -- We will create a pure data component to represent an item drop in the physical world
 local ItemDrop = Matter.component("ItemDrop")

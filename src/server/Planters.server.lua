@@ -19,7 +19,7 @@ local PlayerDataService = require(game.ServerScriptService.Services.PlayerDataSe
 
 local function clonePlant(item, plant)
 	local newPlant = plant:Clone()
-	newPlant:SetAttribute("Planted_at", tick())
+	newPlant:SetAttribute("Planted_at", os.clock())
 	newPlant.Parent = item
 	newPlant.Anchored = true
 	newPlant.Position = Vector3.new(item.Position.X, item.Position.Y + newPlant.Size.Y/2, item.Position.Z)
@@ -92,7 +92,7 @@ local function growPlants()
 							local time_to_grow = properties.Grow_Time
 							-- Guard against nil/missing time_planted
 							if time_planted and time_to_grow and time_planted > 0 then
-								local time_passed = tick() - time_planted
+								local time_passed = os.clock() - time_planted
 								if time_passed > time_to_grow then
 									val:Destroy()
 									clonePlant(item, properties.Sprout)
