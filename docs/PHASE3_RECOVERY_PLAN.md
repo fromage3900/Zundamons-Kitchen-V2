@@ -17,10 +17,13 @@ Restore one server-authoritative implementation for fishing and the Harvest -> C
 ## Progress checkpoint (2026-07-21)
 
 - 3.1 is committed as `668e88d`: versioned player projections, serialized rollback-safe mutations, inventory helpers, and RewardCore ownership are active.
-- 3.2 is implemented and focused-verification complete pending its commit. `FishingServer` is the sole remote owner; `FishingService` owns one Matter session per player, server simulation, lifecycle cleanup, and atomic settlement.
+- `FishingServer` is the sole remote owner; `FishingService` owns one Matter session per player, server simulation, lifecycle cleanup, and atomic settlement.
 - A real Studio catch granted one `Fish: Trout`, advanced the data revision once, and rejected replay. Duplicate begin, forged session, legacy client-result, and repeated cancellation requests were rejected.
 - Product decision: a catch becomes a visible raw inventory item named `Fish: <species>` plus chef XP. It does not grant immediate gold, preserving fish for later recipe or selling design without double-paying the economy.
 - The local Blender and `crucialassets/` sources remain owner-controlled and untracked.
+- 3.2 was committed as `3a304c5`. A real catch granted one fish and one revision, while duplicate/forged/replayed requests awarded nothing.
+- 3.3 is implemented and focused-verification complete in the current Phase 3 checkpoint. Ingredients are journaled in a rejoin-safe reservation, note timing and quality are server-derived, and completion atomically creates quality-owned dishes plus rewards.
+- A real perfect Apple Pie session consumed exactly 3 Apples and 5 Wheat, created two dishes through the configured bonus, updated `recipes_cooked_count` rather than served count, and advanced two revisions: reserve then settle.
 
 ## Architecture contract
 

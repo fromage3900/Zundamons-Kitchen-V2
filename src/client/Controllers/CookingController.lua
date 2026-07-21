@@ -29,10 +29,10 @@ end
 
 local PEA_CONFIG = {
 	fallDuration = 2.0,
-	hitWindow = 0.15,     -- Perfect <= 0.15s
-	greatWindow = 0.35,   -- Great <= 0.35s
-	okWindow = 0.60,      -- OK <= 0.60s
-	totalNotes = 10,      -- Server default total note count
+	hitWindow = 0.15, -- Perfect <= 0.15s
+	greatWindow = 0.35, -- Great <= 0.35s
+	okWindow = 0.60, -- OK <= 0.60s
+	totalNotes = 10, -- Server default total note count
 }
 
 local CookingController = {}
@@ -41,6 +41,7 @@ local currentPeas = {}
 local currentScore = { perfect = 0, great = 0, ok = 0, miss = 0 }
 local comboCount = 0
 local maxComboCount = 0
+local currentSessionId: string? = nil
 
 -- UI Elements
 local screenGui: ScreenGui? = nil
@@ -171,7 +172,7 @@ local function buildUI()
 	return screenGui, mainPanel, trackFrame, comboLabel, recipeLabel, tapButton
 end
 
-local function createPea(track: Frame, spawnTime: number)
+local function createPea(track: Frame, spawnTime: number, noteIndex: number)
 	local pea = Instance.new("Frame")
 	pea.Size = UDim2.new(0, 28, 0, 28)
 	pea.Position = UDim2.new(0.5, -14, 0, 0)
@@ -193,11 +194,14 @@ local function createPea(track: Frame, spawnTime: number)
 		spawnTime = spawnTime,
 		hit = false,
 		missed = false,
+		noteIndex = noteIndex,
 	}
 end
 
 local function handleHitInput()
-	if not activeSession or not mainPanel or not mainPanel.Visible then return end
+	if not activeSession or not mainPanel or not mainPanel.Visible then
+		return
+	end
 
 	local now = os.clock()
 	local bestPea = nil
@@ -219,7 +223,9 @@ local function handleHitInput()
 		local quality = getHitQuality(bestDiff)
 		currentScore[quality] = (currentScore[quality] or 0) + 1
 		comboCount = comboCount + 1
-		if comboCount > maxComboCount then maxComboCount = comboCount end
+		if comboCount > maxComboCount then
+			maxComboCount = comboCount
+		end
 
 		local ratingText = quality:upper() .. "!"
 		local ratingColor = Color3.fromRGB(255, 215, 0)
@@ -232,8 +238,8 @@ local function handleHitInput()
 		bestPea.instance.BackgroundColor3 = ratingColor
 		spawnFloatingRating(ratingText, ratingColor, mainPanel)
 
-		-- Send remote event to server
-		cookingHitEvent:FireServer(now, quality)
+		-- Quality is presentation-only; server derives it from this note intent.
+		cookingHitEvent:FireServer(currentSessionId, bestPea.noteIndex)
 
 		local shrinkTween = TweenService:Create(
 			bestPea.instance,
@@ -249,7 +255,8 @@ local function handleHitInput()
 		comboCount = 0
 		currentScore.miss = (currentScore.miss or 0) + 1
 		spawnFloatingRating("MISS!", Color3.fromRGB(255, 80, 80), mainPanel)
-		cookingHitEvent:FireServer(now, "miss")
+		-- Mistaps do not create an authoritative hit. The server records absent
+		-- notes as misses when their timing window expires.
 	end
 
 	if comboLabel then
@@ -257,23 +264,32 @@ local function handleHitInput()
 	end
 end
 
-function CookingController.start(recipeName: string, onComplete: ((quality: string, score: any, maxCombo: number) -> ())?)
-	if activeSession then return end
+function CookingController.start(
+	recipeName: string,
+	session: any,
+	onComplete: ((quality: string, score: any, maxCombo: number) -> ())?
+)
+	if activeSession then
+		return
+	end
+	if type(session) ~= "table" or type(session.sessionId) ~= "string" then
+		return
+	end
 
 	local _, panel, track, cLabel, rLabel, tButton = buildUI()
-	if not panel or not track or not cLabel or not rLabel or not tButton then return end
+	if not panel or not track or not cLabel or not rLabel or not tButton then
+		return
+	end
 
 	activeSession = true
+	currentSessionId = session.sessionId
 	currentPeas = {}
 	currentScore = { perfect = 0, great = 0, ok = 0, miss = 0 }
 	comboCount = 0
 	maxComboCount = 0
 
 	-- Configure total notes & difficulty for recipe
-	local totalNotesToSpawn = PEA_CONFIG.totalNotes
-	if craftConfig and craftConfig.difficulty and craftConfig.difficulty[recipeName] then
-		totalNotesToSpawn = craftConfig.difficulty[recipeName].notes or PEA_CONFIG.totalNotes
-	end
+	local totalNotesToSpawn = tonumber(session.totalNotes) or PEA_CONFIG.totalNotes
 
 	rLabel.Text = "Cooking: " .. (recipeName or "Dish")
 	cLabel.Text = "Combo: 0 | Max: 0"
@@ -294,9 +310,19 @@ function CookingController.start(recipeName: string, onComplete: ((quality: stri
 	local function cleanup()
 		ended = true
 		activeSession = false
-		if inputConn then inputConn:Disconnect(); inputConn = nil end
-		if tapConn then tapConn:Disconnect(); tapConn = nil end
-		if runConn then runConn:Disconnect(); runConn = nil end
+		currentSessionId = nil
+		if inputConn then
+			inputConn:Disconnect()
+			inputConn = nil
+		end
+		if tapConn then
+			tapConn:Disconnect()
+			tapConn = nil
+		end
+		if runConn then
+			runConn:Disconnect()
+			runConn = nil
+		end
 
 		for _, p in ipairs(currentPeas) do
 			if p.instance and p.instance.Parent then
@@ -305,12 +331,16 @@ function CookingController.start(recipeName: string, onComplete: ((quality: stri
 		end
 		currentPeas = {}
 
-		if panel then panel.Visible = false end -- Hide panel on completion (AGENTS.md Rule 2)
+		if panel then
+			panel.Visible = false
+		end -- Hide panel on completion (AGENTS.md Rule 2)
 	end
 
 	-- Input Listener (Spacebar, Mobile Touch, Gamepad ButtonA/ButtonX)
 	inputConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if gameProcessed then return end
+		if gameProcessed then
+			return
+		end
 		local isKeyboard = input.KeyCode == Enum.KeyCode.Space
 		local isGamepad = input.KeyCode == Enum.KeyCode.ButtonA or input.KeyCode == Enum.KeyCode.ButtonX
 		local isTouch = input.UserInputType == Enum.UserInputType.Touch
@@ -326,7 +356,9 @@ function CookingController.start(recipeName: string, onComplete: ((quality: stri
 
 	-- Heartbeat Loop for note animation & passive miss detection
 	runConn = RunService.Heartbeat:Connect(function()
-		if ended then return end
+		if ended then
+			return
+		end
 		local now = os.clock()
 		local elapsed = now - startTime
 
@@ -334,7 +366,7 @@ function CookingController.start(recipeName: string, onComplete: ((quality: stri
 		if notesSpawned < totalNotesToSpawn and (now - lastSpawnTime >= peaSpawnInterval or notesSpawned == 0) then
 			notesSpawned = notesSpawned + 1
 			lastSpawnTime = now
-			table.insert(currentPeas, createPea(track, now))
+			table.insert(currentPeas, createPea(track, now, notesSpawned))
 		end
 
 		-- Move active notes & handle passive misses
@@ -367,19 +399,35 @@ function CookingController.start(recipeName: string, onComplete: ((quality: stri
 		end
 
 		-- Session Completion Check
-		if elapsed >= totalSessionDuration or (notesSpawned >= totalNotesToSpawn and #currentPeas > 0 and (now - currentPeas[#currentPeas].spawnTime >= PEA_CONFIG.fallDuration + 0.5)) then
+		if
+			elapsed >= totalSessionDuration
+			or (
+				notesSpawned >= totalNotesToSpawn
+				and #currentPeas > 0
+				and (now - currentPeas[#currentPeas].spawnTime >= PEA_CONFIG.fallDuration + 0.5)
+			)
+		then
 			cleanup()
 
 			local scoreList = {}
-			for _ = 1, (currentScore.perfect or 0) do table.insert(scoreList, { tag = "perfect" }) end
-			for _ = 1, (currentScore.great or 0) do table.insert(scoreList, { tag = "great" }) end
-			for _ = 1, (currentScore.ok or 0) do table.insert(scoreList, { tag = "good" }) end
-			for _ = 1, (currentScore.miss or 0) do table.insert(scoreList, { tag = "miss" }) end
+			for _ = 1, (currentScore.perfect or 0) do
+				table.insert(scoreList, { tag = "perfect" })
+			end
+			for _ = 1, (currentScore.great or 0) do
+				table.insert(scoreList, { tag = "great" })
+			end
+			for _ = 1, (currentScore.ok or 0) do
+				table.insert(scoreList, { tag = "good" })
+			end
+			for _ = 1, (currentScore.miss or 0) do
+				table.insert(scoreList, { tag = "miss" })
+			end
 			while #scoreList < totalNotesToSpawn do
 				table.insert(scoreList, { tag = "miss" })
 			end
 
-			local quality = craftConfig.calculateQuality and craftConfig.calculateQuality(scoreList, totalNotesToSpawn) or "ok"
+			local quality = craftConfig.calculateQuality and craftConfig.calculateQuality(scoreList, totalNotesToSpawn)
+				or "ok"
 
 			if onComplete then
 				onComplete(quality, currentScore, maxComboCount)

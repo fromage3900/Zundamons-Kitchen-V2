@@ -237,6 +237,10 @@ function RewardCore.settle(player, opts, domainMutator)
 			d.combo.lastActionAt = now
 			d.combo.multiplier = comboMultiplier(d.combo.count)
 			comboChanged = true
+		elseif opts.breakCombo then
+			d.combo.count = 0
+			d.combo.multiplier = 1.0
+			comboChanged = true
 		end
 
 		local requestedGold = opts.gold or 0

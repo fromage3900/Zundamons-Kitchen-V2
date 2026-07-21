@@ -5,11 +5,19 @@ local CookingSession = Matter.component("CookingSession")
 --[[
 	Data Structure:
 	{
+		sessionId = string,
 		playerId = number,
 		recipeId = string,
-		position = Vector3,
 		startTime = number,
-		duration = number,
+		firstTargetAt = number,
+		noteInterval = number,
+		totalNotes = number,
+		nextExpected = number,
+		perfectHits = number,
+		greatHits = number,
+		okHits = number,
+		misses = number,
+		settled = boolean,
 	}
 ]]
 

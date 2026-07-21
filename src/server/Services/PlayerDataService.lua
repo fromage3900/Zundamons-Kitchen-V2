@@ -97,6 +97,7 @@ local function buildProjection(data: { [string]: any }): { [string]: any }
 		recipesUnlocked = cloneDictionary(data.recipes_unlocked) or {},
 		recipesCookedCount = cloneDictionary(data.recipes_cooked_count) or {},
 		recipesServedCount = cloneDictionary(data.recipes_served_count) or {},
+		cookedDishes = deepClone(data.cooked_dishes) or {},
 		totalFishCaught = data.total_fish_caught or 0,
 		fishCaughtCount = cloneDictionary(data.fish_caught_count) or {},
 	}
@@ -255,6 +256,8 @@ createDefaultData = function(): { [string]: any }
 		speed_cooks = 0,
 		total_fish_caught = 0,
 		fish_caught_count = {},
+		cooked_dishes = {},
+		cooking_reservation = nil,
 		gathered_items = {},
 		companions_set = {},
 		npc_chats = {},
@@ -296,6 +299,20 @@ local function backfillLoadedData(loaded: { [string]: any })
 	loaded.recipes_served_count = loaded.recipes_served_count or {}
 	loaded.total_fish_caught = loaded.total_fish_caught or 0
 	loaded.fish_caught_count = loaded.fish_caught_count or {}
+	loaded.cooked_dishes = loaded.cooked_dishes or {}
+	-- A persisted reservation means the prior server ended before settlement.
+	-- Restore its ingredients once during load, then clear the journal.
+	if type(loaded.cooking_reservation) == "table" then
+		local ingredients = loaded.cooking_reservation.ingredients
+		if type(ingredients) == "table" then
+			for ingredient, amount in pairs(ingredients) do
+				if type(ingredient) == "string" and type(amount) == "number" and amount > 0 then
+					loaded[ingredient] = (loaded[ingredient] or 0) + amount
+				end
+			end
+		end
+		loaded.cooking_reservation = nil
+	end
 	if loaded.owned_clothing == nil then
 		loaded.owned_clothing = {}
 	end

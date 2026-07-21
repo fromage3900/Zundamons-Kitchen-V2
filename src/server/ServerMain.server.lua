@@ -5,6 +5,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Matter = require(ReplicatedStorage.Packages.Matter)
 local FishingService = require(ServerScriptService.Services.FishingService)
+local CookingService = require(ServerScriptService.Services.CookingService)
 
 local systemsFolder = ServerScriptService:WaitForChild("systems")
 local cookingSystems = systemsFolder:WaitForChild("cooking")
@@ -18,6 +19,7 @@ local systems = {
 
 local world = Matter.World.new()
 FishingService.attachWorld(world)
+CookingService.attachWorld(world)
 local loop = Matter.Loop.new(world)
 loop:scheduleSystems(systems)
 loop:begin({

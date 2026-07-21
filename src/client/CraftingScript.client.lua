@@ -117,16 +117,16 @@ local function buildIngredientLine(parent, xPos, yPos, width, item, count)
 	local icon = UIHelper.createItemIcon(item, UDim2.fromOffset(20, 20), row)
 	icon.Position = UDim2.new(0, 0, 0.5, -10)
 
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1, -24, 1, 0)
-    lbl.Position = UDim2.new(0, 24, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = count .. "x " .. item
-    lbl.TextColor3 = UIConfig.COLORS.TextDarkSec
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.TextScaled = true
-    lbl.FontFace = UIConfig.FONTS.Body
-    lbl.Parent = row
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1, -24, 1, 0)
+	lbl.Position = UDim2.new(0, 24, 0, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text = count .. "x " .. item
+	lbl.TextColor3 = UIConfig.COLORS.TextDarkSec
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.TextScaled = true
+	lbl.FontFace = UIConfig.FONTS.Body
+	lbl.Parent = row
 end
 
 -- Build a card for each recipe
@@ -139,30 +139,30 @@ local function buildRecipeCard(recipe)
 	card.Parent = scroll
 	Instance.new("UICorner", card).CornerRadius = UDim.new(0, 8)
 
-    local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(0.7, 0, 0.5, 0)
-    nameLabel.Position = UDim2.new(0, 10, 0, 5)
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.Text = recipe.name
-    nameLabel.TextColor3 = UIConfig.COLORS.TextDark
-    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.TextScaled = true
-    nameLabel.FontFace = UIConfig.FONTS.Heading
-    nameLabel.Parent = card
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.new(0.7, 0, 0.5, 0)
+	nameLabel.Position = UDim2.new(0, 10, 0, 5)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Text = recipe.name
+	nameLabel.TextColor3 = UIConfig.COLORS.TextDark
+	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	nameLabel.TextScaled = true
+	nameLabel.FontFace = UIConfig.FONTS.Heading
+	nameLabel.Parent = card
 
 	-- Unlock hint for locked recipes
-    local hintLabel = Instance.new("TextLabel")
-    hintLabel.Name = "HintLabel"
-    hintLabel.Size = UDim2.new(0.7, 0, 0, 16)
-    hintLabel.Position = UDim2.new(0, 10, 0, 32)
-    hintLabel.BackgroundTransparency = 1
-    hintLabel.Text = recipe.locked and "🔒 Unlocks at Tier 2 (15 guests)" or ""
-    hintLabel.TextColor3 = UIConfig.COLORS.ZundamonPink
-    hintLabel.TextXAlignment = Enum.TextXAlignment.Left
-    hintLabel.TextScaled = true
-    hintLabel.FontFace = UIConfig.FONTS.Body
-    hintLabel.Visible = recipe.locked
-    hintLabel.Parent = card
+	local hintLabel = Instance.new("TextLabel")
+	hintLabel.Name = "HintLabel"
+	hintLabel.Size = UDim2.new(0.7, 0, 0, 16)
+	hintLabel.Position = UDim2.new(0, 10, 0, 32)
+	hintLabel.BackgroundTransparency = 1
+	hintLabel.Text = recipe.locked and "🔒 Unlocks at Tier 2 (15 guests)" or ""
+	hintLabel.TextColor3 = UIConfig.COLORS.ZundamonPink
+	hintLabel.TextXAlignment = Enum.TextXAlignment.Left
+	hintLabel.TextScaled = true
+	hintLabel.FontFace = UIConfig.FONTS.Body
+	hintLabel.Visible = recipe.locked
+	hintLabel.Parent = card
 
 	local ingY = 0
 	for item, count in recipe.ings do
@@ -170,16 +170,16 @@ local function buildRecipeCard(recipe)
 		ingY = ingY + 22
 	end
 
-    local craftBtn = Instance.new("TextButton")
-    craftBtn.Size = UDim2.new(0, 90, 0, 50)
-    craftBtn.Position = UDim2.new(1, -100, 0, 10)
-    craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
-    craftBtn.TextColor3 = UIConfig.COLORS.TextWhite
-    craftBtn.Text = "Craft"
-    craftBtn.TextScaled = true
-    craftBtn.FontFace = UIConfig.FONTS.Heading
-    craftBtn.Parent = card
-    Instance.new("UICorner", craftBtn).CornerRadius = UDim.new(0, 6)
+	local craftBtn = Instance.new("TextButton")
+	craftBtn.Size = UDim2.new(0, 90, 0, 50)
+	craftBtn.Position = UDim2.new(1, -100, 0, 10)
+	craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
+	craftBtn.TextColor3 = UIConfig.COLORS.TextWhite
+	craftBtn.Text = "Craft"
+	craftBtn.TextScaled = true
+	craftBtn.FontFace = UIConfig.FONTS.Heading
+	craftBtn.Parent = card
+	Instance.new("UICorner", craftBtn).CornerRadius = UDim.new(0, 6)
 
 	craftBtn.MouseButton1Click:Connect(function()
 		local pos = craftBtn.AbsolutePosition
@@ -196,38 +196,38 @@ local function buildRecipeCard(recipe)
 			return
 		end
 
-		-- Helper: send craft to server (server will return "Cooking" to start minigame, or "Fail")
+		-- Server reserves ingredients and returns an opaque authoritative session.
 		local function submitCraft()
 			craftBtn.Text = "\u{2728}" -- ✨ while server processes
 			local ok, result = pcall(function()
 				return craftFunc:InvokeServer(recipe.name, hrp.Position)
 			end)
-            if ok and result == "Cooking" then
-                if _G.TimedCooking and _G.TimedCooking.start then
-                    craftBtn.Text = "Cooking\u{2026}"
-                    _G.TimedCooking.start(recipe.name, function(quality)
-                        craftBtn.Text = quality:upper() .. "!"
-                        if quality == "perfect" then
-                            craftBtn.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
-                        elseif quality == "great" then
-                            craftBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
-                        else
-                            craftBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 100)
-                        end
-                        task.delay(2, function()
-                            craftBtn.Text = "Craft"
-                            craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
-                        end)
-                    end)
-                end
-            else
-                craftBtn.Text = "Need more!"
-                craftBtn.BackgroundColor3 = UIConfig.COLORS.Danger
-                task.delay(1.8, function()
-                    craftBtn.Text = "Craft"
-                    craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
-                end)
-            end
+			if ok and type(result) == "table" and result.ok then
+				if _G.TimedCooking and _G.TimedCooking.start then
+					craftBtn.Text = "Cooking\u{2026}"
+					_G.TimedCooking.start(recipe.name, result, function(quality)
+						craftBtn.Text = quality:upper() .. "!"
+						if quality == "perfect" then
+							craftBtn.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+						elseif quality == "great" then
+							craftBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+						else
+							craftBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 100)
+						end
+						task.delay(2, function()
+							craftBtn.Text = "Craft"
+							craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
+						end)
+					end)
+				end
+			else
+				craftBtn.Text = "Need more!"
+				craftBtn.BackgroundColor3 = UIConfig.COLORS.Danger
+				task.delay(1.8, function()
+					craftBtn.Text = "Craft"
+					craftBtn.BackgroundColor3 = UIConfig.COLORS.PeaGreen
+				end)
+			end
 		end
 
 		submitCraft()
