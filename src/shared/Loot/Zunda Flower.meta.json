@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Zunda Flower",
+		"Size": [1, 1, 1],
+		"BrickColor": "Pink",
+		"Material": "SmoothPlastic",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

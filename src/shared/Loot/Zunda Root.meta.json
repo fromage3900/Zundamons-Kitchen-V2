@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Zunda Root",
+		"Size": [1, 1, 1],
+		"BrickColor": "Brown",
+		"Material": "Wood",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

@@ -1,0 +1,8 @@
+{
+	"className": "Folder",
+	"children": [
+		{ "name": "FishingCast", "className": "RemoteFunction" },
+		{ "name": "ToolUse", "className": "RemoteEvent" },
+		{ "name": "ToolUpgrade", "className": "RemoteFunction" }
+	]
+}

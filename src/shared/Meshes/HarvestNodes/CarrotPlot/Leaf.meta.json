@@ -1,0 +1,9 @@
+{
+	"className": "MeshPart",
+	"properties": {
+		"Name": "Leaf",
+		"Size": [1.5, 1.5, 1.5],
+		"Anchored": true,
+		"CanCollide": false
+	}
+}

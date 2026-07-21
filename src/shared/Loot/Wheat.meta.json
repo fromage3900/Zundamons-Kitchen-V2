@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Wheat",
+		"Size": [1, 1, 1],
+		"BrickColor": "Bright yellow",
+		"Material": "SmoothPlastic",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

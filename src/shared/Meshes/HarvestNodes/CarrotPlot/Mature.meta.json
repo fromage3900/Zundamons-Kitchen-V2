@@ -1,0 +1,9 @@
+{
+	"className": "MeshPart",
+	"properties": {
+		"Name": "Mature",
+		"Size": [2, 2, 2],
+		"Anchored": true,
+		"CanCollide": false
+	}
+}

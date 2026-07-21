@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Rock",
+		"Size": [1, 1, 1],
+		"BrickColor": "Medium stone grey",
+		"Material": "Slate",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

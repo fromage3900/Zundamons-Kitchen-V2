@@ -1,0 +1,15 @@
+{
+	"className": "Folder",
+	"children": [
+		{ "name": "RequestData", "className": "RemoteFunction" },
+		{ "name": "CraftFunction", "className": "RemoteFunction" },
+		{ "name": "ServeGuest", "className": "RemoteFunction" },
+		{ "name": "GiveLoot", "className": "RemoteFunction" },
+		{ "name": "sellLoot", "className": "RemoteFunction" },
+		{ "name": "GetActiveCompanionBuff", "className": "RemoteFunction" },
+		{ "name": "MarkTutorialDone", "className": "RemoteFunction" },
+		{ "name": "PurchaseGoldCompanion", "className": "RemoteFunction" },
+		{ "name": "PurchaseCompanion", "className": "RemoteFunction" },
+		{ "name": "RequestRewardSync", "className": "RemoteFunction" }
+	]
+}

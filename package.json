@@ -1,0 +1,17 @@
+{
+  "name": "zundamons-kitchen-v2",
+  "version": "1.0.0",
+  "description": "Clean, structured transfer of Zundamon's kItchen",
+  "private": true,
+  "scripts": {
+    "lint": "npm run lint:stylua && npm run lint:selene",
+    "lint:stylua": "npx stylua-bin --check src",
+    "lint:selene": "selene src",
+    "rojo:build": "rojo build default.project.json -o build/Zundamons-kItchen.rbxl",
+    "rojo:serve": "rojo serve default.project.json"
+  },
+  "devDependencies": {
+    "@johnnymorganz/stylua-bin": "2.5.2",
+    "rojo": "1.0.3-rojo7.6.1"
+  }
+}

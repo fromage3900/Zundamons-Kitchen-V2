@@ -1,0 +1,11 @@
+{
+	"className": "Folder",
+	"children": [
+		{ "name": "PopupEvent", "className": "RemoteEvent" },
+		{ "name": "ChefLevelUpdate", "className": "RemoteEvent" },
+		{ "name": "ComboUpdate", "className": "RemoteEvent" },
+		{ "name": "LevelUpEvent", "className": "RemoteEvent" },
+		{ "name": "NotifyAction", "className": "RemoteEvent" },
+		{ "name": "AchievementUnlocked", "className": "RemoteEvent" }
+	]
+}
