@@ -256,7 +256,7 @@ end
 -- Toggle
 UIS.InputBegan:Connect(function(input, gpe)
 	if gpe then return end
-	if input.KeyCode == Enum.KeyCode.P then
+	if input.KeyCode == Enum.KeyCode.H then
 		gui.Enabled = not gui.Enabled
 		if gui.Enabled then
 			refreshGold()

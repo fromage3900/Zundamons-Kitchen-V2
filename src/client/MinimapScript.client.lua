@@ -3,7 +3,7 @@ local Players  = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local RunSvc   = game:GetService("RunService")
 local player   = Players.LocalPlayer
-local gui      = script.Parent
+local gui      = require(game:GetService("ReplicatedStorage").ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "MinimapGui", 10)
 
 -- ── CONFIG ─────────────────────────────────────────────────────────────────
 -- World bounds (from terrain survey)

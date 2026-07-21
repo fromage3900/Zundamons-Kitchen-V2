@@ -1,7 +1,7 @@
 -- [[LocalScript] QuestScript (ref: RBX6E7F43188E8A49A4BC4376C52E72FD93)]]
 local Players=game:GetService("Players"); local RS=game:GetService("ReplicatedStorage")
 local Tween=game:GetService("TweenService"); local UIS=game:GetService("UserInputService")
-local player=Players.LocalPlayer; local gui=script.Parent
+local player=Players.LocalPlayer; local gui=require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "QuestGui", 25)
 local UIHelper = require(RS.Shared.Modules.UIHelper)
 local RE=RS:WaitForChild("RemoteEvents"); local ev=RE:WaitForChild("UpdateQuests",15)
 local C={bg=Color3.fromRGB(252,248,240),border=Color3.fromRGB(130,195,120),

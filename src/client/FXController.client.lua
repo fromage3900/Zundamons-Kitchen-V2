@@ -2,9 +2,20 @@
 -- ZundaFX/FXController: Animates watercolour corner bleed blobs
 local rs = game:GetService("RunService")
 local Tween = game:GetService("TweenService")
-local gui = script.Parent
-local bleed = gui:FindFirstChild("WatercolourBleed")
-if not bleed then return end
+local player = game:GetService("Players").LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local gui, bleed
+for _, g in ipairs(playerGui:GetChildren()) do
+	if g:IsA("ScreenGui") then
+		local found = g:FindFirstChild("WatercolourBleed", true)
+		if found then gui = g; bleed = found; break end
+	end
+end
+if not bleed then
+	print("[FXController] WatercolourBleed not found — skipping watercolour FX")
+	return
+end
 
 -- Subtle breathing wash: gently animate the edge-wash gradients' transparency for life
 local edges = bleed:GetChildren()
@@ -15,7 +26,7 @@ for i, edge in ipairs(edges) do
             local phase = i * (math.pi / 2)
             task.spawn(function()
                 while edge.Parent do
-                    local t = tick() * 0.18 + phase
+                    local t = os.clock() * 0.18 + phase
                     local breathe = math.sin(t) * 0.04
                     local baseT = (i == 1 or i == 2) and 0.85 or 0.87
                     g.Transparency = NumberSequence.new({
@@ -50,10 +61,9 @@ if grain then
     grain.BackgroundTransparency = 1  -- let the noise image carry the effect
     task.spawn(function()
         while true do
-            local t = tick()
             if noise then
                 noise.ImageRectOffset = Vector2.new(math.random(0, 512), math.random(0, 512))
-                noise.ImageTransparency = 0.90 + math.sin(t * 0.6) * 0.025
+                noise.ImageTransparency = 0.90 + math.sin(os.clock() * 0.6) * 0.025
             end
             task.wait(1/30)
         end

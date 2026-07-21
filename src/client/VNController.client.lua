@@ -61,6 +61,7 @@ panel.BackgroundColor3 = C_cream
 panel.BorderSizePixel = 0
 panel.ZIndex = 10
 panel.Active = true
+panel.Visible = false
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 24)
 local pStroke = Instance.new("UIStroke", panel)
 pStroke.Color = C_border; pStroke.Thickness = 3

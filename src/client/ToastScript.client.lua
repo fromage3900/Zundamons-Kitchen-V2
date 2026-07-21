@@ -8,12 +8,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player            = Players.LocalPlayer
 
 local RE       = ReplicatedStorage:WaitForChild("RemoteEvents")
-local notifyRE = RE:FindFirstChild("NotifyPlayer") or Instance.new("RemoteEvent")
+local notifyRE = RE:WaitForChild("NotifyPlayer")
 notifyRE.Name = "NotifyPlayer"
 notifyRE.Parent = RE
 
 -- Create the toast container in PlayerGui
-local gui = script.Parent
+local gui = require(ReplicatedStorage.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "ToastGui", 100)
 
 local function showToast(eventType, message)
     -- Color by event type

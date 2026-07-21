@@ -3,7 +3,7 @@ local RS      = game:GetService("ReplicatedStorage")
 local Tween   = game:GetService("TweenService")
 local UIS     = game:GetService("UserInputService")
 local player  = Players.LocalPlayer
-local gui     = script.Parent
+local gui     = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "CompendiumGui", 20)
 
 local UIHelper = require(RS.Shared.Modules.UIHelper)
 local craftConfig = require(RS.ConfigurationFiles.CraftConfig)

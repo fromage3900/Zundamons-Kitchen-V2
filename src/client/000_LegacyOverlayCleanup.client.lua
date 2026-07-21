@@ -118,6 +118,16 @@ local function destroyStudioGreyFullscreen(root: Instance)
 	end
 end
 
+local function stripEmbeddedScripts(gui: ScreenGui)
+	for _, inst in ipairs(gui:GetDescendants()) do
+		if inst:IsA("LocalScript") then
+			inst.Enabled = false
+			inst:Destroy()
+			logRemoved("Embedded LocalScript " .. inst:GetFullName())
+		end
+	end
+end
+
 local function cleanupScreenGui(gui: ScreenGui)
 	if destroyOverlayGui(gui) then
 		return
@@ -128,6 +138,7 @@ local function cleanupScreenGui(gui: ScreenGui)
 	destroyStudioGreyFullscreen(gui)
 	destroyNamedDescendants(gui)
 	destroyHeuristicVignettes(gui)
+	stripEmbeddedScripts(gui)
 end
 
 local function cleanupPlayerGui()

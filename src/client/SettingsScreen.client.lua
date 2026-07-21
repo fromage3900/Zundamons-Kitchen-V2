@@ -165,12 +165,7 @@ closeBtn.MouseButton1Click:Connect(hide)
 backdrop.MouseButton1Click:Connect(hide)
 
 local RS_gui = RS:WaitForChild("RemoteEvents")
-local toggleEv = RS_gui:FindFirstChild("ToggleSettingsUI")
-if not toggleEv then
-	toggleEv = Instance.new("RemoteEvent")
-	toggleEv.Name = "ToggleSettingsUI"
-	toggleEv.Parent = RS_gui
-end
+local toggleEv = RS_gui:WaitForChild("ToggleSettingsUI")
 toggleEv.OnClientEvent:Connect(function()
 	if gui.Enabled then hide() else show() end
 end)

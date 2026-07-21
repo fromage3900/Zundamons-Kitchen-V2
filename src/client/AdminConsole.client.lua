@@ -6,12 +6,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 local RS = game:GetService("ReplicatedStorage")
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local RF = RS:FindFirstChild("RemoteFunctions") or RS:WaitForChild("RemoteFunctions", 10)
-local executeCmd = RF:FindFirstChild("ExecuteAdminCommand")
-if not executeCmd then
-	executeCmd = Instance.new("RemoteFunction")
-	executeCmd.Name = "ExecuteAdminCommand"
-	executeCmd.Parent = RF
-end
+local executeCmd = RF:WaitForChild("ExecuteAdminCommand")
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AdminConsole"

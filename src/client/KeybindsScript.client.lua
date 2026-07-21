@@ -4,7 +4,8 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
-local gui = script.Parent
+local RS = game:GetService("ReplicatedStorage")
+local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "KeybindsGui", 30)
 
 local DEFAULTS = {
     { action = "inventory",  cat = "Inventory",    key = Enum.KeyCode.Backquote, desc = "Open Inventory",     icon = "🎒" },

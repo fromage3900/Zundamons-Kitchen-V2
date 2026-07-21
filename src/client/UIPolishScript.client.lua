@@ -5,7 +5,7 @@ local UIS       = game:GetService("UserInputService")
 local RunSvc    = game:GetService("RunService")
 local Tween     = game:GetService("TweenService")
 local player    = Players.LocalPlayer
-local gui       = script.Parent
+local gui       = require(game:GetService("ReplicatedStorage").ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "UIPolishGui", 999)
 
 -- ── FONT CONSTANTS ──────────────────────────────────────────────────────────
 -- Applied to every panel on first load via applyFonts()

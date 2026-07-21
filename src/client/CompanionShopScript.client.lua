@@ -351,7 +351,7 @@ end }
 -- Hotkey: K
 UIS.InputBegan:Connect(function(input, gpe)
     if gpe then return end
-    if input.KeyCode == Enum.KeyCode.K then
+    if input.KeyCode == Enum.KeyCode.O then
         if panel.Visible then close() else open() end
     end
 end)
