@@ -4,13 +4,32 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 
--- Wait for GUI
-local panel = script.Parent
-local mainFrame = panel:WaitForChild("MainFrame")
-local goldLabel = mainFrame:WaitForChild("GoldLabel")
-local guestsLabel = mainFrame:WaitForChild("GuestsLabel")
-local progressFill = mainFrame:WaitForChild("ProgressBg"):WaitForChild("Fill")
-local progressLabel = mainFrame:WaitForChild("ProgressLabel")
+local playerGui = player:WaitForChild("PlayerGui")
+
+local function findGuiWithChild(childName)
+	for _, g in ipairs(playerGui:GetChildren()) do
+		if g:IsA("ScreenGui") and g:FindFirstChild(childName, true) then
+			g.ResetOnSpawn = false
+			return g
+		end
+	end
+	return nil
+end
+
+local panelGui = findGuiWithChild("MainFrame")
+if not panelGui then
+	print("[UpdateScript] No GUI with MainFrame found — Progression panel skipped")
+	return
+end
+local mainFrame = panelGui:FindFirstChild("MainFrame", true)
+local goldLabel = mainFrame and mainFrame:FindFirstChild("GoldLabel", true)
+local guestsLabel = mainFrame and mainFrame:FindFirstChild("GuestsLabel", true)
+local progressFill = mainFrame and mainFrame:FindFirstChild("ProgressBg", true) and mainFrame.ProgressBg:FindFirstChild("Fill")
+local progressLabel = mainFrame and mainFrame:FindFirstChild("ProgressLabel", true)
+if not mainFrame or not goldLabel then
+	print("[UpdateScript] Required GUI elements not found — skipping")
+	return
+end
 
 -- RemoteFunction for data
 local requestData = ReplicatedStorage:WaitForChild("RemoteFunctions", 10)

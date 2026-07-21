@@ -1,7 +1,21 @@
 -- [[LocalScript] ZundaFrameAnim (ref: RBXE8A45ABE5F6C48F285FDA5A0B99C4A0A)]]
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local gui = script.Parent
+local player = game:GetService("Players").LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local gui
+for _, g in ipairs(playerGui:GetChildren()) do
+	if g:IsA("ScreenGui") and g:FindFirstChild("BorderAccent", true) then
+		g.ResetOnSpawn = false
+		gui = g
+		break
+	end
+end
+if not gui then
+	print("[ZundaFrameAnim] BorderAccent GUI not found — skipping frame animation")
+	return
+end
 local borderStroke = gui:FindFirstChild("BorderAccent") and gui.BorderAccent:FindFirstChildOfClass("UIStroke")
 
 local corners = {}
@@ -26,7 +40,7 @@ local function animateCorner(corner, index)
 
     task.spawn(function()
         while corner.Parent do
-            local t = tick() * 0.6 + phase
+            local t = os.clock() * 0.6 + phase
 
             -- Primary breathes 0.95x ↔ 1.05x with subtle rotation drift
             if primary then
@@ -60,7 +74,7 @@ end
 if borderStroke then
     task.spawn(function()
         while borderStroke.Parent do
-            local t = tick() * 0.4
+            local t = os.clock() * 0.4
             borderStroke.Transparency = 0.7 + math.sin(t) * 0.12
             borderStroke.Color = Color3.fromHSV(
                 (math.sin(t * 0.3) * 0.04 + 0.93) % 1,  -- hue drifts in pink/lavender range

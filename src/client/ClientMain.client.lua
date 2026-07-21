@@ -7,8 +7,8 @@ local Matter = require(ReplicatedStorage.Packages.Matter)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
 
-local CookingHUD = require(StarterPlayer.StarterPlayerScripts.Client.UI.Cooking.Components.CookingHUD)
-local InventoryHUD = require(StarterPlayer.StarterPlayerScripts.Client.UI.Inventory.Components.InventoryHUD)
+local CookingHUD = require(script.Parent.ui.cooking.components.CookingHUD)
+local InventoryHUD = require(script.Parent.ui.inventory.components.InventoryHUD)
 local CookingSession = require(ReplicatedStorage.Shared.Components.Cooking.CookingSession)
 local CookingScore = require(ReplicatedStorage.Shared.Components.Cooking.CookingScore)
 local ItemDrop = require(ReplicatedStorage.Shared.Components.ItemDrop)
@@ -21,9 +21,11 @@ local loop = Matter.Loop.new(world)
 
 -- 2. Load all Client Systems
 local systems = {}
-for _, child in ipairs(StarterPlayer.StarterPlayerScripts.Client.Systems:GetDescendants()) do
-	if child:IsA("ModuleScript") then
-		table.insert(systems, require(child))
+if script.Parent:FindFirstChild("systems") then
+	for _, child in ipairs(script.Parent.systems:GetDescendants()) do
+		if child:IsA("ModuleScript") then
+			table.insert(systems, require(child))
+		end
 	end
 end
 
@@ -44,29 +46,12 @@ root:render(React.createElement(React.Fragment, nil, {
 		recipeName = "Zunda Apple Pie",
 		duration = 15,
 		timeElapsed = 0,
+		visible = false,
 	}),
 	InventoryHUD = React.createElement(InventoryHUD)
 }))
 
 print("[ClientMain] Matter ECS and React UI initialized successfully.")
-
--- 5. PoC Trigger: Fake a cooking session start after 3 seconds!
-task.delay(3, function()
-	print("Triggering Cooking Session PoC!")
-	world:spawn(
-		CookingSession({
-			playerId = LocalPlayer.UserId,
-			recipeId = "Zunda Apple Pie",
-			startTime = os.clock(),
-			duration = 15,
-		}),
-		CookingScore({
-			perfectHits = 0,
-			misses = 0,
-			totalNotes = 0,
-		})
-	)
-end)
 
 -- 6. PoC Trigger: Fake an item drop collection after 5 seconds!
 task.delay(5, function()

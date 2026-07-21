@@ -9,12 +9,82 @@ local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 
 local player = Players.LocalPlayer
-local gui = script.Parent
-local panel = gui:WaitForChild("Panel")
-local toggleBtn = gui:WaitForChild("ToggleButton")
-local closeBtn = panel.TitleBar:WaitForChild("TextButton")
-local listFrame = panel:WaitForChild("MaterialsList")
-local toasts = gui:WaitForChild("ToastContainer")
+local playerGui = player:WaitForChild("PlayerGui")
+
+local ClientGuiBootstrap = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("ClientGuiBootstrap"))
+
+local gui
+local panel
+local toggleBtn
+local closeBtn
+local listFrame
+
+for _, g in ipairs(playerGui:GetChildren()) do
+	if g:IsA("ScreenGui") and g:FindFirstChild("MaterialsList", true) then
+		gui = g
+		gui.ResetOnSpawn = false
+		panel = gui:FindFirstChild("Panel", true)
+		toggleBtn = gui:FindFirstChild("ToggleButton", true)
+		closeBtn = panel and (panel:FindFirstChild("CloseBtn", true) or panel:FindFirstChild("TextButton", true))
+		listFrame = panel and panel:FindFirstChild("MaterialsList", true)
+		break
+	end
+end
+
+if not gui or not panel or not listFrame then
+	gui = ClientGuiBootstrap.createScreenGui(player, "MaterialsGui", 24)
+
+	panel = Instance.new("Frame", gui)
+	panel.Name = "Panel"
+	panel.Size = UDim2.new(0, 420, 0, 480)
+	panel.Position = UDim2.new(0.5, -210, 0.5, -240)
+	panel.BackgroundColor3 = Color3.fromRGB(24, 32, 40)
+	panel.BorderSizePixel = 0
+	panel.Visible = false
+	Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 16)
+	local stroke = Instance.new("UIStroke", panel)
+	stroke.Color = Color3.fromRGB(120, 200, 180)
+	stroke.Thickness = 2
+
+	local title = Instance.new("TextLabel", panel)
+	title.Name = "Title"
+	title.Size = UDim2.new(1, -60, 0, 44)
+	title.Position = UDim2.new(0, 16, 0, 8)
+	title.BackgroundTransparency = 1
+	title.Text = "🎒  Materials Inventory"
+	title.Font = Enum.Font.FredokaOne
+	title.TextSize = 24
+	title.TextColor3 = Color3.fromRGB(200, 240, 230)
+	title.TextXAlignment = Enum.TextXAlignment.Left
+
+	closeBtn = Instance.new("TextButton", panel)
+	closeBtn.Name = "CloseBtn"
+	closeBtn.Size = UDim2.new(0, 32, 0, 32)
+	closeBtn.Position = UDim2.new(1, -42, 0, 12)
+	closeBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 100)
+	closeBtn.Text = "✕"
+	closeBtn.Font = Enum.Font.GothamBold
+	closeBtn.TextSize = 16
+	closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	closeBtn.BorderSizePixel = 0
+	Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
+
+	listFrame = Instance.new("ScrollingFrame", panel)
+	listFrame.Name = "MaterialsList"
+	listFrame.Size = UDim2.new(1, -28, 1, -72)
+	listFrame.Position = UDim2.new(0, 14, 0, 60)
+	listFrame.BackgroundTransparency = 1
+	listFrame.BorderSizePixel = 0
+	listFrame.ScrollBarThickness = 6
+	listFrame.ScrollBarImageColor3 = Color3.fromRGB(120, 200, 180)
+	listFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+	local layout = Instance.new("UIGridLayout", listFrame)
+	layout.CellSize = UDim2.new(0, 118, 0, 118)
+	layout.CellPadding = UDim2.new(0, 10, 0, 10)
+end
+local toasts = gui:FindFirstChild("ToastContainer", true)
 
 local RE = RS:WaitForChild("RemoteEvents")
 local notify = RE:FindFirstChild("NotifyPlayer")
@@ -151,7 +221,7 @@ end)
 closeBtn.MouseButton1Click:Connect(function() setOpen(false) end)
 UIS.InputBegan:Connect(function(input, processed)
 	if processed then return end
-	if input.KeyCode == Enum.KeyCode.I then setOpen(not panel.Visible) end
+	if input.KeyCode == Enum.KeyCode.U then setOpen(not panel.Visible) end
 end)
 
 -- ---- LISTEN FOR NOTIFICATIONS ----

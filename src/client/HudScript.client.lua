@@ -1,18 +1,128 @@
--- [[LocalScript] HUDScript (ref: RBX0DDB0C73D6D143E9BCA492F09680DD0F)]]
+-- [[LocalScript] HUDScript (ref: RBX0DDB0C73D6D143E9BCA492F09680DD0F)]
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RS = game:GetService("ReplicatedStorage")
-local UIHelper = require(RS.Shared.Modules.UIHelper)
-local UIConfig = require(RS.ConfigurationFiles.UIConfig)
-local gui = script.Parent
-local pill = gui:WaitForChild("ChefPill")
-local badge = pill:WaitForChild("Badge")
-local tierLabel = pill:WaitForChild("TierLabel")
-local xpFill = pill:WaitForChild("XPBar"):WaitForChild("Fill")
-local combo = gui:WaitForChild("ComboMeter")
-local cCount = combo:WaitForChild("Count")
-local cMult = combo:WaitForChild("Mult")
-local popupRoot = gui:WaitForChild("PopupRoot")
+local UIHelper = require(RS:WaitForChild("Shared"):WaitForChild("Modules"):WaitForChild("UIHelper"))
+local UIConfig = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("UIConfig"))
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Helper to find or build ZundaHUD
+local function getOrBuildZundaHUD()
+	local existing = playerGui:FindFirstChild("ZundaHUD")
+	if existing and existing:IsA("ScreenGui") then
+		existing.ResetOnSpawn = false
+		return existing
+	end
+	local sg = Instance.new("ScreenGui")
+	sg.Name = "ZundaHUD"
+	sg.ResetOnSpawn = false
+	sg.DisplayOrder = 10
+	sg.Parent = playerGui
+	return sg
+end
+
+local gui = getOrBuildZundaHUD()
+
+-- ChefPill (top-left badge showing tier, XP bar)
+local pill = gui:FindFirstChild("ChefPill")
+if not pill then
+	pill = Instance.new("Frame", gui)
+	pill.Name = "ChefPill"
+	pill.Size = UDim2.new(0, 240, 0, 54)
+	pill.Position = UDim2.new(0, 16, 0, 16)
+	pill.BackgroundColor3 = Color3.fromRGB(20, 16, 30)
+	pill.BorderSizePixel = 0
+	Instance.new("UICorner", pill).CornerRadius = UDim.new(0, 27)
+	local pillStroke = Instance.new("UIStroke", pill)
+	pillStroke.Color = Color3.fromRGB(200, 160, 240)
+	pillStroke.Thickness = 2
+
+	local badge = Instance.new("TextLabel", pill)
+	badge.Name = "Badge"
+	badge.Size = UDim2.new(0, 44, 1, 0)
+	badge.Position = UDim2.new(0, 6, 0, 0)
+	badge.BackgroundTransparency = 1
+	badge.Text = "🌱"
+	badge.Font = Enum.Font.GothamBold
+	badge.TextScaled = true
+
+	local tierLabel = Instance.new("TextLabel", pill)
+	tierLabel.Name = "TierLabel"
+	tierLabel.Size = UDim2.new(1, -54, 0, 22)
+	tierLabel.Position = UDim2.new(0, 52, 0, 6)
+	tierLabel.BackgroundTransparency = 1
+	tierLabel.Text = "Chef · Lv 1"
+	tierLabel.Font = Enum.Font.GothamBold
+	tierLabel.TextSize = 13
+	tierLabel.TextColor3 = Color3.fromRGB(220, 210, 255)
+	tierLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+	local xpBar = Instance.new("Frame", pill)
+	xpBar.Name = "XPBar"
+	xpBar.Size = UDim2.new(1, -54, 0, 8)
+	xpBar.Position = UDim2.new(0, 52, 1, -14)
+	xpBar.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+	xpBar.BorderSizePixel = 0
+	Instance.new("UICorner", xpBar).CornerRadius = UDim.new(1, 0)
+
+	local fill = Instance.new("Frame", xpBar)
+	fill.Name = "Fill"
+	fill.Size = UDim2.new(0, 0, 1, 0)
+	fill.BackgroundColor3 = Color3.fromRGB(200, 160, 240)
+	fill.BorderSizePixel = 0
+	Instance.new("UICorner", fill).CornerRadius = UDim.new(1, 0)
+end
+
+local badge = pill:FindFirstChild("Badge") or pill:FindFirstChildWhichIsA("TextLabel")
+local tierLabel = pill:FindFirstChild("TierLabel") or badge
+local xpFill = pill:FindFirstChild("XPBar") and pill.XPBar:FindFirstChild("Fill")
+
+-- ComboMeter (top-centre)
+local combo = gui:FindFirstChild("ComboMeter")
+if not combo then
+	combo = Instance.new("Frame", gui)
+	combo.Name = "ComboMeter"
+	combo.Size = UDim2.new(0, 220, 0, 70)
+	combo.Position = UDim2.new(0.5, -110, 0, 80)
+	combo.BackgroundColor3 = Color3.fromRGB(20, 16, 30)
+	combo.BackgroundTransparency = 0.1
+	combo.BorderSizePixel = 0
+	combo.Visible = false
+	Instance.new("UICorner", combo).CornerRadius = UDim.new(0, 14)
+
+	local cCount = Instance.new("TextLabel", combo)
+	cCount.Name = "Count"
+	cCount.Size = UDim2.new(1, 0, 0.55, 0)
+	cCount.Position = UDim2.new(0, 0, 0, 0)
+	cCount.BackgroundTransparency = 1
+	cCount.Text = "0 COMBO"
+	cCount.Font = Enum.Font.GothamBlack
+	cCount.TextScaled = true
+	cCount.TextColor3 = Color3.fromRGB(255, 240, 255)
+
+	local cMult = Instance.new("TextLabel", combo)
+	cMult.Name = "Mult"
+	cMult.Size = UDim2.new(1, 0, 0.45, 0)
+	cMult.Position = UDim2.new(0, 0, 0.55, 0)
+	cMult.BackgroundTransparency = 1
+	cMult.Text = "x1.0"
+	cMult.Font = Enum.Font.GothamBold
+	cMult.TextScaled = true
+	cMult.TextColor3 = Color3.fromRGB(200, 255, 200)
+end
+local cCount = combo:FindFirstChild("Count") or combo:FindFirstChildWhichIsA("TextLabel")
+local cMult = combo:FindFirstChild("Mult") or cCount
+
+-- PopupRoot for floating reward popups
+local popupRoot = gui:FindFirstChild("PopupRoot")
+if not popupRoot then
+	popupRoot = Instance.new("Frame", gui)
+	popupRoot.Name = "PopupRoot"
+	popupRoot.Size = UDim2.new(1, 0, 1, 0)
+	popupRoot.BackgroundTransparency = 1
+	popupRoot.BorderSizePixel = 0
+end
 
 local rewardEvents = RS:WaitForChild("RewardEvents")
 local PopupEvent       = rewardEvents:WaitForChild("PopupEvent")
@@ -154,33 +264,33 @@ task.spawn(function()
     end
 end)
 
--- ===== Extended handlers =====
+-- ===== Extended handlers (optional — skip gracefully if GUI/events not present) =====
 local UserInputService = game:GetService("UserInputService")
-local daily = gui:WaitForChild("DailyWidget")
-local dTitle = daily:WaitForChild("Title")
-local dDesc = daily:WaitForChild("Desc")
-local dFill = daily:WaitForChild("Bar"):WaitForChild("Fill")
+local daily = gui:FindFirstChild("DailyWidget")
+local dTitle = daily and daily:FindFirstChild("Title")
+local dDesc  = daily and daily:FindFirstChild("Desc")
+local dFill  = daily and daily:FindFirstChild("Bar") and daily.Bar:FindFirstChild("Fill")
 
-local DailyUpdate = rewardEvents:WaitForChild("DailyUpdate")
-local LoginBonusEvent = rewardEvents:WaitForChild("LoginBonusEvent")
-local AchievementUnlocked = rewardEvents:WaitForChild("AchievementUnlocked")
-local PowerupUpdate = rewardEvents:WaitForChild("PowerupUpdate")
-local UsePowerup = rewardEvents:WaitForChild("UsePowerup")
-local UpgradeTool = rewardEvents:WaitForChild("UpgradeTool")
-local GetCompendium = rewardEvents:WaitForChild("GetCompendium")
+local DailyUpdate       = rewardEvents:FindFirstChild("DailyUpdate")
+local LoginBonusEvent   = rewardEvents:FindFirstChild("LoginBonusEvent")
+local AchievementUnlocked = rewardEvents:WaitForChild("AchievementUnlocked") -- declared in meta
+local PowerupUpdate     = rewardEvents:FindFirstChild("PowerupUpdate")
+local UsePowerup        = rewardEvents:FindFirstChild("UsePowerup")
+local UpgradeTool       = rewardEvents:FindFirstChild("UpgradeTool")
+local GetCompendium     = rewardEvents:FindFirstChild("GetCompendium")
 
-DailyUpdate.OnClientEvent:Connect(function(q, progress, claimed)
-    if not q then return end
-    dTitle.Text = "📋 " .. (claimed and "Daily ✓" or "Daily Quest")
-    dDesc.Text = q.title .. "  " .. progress .. "/" .. q.goal
-    local f = math.clamp(progress / q.goal, 0, 1)
-    TweenService:Create(dFill, TweenInfo.new(0.3), { Size = UDim2.new(f, 0, 1, 0) }):Play()
-    if claimed then
-        dFill.BackgroundColor3 = UIConfig.COLORS.Success
-    end
-end)
+if DailyUpdate and dTitle and dDesc then
+	DailyUpdate.OnClientEvent:Connect(function(q, progress, claimed)
+		if not q then return end
+		dTitle.Text = "📋 " .. (claimed and "Daily ✓" or "Daily Quest")
+		dDesc.Text = q.title .. "  " .. progress .. "/" .. q.goal
+		local f = math.clamp(progress / q.goal, 0, 1)
+		if dFill then TweenService:Create(dFill, TweenInfo.new(0.3), { Size = UDim2.new(f, 0, 1, 0) }):Play() end
+		if claimed and dFill then dFill.BackgroundColor3 = UIConfig.COLORS.Success end
+	end)
+end
 
-LoginBonusEvent.OnClientEvent:Connect(function(streak, bonus, q)
+if LoginBonusEvent then LoginBonusEvent.OnClientEvent:Connect(function(streak, bonus, q)
     local banner = Instance.new("Frame")
     banner.Size = UDim2.new(0, 480, 0, 140)
     banner.Position = UDim2.new(0.5, -240, 0.3, -70)

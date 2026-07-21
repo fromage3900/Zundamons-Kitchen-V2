@@ -9,12 +9,26 @@ local player = game:GetService("Players").LocalPlayer
 local backpack = player:WaitForChild("Backpack")
 local camera = workspace.CurrentCamera
 
--- DISABLE BASIC ROBLOX HOTBAR
-StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+-- ENABLE ROBLOX HOTBAR FOR RELIABLE TOOL SLOTS 1-9
+pcall(function()
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
+end)
 
-local CustomInventoryGUI = script.Parent
-local hotBar = CustomInventoryGUI.hotBar
-local Inventory = CustomInventoryGUI.Inventory
+local playerGui = player:WaitForChild("PlayerGui")
+
+local CustomInventoryGUI
+local hotBar
+local Inventory
+
+for _, g in ipairs(playerGui:GetChildren()) do
+	if g:IsA("ScreenGui") and g:FindFirstChild("hotBar", true) then
+		CustomInventoryGUI = g
+		CustomInventoryGUI.ResetOnSpawn = false
+		hotBar = CustomInventoryGUI:FindFirstChild("hotBar", true)
+		Inventory = CustomInventoryGUI:FindFirstChild("Inventory", true)
+		break
+	end
+end
 local toolButton = script.toolButton
 
 local inventoryHandler = require(script.SETTINGS)
