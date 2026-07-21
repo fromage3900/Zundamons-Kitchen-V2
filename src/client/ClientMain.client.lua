@@ -8,8 +8,10 @@ local React = require(ReplicatedStorage.Packages.React)
 local ReactRoblox = require(ReplicatedStorage.Packages.ReactRoblox)
 
 local CookingHUD = require(StarterPlayer.StarterPlayerScripts.Client.UI.Cooking.Components.CookingHUD)
+local InventoryHUD = require(StarterPlayer.StarterPlayerScripts.Client.UI.Inventory.Components.InventoryHUD)
 local CookingSession = require(ReplicatedStorage.Shared.Components.Cooking.CookingSession)
 local CookingScore = require(ReplicatedStorage.Shared.Components.Cooking.CookingScore)
+local ItemDrop = require(ReplicatedStorage.Shared.Components.ItemDrop)
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -37,10 +39,13 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local root = ReactRoblox.createRoot(PlayerGui)
 
 -- In a real scenario, this state would be driven by Reflex or a central UI Store
-root:render(React.createElement(CookingHUD, {
-	recipeName = "Zunda Apple Pie",
-	duration = 15,
-	timeElapsed = 0,
+root:render(React.createElement(React.Fragment, nil, {
+	CookingHUD = React.createElement(CookingHUD, {
+		recipeName = "Zunda Apple Pie",
+		duration = 15,
+		timeElapsed = 0,
+	}),
+	InventoryHUD = React.createElement(InventoryHUD)
 }))
 
 print("[ClientMain] Matter ECS and React UI initialized successfully.")
@@ -59,6 +64,18 @@ task.delay(3, function()
 			perfectHits = 0,
 			misses = 0,
 			totalNotes = 0,
+		})
+	)
+end)
+
+-- 6. PoC Trigger: Fake an item drop collection after 5 seconds!
+task.delay(5, function()
+	print("Triggering ItemDrop PoC!")
+	world:spawn(
+		ItemDrop({
+			targetPlayerId = LocalPlayer.UserId,
+			itemName = "Zunda Berry",
+			quantity = 10,
 		})
 	)
 end)

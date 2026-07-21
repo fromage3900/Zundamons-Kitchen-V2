@@ -16,6 +16,12 @@ local DataSchema = {
 	-- Meta progression
 	ChefLevel = 1,
 	Experience = 0,
+
+	-- Companions
+	EquippedCompanion = "Mini Zunda",
+	UnlockedCompanions = {
+		["Mini Zunda"] = true,
+	},
 }
 
 return DataSchema
