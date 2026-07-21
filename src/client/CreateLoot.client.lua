@@ -24,7 +24,7 @@ local icons = {
 	Key = "rbxassetid://6679078910",
 	Material = "rbxassetid://6879525567",
 	Consumable = "rbxassetid://7197382093",
-	Explosive = "rbxassetid://7635304803"
+	Explosive = "rbxassetid://7635304803",
 }
 
 local function CreateNotification(Title, Text, ObjType, image)
@@ -34,7 +34,7 @@ local function CreateNotification(Title, Text, ObjType, image)
 	else
 		myicon = image
 	end
-	StarterGui:SetCore("SendNotification", {Title = Title, Text = Text, Icon = myicon, Duration = 5})
+	StarterGui:SetCore("SendNotification", { Title = Title, Text = Text, Icon = myicon, Duration = 5 })
 end
 
 local function destroy(item, code)
@@ -45,7 +45,9 @@ local function destroy(item, code)
 end
 
 local function tweenPoint(targetPart, parentObj)
-	if not targetPart then return end
+	if not targetPart then
+		return
+	end
 	-- Add a trail to two attachments
 	local a0 = Instance.new("Attachment", targetPart)
 	a0.Position = Vector3.new(1, 0, 0)
@@ -57,7 +59,7 @@ local function tweenPoint(targetPart, parentObj)
 	trail.FaceCamera = true
 	trail.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(1, 1)
+		NumberSequenceKeypoint.new(1, 1),
 	})
 	trail.Lifetime = 0.35
 
@@ -67,26 +69,33 @@ local function tweenPoint(targetPart, parentObj)
 	local endPos = startPos + Vector3.new(x_add, 0, y_add)
 	local arcHeight = 5
 	local travelTime = 0.25
-	local xzGoal = {Position = Vector3.new(endPos.X, startPos.Y, endPos.Z)}
+	local xzGoal = { Position = Vector3.new(endPos.X, startPos.Y, endPos.Z) }
 	local xzTweenInfo = TweenInfo.new(travelTime, Enum.EasingStyle.Linear)
 	local xzTween = TweenService:Create(targetPart, xzTweenInfo, xzGoal)
 	xzTween:Play()
 	local midY = startPos.Y + arcHeight
 
-	local upTween = TweenService:Create(targetPart, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
-		Position = Vector3.new(startPos.X + (x_add / 2), midY, startPos.Z + (y_add / 2))
-	})
+	local upTween = TweenService:Create(
+		targetPart,
+		TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
+		{
+			Position = Vector3.new(startPos.X + (x_add / 2), midY, startPos.Z + (y_add / 2)),
+		}
+	)
 
-	local downTween = TweenService:Create(targetPart, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
-		Position = Vector3.new(endPos.X, endPos.Y, endPos.Z)
-	})
+	local downTween =
+		TweenService:Create(targetPart, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+			Position = Vector3.new(endPos.X, endPos.Y, endPos.Z),
+		})
 
 	upTween:Play()
 	upTween.Completed:Connect(function()
 		downTween:Play()
 		downTween.Completed:Connect(function()
 			targetPart:SetAttribute("TweenEnd", true)
-			if parentObj then parentObj:SetAttribute("TweenEnd", true) end
+			if parentObj then
+				parentObj:SetAttribute("TweenEnd", true)
+			end
 		end)
 	end)
 end
@@ -138,6 +147,15 @@ local function makeLootLocal(myloot, position, generatedCode, quality)
 
 	obj.Parent = lootfolder or workspace
 
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.Name = "PickupPrompt"
+	prompt.ActionText = "Pick Up"
+	prompt.ObjectText = myloot
+	prompt.HoldDuration = 0
+	prompt.MaxActivationDistance = 12
+	prompt.RequiresLineOfSight = false
+	prompt.Parent = mainPart
+
 	-- Store quality on crafted food items for serving
 	if quality and quality ~= "" then
 		obj:SetAttribute("Quality", quality)
@@ -149,13 +167,17 @@ local function makeLootLocal(myloot, position, generatedCode, quality)
 	if lootBB then
 		local lootBBClone = lootBB:Clone()
 		local lootLabel = lootBBClone:FindFirstChild("LootFrame") and lootBBClone.LootFrame:FindFirstChild("LootLabel")
-		if lootLabel then lootLabel.Text = myloot end
+		if lootLabel then
+			lootLabel.Text = myloot
+		end
 		lootBBClone.Parent = mainPart
 	end
 
 	local function onTouch(hit)
 		local character = hit.Parent
-		if not character then return end
+		if not character then
+			return
+		end
 		local humanoid = character:FindFirstChild("Humanoid")
 		if humanoid then
 			local player = game.Players.LocalPlayer
@@ -169,7 +191,9 @@ local function makeLootLocal(myloot, position, generatedCode, quality)
 					local mysound = obj:GetAttribute("Sound") or mainPart:GetAttribute("Sound")
 					if mysound and LocalSounds then
 						local sound = LocalSounds:FindFirstChild(mysound)
-						if sound then sound:Play() end
+						if sound then
+							sound:Play()
+						end
 					end
 					local myType = obj:GetAttribute("Type") or obj:GetAttribute("SubType") or "Material"
 					local image = nil
@@ -177,12 +201,19 @@ local function makeLootLocal(myloot, position, generatedCode, quality)
 					if texture and texture:IsA("StringValue") then
 						image = texture.Value
 					end
-					CreateNotification(myType .. " Collected", "Picked up " .. myType .. ": " .. obj.Name, myType, image)
+					CreateNotification(
+						myType .. " Collected",
+						"Picked up " .. myType .. ": " .. obj.Name,
+						myType,
+						image
+					)
 					destroy(obj, generatedCode)
 				else
 					if LocalSounds then
 						local sound = LocalSounds:FindFirstChild("Fail")
-						if sound then sound:Play() end
+						if sound then
+							sound:Play()
+						end
 					end
 					obj:SetAttribute("isTouched", false)
 					mainPart:SetAttribute("isTouched", false)
@@ -190,6 +221,19 @@ local function makeLootLocal(myloot, position, generatedCode, quality)
 			end
 		end
 	end
+
+	local function claimFromPrompt()
+		local player = game.Players.LocalPlayer
+		if not player.Character or not mainPart.Parent then
+			return
+		end
+		local root = player.Character:FindFirstChild("HumanoidRootPart")
+		if not root or (root.Position - mainPart.Position).Magnitude > 14 then
+			return
+		end
+		onTouch(root)
+	end
+	prompt.Triggered:Connect(claimFromPrompt)
 
 	if obj:IsA("Model") then
 		for _, desc in ipairs(obj:GetDescendants()) do

@@ -1,170 +1,221 @@
--- [[ModuleScript] LootModule (ref: RBX4573179EFA054EED872412F08A8A6EF4)]]
-local loot_module = {}
-local RS = game.ReplicatedStorage
-local RE = RS:WaitForChild("RemoteEvents", 10)
-local RF = RS:WaitForChild("RemoteFunctions", 10)
-local loot = RS:WaitForChild("Loot", 10)
-if not RE or not RF or not loot then
-	warn("[LootModule] Core folders not found — loot disabled")
-	return { GiveLoot = function() return false end, generateLoot = function() end, lootMaker = function() return {} end }
-end
-local give_loot = RF:WaitForChild("GiveLoot", 10)
-local removeCode = RE:WaitForChild("RemoveCode", 10)
-local MakeLootEvent = RE:WaitForChild("MakeLootEvent", 10)
-local finalLoots = loot:GetChildren()
-local sellLoot = RF:WaitForChild("sellLoot", 10)
-local configFiles = RS:WaitForChild("ConfigurationFiles", 10)
-local mineableConfig = configFiles and require(configFiles:WaitForChild("MineableConfig", 10))
-local priceLists = mineableConfig and mineableConfig.priceLists or {}
+--!strict
+-- Server-owned physical-drop claims. Visuals remain client-local, but every
+-- claim is bound to one player, item, origin, expiry, and exactly-once token.
 
-local PlayerDataService = require(game.ServerScriptService.Services.PlayerDataService)
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
-local RewardCore = require(game:GetService("ServerScriptService").Services.RewardCore)
-local ChefLevelConfig = configFiles and require(configFiles:WaitForChild("ChefLevelConfig", 10))
+local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local remoteFunctions = ReplicatedStorage:WaitForChild("RemoteFunctions")
+local lootFolder = ReplicatedStorage:WaitForChild("Loot")
+local makeLoot = remoteEvents:WaitForChild("MakeLootEvent") :: RemoteEvent
+local removeCode = remoteEvents:WaitForChild("RemoveCode") :: RemoteEvent
+local giveLoot = remoteFunctions:WaitForChild("GiveLoot") :: RemoteFunction
+local sellLoot = remoteFunctions:WaitForChild("sellLoot") :: RemoteFunction
 
-local codes: { [string]: { { string } } } = {}
-local sellTimestamps: { [string]: { number } } = {}
+local MineableConfig = require(ReplicatedStorage.ConfigurationFiles.MineableConfig)
+local ChefLevelConfig = require(ReplicatedStorage.ConfigurationFiles.ChefLevelConfig)
+local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
+local RewardCore = require(ServerScriptService.Services.RewardCore)
+
+local CLAIM_DISTANCE = 22
+local CLAIM_LIFETIME = 60
+local MAX_CLAIMS_PER_SECOND = 10
 local MAX_SELLS_PER_SECOND = 5
 
-local function validateRateLimit(player: Player): boolean
-	local now = tick()
-	local timestamps = sellTimestamps[player.Name] or {}
+local LootModule = {}
+local claims: { [string]: { ownerId: number, item: string, position: Vector3, expiresAt: number } } = {}
+local playerClaims: { [number]: { [string]: boolean } } = {}
+local claimTimes: { [number]: { number } } = {}
+local sellTimes: { [number]: { number } } = {}
+
+local function withinRateLimit(bucket: { [number]: { number } }, userId: number, maximum: number): boolean
+	local now = os.clock()
 	local recent = {}
-	for _, ts in ipairs(timestamps) do
-		if now - ts <= 1 then
-			table.insert(recent, ts)
+	for _, timestamp in ipairs(bucket[userId] or {}) do
+		if now - timestamp <= 1 then
+			table.insert(recent, timestamp)
 		end
 	end
-	if #recent >= MAX_SELLS_PER_SECOND then
+	if #recent >= maximum then
+		bucket[userId] = recent
 		return false
 	end
 	table.insert(recent, now)
-	sellTimestamps[player.Name] = recent
+	bucket[userId] = recent
 	return true
 end
 
-function handleOreSell(player, item)
-	if typeof(item) ~= "string" or not priceLists[item] then
-		return false
+local function removeClaim(token: string)
+	local claim = claims[token]
+	if not claim then
+		return
 	end
-	if not validateRateLimit(player) then
-		return false
+	claims[token] = nil
+	local owned = playerClaims[claim.ownerId]
+	if owned then
+		owned[token] = nil
+		if next(owned) == nil then
+			playerClaims[claim.ownerId] = nil
+		end
 	end
+end
 
+local function validRoot(player: Player): BasePart?
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	if humanoid and humanoid.Health > 0 and root and root:IsA("BasePart") then
+		return root
+	end
+	return nil
+end
+
+local function grantClaim(player: Player, itemName: string, token: string): boolean
+	if not withinRateLimit(claimTimes, player.UserId, MAX_CLAIMS_PER_SECOND) then
+		return false
+	end
+	local claim = claims[token]
+	if not claim or claim.ownerId ~= player.UserId or claim.item ~= itemName or os.clock() > claim.expiresAt then
+		return false
+	end
+	local root = validRoot(player)
+	if not root or (root.Position - claim.position).Magnitude > CLAIM_DISTANCE then
+		return false
+	end
+	local template = lootFolder:FindFirstChild(itemName)
+	if not template then
+		return false
+	end
+	-- Consume before settlement so concurrent/replayed requests cannot both win.
+	removeClaim(token)
+	local baseAmount = template:GetAttribute("Value") or 1
+	if type(baseAmount) ~= "number" or baseAmount <= 0 then
+		baseAmount = 1
+	end
+	local extraChance = RewardCore.companionBuff(player, "extra_drop")
+	local totalAmount = math.floor(baseAmount) * ((extraChance > 0 and math.random() < extraChance) and 2 or 1)
+	local result = RewardCore.settle(player, {
+		xp = ChefLevelConfig.xpRewards.gather,
+		reason = "gather",
+		popupItem = string.format("%dx %s", totalAmount, itemName),
+	}, function(data)
+		data[itemName] = (data[itemName] or 0) + totalAmount
+		if itemName == "Wood" or itemName == "Wood Log" then
+			data.Wood = data[itemName]
+			data["Wood Log"] = data[itemName]
+		end
+		data.gathered_items = data.gathered_items or {}
+		data.gathered_items[itemName] = true
+		return true, { item = itemName, count = totalAmount }
+	end)
+	if not result.ok then
+		-- Mutation contention is safe to retry until the original expiry.
+		claims[token] = claim
+		playerClaims[player.UserId] = playerClaims[player.UserId] or {}
+		playerClaims[player.UserId][token] = true
+		return false
+	end
+	return true
+end
+
+function LootModule.generateLoot(player: Player, lootTable: { string }, position: Vector3, _quality: string?)
+	if typeof(position) ~= "Vector3" or type(lootTable) ~= "table" then
+		return
+	end
+	for _, itemName in ipairs(lootTable) do
+		if type(itemName) == "string" and lootFolder:FindFirstChild(itemName) then
+			local token = HttpService:GenerateGUID(false)
+			claims[token] = {
+				ownerId = player.UserId,
+				item = itemName,
+				position = position,
+				expiresAt = os.clock() + CLAIM_LIFETIME,
+			}
+			playerClaims[player.UserId] = playerClaims[player.UserId] or {}
+			playerClaims[player.UserId][token] = true
+			makeLoot:FireClient(player, itemName, position, token)
+		end
+	end
+end
+
+function LootModule.GiveLoot(player: Player, itemName: any, token: any): boolean
+	if type(itemName) ~= "string" or type(token) ~= "string" then
+		return false
+	end
+	return grantClaim(player, itemName, token)
+end
+
+function LootModule.lootMaker(totalLoot: number): { string }
+	local templates = lootFolder:GetChildren()
+	local selected = {}
+	if #templates == 0 then
+		return selected
+	end
+	for _ = 1, math.max(0, math.floor(totalLoot)) do
+		table.insert(selected, templates[math.random(1, #templates)].Name)
+	end
+	return selected
+end
+
+function LootModule.eraseData(player: Player)
+	for token in pairs(playerClaims[player.UserId] or {}) do
+		removeClaim(token)
+	end
+	claimTimes[player.UserId] = nil
+	sellTimes[player.UserId] = nil
+end
+
+giveLoot.OnServerInvoke = LootModule.GiveLoot
+removeCode.OnServerEvent:Connect(function(player, token, itemName)
+	if type(token) ~= "string" or type(itemName) ~= "string" then
+		return
+	end
+	local claim = claims[token]
+	if claim and claim.ownerId == player.UserId and claim.item == itemName then
+		removeClaim(token)
+	end
+end)
+
+sellLoot.OnServerInvoke = function(player, itemName)
+	if type(itemName) ~= "string" or not MineableConfig.priceLists[itemName] then
+		return false
+	end
+	if not withinRateLimit(sellTimes, player.UserId, MAX_SELLS_PER_SECOND) then
+		return false
+	end
 	local data = PlayerDataService.get(player)
-	if not data or not data[item] then
+	local quantity = data and data[itemName]
+	if type(quantity) ~= "number" or quantity <= 0 then
 		return false
 	end
-
-	local total = priceLists[item] * data[item]
-	data[item] = nil
-	total = RewardCore.addGold(player, total, "sell")
-	return data.gold or 0
+	local result = RewardCore.settle(player, {
+		gold = MineableConfig.priceLists[itemName] * quantity,
+		reason = "sell",
+	}, function(current)
+		if current[itemName] ~= quantity then
+			return false, "inventory_changed"
+		end
+		current[itemName] = nil
+		return true
+	end)
+	return result.ok and (PlayerDataService.get(player).gold or 0) or false
 end
 
-function loot_module.eraseData(player)
-	codes[player.Name] = nil
-	sellTimestamps[player.Name] = nil
-end
+Players.PlayerRemoving:Connect(LootModule.eraseData)
 
-function searchforCode(player, genCode, name, isRemoving)
-	local list = codes[player.Name]
-	if list then
-		for i = 1, #list do
-			if genCode == list[i][1] and name == list[i][2] then
-				if isRemoving then
-					table.remove(list, i)
-					break
-				end
-				return true
+task.spawn(function()
+	while true do
+		task.wait(10)
+		local now = os.clock()
+		for token, claim in pairs(claims) do
+			if now > claim.expiresAt then
+				removeClaim(token)
 			end
 		end
 	end
-	return false
-end
-
-function assignLoot(player, lootname, myloot)
-	local value = (myloot and myloot:GetAttribute("Value")) or 1
-	local data = PlayerDataService.getOrCreate(player)
-	if not data[lootname] then
-		data[lootname] = value
-	else
-		data[lootname] = data[lootname] + value
-	end
-	if lootname == "Wood" or lootname == "Wood Log" then
-		data["Wood"] = data[lootname]
-		data["Wood Log"] = data[lootname]
-	end
-	RewardCore.addXP(player, ChefLevelConfig.xpRewards.gather, "gather")
-	local popupEvt = game.ReplicatedStorage:FindFirstChild("RewardEvents")
-		and game.ReplicatedStorage.RewardEvents:FindFirstChild("PopupEvent")
-	if popupEvt then
-		popupEvt:FireClient(player, "item", "+" .. value .. " " .. lootname, Color3.fromRGB(160, 240, 170))
-	end
-	local extraChance = RewardCore.companionBuff and RewardCore.companionBuff(player, "extra_drop") or 0
-	if extraChance > 0 and math.random() < extraChance then
-		data[lootname] = (data[lootname] or 0) + value
-		if lootname == "Wood" or lootname == "Wood Log" then
-			data["Wood"] = data[lootname]
-			data["Wood Log"] = data[lootname]
-		end
-		if popupEvt then
-			popupEvt:FireClient(player, "bonus", "✨ " .. lootname .. " ×2 (Antimon!)", Color3.fromRGB(180, 240, 200))
-		end
-	end
-	RewardCore.notify(player, "gather", { item = lootname, count = value })
-	return true
-end
-
-function loot_module.GiveLoot(player, lootname, genCode)
-	if typeof(lootname) ~= "string" or typeof(genCode) ~= "string" then
-		return false
-	end
-	if genCode and player and lootname then
-		local myloot = loot:FindFirstChild(lootname)
-		-- Pass true for isRemoving so code cannot be claimed multiple times concurrently
-		local exists = searchforCode(player, genCode, lootname, true)
-		if exists and myloot then
-			return assignLoot(player, lootname, myloot)
-		end
-	end
-	return false
-end
-
-function StoreCode(player, mycode, name)
-	local playerName = player.Name
-	if codes[playerName] then
-		table.insert(codes[playerName], { mycode, name })
-	else
-		codes[playerName] = { { mycode, name } }
-	end
-end
-
-function loot_module.lootMaker(totalLoot)
-	local selLoot = {}
-	for i = 1, totalLoot do
-		local obj = finalLoots[math.random(1, #finalLoots)]
-		table.insert(selLoot, obj.Name)
-	end
-	return selLoot
-end
-
-function loot_module.generateLoot(player, loottable, position, quality)
-	-- quality: optional string ("perfect", "great", "ok") for crafted food
-	if not loottable then return end
-	for i = 1, #loottable do
-		local generatedCode = tick() .. "" .. math.random(600, 10000000)
-		local obj = loottable[i]
-		StoreCode(player, generatedCode, obj)
-		MakeLootEvent:FireClient(player, obj, position, generatedCode, quality)
-	end
-end
-
-removeCode.OnServerEvent:Connect(function(player, genCode, name, isRemoving)
-	searchforCode(player, genCode, name, isRemoving == true)
 end)
 
-give_loot.OnServerInvoke = loot_module.GiveLoot
-sellLoot.OnServerInvoke = handleOreSell
-
-return loot_module
+return LootModule
