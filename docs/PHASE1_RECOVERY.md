@@ -29,6 +29,17 @@ Phase 1 is complete only when:
 
 1. The recovery branch has no unexplained tracked or untracked changes.
 2. Its tracked snapshot matches the archive for all retained project files.
-3. Differences from the archive are limited to documented local/generated exclusions and this recovery policy.
+3. Differences from the archive are limited to documented local/generated exclusions, mechanical whitespace/LF normalization, the invalid `MeshAssets.lua` BOM removal, and this recovery policy.
 4. Commit boundaries separate repository policy, documentation/audits, project structure, shared contracts, server domains, and client domains.
 5. `git diff --check` passes and Git reports deterministic LF normalization for repository text.
+
+## Reconstructed commit boundaries
+
+- Repository policy and recovery anchors.
+- Documentation and agent audit records.
+- Rojo, Wally, MCP configuration, and protected Workspace scaffolding.
+- Shared configurations, remotes, ECS components, and loot metadata.
+- Persistence, rewards, progression, marketplace, admin, and LLM services.
+- Harvest/tools, cooking, fishing, guests/building, companions, and server bootstrap.
+- Client cooking, tools/fishing, HUD/inventory, and persistent UI compatibility.
+- Mechanical whitespace/LF normalization and Lua BOM cleanup.
