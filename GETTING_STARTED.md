@@ -21,7 +21,18 @@ wally install
 
 ---
 
-## Step 2: The Studio Workflow
+## Step 2: Git and recovery branch
+
+The active recovery branch is `codex/phase1-recovery`. Before editing, run:
+
+```powershell
+git status --short --branch
+git log -5 --oneline
+```
+
+Do not stage generated builds, place files, Blender working files, `crucialassets/`, `Packages/`, or `ServerPackages/`. Existing untracked files belong to their author unless a task explicitly places them in scope. Phase commits are intentionally small and reversible; do not push or publish unless the owner requests it.
+
+## Step 3: The Studio Workflow
 
 **Do not edit code in Studio!** All scripts and configuration files must be edited in VS Code.
 
@@ -29,15 +40,17 @@ wally install
 2. Open the repository in VS Code.
 3. In your VS Code terminal, start Rojo:
 ```bash
-rojo serve
+rojo serve --port 34872
 ```
 4. In Roblox Studio, open the **Plugins** tab, click **Rojo**, and hit **Connect**.
 
-Your scripts will now automatically sync to the game when you save them in VS Code.
+Your scripts will now automatically sync to the game when you save them in VS Code. Keep `$ignoreUnknownInstances: true` under `Workspace` in `default.project.json`; the authored world is Studio-owned and must not be erased by Rojo.
+
+For Studio automation, use `@chrrxs/robloxstudio-mcp@latest` on `http://localhost:58741`. Confirm the active Studio instance before edits. Port `28821` belongs to the quarantined legacy plugin and must have no listener or connection.
 
 ---
 
-## Step 3: Generating the Workspace (If starting from scratch)
+## Step 4: Generating the Workspace (If starting from scratch)
 
 If you are opening an empty baseplate instead of the live Team Create place, you need to populate the world.
 
@@ -49,7 +62,7 @@ require(game.ServerScriptService.DevTools["PopulateWorld.dev"]).populate()
 
 ---
 
-## Step 4: UI Development with Hoarcekat
+## Step 5: UI Development with Hoarcekat
 
 If you are working on React-Lua UI, you don't need to press Play in Studio.
 
@@ -59,23 +72,31 @@ If you are working on React-Lua UI, you don't need to press Play in Studio.
 
 ---
 
-## Step 5: Before You Commit (The Iron Gate)
+## Step 6: Before You Commit (Independent Gates)
 
 Our CI pipeline will reject bad code. Before making a Pull Request:
 
-1. **Format your code:**
+Run each gate separately so a later success cannot mask an earlier failure:
+
+1. **Check formatting without rewriting unrelated files:**
 ```bash
-stylua src/
+npm run lint:stylua
 ```
 2. **Lint your code:**
 ```bash
-selene src/
+npm run lint:selene
 ```
-*(Remember: `print()` and `warn()` are banned in production code and will cause Selene to fail. Remove them!)*
 3. **Verify the build:**
 ```bash
 rojo build default.project.json -o build/test.rbxl
 ```
+4. **Verify Git whitespace and scope:**
+```bash
+git diff --check
+git status --short
+```
+
+The inherited full-source StyLua baseline and Selene warnings are tracked debt. A phase commit must not hide them or bulk-format unrelated code. Report each gate as pass/fail independently.
 
 ---
 

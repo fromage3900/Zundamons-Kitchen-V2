@@ -2,7 +2,7 @@
 
 A cooperative, massively persistent kitchen life-sim Roblox experience — gather ingredients, cook dishes with rhythm minigames, serve guests, and build your restaurant empire with your Zundamon companion.
 
-> **Status:** Active development · [MIT License](LICENSE) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
+> **Status:** Active recovery and hybrid ECS migration. Phase 2 restores deterministic boot; end-to-end gameplay parity is not yet certified. See [Phase 2 Boot Recovery](docs/PHASE2_BOOT_RECOVERY.md). · [MIT License](LICENSE) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
 
 ---
 
@@ -100,13 +100,13 @@ Zundamons-kItchen-V2/
 | [Mise](https://mise.jdx.dev/) | — | Universal toolchain manager (one `mise install` gets everything) |
 | [Rojo](https://rojo.space/) | 7.7.0 | File sync between VS Code and Roblox Studio (preserves Studio level design via `$ignoreUnknownInstances`) |
 | [Wally](https://wally.run/) | 0.3.2 | Roblox package manager (Matter, React, ProfileService) |
-| [StyLua](https://github.com/JohnnyMorganz/StyLua) | 1.32.0 | Lua code formatter |
+| [StyLua](https://github.com/JohnnyMorganz/StyLua) | 2.5.2 | Lua code formatter |
 | [Selene](https://kampfkarren.github.io/selene/) | 0.27.1 | Lua linter |
 | [Blink](https://github.com/1axen/blink) | latest | Network event compiler |
 | [Matter](https://matter-ecs.github.io/matter/) | 0.8.4 | Entity-Component-System framework |
 | [React-Lua](https://github.com/jsdotlua/react-lua) | 17.1.0 | Declarative UI rendering |
 | [ProfileService](https://madstudioroblox.github.io/ProfileService/) | 1.0.4 | Player data persistence |
-| [ReplicaService](https://madstudioroblox.github.io/ReplicaService/) | 1.0.0 | State replication |
+| [ReplicaService](https://madstudioroblox.github.io/ReplicaService/) | 1.0.1 | State replication |
 
 ---
 

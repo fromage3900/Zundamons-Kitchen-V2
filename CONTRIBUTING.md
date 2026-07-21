@@ -4,7 +4,7 @@ Thanks for helping build **Zundamon's kItchen**!
 
 ## Development Model
 
-- Use **feature branches**: `feature/<short-name>` or `fix/<issue-number>-<description>`
+- Use focused branches. Codex-created branches use `codex/<short-name>`; human feature and fix branches may use `feature/<short-name>` or `fix/<issue-number>-<description>`.
 - Open a **Pull Request** targeting `main`
 - Prefer small PRs with clear descriptions and playtest steps
 - Fill out the [PR template](.github/PULL_REQUEST_TEMPLATE.md) completely
@@ -24,6 +24,9 @@ All gameplay **code and config modules** live under `src/` and sync to Studio vi
 - `build/` outputs
 - `node_modules/` or `Packages/`
 - `.env` files with secrets
+- Unrelated pre-existing untracked assets or generated outputs
+
+Before staging, inspect `git status --short` and stage explicit paths. Do not use broad staging when the working tree contains owner assets. Each migration commit should have one rollback-safe concern and documented verification.
 
 ## Code Style
 
@@ -75,6 +78,8 @@ selene src/
 - [ ] Playtested in Studio with Rojo connected
 - [ ] No `print()`/`warn()` debugging statements remain
 - [ ] No place/model binary files committed
+- [ ] Existing untracked owner assets remain untouched
+- [ ] Studio-only changes are recorded separately from Git changes
 
 ## Reporting Issues
 

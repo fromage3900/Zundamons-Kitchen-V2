@@ -38,17 +38,19 @@ This document serves as the live coordination hub for **Antigravity**, **Cline**
 
 ---
 
-## Current Project State (V2 Migration - Phase 6 Complete)
+## Current Project State (Phase 2 Recovery Checkpoint)
+
+The earlier "Phase 6 complete" label was not supported by the live implementation. Phase 2 restored deterministic boot and tooling; it did not certify end-to-end gameplay parity. See [PHASE2_BOOT_RECOVERY.md](PHASE2_BOOT_RECOVERY.md) and [PHASE3_RECOVERY_PLAN.md](PHASE3_RECOVERY_PLAN.md).
 
 | Component | Status | Details |
 |-----------|--------|---------|
 | **Rojo Server** | ✅ ACTIVE (Port 34872) | Rojo 7.7.0 running; `$ignoreUnknownInstances: true` enabled on Workspace to preserve Studio level design |
 | **Wally Packages** | ✅ INSTALLED | Matter 0.8.4, React 17.1.0, ProfileService, ReplicaService loaded in `Packages/` & `ServerPackages/` |
-| **UI Bootstrapping** | ✅ DECOUPLED | All UI scripts load dynamically into `PlayerGui` with `ResetOnSpawn = false` |
-| **VN Dialogue UI** | ✅ FIXED | Hidden by default on startup (`panel.Visible = false`) to eliminate UI overlaps |
-| **Timed Cooking** | ✅ INTEGRATED | Client minigame linked to `CookingValidationSystem` Matter ECS system |
-| **Harvesting & Tools** | ✅ ACTIVE | `LocalTools` dynamically binds to inventory tools via `CollectionService` |
-| **Fishing** | ✅ ECS-BACKED | `FishingMinigameScript` now backed by `FishingSystem` Matter ECS module with server-authoritative session management |
+| **UI Bootstrapping** | RECOVERED | Canonical client boot is Rojo-managed; legacy `StarterGui` scripts are disabled in the saved place. Respawn safety passed a focused smoke test. |
+| **VN Dialogue UI** | RECOVERED | Canonical modal starts hidden and its top-level GUI uses `ResetOnSpawn = false`. |
+| **Timed Cooking** | BLOCKED FLOW | Ingredients can be deducted, but the start event does not reach the registered Matter system. Phase 3 must restore one authoritative session path. |
+| **Harvesting & Tools** | BOOTABLE / PARITY PENDING | Validation and tool startup load; authoritative inventory settlement and full-loop parity remain Phase 3 work. |
+| **Fishing** | FAILS CLOSED | The adapter rejects requests until one authoritative adapter-to-session handoff is rebuilt and validated. |
 
 ---
 
@@ -57,5 +59,5 @@ This document serves as the live coordination hub for **Antigravity**, **Cline**
 - [x] Task 1: Fix missing Wally packages and Rojo Workspace overwrite ($ignoreUnknownInstances).
 - [x] Task 2: Patch VN UI default visibility overlap.
 - [ ] Task 3: Complete HUD synchronization so `ChefPill` and `XPBar` reflect `DataManager` profile updates in real-time.
-- [x] Task 4: Connect `FishingMinigameScript` directly to a dedicated `FishingSystem` ECS module.
+- [ ] Task 4: Rebuild fishing as one authoritative adapter-to-domain/ECS session flow; reject forged, premature, duplicate, timed-out, and disconnected results.
 - [ ] Task 5: Verify all remote events (`CraftFunction`, `HarvestNode`, `CookingHit`, `CookingResult`) operate securely under server-authoritative validation.

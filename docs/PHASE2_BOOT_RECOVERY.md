@@ -12,7 +12,7 @@ Phase 2 restores a deterministic, reviewable bootstrap without claiming that the
 | Rojo server | PASS | Listening on `127.0.0.1:34872`. |
 | Rojo Studio sync | PASS | Studio is connected to localhost:34872; repository bootstraps, remote classes, and renamed persistence modules were verified live. |
 | chrxxs Studio MCP | PASS | v2.22.3 listens on 127.0.0.1:58741; Studio has established connections and /ready succeeds for Edit and Server. |
-| Legacy MCP conflict | PASS | RobloxStudioMCP.server.lua was identified as the port-28821 poller and quarantined as .disabled-phase2; no 28821 listener remains. |
+| Legacy MCP conflict | PASS | `RobloxStudioMCP.server.lua` was identified as the port-28821 poller and quarantined as `.disabled-phase2`. After a full Studio restart, no 28821 listener or client connection remains. |
 | Wally | PASS | 0.3.2. |
 | StyLua tool | PASS | `@johnnymorganz/stylua-bin` 2.5.2 resolves; the prior nonexistent package command is removed. |
 | Focused StyLua bootstrap gate | PASS | The deterministic bootstrap repair set passes the formatter check; later compatibility fixes retain inherited file formatting and remain covered by the separately failing full baseline. |
@@ -38,6 +38,8 @@ Phase 2 restores a deterministic, reviewable bootstrap without claiming that the
 - The unfinished fishing adapter now fails closed instead of returning success without creating or rewarding an authoritative session.
 - Nine exact failing scripts embedded in imported Workspace decorations were disabled in Studio; models and geometry were preserved.
 - A 35-second playtest and forced respawn completed with no runtime stack traces. HUD and modal interfaces retained ResetOnSpawn = false; modal panels returned hidden.
+- After owner approval, all 32 embedded `StarterGui` LocalScripts were disabled in Edit mode (27 newly disabled and five previously disabled). Instances and source remain available for rollback; canonical Rojo-managed client entrypoints live in `StarterPlayerScripts`.
+- A post-restart smoke test on Studio PID 33392 confirmed established Rojo (`34872`) and chrxxs MCP (`58741`) connections, no port-28821 activity, and successful server/client Matter startup without a stack trace. The DataStore warning was the expected Studio API-access restriction.
 
 ## Explicitly deferred
 
@@ -60,6 +62,6 @@ No branch was pushed or published.
 
 Do not discard the project for a blank-slate rewrite. The fastest production route is a controlled in-place rebuild (strangler migration): retain the authored world, content/configuration, proven services, and working UI behaviors while replacing one authoritative gameplay domain at a time behind validated adapters. A clean-room rewrite would recreate a large content surface and rediscover Studio-only contracts without removing the need for parity testing. Reconsider a full rewrite only if the product scope changes materially or the retained code/assets cannot be trusted.
 
-## Live Studio follow-up
+## Live Studio checkpoint
 
-Save the open place to retain the Editor-only safety changes: nine imported asset scripts and five scripts inside explicitly documented legacy StarterGui shells were disabled. Other legacy StarterGui scripts still clone briefly before the runtime compatibility cleanup removes them; disabling all remaining embedded StarterGui scripts requires explicit owner approval because some may represent intentionally retained UI behavior.
+The place was saved after the Editor-only safety changes: nine exact imported-asset scripts and all 32 embedded legacy `StarterGui` LocalScripts are disabled, not deleted. These Studio-only changes are not represented by Git and must remain protected in the place file. Runtime compatibility cleanup remains defensive until the legacy shells are deliberately removed in a separately reviewed migration.
