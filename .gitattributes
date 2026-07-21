@@ -1,0 +1,25 @@
+# Keep repository text deterministic across Windows agents and CI.
+* text=auto eol=lf
+
+*.lua text eol=lf
+*.luau text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.mjs text eol=lf
+*.js text eol=lf
+
+# Roblox and media artifacts are binary.
+*.rbxl binary
+*.rbxlx binary
+*.rbxm binary
+*.rbxmx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.fbx binary
+*.obj binary
+*.zip binary

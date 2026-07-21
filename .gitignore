@@ -1,7 +1,36 @@
+# Package manager output
 node_modules/
+Packages/
+ServerPackages/
+wally.exe
+wally.zip
+
+# Build and generated output
 build/
+rbxPublish/
+sourcemap.json
 *.rbxl
 *.rbxlx
-*.rbxlx.lock
+*.rbxm
+*.rbxmx
 *.rbxl.lock
+*.rbxlx.lock
+
+# Local runtime state and logs
+Saved/
+*.log
+*.tmp
+
+# Local MCP and editor state
+.roblox-mcp/
+.opencode/
+.agents/mcp/
+.idea/
+.vscode/
+.vs/
+*.iml
+
+# Operating-system metadata
 .DS_Store
+Thumbs.db
+Desktop.ini
