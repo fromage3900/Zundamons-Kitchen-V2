@@ -43,6 +43,14 @@ local progressContainer = nil
 local harvestAnimTrack = nil
 local harvestSound = nil
 local particleEmitter = nil
+local activeHeartbeatConn: RBXScriptConnection? = nil
+
+local function getNodePosition(node: Instance): Vector3
+	if not node then return Vector3.zero end
+	return if node:IsA("BasePart")
+		then node.Position
+		else (if node:IsA("Model") then (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position) else Vector3.zero)
+end
 
 -- Create progress bar UI
 local function createProgressBar()
@@ -121,7 +129,7 @@ local function createHarvestParticles(position: Vector3)
 	task.delay(PARTICLE_LIFETIME + 0.5, function()
 		emitter.Enabled = false
 		task.delay(2, function()
-			part:Destroy()
+			if part and part.Parent then part:Destroy() end
 		end)
 	end)
 
@@ -219,12 +227,17 @@ local function isInRange(node: Instance): boolean
 	if not character then return false end
 	local rootPart = character:FindFirstChild("HumanoidRootPart")
 	if not rootPart then return false end
-	local distance = (rootPart.Position - node.Position).Magnitude
+	local nodePos = getNodePosition(node)
+	local distance = (rootPart.Position - nodePos).Magnitude
 	return distance <= MAX_DISTANCE
 end
 
 -- Cancel current harvest
 local function cancelHarvest(reason: string?)
+	if activeHeartbeatConn then
+		activeHeartbeatConn:Disconnect()
+		activeHeartbeatConn = nil
+	end
 	if not isHarvesting then return end
 	isHarvesting = false
 	harvestTargetNode = nil
@@ -245,22 +258,25 @@ end
 
 -- Complete harvest
 local function completeHarvest()
+	if activeHeartbeatConn then
+		activeHeartbeatConn:Disconnect()
+		activeHeartbeatConn = nil
+	end
 	if not isHarvesting or not harvestTargetNode then return end
 	isHarvesting = false
 
 	hideProgressBar()
 	stopHarvestAnimation()
 
+	local nodePos = getNodePosition(harvestTargetNode)
 	-- Play effects at node position
-	createHarvestParticles(harvestTargetNode.Position)
-	playHarvestSound(harvestTargetNode.Position)
+	createHarvestParticles(nodePos)
+	playHarvestSound(nodePos)
 
-	-- Fire the existing ClickDetector or RemoteEvent
-	-- The existing ZundaGatherServer/Planters handle the actual loot via ClickDetector
-	local clickDetector = harvestTargetNode:FindFirstChildOfClass("ClickDetector")
-	if clickDetector then
-		-- Simulate click to trigger existing server logic
-		clickDetector:MouseClick(player)
+	-- The existing ZundaGatherServer handles the actual loot
+	local RE_Harvest = ReplicatedStorage:FindFirstChild("RemoteEvents") and ReplicatedStorage.RemoteEvents:FindFirstChild("HarvestNode")
+	if RE_Harvest then
+		RE_Harvest:FireServer(harvestTargetNode)
 	end
 
 	harvestTargetNode = nil
@@ -269,6 +285,10 @@ end
 
 -- Start harvest on a node
 local function startHarvest(node: Instance)
+	if activeHeartbeatConn then
+		activeHeartbeatConn:Disconnect()
+		activeHeartbeatConn = nil
+	end
 	if isHarvesting then
 		cancelHarvest("New harvest started")
 	end
@@ -282,53 +302,52 @@ local function startHarvest(node: Instance)
 	harvestTargetNode = node
 	harvestStartPosition = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position or nil
 
+	local nodePos = getNodePosition(node)
 	showProgressBar()
 	playHarvestAnimation()
-	playHarvestSound(node.Position)
-	createHarvestParticles(node.Position)
+	playHarvestSound(nodePos)
+	createHarvestParticles(nodePos)
 
 	-- Animate progress bar
-	local startTime = tick()
+	local startTime = os.clock()
 	local duration = HARVEST_DURATION
 
 	-- Use a heartbeat connection for smooth progress
-	local heartbeatConn
-	heartbeatConn = RunService.Heartbeat:Connect(function()
+	activeHeartbeatConn = RunService.Heartbeat:Connect(function()
 		if not isHarvesting then
-			if heartbeatConn then heartbeatConn:Disconnect() end
+			if activeHeartbeatConn then
+				activeHeartbeatConn:Disconnect()
+				activeHeartbeatConn = nil
+			end
 			return
 		end
 
 		-- Check if moved too far
 		if hasMovedTooFar() then
 			cancelHarvest("Player moved too far")
-			if heartbeatConn then heartbeatConn:Disconnect() end
 			return
 		end
 
 		-- Check if still in range
 		if not isInRange(node) then
 			cancelHarvest("Node out of range")
-			if heartbeatConn then heartbeatConn:Disconnect() end
 			return
 		end
 
 		-- Check if node is still available
 		if node:GetAttribute("Available") == false then
 			cancelHarvest("Node no longer available")
-			if heartbeatConn then heartbeatConn:Disconnect() end
 			return
 		end
 
 		-- Update progress
-		local elapsed = tick() - startTime
+		local elapsed = os.clock() - startTime
 		local progress = elapsed / duration
 		updateProgressBar(progress)
 
 		-- Complete
 		if elapsed >= duration then
 			completeHarvest()
-			if heartbeatConn then heartbeatConn:Disconnect() end
 		end
 	end)
 end
@@ -338,9 +357,6 @@ local function bindNode(node: Instance)
 	local clickDetector = node:FindFirstChildOfClass("ClickDetector")
 	if not clickDetector then return end
 
-	-- Override the click to use our harvest system
-	-- We connect to MouseClick but intercept it
-	local originalClick = clickDetector.MouseClick
 	clickDetector.MouseClick:Connect(function(clickingPlayer)
 		if clickingPlayer ~= player then return end
 		if isHarvesting then
@@ -351,34 +367,191 @@ local function bindNode(node: Instance)
 	end)
 end
 
+-- Helper to create 3D BillboardGui for Mineable resource nodes
+local function getOrAttachBillboardGui(node: Instance): BillboardGui?
+	local targetPart = if node:IsA("BasePart") then node else (node.PrimaryPart or node:FindFirstChildWhichIsA("BasePart"))
+	if not targetPart then return nil end
+
+	local existing = targetPart:FindFirstChild("NodeHealthGui")
+	if existing and existing:IsA("BillboardGui") then
+		return existing
+	end
+
+	local gui = Instance.new("BillboardGui")
+	gui.Name = "NodeHealthGui"
+	gui.Size = UDim2.new(0, 140, 0, 20)
+	gui.StudsOffset = Vector3.new(0, 3, 0)
+	gui.AlwaysOnTop = true
+	gui.ResetOnSpawn = false
+	gui.Enabled = false
+
+	local bg = Instance.new("Frame")
+	bg.Name = "Background"
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+	bg.BackgroundTransparency = 0.2
+	bg.BorderSizePixel = 0
+	bg.Parent = gui
+
+	local bgCorner = Instance.new("UICorner")
+	bgCorner.CornerRadius = UDim.new(0, 6)
+	bgCorner.Parent = bg
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(220, 220, 230)
+	stroke.Thickness = 1.5
+	stroke.Parent = bg
+
+	local fill = Instance.new("Frame")
+	fill.Name = "Fill"
+	fill.Size = UDim2.new(1, -4, 1, -4)
+	fill.Position = UDim2.new(0, 2, 0, 2)
+	fill.BackgroundColor3 = Color3.fromRGB(75, 210, 110)
+	fill.BorderSizePixel = 0
+	fill.Parent = bg
+
+	local fillCorner = Instance.new("UICorner")
+	fillCorner.CornerRadius = UDim.new(0, 4)
+	fillCorner.Parent = fill
+
+	local text = Instance.new("TextLabel")
+	text.Name = "HealthText"
+	text.Size = UDim2.new(1, 0, 1, 0)
+	text.BackgroundTransparency = 1
+	text.TextColor3 = Color3.fromRGB(255, 255, 255)
+	text.TextScaled = true
+	text.Font = Enum.Font.GothamBold
+	text.Text = "100 / 100"
+	text.Parent = bg
+
+	gui.Parent = targetPart
+	return gui
+end
+
+-- Create hit particles tailored to node material/category (Rocks = sparks/dust, Trees = wood chips, Crops = leaf bits)
+local function createToolHitFX(position: Vector3, nodeType: string?)
+	local part = Instance.new("Part")
+	part.Name = "ToolHitFX"
+	part.Size = Vector3.new(0.5, 0.5, 0.5)
+	part.Position = position
+	part.Anchored = true
+	part.CanCollide = false
+	part.Transparency = 1
+	part.Parent = workspace
+
+	local emitter = Instance.new("ParticleEmitter")
+	emitter.Rate = 0
+	emitter.Lifetime = NumberRange.new(0.4, 0.8)
+	emitter.Speed = NumberRange.new(6, 14)
+	emitter.SpreadAngle = Vector2.new(45, 45)
+	emitter.Acceleration = Vector3.new(0, -15, 0)
+	emitter.Drag = 3
+	emitter.Size = NumberSequence.new(0.4, 0.05)
+	emitter.Transparency = NumberSequence.new(0.1, 1)
+
+	local nType = string.lower(nodeType or "")
+	if string.find(nType, "rock") or string.find(nType, "ore") or string.find(nType, "gold") or string.find(nType, "marble") then
+		emitter.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 200, 80)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(180, 180, 190)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 100, 110))
+		})
+		emitter.Texture = "rbxassetid://2846894023"
+	elseif string.find(nType, "tree") or string.find(nType, "wood") or string.find(nType, "apple") or string.find(nType, "pine") then
+		emitter.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 110, 60)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 65, 30))
+		})
+		emitter.Texture = "rbxassetid://2846894023"
+	else
+		emitter.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(120, 210, 90)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 140, 50))
+		})
+		emitter.Texture = "rbxassetid://2846894023"
+	end
+
+	emitter.Parent = part
+	emitter:Emit(12)
+
+	task.delay(1.0, function()
+		if part and part.Parent then part:Destroy() end
+	end)
+end
+
+-- Bind health listener and 3D BillboardGui to Mineable nodes
+local function bindMineableNode(node: Instance)
+	local pos = if node:IsA("BasePart") then node.Position else (node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)
+
+	node:GetAttributeChangedSignal("Health"):Connect(function()
+		local health = node:GetAttribute("Health")
+		local maxHealth = node:GetAttribute("MaxHealth") or 100
+		local nodeType = node:GetAttribute("Type") or node.Name
+
+		if typeof(health) == "number" and typeof(maxHealth) == "number" then
+			local gui = getOrAttachBillboardGui(node)
+			if gui then
+				local bg = gui:FindFirstChild("Background") :: Frame?
+				local fill = bg and bg:FindFirstChild("Fill") :: Frame?
+				local label = bg and bg:FindFirstChild("HealthText") :: TextLabel?
+				local ratio = math.clamp(health / maxHealth, 0, 1)
+
+				if fill then
+					fill.Size = UDim2.new(ratio, -4, 1, -4)
+					fill.BackgroundColor3 = Color3.fromHSV(ratio * 0.33, 0.8, 0.8)
+				end
+				if label then
+					label.Text = string.format("%d / %d", math.ceil(health), math.ceil(maxHealth))
+				end
+				gui.Enabled = (health < maxHealth and health > 0)
+			end
+
+			-- Disable gui when node destroyed (particles handled by Tools.server)
+			if health <= 0 then
+				task.delay(0.5, function()
+					local gui = getOrAttachBillboardGui(node)
+					if gui then gui.Enabled = false end
+				end)
+			end
+		end
+	end)
+end
+
 -- Scan for harvestable nodes
 local function scanForNodes()
 	-- Look for gathering nodes in GameplayLoopArea
-	local loopArea = workspace:FindFirstChild("GameplayLoopArea")
-	if loopArea then
-		local gatherFolder = loopArea:FindFirstChild("GatheringNodes")
-		if gatherFolder then
-			for _, node in ipairs(gatherFolder:GetDescendants()) do
-				if node:IsA("BasePart") and node:GetAttribute("ResourceType") then
-					bindNode(node)
+	task.spawn(function()
+		local loopArea = workspace:WaitForChild("GameplayLoopArea", 30)
+		if loopArea then
+			local gatherFolder = loopArea:WaitForChild("GatheringNodes", 10)
+			if gatherFolder then
+				for _, node in ipairs(gatherFolder:GetDescendants()) do
+					if node:IsA("BasePart") and node:GetAttribute("ResourceType") then
+						bindNode(node)
+					end
 				end
+				-- Watch for new nodes
+				gatherFolder.DescendantAdded:Connect(function(desc)
+					task.wait(0.1)
+					if desc:IsA("BasePart") and desc:GetAttribute("ResourceType") then
+						bindNode(desc)
+					end
+				end)
 			end
-			-- Watch for new nodes
-			gatherFolder.DescendantAdded:Connect(function(desc)
-				task.wait(0.1)
-				if desc:IsA("BasePart") and desc:GetAttribute("ResourceType") then
-					bindNode(desc)
-				end
-			end)
 		end
-	end
+	end)
 
-	-- Also scan for CollectionService-tagged planters
+	-- Also scan for CollectionService-tagged planters and mineables
 	local CollectionService = game:GetService("CollectionService")
 	for _, planter in ipairs(CollectionService:GetTagged("Planter")) do
 		bindNode(planter)
 	end
 	CollectionService:GetInstanceAddedSignal("Planter"):Connect(bindNode)
+
+	for _, mineable in ipairs(CollectionService:GetTagged("Mineable")) do
+		bindMineableNode(mineable)
+	end
+	CollectionService:GetInstanceAddedSignal("Mineable"):Connect(bindMineableNode)
 end
 
 -- Initialize

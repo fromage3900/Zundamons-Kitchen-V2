@@ -5,11 +5,11 @@ local RF = RS:WaitForChild("RemoteFunctions")
 local remoteEvent = RE:WaitForChild("MakeLootEvent")
 local giveloot = RF:WaitForChild("GiveLoot")
 local removeCode = RE:WaitForChild("RemoveCode")
-local loot = RS:WaitForChild("Loot")
-local lootCommons = RS:WaitForChild("LootCommons")
-local lootBB = lootCommons:WaitForChild("LootBB")
+local loot = RS:FindFirstChild("Loot") or RS:WaitForChild("Loot", 5)
+local lootCommons = RS:FindFirstChild("LootCommons")
+local lootBB = lootCommons and lootCommons:FindFirstChild("LootBB")
 local GW = game:GetService("Workspace")
-local LocalSounds = GW:WaitForChild("LocalSounds")
+local LocalSounds = GW:FindFirstChild("LocalSounds")
 local StarterGui = game:GetService("StarterGui")
 local lootfolder = GW:FindFirstChild("LootFolder")
 local TweenService = game:GetService("TweenService")
@@ -27,7 +27,7 @@ local icons = {
 	Explosive = "rbxassetid://7635304803"
 }
 
-function CreateNotification(Title, Text, ObjType, image)
+local function CreateNotification(Title, Text, ObjType, image)
 	local myicon = nil
 	if not image or image == "" then
 		myicon = icons[ObjType] or ""
@@ -37,20 +37,21 @@ function CreateNotification(Title, Text, ObjType, image)
 	StarterGui:SetCore("SendNotification", {Title = Title, Text = Text, Icon = myicon, Duration = 5})
 end
 
-function destroy(item, code)
+local function destroy(item, code)
 	if item then
 		removeCode:FireServer(code, item.Name, true)
 		item:Destroy()
 	end
 end
 
-function tweenPoint(part)
+local function tweenPoint(targetPart, parentObj)
+	if not targetPart then return end
 	-- Add a trail to two attachments
-	local a0 = Instance.new("Attachment", part)
+	local a0 = Instance.new("Attachment", targetPart)
 	a0.Position = Vector3.new(1, 0, 0)
-	local a1 = Instance.new("Attachment", part)
+	local a1 = Instance.new("Attachment", targetPart)
 	a1.Position = Vector3.new(-1, 0, 0)
-	local trail = Instance.new("Trail", part)
+	local trail = Instance.new("Trail", targetPart)
 	trail.Attachment0 = a0
 	trail.Attachment1 = a1
 	trail.FaceCamera = true
@@ -60,7 +61,7 @@ function tweenPoint(part)
 	})
 	trail.Lifetime = 0.35
 
-	local startPos = part.Position
+	local startPos = targetPart.Position
 	local x_add = math.random(-10, 10)
 	local y_add = math.random(-10, 10)
 	local endPos = startPos + Vector3.new(x_add, 0, y_add)
@@ -68,15 +69,15 @@ function tweenPoint(part)
 	local travelTime = 0.25
 	local xzGoal = {Position = Vector3.new(endPos.X, startPos.Y, endPos.Z)}
 	local xzTweenInfo = TweenInfo.new(travelTime, Enum.EasingStyle.Linear)
-	local xzTween = TweenService:Create(part, xzTweenInfo, xzGoal)
+	local xzTween = TweenService:Create(targetPart, xzTweenInfo, xzGoal)
 	xzTween:Play()
 	local midY = startPos.Y + arcHeight
 
-	local upTween = TweenService:Create(part, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
+	local upTween = TweenService:Create(targetPart, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
 		Position = Vector3.new(startPos.X + (x_add / 2), midY, startPos.Z + (y_add / 2))
 	})
 
-	local downTween = TweenService:Create(part, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+	local downTween = TweenService:Create(targetPart, TweenInfo.new(travelTime / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
 		Position = Vector3.new(endPos.X, endPos.Y, endPos.Z)
 	})
 
@@ -84,19 +85,57 @@ function tweenPoint(part)
 	upTween.Completed:Connect(function()
 		downTween:Play()
 		downTween.Completed:Connect(function()
-			part:SetAttribute("TweenEnd", true)
+			targetPart:SetAttribute("TweenEnd", true)
+			if parentObj then parentObj:SetAttribute("TweenEnd", true) end
 		end)
 	end)
 end
 
-function makeLootLocal(myloot, position, generatedCode, quality)
-	--print(myloot, position, generatedCode, quality)
-	local objloot = loot:WaitForChild(myloot)
-	local obj = objloot:Clone()
-	obj.Position = position
-	obj.Anchored = true
-	obj.CanCollide = false
-	obj.Transparency = 0
+local function makeLootLocal(myloot, position, generatedCode, quality)
+	local objloot = loot and loot:FindFirstChild(myloot)
+	local obj: Instance
+	local mainPart: BasePart
+
+	if objloot then
+		obj = objloot:Clone()
+	else
+		-- Fallback colored Part for missing loot templates
+		local part = Instance.new("Part")
+		part.Name = myloot
+		part.Size = Vector3.new(1.2, 1.2, 1.2)
+		part.Material = Enum.Material.SmoothPlastic
+		part.Color = Color3.fromRGB(130, 210, 140)
+		obj = part
+	end
+
+	if obj:IsA("Model") then
+		obj:PivotTo(CFrame.new(position))
+		for _, desc in ipairs(obj:GetDescendants()) do
+			if desc:IsA("BasePart") then
+				desc.Anchored = true
+				desc.CanCollide = false
+			end
+		end
+		mainPart = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+		if not mainPart then
+			mainPart = Instance.new("Part")
+			mainPart.Name = "MainPart"
+			mainPart.Size = Vector3.new(1, 1, 1)
+			mainPart.Position = position
+			mainPart.Transparency = 1
+			mainPart.Anchored = true
+			mainPart.CanCollide = false
+			mainPart.Parent = obj
+			obj.PrimaryPart = mainPart
+		end
+	else
+		mainPart = obj :: BasePart
+		mainPart.Position = position
+		mainPart.Anchored = true
+		mainPart.CanCollide = false
+		mainPart.Transparency = 0
+	end
+
 	obj.Parent = lootfolder or workspace
 
 	-- Store quality on crafted food items for serving
@@ -105,41 +144,63 @@ function makeLootLocal(myloot, position, generatedCode, quality)
 		obj:SetAttribute("Recipe", myloot)
 	end
 
-	tweenPoint(obj)
-	local lootBBClone = lootBB:Clone()
-	lootBBClone.LootFrame.LootLabel.Text = myloot
-	lootBBClone.Parent = obj
+	tweenPoint(mainPart, obj)
 
-	obj.Touched:Connect(function(hit)
+	if lootBB then
+		local lootBBClone = lootBB:Clone()
+		local lootLabel = lootBBClone:FindFirstChild("LootFrame") and lootBBClone.LootFrame:FindFirstChild("LootLabel")
+		if lootLabel then lootLabel.Text = myloot end
+		lootBBClone.Parent = mainPart
+	end
+
+	local function onTouch(hit)
 		local character = hit.Parent
+		if not character then return end
 		local humanoid = character:FindFirstChild("Humanoid")
 		if humanoid then
 			local player = game.Players.LocalPlayer
-			if player.Character == character and not obj:GetAttribute("isTouched") and obj:GetAttribute("TweenEnd") then
+			local isTouched = obj:GetAttribute("isTouched") or mainPart:GetAttribute("isTouched")
+			local tweenEnd = obj:GetAttribute("TweenEnd") or mainPart:GetAttribute("TweenEnd")
+			if player.Character == character and not isTouched and tweenEnd then
 				obj:SetAttribute("isTouched", true)
+				mainPart:SetAttribute("isTouched", true)
 				local given = giveloot:InvokeServer(myloot, generatedCode)
 				if given then
-					local mysound = obj:GetAttribute("Sound")
-					if mysound then
-						local sound = LocalSounds:WaitForChild(mysound)
-						sound:Play()
+					local mysound = obj:GetAttribute("Sound") or mainPart:GetAttribute("Sound")
+					if mysound and LocalSounds then
+						local sound = LocalSounds:FindFirstChild(mysound)
+						if sound then sound:Play() end
 					end
-					local myType = obj:GetAttribute("Type") or obj:GetAttribute("SubType")
+					local myType = obj:GetAttribute("Type") or obj:GetAttribute("SubType") or "Material"
 					local image = nil
-					local texture = obj:FindFirstChild("Texture")
-					if texture then
+					local texture = obj:FindFirstChild("Texture") or mainPart:FindFirstChild("Texture")
+					if texture and texture:IsA("StringValue") then
 						image = texture.Value
 					end
 					CreateNotification(myType .. " Collected", "Picked up " .. myType .. ": " .. obj.Name, myType, image)
 					destroy(obj, generatedCode)
 				else
-					local sound = LocalSounds:WaitForChild("Fail")
-					sound:Play()
+					if LocalSounds then
+						local sound = LocalSounds:FindFirstChild("Fail")
+						if sound then sound:Play() end
+					end
 					obj:SetAttribute("isTouched", false)
+					mainPart:SetAttribute("isTouched", false)
 				end
 			end
 		end
-	end)
+	end
+
+	if obj:IsA("Model") then
+		for _, desc in ipairs(obj:GetDescendants()) do
+			if desc:IsA("BasePart") then
+				desc.Touched:Connect(onTouch)
+			end
+		end
+	else
+		mainPart.Touched:Connect(onTouch)
+	end
+
 	task.wait(60)
 	destroy(obj, generatedCode)
 end

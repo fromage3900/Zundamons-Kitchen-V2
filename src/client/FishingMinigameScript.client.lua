@@ -13,7 +13,7 @@ local RS = game:GetService("ReplicatedStorage")
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local gui = script.Parent
+local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "FishingGui", 100)
 
 -- Backdrop
 local backdrop = Instance.new("Frame", gui)
@@ -231,10 +231,10 @@ local function start(fish, diff, cb)
     TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
         { Size = UDim2.new(0, 720, 0, 460) }):Play()
 
-    local startTime = tick()
+    local startTime = os.clock()
     stepConn = RunService.Heartbeat:Connect(function(dt)
         if not active then return end
-        local elapsed = tick() - startTime
+        local elapsed = os.clock() - startTime
         -- Periodic tugs (fish struggles): random spikes
         if math.random() < diff.dodgeChance * dt then
             tension = math.min(1.0, tension + diff.tugMag)
