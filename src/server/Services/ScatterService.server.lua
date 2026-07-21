@@ -11,10 +11,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
 
 local configFolder = ReplicatedStorage:FindFirstChild("ConfigurationFiles")
-if not configFolder then configFolder = ReplicatedStorage:WaitForChild("ConfigurationFiles", 10) end
+if not configFolder then
+	configFolder = ReplicatedStorage:WaitForChild("ConfigurationFiles", 10)
+end
 local ScatterConfig = configFolder and require(configFolder:WaitForChild("ScatterConfig", 10))
 local MeshAssets = configFolder and require(configFolder:WaitForChild("MeshAssets", 10))
-if not ScatterConfig or not MeshAssets then
+local ResourceNodeRegistry = configFolder and require(configFolder:WaitForChild("ResourceNodeRegistry", 10))
+if not ScatterConfig or not MeshAssets or not ResourceNodeRegistry then
 	warn("[ScatterService] Config assets not found — scatter disabled")
 	return {}
 end
@@ -149,23 +152,17 @@ local function spawnNode(nodeType: string, variantId: string, position: Vector3,
 	local scale = math.random() * (nodeConfig.scaleRange[2] - nodeConfig.scaleRange[1]) + nodeConfig.scaleRange[1]
 	part.Size = part.Size * scale
 
-	-- Attributes for harvesting system
-	part:SetAttribute("ResourceType", nodeConfig.resourceType)
-	part:SetAttribute("Available", true)
+	-- Visual identity is separate from behavior; the registry supplies tags,
+	-- durability/yield, tool requirements, and interaction metadata.
 	part:SetAttribute("VariantId", variantId)
 	part:SetAttribute("_origSize", part.Size)
 	part:SetAttribute("ScatterBiome", biomeName)
 
-	-- ClickDetector for interaction
-	local cd = Instance.new("ClickDetector")
-	cd.MaxActivationDistance = 16
-	cd.Parent = part
+	ResourceNodeRegistry.applyBehavior(part, nodeConfig.resourceType)
 
-	-- Tag for CollectionService
-	CollectionService:AddTag(part, "GatheringNode")
-
-	part.Parent = Workspace:FindFirstChild("GameplayLoopArea") and
-		Workspace.GameplayLoopArea:FindFirstChild("GatheringNodes") or Workspace
+	part.Parent = Workspace:FindFirstChild("GameplayLoopArea")
+			and Workspace.GameplayLoopArea:FindFirstChild("GatheringNodes")
+		or Workspace
 
 	activeNodes[part] = true
 	return part
