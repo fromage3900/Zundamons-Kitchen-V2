@@ -1,29 +1,3 @@
 {
-	"className": "Folder",
-	"children": [
-		{ "name": "OpenCompanionVN", "className": "RemoteEvent" },
-		{ "name": "UpdateQuests", "className": "RemoteEvent" },
-		{ "name": "PurchaseCompanion", "className": "RemoteEvent" },
-		{ "name": "SetCompanion", "className": "RemoteEvent" },
-		{ "name": "NotifyPlayer", "className": "RemoteEvent" },
-		{ "name": "MakeLootEvent", "className": "RemoteEvent" },
-		{ "name": "RemoveCode", "className": "RemoteEvent" },
-		{ "name": "CookingHit", "className": "RemoteEvent" },
-		{ "name": "CookingResult", "className": "RemoteEvent" },
-		{ "name": "WeatherChanged", "className": "RemoteEvent" },
-		{ "name": "CompanionOwnedSync", "className": "RemoteEvent" },
-		{ "name": "QuestCompleted", "className": "RemoteEvent" },
-		{ "name": "QuestCompletedBatch", "className": "RemoteEvent" },
-		{ "name": "CompanionChat", "className": "RemoteEvent" },
-		{ "name": "NPCChat", "className": "RemoteEvent" },
-		{ "name": "PurchaseResult", "className": "RemoteEvent" },
-		{ "name": "ZundapalChatSend", "className": "RemoteEvent" },
-		{ "name": "ZundapalChatReply", "className": "RemoteEvent" },
-		{ "name": "ZundapalChatError", "className": "RemoteEvent" },
-		{ "name": "ZundapalChatStatus", "className": "RemoteEvent" },
-		{ "name": "HarvestNode", "className": "RemoteEvent" },
-		{ "name": "ToggleSettingsUI", "className": "RemoteEvent" },
-		{ "name": "TriggerSideDialogue", "className": "RemoteEvent" },
-		{ "name": "RecipeUnlocked", "className": "RemoteEvent" }
-	]
+    "className":  "Folder"
 }
