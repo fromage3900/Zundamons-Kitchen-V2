@@ -126,7 +126,7 @@ end
 local CYCLE      = CONFIG.cycle.minutes_per_day * 60
 local START      = CONFIG.cycle.start_hour
 local STEP       = CONFIG.cycle.step_interval
-local startTick  = tick()
+local startTick  = os.clock()
 local lastExposure = L.exposure_compensation
 
 local function constellationVisibility(hour)
@@ -191,7 +191,7 @@ local function applyHour(hour)
     local auroraOn = (weather == "aurora") and isNight
     for _, band in ipairs(auroraFolder:GetChildren()) do
         if band:IsA("BasePart") then
-            band.Transparency = auroraOn and (0.15 + math.sin(tick()*0.4 + band.Position.X*0.05)*0.25) or 1
+            band.Transparency = auroraOn and (0.15 + math.sin(os.clock()*0.4 + band.Position.X*0.05)*0.25) or 1
         end
     end
 end
@@ -203,7 +203,7 @@ Lighting:SetAttribute("CurrentHour", START)
 -- ── MAIN LOOP ─────────────────────────────────────────────
 task.spawn(function()
     while true do
-        local elapsed = tick() - startTick
+        local elapsed = os.clock() - startTick
         local frac    = (elapsed % CYCLE) / CYCLE
         local hour    = (START + frac * 24) % 24
         applyHour(hour)
