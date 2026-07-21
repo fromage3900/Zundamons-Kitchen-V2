@@ -365,15 +365,15 @@ function PlayerDataService.savePlayer(player: Player)
 end
 
 function PlayerDataService.checkAndUnlockTiers(player: Player)
-	local data = store[tostring(player.UserId)]
-	if not data then
-		return
-	end
-
-	local currentTier = data.tier
-	for milestoneId = currentTier + 1, #CONFIG.milestones do
-		local milestone = CONFIG.milestones[milestoneId]
-		if data.guests_served >= milestone.guests_served then
+	local unlocks = {}
+	local ok = PlayerDataService.mutate(player, "tier_unlock", function(data)
+		local changed = false
+		for milestoneId = data.tier + 1, #CONFIG.milestones do
+			local milestone = CONFIG.milestones[milestoneId]
+			if data.guests_served < milestone.guests_served then
+				break
+			end
+			changed = true
 			data.tier = milestoneId
 			local newRecipes = {}
 			for _, recipe in ipairs(milestone.unlocks.recipes) do
@@ -382,33 +382,31 @@ function PlayerDataService.checkAndUnlockTiers(player: Player)
 					table.insert(newRecipes, recipe)
 				end
 			end
-			for _, cosmetic in ipairs(milestone.unlocks.cosmetics) do
-				if not table.find(data.cosmetics_unlocked, cosmetic) then
-					table.insert(data.cosmetics_unlocked, cosmetic)
+			for field, values in pairs({
+				cosmetics_unlocked = milestone.unlocks.cosmetics,
+				furniture_unlocked = milestone.unlocks.furniture,
+				locations_unlocked = milestone.unlocks.locations,
+			}) do
+				for _, value in ipairs(values) do
+					if not table.find(data[field], value) then
+						table.insert(data[field], value)
+					end
 				end
 			end
-			for _, furniture in ipairs(milestone.unlocks.furniture) do
-				if not table.find(data.furniture_unlocked, furniture) then
-					table.insert(data.furniture_unlocked, furniture)
-				end
-			end
-			for _, location in ipairs(milestone.unlocks.locations) do
-				if not table.find(data.locations_unlocked, location) then
-					table.insert(data.locations_unlocked, location)
-				end
-			end
-			if #newRecipes > 0 then
-				local reFolder = game.ReplicatedStorage:WaitForChild("RemoteEvents")
-				local unlockEv = reFolder:FindFirstChild("RecipeUnlocked")
-				if not unlockEv then
-					unlockEv = Instance.new("RemoteEvent")
-					unlockEv.Name = "RecipeUnlocked"
-					unlockEv.Parent = reFolder
-				end
-				unlockEv:FireClient(player, { tier = milestoneId, tierName = milestone.name, recipes = newRecipes })
-			end
-			print("[PlayerDataService] " .. player.Name .. " unlocked tier " .. milestoneId .. ": " .. milestone.name)
+			table.insert(unlocks, { tier = milestoneId, tierName = milestone.name, recipes = newRecipes })
 		end
+		if not changed then
+			return false, "no_unlock"
+		end
+		return true
+	end)
+	if not ok then
+		return
+	end
+	local unlockEvent = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("RecipeUnlocked")
+	for _, unlock in ipairs(unlocks) do
+		unlockEvent:FireClient(player, unlock)
+		print("[PlayerDataService] " .. player.Name .. " unlocked tier " .. unlock.tier .. ": " .. unlock.tierName)
 	end
 end
 

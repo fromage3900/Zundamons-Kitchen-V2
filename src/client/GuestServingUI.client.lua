@@ -111,13 +111,35 @@ local currentPlayer = nil
 
 local function filterFoods(data)
 	local foods = {}
-	if not data then return foods end
-	local exclude = { gold = true, Apple = true, Wheat = true, Wood = true, Rock = true, ["Iron Ore"] = true,
-		guests_served = true, chef = true, total_gold_earned = true, tier = true, cooking_streak = true,
-		max_cooking_streak = true, perfect_cooks = true, great_cooks = true, companion_chats = true,
-		companion_affection = true, npc_chats = true, zones_visited = true, gathered_items = true,
-		quests_completed = true, recipes_unlocked = true, cosmetics_unlocked = true,
-		furniture_unlocked = true, locations_unlocked = true}
+	if not data then
+		return foods
+	end
+	local exclude = {
+		gold = true,
+		Apple = true,
+		Wheat = true,
+		Wood = true,
+		Rock = true,
+		["Iron Ore"] = true,
+		guests_served = true,
+		chef = true,
+		total_gold_earned = true,
+		tier = true,
+		cooking_streak = true,
+		max_cooking_streak = true,
+		perfect_cooks = true,
+		great_cooks = true,
+		companion_chats = true,
+		companion_affection = true,
+		npc_chats = true,
+		zones_visited = true,
+		gathered_items = true,
+		quests_completed = true,
+		recipes_unlocked = true,
+		cosmetics_unlocked = true,
+		furniture_unlocked = true,
+		locations_unlocked = true,
+	}
 	for k, v in pairs(data) do
 		if type(k) == "string" and type(v) == "number" and not exclude[k] and not k:match("_") then
 			if k ~= "Gold" and k ~= "Marble Rock" and k ~= "Wood Log" and k ~= "Pine Cone" then
@@ -129,7 +151,9 @@ local function filterFoods(data)
 end
 
 local function buildDishList(guest, playerData)
-	for _, child in ipairs(listFrame:GetChildren()) do child:Destroy() end
+	for _, child in ipairs(listFrame:GetChildren()) do
+		child:Destroy()
+	end
 	local dish = guest:GetAttribute("PreferredRecipe") or ""
 	title.Text = "Serve: " .. dish
 	payLabel.Text = "Pay: " .. (guest:GetAttribute("PayAmount") or 10) .. " Gold"
@@ -168,7 +192,9 @@ local function buildDishList(guest, playerData)
 end
 
 local function show(data)
-	if not currentGuest then return end
+	if not currentGuest then
+		return
+	end
 	backdrop.Visible = true
 	panel.Visible = true
 	gui.Enabled = true
@@ -188,10 +214,12 @@ cancelButton.MouseButton1Click:Connect(function()
 end)
 
 serveButton.MouseButton1Click:Connect(function()
-	if not currentGuest then return end
+	if not currentGuest then
+		return
+	end
 	local dish = currentGuest:GetAttribute("PreferredRecipe") or ""
 	local ok, result = pcall(function()
-		return serveGuestRF:InvokeServer(currentGuest, dish, "ok")
+		return serveGuestRF:InvokeServer(currentGuest, dish)
 	end)
 	if ok and result then
 		gui.Enabled = false

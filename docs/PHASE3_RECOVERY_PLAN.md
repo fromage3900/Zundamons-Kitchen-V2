@@ -24,6 +24,7 @@ Restore one server-authoritative implementation for fishing and the Harvest -> C
 - 3.2 was committed as `3a304c5`. A real catch granted one fish and one revision, while duplicate/forged/replayed requests awarded nothing.
 - 3.3 is implemented and focused-verification complete in the current Phase 3 checkpoint. Ingredients are journaled in a rejoin-safe reservation, note timing and quality are server-derived, and completion atomically creates quality-owned dishes plus rewards.
 - A real perfect Apple Pie session consumed exactly 3 Apples and 5 Wheat, created two dishes through the configured bonus, updated `recipes_cooked_count` rather than served count, and advanced two revisions: reserve then settle.
+- 3.4 serving is implemented with guest ownership/proximity/state validation, server-selected dish quality, one atomic dish/counter/reward settlement, and replay locking. Static gates pass; the integrated Studio Cook -> Serve -> replay acceptance remains pending because both local Studio MCP and Rojo listeners disconnected before the runtime test.
 
 ## Architecture contract
 

@@ -199,6 +199,8 @@ local function createGuest(player)
 	guest:SetAttribute("SpawnTime", os.clock())
 	guest:SetAttribute("Patience", patience)
 	guest:SetAttribute("ServingPlayer", player.Name)
+	guest:SetAttribute("ServingUserId", player.UserId)
+	guest:SetAttribute("ServingState", "active")
 	guest:SetAttribute("IsChallenge", preference.challenge and true or false)
 	guest:SetAttribute("BonusGold", preference.challenge and preference.challenge.bonus_gold or 0)
 
