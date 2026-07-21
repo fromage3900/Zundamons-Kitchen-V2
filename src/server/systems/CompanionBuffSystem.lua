@@ -3,7 +3,7 @@ local Companion = require(game.ReplicatedStorage.Shared.Components.Companion)
 local Owner = require(game.ReplicatedStorage.Shared.Components.Owner)
 local BuffProvider = require(game.ReplicatedStorage.Shared.Components.BuffProvider)
 
-local DataManager = require(game.ServerScriptService.Server.Services.DataManager)
+local DataManager = require(game.ServerScriptService:WaitForChild("Services"):WaitForChild("DataManager"))
 
 -- Infinity Nikki Lens: 
 -- Server-authoritative buff management. Players cannot spoof their pet stats.
