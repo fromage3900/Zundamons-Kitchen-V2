@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Mise
+        uses: jdx/mise-action@v2
+
+      - name: Install Dependencies
+        run: wally install
+
+      - name: Run StyLua (Formatting Check)
+        run: stylua --check src/
+
+      - name: Run Selene (Linting Check)
+        run: selene src/
+
+      - name: Verify Rojo Build
+        run: rojo build default.project.json --output build.rbxl
