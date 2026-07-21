@@ -2,7 +2,7 @@
 local RS = game:GetService("ReplicatedStorage")
 local RF = RS:WaitForChild("RemoteFunctions")
 local DecorationConfig = require(RS.ConfigurationFiles.DecorationConfig)
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 local function allItems()
 	local out = {}

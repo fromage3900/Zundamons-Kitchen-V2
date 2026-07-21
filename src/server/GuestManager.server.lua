@@ -48,6 +48,7 @@ local function refreshSpawnPoints()
 end
 refreshSpawnPoints()
 
+local RS = game:GetService("ReplicatedStorage")
 local NPCConfig = require(RS.Shared.Config.NPCConfig)
 local InsertService = game:GetService("InsertService")
 
@@ -164,6 +165,25 @@ local function createGuest(player)
     -- Set mesh type attribute
     guest:SetAttribute("MeshType", selectedMeshType)
 
+	-- Pick a random guest preference
+	local preference = CONFIG.guest_preferences[math.random(1, #CONFIG.guest_preferences)]
+	local recipe = preference.preferred_recipes[math.random(1, #preference.preferred_recipes)]
+	local pay = math.random(preference.pay_range[1], preference.pay_range[2])
+	local patience = CONFIG.guest_settings.guest_patience
+	if preference.challenge then
+		patience = preference.challenge.patience
+	end
+
+	-- Set guest attributes
+	guest:SetAttribute("GuestName", preference.name)
+	guest:SetAttribute("PreferredRecipe", recipe)
+	guest:SetAttribute("PayAmount", pay)
+	guest:SetAttribute("SpawnTime", os.clock())
+	guest:SetAttribute("Patience", patience)
+	guest:SetAttribute("ServingPlayer", player.Name)
+	guest:SetAttribute("IsChallenge", preference.challenge and true or false)
+	guest:SetAttribute("BonusGold", preference.challenge and preference.challenge.bonus_gold or 0)
+
     -- Trigger VN dialogue for guest spawn
     local VNDialogueData = require(RS.ConfigurationFiles.VNDialogueData)
     local dialogue = VNDialogueData.GUEST_BY_TYPE[selectedMeshType]
@@ -179,27 +199,8 @@ local function createGuest(player)
         VNEvent:FireClient(player, "guest", text)
     end
 
-	-- Pick a random guest preference
-	local preference = CONFIG.guest_preferences[math.random(1, #CONFIG.guest_preferences)]
-	local recipe = preference.preferred_recipes[math.random(1, #preference.preferred_recipes)]
-	local pay = math.random(preference.pay_range[1], preference.pay_range[2])
-	local patience = CONFIG.guest_settings.guest_patience
-	if preference.challenge then
-		patience = preference.challenge.patience
-	end
-
-	-- Set guest attributes
-	guest:SetAttribute("GuestName", preference.name)
-	guest:SetAttribute("PreferredRecipe", recipe)
-	guest:SetAttribute("PayAmount", pay)
-	guest:SetAttribute("SpawnTime", tick())
-	guest:SetAttribute("Patience", patience)
-	guest:SetAttribute("ServingPlayer", player.Name)
-	guest:SetAttribute("IsChallenge", preference.challenge and true or false)
-	guest:SetAttribute("BonusGold", preference.challenge and preference.challenge.bonus_gold or 0)
-
 	-- Apply decoration patience buffs
-	local PlayerDataService = require(script.Parent.Services.PlayerDataService)
+	local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 	local d = PlayerDataService.get(player)
 	if d and d.active_decor_buffs and d.active_decor_buffs.patience > 0 then
 		local buffMult = 1 + d.active_decor_buffs.patience
@@ -346,7 +347,7 @@ local function checkGuestTimeout(guest)
 	local spawnTime = guest:GetAttribute("SpawnTime")
 	local patience = guest:GetAttribute("Patience")
 
-	if (tick() - spawnTime) > patience then
+	if (os.clock() - spawnTime) > patience then
 		return true -- Timed out
 	end
 
@@ -420,7 +421,8 @@ local function guestTimeoutLoop()
 end
 
 local Players = game:GetService("Players")
-local servicesFolder = script.Parent:FindFirstChild("Services")
+local SSS = game:GetService("ServerScriptService")
+local servicesFolder = SSS:FindFirstChild("Services")
 local GuestService = servicesFolder and servicesFolder:FindFirstChild("GuestService")
 if GuestService then
 	GuestService = require(GuestService)

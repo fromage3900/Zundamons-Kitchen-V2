@@ -10,10 +10,11 @@ if not CONFIG then warn("[ServingSystem] ProgressionConfig not found"); return {
 local NPCConfig = require(game.ReplicatedStorage.Shared.Config.NPCConfig)
 local RF = game.ReplicatedStorage:FindFirstChild("RemoteFunctions") or game.ReplicatedStorage:WaitForChild("RemoteFunctions", 10)
 local serveGuestRF = RF and RF:FindFirstChild("ServeGuest") or RF:WaitForChild("ServeGuest", 10)
-local RewardCore = require(game.ReplicatedStorage.ConfigurationFiles.RewardCore)
+local RewardCore = require(game:GetService("ServerScriptService").Services.RewardCore)
 local ChefLevelConfig = configFolder and require(configFolder:WaitForChild("ChefLevelConfig", 10))
-local PlayerDataService = require(script.Parent.Services.PlayerDataService)
-local GuestService = require(script.Parent.Services.GuestService)
+local SSS = game:GetService("ServerScriptService")
+local PlayerDataService = require(SSS.Services.PlayerDataService)
+local GuestService = require(SSS.Services.GuestService)
 
 local MAX_SERVE_DISTANCE = 20
 
