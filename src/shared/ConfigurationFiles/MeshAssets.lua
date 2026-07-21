@@ -1,4 +1,4 @@
-﻿--!strict
+--!strict
 -- [[ModuleScript] MeshAssets]
 -- Integrated harvest node meshes from HarvestNodeVariants.lua
 -- See CREDITS.md for full attribution
