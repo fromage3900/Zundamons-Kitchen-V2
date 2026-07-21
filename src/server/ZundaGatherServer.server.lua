@@ -67,13 +67,13 @@ end
 local function updateNodeMesh(node, stageIndex)
 	local rtype = node:GetAttribute("ResourceType")
 	if rtype ~= "CarrotPlot" then return end -- Only for CarrotPlot nodes
-	
+
 	local stages = GrowthStageConfig.getStages("CarrotPlot")
 	if not stages or not stages[stageIndex] then return end
-	
+
 	local stage = stages[stageIndex]
 	local meshId = GrowthStageConfig.getMeshId(stage)
-	
+
 	if meshId ~= "" and node:IsA("MeshPart") then
 		node.MeshId = meshId
 		node.Size = Vector3.new(2, 2, 2) * stage.scale
@@ -116,7 +116,7 @@ local function bindNode(node)
 	end
 	-- Store original size for respawn
 	node:SetAttribute("_origSize", node.Size)
-	
+
 	-- Initialize CarrotPlot growth stage
 	if node:GetAttribute("ResourceType") == "CarrotPlot" then
 		local currentStage = node:GetAttribute("GrowthStage") or 1
@@ -191,7 +191,7 @@ if RE_Harvest then
 			-- CarrotPlot uses growth stages
 			local currentStage = node:GetAttribute("GrowthStage") or 1
 			local stages = GrowthStageConfig.getStages("CarrotPlot")
-			
+
 			-- Check if harvestable (final stage)
 			if stages[currentStage] and stages[currentStage].harvestable then
 				local yield = node:GetAttribute("Yield") or 3
@@ -201,7 +201,7 @@ if RE_Harvest then
 				end
 				grantItems(player, items)
 				notify(player, "🥕 +" .. yield .. " Carrot")
-				
+
 				-- Reset to first stage instead of hiding
 				updateNodeMesh(node, 1)
 				node:SetAttribute("Available", true)

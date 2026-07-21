@@ -5,7 +5,7 @@ local FishingCast = RS:WaitForChild("ToolRemotes"):WaitForChild("FishingCast")
 
 local function bindFishingRod(tool)
     if tool.Name ~= "FishingRod" then return end
-    
+
     local cooldown = 0
     tool.Activated:Connect(function()
         local now = os.clock()

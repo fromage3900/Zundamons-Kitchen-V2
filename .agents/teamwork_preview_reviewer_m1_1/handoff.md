@@ -1,8 +1,8 @@
 # Handoff Report — Reviewer 1 (Milestone 1: Harvesting & Resource Node System)
 
-**Agent**: Reviewer 1 (teamwork_preview_reviewer_m1_1)  
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_1`  
-**Date**: 2026-07-21  
+**Agent**: Reviewer 1 (teamwork_preview_reviewer_m1_1)
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_1`
+**Date**: 2026-07-21
 
 ---
 
@@ -48,7 +48,7 @@
   ```lua
   43: if health <= 0 and not mined then
   44:     item:SetAttribute("Mined", true)
-  45: 
+  45:
   46:     for _, player in pairs(Players:GetPlayers()) do
   47:         local tag = hasWildcardTag(item, player.Name .. "|")
   48:         if tag then

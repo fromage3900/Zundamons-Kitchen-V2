@@ -31,7 +31,7 @@ local function PlayerAdded(player)
 	if profile ~= nil then
 		profile:AddUserId(player.UserId)
 		profile:Reconcile()
-		
+
 		profile:ListenToRelease(function()
 			DataManager.Profiles[player] = nil
 			player:Kick("Data was loaded on another server. Please rejoin.")
@@ -39,7 +39,7 @@ local function PlayerAdded(player)
 
 		if player:IsDescendantOf(Players) then
 			DataManager.Profiles[player] = profile
-			
+
 			-- Create Replica to stream state directly to React UI
 			local replica = ReplicaService.NewReplica({
 				ClassToken = PlayerProfileClassToken,
@@ -47,7 +47,7 @@ local function PlayerAdded(player)
 				Data = profile.Data,
 				Replication = player,
 			})
-			
+
 			-- Tie Replica lifespan to Profile
 			profile.Replica = replica
 		else

@@ -90,7 +90,7 @@ local function buildCard(q,idx)
     checkBtn.TextSize=16; checkBtn.TextColor3=Color3.new(1,1,1)
     checkBtn.Visible=false
     Instance.new("UICorner",checkBtn).CornerRadius=UDim.new(0,8)
-    
+
     checkBtn.MouseButton1Click:Connect(function()
         -- Fade out and remove the card
         Tween:Create(card,TweenInfo.new(0.3),{BackgroundTransparency=1}):Play()

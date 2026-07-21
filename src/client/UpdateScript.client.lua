@@ -48,24 +48,24 @@ local lastGold, lastGuests = -1, -1
 
 local function updateUI()
     if not requestData then return end
-    
+
     local ok, data = pcall(function()
         return requestData:InvokeServer()
     end)
     if not ok or not data then return end
     _G.data = data
-    
+
     local gold = data.gold or 0
     local guests = data.guests_served or 0
-    
+
     if gold == lastGold and guests == lastGuests then return end
     lastGold = gold
     lastGuests = guests
-    
+
     -- Update labels
     goldLabel.Text = "🪙  " .. gold .. " Gold"
     guestsLabel.Text = "👥  " .. guests .. " Guests Served"
-    
+
     -- Find current tier and next milestone
     local currentTier = TIERS[1]
     for _, tier in ipairs(TIERS) do
@@ -73,14 +73,14 @@ local function updateUI()
             currentTier = tier
         end
     end
-    
+
     -- Progress bar
     local nextGuests = currentTier.next
     local tierStart = currentTier.guests
     if nextGuests > tierStart then
         local progress = math.clamp((guests - tierStart) / (nextGuests - tierStart), 0, 1)
         progressFill.Size = UDim2.new(progress, 0, 1, 0)
-        progressLabel.Text = string.format("🎯 %s  →  Serve %d guests for %s!", 
+        progressLabel.Text = string.format("🎯 %s  →  Serve %d guests for %s!",
             currentTier.name, nextGuests, currentTier.nextName)
     else
         progressFill.Size = UDim2.new(1, 0, 1, 0)

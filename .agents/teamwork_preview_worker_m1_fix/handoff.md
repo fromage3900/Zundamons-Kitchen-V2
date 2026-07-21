@@ -1,9 +1,9 @@
 # Handoff Report — Worker 2 (M1 Edge Case Hardening)
 
-**Agent**: Worker 2 (M1 Edge Case Hardening)  
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m1_fix`  
-**Project Root**: `g:\Zundamons-kItchen-V2`  
-**Date**: 2026-07-21  
+**Agent**: Worker 2 (M1 Edge Case Hardening)
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m1_fix`
+**Project Root**: `g:\Zundamons-kItchen-V2`
+**Date**: 2026-07-21
 
 ---
 

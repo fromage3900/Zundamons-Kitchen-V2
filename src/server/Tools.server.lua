@@ -160,5 +160,3 @@ function Activated(player, toolName)
 end
 
 ConnectFunction.OnServerInvoke = Activated
-
-

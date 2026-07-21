@@ -96,12 +96,12 @@ TOOLS_CONFIG = {
 # ------------------------------------------------------------------
 def test_category_1():
     print("\n--- Running Category 1: Rapid Tool Swinging Stress Test ---")
-    
+
     # 1.1 Rapid Invocation Debounce Check
     # Simulate mytool:GetAttribute("Swinging")
     tool_attributes = {"Swinging": False}
     swing_success_count = 0
-    
+
     def simulate_activated(tool_attr):
         if tool_attr.get("Swinging"):
             return False
@@ -112,7 +112,7 @@ def test_category_1():
     # Fire 100 times synchronously while swinging
     first_res = simulate_activated(tool_attributes)
     subsequent_res = [simulate_activated(tool_attributes) for _ in range(99)]
-    
+
     if first_res is True and all(r is False for r in subsequent_res):
         record_test("Category 1: Rapid Tool Swinging", "Debounce attribute check during active swing", True, "Successfully blocked 99 concurrent swings while Swinging=True")
     else:
@@ -125,7 +125,7 @@ def test_category_1():
 
     has_pcall = "pcall" in code or "xpcall" in code
     resets_on_error = False
-    
+
     if "pcall(" in code:
         resets_on_error = True
 

@@ -90,7 +90,7 @@ Three separate files calculate rhythm minigame quality using incompatible algori
   local d = PlayerDataService.getOrCreate(player)
   d.inventory = d.inventory or {}
   ```
-- **Impact**: 
+- **Impact**:
   1. Cooked dishes spawn in the 3D world as physical drops (`MakeLootEvent`). If uncollected, ingredients are consumed but dish is lost.
   2. Collected dishes are saved to `data["Zunda Mochi"]` (top-level keys), leaving `d.inventory` in `RewardCore` empty and unused.
 

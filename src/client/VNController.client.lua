@@ -520,9 +520,9 @@ end
 _G.ZundaVN = {
     show = function(speakerKey, lines, onComplete)
         print("[VN.show] Called with speaker:", speakerKey, "lines count:", #lines)
-        if type(lines) ~= "table" or #lines == 0 then 
+        if type(lines) ~= "table" or #lines == 0 then
             warn("[VN.show] Invalid lines parameter")
-            return 
+            return
         end
         if isOpen then
             print("[VN.show] Panel already open, queuing")

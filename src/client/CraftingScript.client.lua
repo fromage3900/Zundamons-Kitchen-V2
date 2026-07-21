@@ -29,7 +29,7 @@ end
 
 if not gui or not panel or not scroll then
 	gui = ClientGuiBootstrap.createScreenGui(player, "CraftingGui", 25)
-	
+
 	panel = Instance.new("Frame", gui)
 	panel.Name = "Panel"
 	panel.Size = UDim2.new(0, 460, 0, 520)
@@ -75,7 +75,7 @@ if not gui or not panel or not scroll then
 	scroll.ScrollBarImageColor3 = Color3.fromRGB(220, 160, 230)
 	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-	
+
 	local layout = Instance.new("UIListLayout", scroll)
 	layout.Padding = UDim.new(0, 8)
 	layout.SortOrder = Enum.SortOrder.LayoutOrder

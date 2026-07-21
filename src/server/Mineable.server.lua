@@ -155,4 +155,3 @@ end
 addAttributes()
 
 CollectionService:GetInstanceAddedSignal("Mineable"):Connect(setupMineableItem)
-

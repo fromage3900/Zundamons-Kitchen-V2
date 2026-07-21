@@ -18,9 +18,9 @@ local function ItemGatherSystem(world)
 				-- will automatically trigger the `useInventory` React hook and re-render the player's screen!
 				local currentQty = profile.Data.Inventory[drop.itemName] or 0
 				profile.Data.Inventory[drop.itemName] = currentQty + drop.quantity
-				
+
 				print(string.format("[ItemGatherSystem] Granted %d %s to %s", drop.quantity, drop.itemName, player.Name))
-				
+
 				-- Destory the physical item
 				world:despawn(id)
 			end

@@ -8,10 +8,10 @@ end
 local plants = {}
 
 -- Safely construct the table, letting Sprout be nil on the client
-plants.items={["WheatSeed"]={["Grow_Time"]=5, 
+plants.items={["WheatSeed"]={["Grow_Time"]=5,
 	                         ["Sprout"]=plantModels and plantModels:WaitForChild("Wheat Plant(Young)")},
 
-	["Wheat Plant(Young)"]={["Grow_Time"]=5, 
+	["Wheat Plant(Young)"]={["Grow_Time"]=5,
 		                     ["Sprout"]=plantModels and plantModels:WaitForChild("Wheat Plant")}
 }
 

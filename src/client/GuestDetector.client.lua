@@ -24,7 +24,7 @@ local function startDetection(character)
 			task.wait(DETECTION_INTERVAL)
 			local guestFolder = workspace:FindFirstChild("Guests")
 			local closestGuest = nil
-			
+
 			if guestFolder then
 				local closestDistance = INTERACTION_RANGE
 				for _, guest in pairs(guestFolder:GetChildren()) do
@@ -38,7 +38,7 @@ local function startDetection(character)
 					end
 				end
 			end
-			
+
 			if closestGuest ~= nearbyGuest then
 				nearbyGuest = closestGuest
 				isDetectingNearbyGuestChanged:Fire(nearbyGuest)

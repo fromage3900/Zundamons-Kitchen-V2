@@ -53,7 +53,7 @@ def test_tool_hit_detection():
                     vulnerable = True
                     break
         if vulnerable:
-            record_test("Model Position Safety", "Tool Hit Detection", "FAIL", 
+            record_test("Model Position Safety", "Tool Hit Detection", "FAIL",
                         "Tools.server.lua accesses 'node.Position' directly on Mineable tagged instances without checking if instance is a Model, causing crash if a Model is tagged Mineable")
         else:
             record_test("Model Position Safety", "Tool Hit Detection", "PASS", "Mineable instance position checked safely")
@@ -74,7 +74,7 @@ def test_node_health_and_multiplayer():
     print("\n--- Running Test 2: Node Health Reduction & Multiplayer Cooldown Bug ---")
     mineable_path = os.path.join(project_root, "src", "server", "Mineable.server.lua")
     validator_path = os.path.join(project_root, "src", "server", "Validation", "HarvestValidator.lua")
-    
+
     with open(mineable_path, "r", encoding="utf-8") as f:
         mineable_code = f.read()
 
@@ -92,7 +92,7 @@ def test_node_health_and_multiplayer():
     if "RemoveTag" in mineable_code:
         record_test("Wildcard Tag Cleanup", "Node Health & Loot", "PASS", "Tags removed from node upon harvest")
     else:
-        record_test("Wildcard Tag Cleanup", "Node Health & Loot", "FAIL", 
+        record_test("Wildcard Tag Cleanup", "Node Health & Loot", "FAIL",
                     "Mineable.server.lua NEVER removes wildcard tags (player.Name..'|'..tier). Tags persist across respawns, allowing stale players to steal loot drops in future respawns!")
 
     # Check 2.3: Multiplayer validateHarvest Cooldown Race Condition
@@ -159,8 +159,8 @@ def test_loot_drops_and_collection():
             missing_items.append(item)
 
     if missing_items:
-        record_test("Loot Model Existence Check", "Loot Drops", "FAIL", 
-                    f"Items dropped by gathering/mining missing in ReplicatedStorage.Loot: {missing_items}. GiveLoot fails for these items!", 
+        record_test("Loot Model Existence Check", "Loot Drops", "FAIL",
+                    f"Items dropped by gathering/mining missing in ReplicatedStorage.Loot: {missing_items}. GiveLoot fails for these items!",
                     {"missing": missing_items})
     else:
         record_test("Loot Model Existence Check", "Loot Drops", "PASS", "All dropped items exist in ReplicatedStorage.Loot")

@@ -116,7 +116,7 @@ end
 local function updateHudPosition()
 	local viewPortSize = camera.ViewportSize
 	local slotSize = UDim2.fromOffset(hotBar.AbsoluteSize.Y, hotBar.AbsoluteSize.Y)
-	
+
 	Inventory.Frame.Grid.CellSize = slotSize
 	hotBar.Grid.CellSize = slotSize
 
@@ -134,7 +134,7 @@ if inventoryHandler.SETTINGS.OPEN_BUTTON then
 	CustomInventoryGUI.openButton.MouseButton1Down:Connect(function()
 		Inventory.Visible = not Inventory.Visible
 		local currentState = Inventory.Visible
-		
+
 		inventoryHandler:removeCurrentDescription()
 		if currentState then
 			showSlots()
@@ -165,7 +165,7 @@ UserInputService.InputChanged:Connect(function(input)
 
 		local toolEquipped = getToolEquipped()
 		local toolPosition = inventoryHandler:getToolPosition(toolEquipped) or 0
-		
+
 		for i=toolPosition + direction, direction < 0 and 1 or inventoryHandler.slotAmount, direction do
 			local toolObject = inventoryHandler.OBJECTS.HotBar[i]
 			if toolObject and humanoid then

@@ -1,8 +1,8 @@
 # Handoff Report — Milestone 1 (R1: Harvesting & Resource Node System)
 
-**Agent**: Worker M1  
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m1`  
-**Date**: 2026-07-21  
+**Agent**: Worker M1
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m1`
+**Date**: 2026-07-21
 
 ---
 

@@ -244,18 +244,18 @@ UsePowerup.OnServerInvoke = function(player, key)
 
     local d = PlayerDataService.get(player); if not d then return false, "no data" end
     local cfg = PowerupConfig[key]; if not cfg then return false, "unknown powerup" end
-    
+
     local cost = cfg.cost and cfg.cost.gold or 0
     if (d.gold or 0) < cost then return false, "not enough gold" end
-    
+
     d.gold = d.gold - cost
     d.powerups[key] = os.time() + cfg.duration
     bumpStat(d, "powerupsUsed", 1)
-    
+
     PowerupUpdate:FireClient(player, key, d.powerups[key])
     PopupEvent:FireClient(player, "bonus", cfg.icon .. " " .. cfg.name .. "!", Color3.fromRGB(180, 240, 200))
     checkAchievements(player, gatherMetrics(d))
-    
+
     return true, d.gold
 end
 
@@ -274,13 +274,13 @@ UpgradeTool.OnServerInvoke = function(player, toolType)
     local d = PlayerDataService.get(player); if not d then return false, "no data" end
     local cur = d.toolTiers[toolType] or 1
     if cur >= 3 then return false, "already max" end
-    
+
     local cost = (cur == 1) and 300 or 900
     if (d.gold or 0) < cost then return false, "not enough gold (need " .. cost .. ")" end
-    
+
     d.gold = d.gold - cost
     d.toolTiers[toolType] = cur + 1
-    
+
     -- Apply to live tool in character
     if player.Character then
         for _, item in pairs(player.Character:GetChildren()) do
@@ -294,7 +294,7 @@ UpgradeTool.OnServerInvoke = function(player, toolType)
             end
         end
     end
-    
+
     PopupEvent:FireClient(player, "bonus", "🔨 " .. toolType .. " → Tier " .. (cur + 1), Color3.fromRGB(255, 220, 150))
     checkAchievements(player, gatherMetrics(d))
     return true, d.gold

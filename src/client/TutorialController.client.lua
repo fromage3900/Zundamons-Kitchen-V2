@@ -179,9 +179,9 @@ local animating = false
 
 local function showStep(idx)
     print("[Tutorial.showStep] Showing step", idx)
-    if idx < 1 or idx > #STEPS then 
+    if idx < 1 or idx > #STEPS then
         warn("[Tutorial.showStep] Invalid step index:", idx)
-        return 
+        return
     end
     currentStep = idx
     local step = STEPS[idx]
@@ -257,9 +257,9 @@ task.spawn(function()
     print("[Tutorial] Character spawned, checking if tutorial done...")
     local tutorialDone = checkTutorialDone()
     print("[Tutorial] Tutorial done:", tutorialDone)
-    if tutorialDone then 
+    if tutorialDone then
         print("[Tutorial] Tutorial already completed, skipping")
-        return 
+        return
     end
     task.wait(1.5)
     print("[Tutorial] Showing step 1")

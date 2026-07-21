@@ -93,7 +93,7 @@ local function handleServeGuest(player, guestInstance, foodItemName, quality)
 
     if foodItemName ~= recipe then
         print("[ServingSystem] " .. player.Name .. " tried to serve " .. foodItemName .. " but guest wanted " .. tostring(recipe))
-        
+
         -- Trigger VN dialogue for wrong dish
         local meshType = guestInstance:GetAttribute("MeshType")
         local VNDialogueData = require(game.ReplicatedStorage.ConfigurationFiles.VNDialogueData)
@@ -104,7 +104,7 @@ local function handleServeGuest(player, guestInstance, foodItemName, quality)
                 VNEvent:FireClient(player, "guest", dialogue.wrong_dish)
             end
         end
-        
+
         return false, "Wrong food! Guest wants " .. tostring(recipe)
     end
 

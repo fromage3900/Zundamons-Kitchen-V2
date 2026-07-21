@@ -320,14 +320,14 @@ local function open()
     end)
     print("[CompanionShop.open] Catalog success:", success1)
     catalog = catalogData or {}
-    
+
     print("[CompanionShop.open] Fetching owned companions...")
     local success2, ownedData = pcall(function()
         return GetOwnedCompanions:InvokeServer()
     end)
     print("[CompanionShop.open] Owned success:", success2)
     owned = ownedData or {}
-    
+
     if owned.__active then currentKey = owned.__active end
     print("[CompanionShop.open] Building UI...")
     buildTabs()

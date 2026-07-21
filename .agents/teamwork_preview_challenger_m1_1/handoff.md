@@ -2,7 +2,7 @@
 
 ## Observation
 
-Empirical testing was conducted using custom test harness `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\test_harness_m1.py` and Rojo build verification `rojo build default.project.json -o build/Zundamons-kItchen.rbxl`. 
+Empirical testing was conducted using custom test harness `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\test_harness_m1.py` and Rojo build verification `rojo build default.project.json -o build/Zundamons-kItchen.rbxl`.
 
 Out of 16 empirical test cases evaluated across the 6 specified R1 subsystems, **10 PASSED** and **6 FAILED**:
 

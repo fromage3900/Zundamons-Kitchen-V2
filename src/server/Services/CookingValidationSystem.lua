@@ -67,7 +67,7 @@ local function CookingValidationSystem(world)
 			local player, item, position = ev[1], ev[2], ev[3]
 
 			local recipeDef = craftConfig.recipes and craftConfig.recipes[item]
-			local noteCount = (craftConfig.difficulty and craftConfig.difficulty[item] and craftConfig.difficulty[item].notes) 
+			local noteCount = (craftConfig.difficulty and craftConfig.difficulty[item] and craftConfig.difficulty[item].notes)
 				or (recipeDef and recipeDef.notes) or 10
 			local duration = math.max(craftConfig.cookingTimes and craftConfig.cookingTimes[item] or 15, (noteCount * 1.0) + 2.0 + 3.0)
 

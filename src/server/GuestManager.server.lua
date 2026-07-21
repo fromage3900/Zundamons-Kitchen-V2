@@ -59,30 +59,30 @@ local function loadMeshTemplate(meshType)
     if meshTemplateCache[meshType] then
         return meshTemplateCache[meshType]:Clone()
     end
-    
+
     local template = NPCConfig.guestTemplates[meshType]
     if not template then
         warn("[GuestManager] Unknown mesh type:", meshType)
         return nil
     end
-    
+
     local success, model = pcall(function()
         local assetId = tonumber(template.meshId:match("%d+"))
         return InsertService:LoadAsset(assetId)
     end)
-    
+
     if not success or not model then
         warn("[GuestManager] Failed to load mesh:", meshType, model)
         return nil
     end
-    
+
     -- Ensure model has required structure
     if not model:FindFirstChild("Torso") then
         warn("[GuestManager] Mesh missing Torso:", meshType)
         model:Destroy()
         return nil
     end
-    
+
     meshTemplateCache[meshType] = model
     return model:Clone()
 end
@@ -119,14 +119,14 @@ local function createGuest(player)
             child.Parent = guest
         end
         meshModel:Destroy()
-        
+
         -- Apply scale
         local scale = NPCConfig.guestTemplates[selectedMeshType].scale
         local torso = guest:FindFirstChild("Torso")
         if torso then
             torso.Size = torso.Size * scale
         end
-        
+
         print("[GuestManager] Using mesh guest:", selectedMeshType)
     else
         -- Fallback to procedural capsule

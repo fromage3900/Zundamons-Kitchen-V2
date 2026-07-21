@@ -44,7 +44,7 @@ Review Milestone 1 (R1: Harvesting & Resource Node System) work product for corr
 - **Unverified claims**: None (all claims verified via code inspection and build command)
 
 ## Attack Surface
-- **Hypotheses tested**: 
+- **Hypotheses tested**:
   - Co-op multi-player node harvesting -> FAIL (cooldown blocks player 2+ in iteration loop)
   - Model node passing to HarvestValidator -> WARN (node.Position direct index on Model would error)
   - Rule 4 import paths in src/server -> PASS (0 relative script.Parent imports)
