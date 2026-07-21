@@ -229,9 +229,13 @@ skipBtn.MouseButton1Click:Connect(dismiss)
 -- Automatically advance for timed steps
 local autoTimer
 local function resetAutoTimer(step)
-	if autoTimer then autoTimer:Cancel() end
+	if autoTimer then
+        task.cancel(autoTimer)
+        autoTimer = nil
+    end
 	if step.auto and step.auto > 0 then
 		autoTimer = task.delay(step.auto, function()
+            autoTimer = nil
 			if currentStep >= #STEPS then
 				dismiss()
 			else

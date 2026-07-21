@@ -346,10 +346,6 @@ local function createGuest(player)
 	payLabel.TextScaled = true
 	payLabel.Font = Enum.Font.Gotham
 	payLabel.Parent = bg
-
-	-- Store reference for patience updates
-	guest._patienceFill = patienceFill
-
 	-- Parent to Guests folder
 	guest.Parent = GUEST_SPAWN_FOLDER
 

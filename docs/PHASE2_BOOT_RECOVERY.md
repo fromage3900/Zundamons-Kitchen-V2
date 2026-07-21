@@ -10,12 +10,12 @@ Phase 2 restores a deterministic, reviewable bootstrap without claiming that the
 | --- | --- | --- |
 | Rojo CLI | PASS | Pinned Rojo 7.7.0; `rojo build default.project.json` succeeds. |
 | Rojo server | PASS | Listening on `127.0.0.1:34872`. |
-| Rojo Studio sync | BLOCKED | The open Studio DataModel still exposes the pre-recovery tree. The 7.7.0 plugin was installed/updated, but Studio must reload the plugin and connect to `localhost:34872`. |
-| chrxxs Studio MCP | PASS | One active Studio instance (`Zundamon'sKitchenV2`), Edit DataModel available, live Luau queries succeed. |
-| Legacy MCP conflict | PASS | No listener on port 28821 and no live script containing the stale bridge marker. |
+| Rojo Studio sync | PASS | Studio is connected to localhost:34872; repository bootstraps, remote classes, and renamed persistence modules were verified live. |
+| chrxxs Studio MCP | PASS | v2.22.3 listens on 127.0.0.1:58741; Studio has established connections and /ready succeeds for Edit and Server. |
+| Legacy MCP conflict | PASS | RobloxStudioMCP.server.lua was identified as the port-28821 poller and quarantined as .disabled-phase2; no 28821 listener remains. |
 | Wally | PASS | 0.3.2. |
 | StyLua tool | PASS | `@johnnymorganz/stylua-bin` 2.5.2 resolves; the prior nonexistent package command is removed. |
-| Focused StyLua | PASS | All Phase 2 changed Lua files pass `--check`. |
+| Focused StyLua bootstrap gate | PASS | The deterministic bootstrap repair set passes the formatter check; later compatibility fixes retain inherited file formatting and remain covered by the separately failing full baseline. |
 | Full StyLua baseline | FAIL | Unrelated inherited source remains unformatted. This is no longer masked by Rojo build success. |
 | Selene tool | PASS | 0.27.1 with generated Roblox standard library. |
 | Full Selene error gate | PASS | 0 errors and 0 parse errors after targeted correctness repairs. |
@@ -33,6 +33,11 @@ Phase 2 restores a deterministic, reviewable bootstrap without claiming that the
 - The unfinished Profile/Replica replacement is now a dormant `LegacyProfileDataManager` ModuleScript, preventing a second persistence owner from auto-running.
 - Several confirmed startup faults were corrected: HUD syntax, sprint compatibility, guest template shape, material UI fallbacks, inventory UI fallbacks, and HUD button naming.
 - Selene correctness errors were eliminated without bulk-reformatting the repository: invalid forward references, React keys, duplicate branches/keys, empty blocks, an admin command argument, and obsolete type checks were repaired.
+- Invalid lowercase children metadata was replaced by concrete Rojo .model.json instances; live remotes now match their declared classes.
+- The registered cooking wrapper is a real Matter system function and uses the Matter 0.8.5 event iterator contract.
+- The unfinished fishing adapter now fails closed instead of returning success without creating or rewarding an authoritative session.
+- Nine exact failing scripts embedded in imported Workspace decorations were disabled in Studio; models and geometry were preserved.
+- A 35-second playtest and forced respawn completed with no runtime stack traces. HUD and modal interfaces retained ResetOnSpawn = false; modal panels returned hidden.
 
 ## Explicitly deferred
 
@@ -55,10 +60,6 @@ No branch was pushed or published.
 
 Do not discard the project for a blank-slate rewrite. The fastest production route is a controlled in-place rebuild (strangler migration): retain the authored world, content/configuration, proven services, and working UI behaviors while replacing one authoritative gameplay domain at a time behind validated adapters. A clean-room rewrite would recreate a large content surface and rediscover Studio-only contracts without removing the need for parity testing. Reconsider a full rewrite only if the product scope changes materially or the retained code/assets cannot be trusted.
 
-## Remaining live acceptance gate
+## Live Studio follow-up
 
-1. Restart or reload Studio so the newly installed Rojo 7.7.0 plugin is active.
-2. Connect the plugin to `localhost:34872` while `rojo serve` is running.
-3. Confirm the live remote classes and `LegacyProfileDataManager` match the repository.
-4. Run a focused server/client playtest and record console output.
-
+Save the open place to retain the Editor-only safety changes: nine imported asset scripts and five scripts inside explicitly documented legacy StarterGui shells were disabled. Other legacy StarterGui scripts still clone briefly before the runtime compatibility cleanup removes them; disabling all remaining embedded StarterGui scripts requires explicit owner approval because some may represent intentionally retained UI behavior.

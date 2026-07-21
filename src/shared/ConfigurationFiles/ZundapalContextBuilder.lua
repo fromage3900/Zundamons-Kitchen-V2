@@ -4,9 +4,13 @@
 
 local CraftConfig = require(script.Parent:WaitForChild("CraftConfig"))
 local QuestConfig = require(script.Parent:WaitForChild("QuestConfig"))
-local QuestProgress = require(script.Parent:WaitForChild("QuestProgress"))
+local questProgressModule = script.Parent:FindFirstChild("QuestProgress")
+local QuestProgress = questProgressModule and require(questProgressModule) or nil
 local ProgressionConfig = require(script.Parent:WaitForChild("ProgressionConfig"))
-local ZoneVisitConfig = require(script.Parent:WaitForChild("ZoneVisitConfig"))
+local zoneVisitModule = script.Parent:FindFirstChild("ZoneVisitConfig")
+local ZoneVisitConfig = zoneVisitModule and require(zoneVisitModule) or {
+    canonical_zones = { "village", "kitchen", "eastpeaks", "mystic" },
+}
 local CompanionConfig = require(script.Parent:WaitForChild("CompanionConfig"))
 
 local ZundapalContextBuilder = {}
@@ -131,6 +135,9 @@ local function craftableNow(data: { [string]: any }): { string }
 end
 
 local function activeQuestLines(data: { [string]: any }): { string }
+    if not QuestProgress then
+        return {}
+    end
 	local completed = data.completed_quests or {}
 	local rows = {}
 

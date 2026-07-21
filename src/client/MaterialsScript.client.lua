@@ -287,14 +287,15 @@ end
 -- ---- SKY SYNC ----
 -- Adjust panel title color based on time of day to feel alive
 local function updateSkyColors()
+    local titleBar = panel:FindFirstChild("TitleBar")
 	local hour = Lighting:GetAttribute("CurrentHour") or 12
 	local t = hour % 24
 	local isNight = t < 6 or t > 19
 	if isNight then
-		panel.TitleBar.BackgroundColor3 = Color3.fromRGB(80, 60, 120)
+		if titleBar then titleBar.BackgroundColor3 = Color3.fromRGB(80, 60, 120) end
 		toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 150)
 	else
-		panel.TitleBar.BackgroundColor3 = Color3.fromRGB(220, 180, 200)
+		if titleBar then titleBar.BackgroundColor3 = Color3.fromRGB(220, 180, 200) end
 		toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50)
 	end
 end

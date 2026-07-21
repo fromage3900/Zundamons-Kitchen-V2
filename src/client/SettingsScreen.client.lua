@@ -102,7 +102,13 @@ Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
 local function setVolume(val)
 	local clamped = math.clamp(val, 0, 1)
 	local soundService = game:GetService("SoundService")
-	soundService.Volume = clamped
+    for _, sound in ipairs(soundService:GetDescendants()) do
+        if sound:IsA("Sound") then
+            local baseVolume = sound:GetAttribute("SettingsBaseVolume") or sound.Volume
+            sound:SetAttribute("SettingsBaseVolume", baseVolume)
+            sound.Volume = baseVolume * clamped
+        end
+    end
 	volVal.Text = math.floor(clamped * 100) .. "%"
 	sliderFill.Size = UDim2.new(clamped, 0, 1, 0)
 	sliderBtn.Position = UDim2.new(clamped, -9, 0.5, -9)

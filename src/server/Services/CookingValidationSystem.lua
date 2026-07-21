@@ -4,8 +4,8 @@
 -- awards XP/Gold/Level progression via RewardCore, and delivers dishes directly to PlayerDataService inventory.
 
 local Matter = require(game.ReplicatedStorage.Packages.Matter)
-local CookingSession = require(game.ReplicatedStorage.Shared.Components.Cooking.CookingSession)
-local CookingScore = require(game.ReplicatedStorage.Shared.Components.Cooking.CookingScore)
+local CookingSession = require(game.ReplicatedStorage.components.cooking.CookingSession)
+local CookingScore = require(game.ReplicatedStorage.components.cooking.CookingScore)
 
 local RS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
@@ -63,8 +63,7 @@ local function CookingValidationSystem(world)
 	-- Listen for CookingStartEvent from CraftManager / server scripts
 	local startEvent = RS.RemoteEvents:FindFirstChild("CookingStartEvent")
 	if startEvent then
-		for _, ev in world:query(Matter.useEvent(startEvent, "Event")) do
-			local player, item, position = ev[1], ev[2], ev[3]
+		for _, player, item, position in Matter.useEvent(startEvent, "Event") do
 
 			local recipeDef = craftConfig.recipes and craftConfig.recipes[item]
 			local noteCount = (craftConfig.difficulty and craftConfig.difficulty[item] and craftConfig.difficulty[item].notes)
@@ -95,8 +94,7 @@ local function CookingValidationSystem(world)
 	-- Listen for CookingHit RemoteEvents from clients
 	local hitEvent = RS.RemoteEvents:FindFirstChild("CookingHit")
 	if hitEvent then
-		for _, ev in world:query(Matter.useEvent(hitEvent, "OnServerEvent")) do
-			local player, clientTick, quality = ev[1], ev[2], ev[3]
+		for _, player, clientTick, quality in Matter.useEvent(hitEvent, "OnServerEvent") do
 
 			for id, session, score in world:query(CookingSession, CookingScore) do
 				if session.playerId == player.UserId then

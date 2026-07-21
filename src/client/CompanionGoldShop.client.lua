@@ -41,7 +41,7 @@ scrolling.Parent = frame
 
 -- Build companion cards
 local yPos = 0
-for name, companion in pairs(NPCConfig.goldShopCompanions) do
+for name, companion in pairs(NPCConfig.goldShopCompanions or {}) do
 	local card = Instance.new("Frame")
 	card.Size = UDim2.new(1, 0, 0, 80)
 	card.Position = UDim2.new(0, 0, 0, yPos)

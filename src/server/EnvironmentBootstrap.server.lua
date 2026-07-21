@@ -13,25 +13,15 @@ local ScatterService
 local servicesFolder = ServerScriptService:FindFirstChild("Services")
 if servicesFolder then
 	local scatterModule = servicesFolder:FindFirstChild("ScatterService")
-	if scatterModule then
+    if scatterModule and scatterModule:IsA("ModuleScript") then
 		ScatterService = require(scatterModule)
 	end
 end
 -- Fallback: use a stub if ScatterService is unavailable
 if not ScatterService then
-	local configFolder = ReplicatedStorage:FindFirstChild("ConfigurationFiles")
-	if configFolder then
-		local sc = configFolder:FindFirstChild("ScatterConfig")
-		if sc then
-			ScatterService = require(sc)
-		end
-	end
-	if not ScatterService then
-		ScatterService = { scatterBiome = function() end, clearBiome = function() end, clearAll = function() end }
-		warn("[EnvironmentBootstrap] ScatterService unavailable — using stub")
-	end
+    ScatterService = { scatterBiome = function() end, clearBiome = function() end, clearAll = function() end }
+    warn("[EnvironmentBootstrap] Module-based ScatterService unavailable; standalone service remains authoritative")
 end
-
 -- Tag regions in Studio with "ScatterRegion" and a "Biome" attribute
 -- to auto-scatter them on game load.
 

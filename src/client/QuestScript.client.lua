@@ -92,7 +92,7 @@ local function buildCard(q, idx)
 	em.Size = UDim2.new(0, 52, 0, 52)
 	em.Position = UDim2.new(0, 10, 0, 14)
 	em.BackgroundColor3 = Color3.fromRGB(240, 235, 228)
-	em.Text = q.emoji
+	em.Text = q.emoji or q.icon or ""
 	em.Font = Enum.Font.GothamBold
 	em.TextSize = 28
 	em.TextXAlignment = Enum.TextXAlignment.Center
@@ -103,7 +103,7 @@ local function buildCard(q, idx)
 	tt.Size = UDim2.new(1, -160, 0, 24)
 	tt.Position = UDim2.new(0, 72, 0, 12)
 	tt.BackgroundTransparency = 1
-	tt.Text = q.title
+	tt.Text = q.title or q.name or ""
 	tt.Font = Enum.Font.GothamBold
 	tt.TextSize = 15
 	tt.TextColor3 = C.text
@@ -113,7 +113,7 @@ local function buildCard(q, idx)
 	dd.Size = UDim2.new(1, -160, 0, 18)
 	dd.Position = UDim2.new(0, 72, 0, 36)
 	dd.BackgroundTransparency = 1
-	dd.Text = q.desc
+	dd.Text = q.desc or q.description or ""
 	dd.Font = Enum.Font.Gotham
 	dd.TextSize = 12
 	dd.TextColor3 = C.sub

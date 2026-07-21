@@ -13,7 +13,6 @@ local systemsFolder = playerScripts:WaitForChild("systems")
 -- and the cooking input proof of concept is intentionally not scheduled.
 local systems = {
 	require(systemsFolder:WaitForChild("CompanionFollowSystem")),
-	require(systemsFolder:WaitForChild("StreamingSystem")),
 }
 
 local world = Matter.World.new()

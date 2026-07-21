@@ -10,7 +10,6 @@ local ChefLevelConfig = require(RS.ConfigurationFiles.ChefLevelConfig)
 local AchievementConfig = require(RS.ConfigurationFiles.AchievementConfig)
 local DailyQuestConfig = require(RS.ConfigurationFiles.DailyQuestConfig)
 local PowerupConfig = require(RS.ConfigurationFiles.PowerupConfig)
-local ToolManager = require(SSS:WaitForChild("ToolManager", 10) or SSS.ToolManager)
 local ToolsConfig = require(RS.ConfigurationFiles.ToolsConfig)
 local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
