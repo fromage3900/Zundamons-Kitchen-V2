@@ -7,6 +7,7 @@ local CookingSession = Matter.component("CookingSession")
 	{
 		playerId = number,
 		recipeId = string,
+		position = Vector3,
 		startTime = number,
 		duration = number,
 	}

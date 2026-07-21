@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "WheatSeed",
+		"Size": [1, 1, 1],
+		"BrickColor": "Brick yellow",
+		"Material": "SmoothPlastic",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

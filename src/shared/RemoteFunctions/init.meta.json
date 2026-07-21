@@ -10,6 +10,10 @@
 		{ "name": "MarkTutorialDone", "className": "RemoteFunction" },
 		{ "name": "PurchaseGoldCompanion", "className": "RemoteFunction" },
 		{ "name": "PurchaseCompanion", "className": "RemoteFunction" },
-		{ "name": "RequestRewardSync", "className": "RemoteFunction" }
+		{ "name": "RequestRewardSync", "className": "RemoteFunction" },
+		{ "name": "EquipTool", "className": "RemoteFunction" },
+		{ "name": "GetCompanionCatalog", "className": "RemoteFunction" },
+		{ "name": "GetOwnedCompanions", "className": "RemoteFunction" },
+		{ "name": "ExecuteAdminCommand", "className": "RemoteFunction" }
 	]
 }

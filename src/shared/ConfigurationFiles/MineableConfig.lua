@@ -1,7 +1,7 @@
 -- [[ModuleScript] MineableConfig (ref: RBX6330426701494520A633C16AF5A04948)]]
 local mineableConfig = {}
 
-mineableConfig.priceLists= {["Rock"]=10, ["Marble Rock"]=15, ["Gold Ore"]=30, ["Wheat"]=10, ["Apple"]=5, ["Wood Log"]=20, ["Pine Cone"]=5, ["WheatSeed"]=1, ["Apple Pie"]=100, ["Bread"]=60, ["Zunda Flower"]=12, ["Zunda Pea"]=18, ["Zunda Bread"]=140, ["Zunda Mochi"]=160, ["Zunda Mushroom"]=25, ["Zunda Berry"]=20, ["Zunda Root"]=22}
+mineableConfig.priceLists= {["Rock"]=10, ["Iron Ore"]=20, ["Marble Rock"]=15, ["Gold Ore"]=30, ["Wheat"]=10, ["Apple"]=5, ["Wood Log"]=20, ["Wood"]=20, ["Pine Cone"]=5, ["WheatSeed"]=1, ["Apple Pie"]=100, ["Bread"]=60, ["Zunda Flower"]=12, ["Zunda Pea"]=18, ["Zunda Bread"]=140, ["Zunda Mochi"]=160, ["Zunda Mushroom"]=25, ["Zunda Berry"]=20, ["Zunda Root"]=22}
 
 mineableConfig.Mineables={["Rock"]={["Health"]=100,
 	                      ["MaxHealth"]=100,

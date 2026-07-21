@@ -19,7 +19,7 @@ local priceLists = mineableConfig and mineableConfig.priceLists or {}
 
 local PlayerDataService = require(game.ServerScriptService.Services.PlayerDataService)
 
-local RewardCore = require(game.ReplicatedStorage.ConfigurationFiles.RewardCore)
+local RewardCore = require(game:GetService("ServerScriptService").Services.RewardCore)
 local ChefLevelConfig = configFiles and require(configFiles:WaitForChild("ChefLevelConfig", 10))
 
 local codes: { [string]: { { string } } } = {}
@@ -84,12 +84,16 @@ function searchforCode(player, genCode, name, isRemoving)
 end
 
 function assignLoot(player, lootname, myloot)
-	local value = myloot:GetAttribute("Value")
+	local value = (myloot and myloot:GetAttribute("Value")) or 1
 	local data = PlayerDataService.getOrCreate(player)
 	if not data[lootname] then
 		data[lootname] = value
 	else
 		data[lootname] = data[lootname] + value
+	end
+	if lootname == "Wood" or lootname == "Wood Log" then
+		data["Wood"] = data[lootname]
+		data["Wood Log"] = data[lootname]
 	end
 	RewardCore.addXP(player, ChefLevelConfig.xpRewards.gather, "gather")
 	local popupEvt = game.ReplicatedStorage:FindFirstChild("RewardEvents")
@@ -100,6 +104,10 @@ function assignLoot(player, lootname, myloot)
 	local extraChance = RewardCore.companionBuff and RewardCore.companionBuff(player, "extra_drop") or 0
 	if extraChance > 0 and math.random() < extraChance then
 		data[lootname] = (data[lootname] or 0) + value
+		if lootname == "Wood" or lootname == "Wood Log" then
+			data["Wood"] = data[lootname]
+			data["Wood Log"] = data[lootname]
+		end
 		if popupEvt then
 			popupEvt:FireClient(player, "bonus", "✨ " .. lootname .. " ×2 (Antimon!)", Color3.fromRGB(180, 240, 200))
 		end
@@ -114,7 +122,8 @@ function loot_module.GiveLoot(player, lootname, genCode)
 	end
 	if genCode and player and lootname then
 		local myloot = loot:FindFirstChild(lootname)
-		local exists = searchforCode(player, genCode, lootname, false)
+		-- Pass true for isRemoving so code cannot be claimed multiple times concurrently
+		local exists = searchforCode(player, genCode, lootname, true)
 		if exists and myloot then
 			return assignLoot(player, lootname, myloot)
 		end
@@ -142,6 +151,7 @@ end
 
 function loot_module.generateLoot(player, loottable, position, quality)
 	-- quality: optional string ("perfect", "great", "ok") for crafted food
+	if not loottable then return end
 	for i = 1, #loottable do
 		local generatedCode = tick() .. "" .. math.random(600, 10000000)
 		local obj = loottable[i]

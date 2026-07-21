@@ -3,6 +3,7 @@
 	"children": [
 		{ "name": "FishingCast", "className": "RemoteFunction" },
 		{ "name": "ToolUse", "className": "RemoteEvent" },
-		{ "name": "ToolUpgrade", "className": "RemoteFunction" }
+		{ "name": "ToolUpgrade", "className": "RemoteFunction" },
+		{ "name": "ConnectFunction", "className": "RemoteFunction" }
 	]
 }

@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Iron Ore",
+		"Size": [1, 1, 1],
+		"BrickColor": "Dark stone grey",
+		"Material": "Metal",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

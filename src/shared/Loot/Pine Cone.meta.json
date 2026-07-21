@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Pine Cone",
+		"Size": [1, 1, 1],
+		"BrickColor": "Dark brown",
+		"Material": "SmoothPlastic",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

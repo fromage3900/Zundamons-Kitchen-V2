@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Zunda Bread",
+		"Size": [1, 1, 1],
+		"BrickColor": "Green",
+		"Material": "SmoothPlastic",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

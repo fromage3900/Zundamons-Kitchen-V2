@@ -26,24 +26,7 @@ GatherConfig.clickResources = {
 		respawnSeconds = 35,
 		notifyEmoji = "🫛",
 	},
-	["Zunda Mushroom"] = {
-		itemName = "Zunda Mushroom",
-		defaultYield = 3,
-		respawnSeconds = 25,
-		notifyEmoji = "🍄",
-	},
-	["Zunda Berry"] = {
-		itemName = "Zunda Berry",
-		defaultYield = 4,
-		respawnSeconds = 20,
-		notifyEmoji = "🫐",
-	},
-	["Zunda Root"] = {
-		itemName = "Zunda Root",
-		defaultYield = 3,
-		respawnSeconds = 22,
-		notifyEmoji = "🥜",
-	},
+	-- Zunda Mushroom, Zunda Berry, Zunda Root moved to MineableConfig (Sickle tool)
 	EdamamePod = {
 		itemName = "Edamame Pod",
 		defaultYield = 2,

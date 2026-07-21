@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Marble Rock",
+		"Size": [1, 1, 1],
+		"BrickColor": "White",
+		"Material": "Limestone",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

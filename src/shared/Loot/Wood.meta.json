@@ -1,0 +1,14 @@
+{
+	"className": "Part",
+	"properties": {
+		"Name": "Wood",
+		"Size": [1, 1, 1],
+		"BrickColor": "Brown",
+		"Material": "WoodPlank",
+		"Anchored": true,
+		"CanCollide": false
+	},
+	"attributes": {
+		"Value": 1
+	}
+}

@@ -6,6 +6,7 @@
 		{ "name": "ComboUpdate", "className": "RemoteEvent" },
 		{ "name": "LevelUpEvent", "className": "RemoteEvent" },
 		{ "name": "NotifyAction", "className": "RemoteEvent" },
-		{ "name": "AchievementUnlocked", "className": "RemoteEvent" }
+		{ "name": "AchievementUnlocked", "className": "RemoteEvent" },
+		{ "name": "RequestRewardSync", "className": "RemoteEvent" }
 	]
 }
