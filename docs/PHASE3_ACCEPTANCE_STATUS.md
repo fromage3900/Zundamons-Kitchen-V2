@@ -1,6 +1,6 @@
 # Phase 3 Acceptance Status
 
-Updated: 2026-07-21  
+Updated: 2026-07-21
 Branch: `codex/phase1-recovery`
 
 This document separates implemented source, static/build evidence, live Studio evidence, and acceptance still requiring an external reconnect.
