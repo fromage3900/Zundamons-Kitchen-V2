@@ -8,10 +8,7 @@ local ReplicaService = require(ReplicatedStorage.Packages.ReplicaService)
 local DataSchema = require(ReplicatedStorage.Shared.DataSchema)
 
 -- The #1 Secret to Safe Team Collaboration: Mocking DataStores in Studio
-local LiveProfileStore = ProfileService.GetProfileStore(
-	"PlayerData_V1",
-	DataSchema
-)
+local LiveProfileStore = ProfileService.GetProfileStore("PlayerData_V1", DataSchema)
 
 local ProfileStore = LiveProfileStore
 if RunService:IsStudio() then
@@ -23,7 +20,7 @@ end
 local PlayerProfileClassToken = ReplicaService.NewClassToken("PlayerProfile")
 
 local DataManager = {
-	Profiles = {}
+	Profiles = {},
 }
 
 local function PlayerAdded(player)
@@ -43,7 +40,7 @@ local function PlayerAdded(player)
 			-- Create Replica to stream state directly to React UI
 			local replica = ReplicaService.NewReplica({
 				ClassToken = PlayerProfileClassToken,
-				Tags = {Player = player},
+				Tags = { Player = player },
 				Data = profile.Data,
 				Replication = player,
 			})

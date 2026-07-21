@@ -4,7 +4,7 @@
 -- Validates casting, tracks tug physics server-side, awards rewards via RewardCore.
 
 local Matter = require(game.ReplicatedStorage.Packages.Matter)
-local FishingSession = require(game.ReplicatedStorage.Shared.Components.Fishing.FishingSession)
+local FishingSession = require(game.ReplicatedStorage.components.fishing.FishingSession)
 
 local RS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
@@ -38,7 +38,9 @@ local function FishingSystem(world)
 
 				-- Validate rod equipped
 				local char = player.Character
-				if not char then continue end
+				if not char then
+					continue
+				end
 				local rod
 				for _, t in pairs(char:GetChildren()) do
 					if t:IsA("Tool") and t:GetAttribute("Type") == "FishingRod" then
@@ -46,17 +48,22 @@ local function FishingSystem(world)
 						break
 					end
 				end
-				if not rod then continue end
+				if not rod then
+					continue
+				end
 
 				-- Roll fish
 				local fish = FishConfig.rollFish()
-				if not fish then continue end
-				local diff = FishConfig.difficulty and FishConfig.difficulty[fish.rarity] or {
-					tugMag = 0.15,
-					dodgeChance = 0.10,
-					duration = 6,
-					hookWindow = 0.55,
-				}
+				if not fish then
+					continue
+				end
+				local diff = FishConfig.difficulty and FishConfig.difficulty[fish.rarity]
+					or {
+						tugMag = 0.15,
+						dodgeChance = 0.10,
+						duration = 6,
+						hookWindow = 0.55,
+					}
 
 				-- Spawn ECS entity
 				world:spawn(FishingSession({
@@ -76,8 +83,14 @@ local function FishingSystem(world)
 				}))
 				activePlayerIds[player.UserId] = true
 
-				print(string.format("[FishingSystem] Session started for %s (%s, rarity %d)", player.Name, fish.name, fish.rarity))
-
+				print(
+					string.format(
+						"[FishingSystem] Session started for %s (%s, rarity %d)",
+						player.Name,
+						fish.name,
+						fish.rarity
+					)
+				)
 			elseif action == "result" then
 				-- Find the player's session
 				for id, session in world:query(FishingSession) do
@@ -90,7 +103,9 @@ local function FishingSystem(world)
 								RewardCore.breakCombo(player)
 								world:despawn(id)
 								activePlayerIds[player.UserId] = nil
-								print(string.format("[FishingSystem] %s caught too fast (exploit blocked)", player.Name))
+								print(
+									string.format("[FishingSystem] %s caught too fast (exploit blocked)", player.Name)
+								)
 								continue
 							end
 
@@ -107,7 +122,8 @@ local function FishingSystem(world)
 							end
 
 							-- Fire popup
-							local popupEvent = RS:FindFirstChild("RewardEvents") and RS.RewardEvents:FindFirstChild("PopupEvent")
+							local popupEvent = RS:FindFirstChild("RewardEvents")
+								and RS.RewardEvents:FindFirstChild("PopupEvent")
 							if popupEvent then
 								popupEvent:FireClient(player, "item", "🎣 " .. session.fishName, session.fishColor)
 							end
@@ -118,7 +134,15 @@ local function FishingSystem(world)
 								gold = goldAwarded,
 							})
 
-							print(string.format("[FishingSystem] %s caught %s (+%dg, +%dxp)", player.Name, session.fishName, goldAwarded, session.fishXp))
+							print(
+								string.format(
+									"[FishingSystem] %s caught %s (+%dg, +%dxp)",
+									player.Name,
+									session.fishName,
+									goldAwarded,
+									session.fishXp
+								)
+							)
 						else
 							RewardCore.breakCombo(player)
 							print(string.format("[FishingSystem] %s lost fish (%s)", player.Name, session.fishName))

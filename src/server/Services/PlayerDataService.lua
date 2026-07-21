@@ -12,6 +12,8 @@ local store: { [string]: { [string]: any } } = {}
 
 local PlayerDataService = {}
 
+local createDefaultData: () -> { [string]: any }
+
 function PlayerDataService.get(player: Player): { [string]: any }?
 	local key = tostring(player.UserId)
 	return store[key]
@@ -37,13 +39,16 @@ function PlayerDataService.update(player: Player, mutator: ({ [string]: any }) -
 	local data = PlayerDataService.getOrCreate(player)
 	mutator(data)
 	if data["Wood"] or data["Wood Log"] then
-		local syncVal = (data["Wood Log"] and data["Wood"] and math.max(data["Wood"], data["Wood Log"])) or data["Wood Log"] or data["Wood"] or 0
+		local syncVal = (data["Wood Log"] and data["Wood"] and math.max(data["Wood"], data["Wood Log"]))
+			or data["Wood Log"]
+			or data["Wood"]
+			or 0
 		data["Wood"] = syncVal
 		data["Wood Log"] = syncVal
 	end
 end
 
-local function createDefaultData(): { [string]: any }
+createDefaultData = function(): { [string]: any }
 	local data = {
 		gold = 50,
 		total_gold_earned = 0,
@@ -102,7 +107,10 @@ local function backfillLoadedData(loaded: { [string]: any })
 	loaded.current_gold = nil
 	loaded.Gold = nil
 	if loaded["Wood"] or loaded["Wood Log"] then
-		local syncVal = (loaded["Wood Log"] and loaded["Wood"] and math.max(loaded["Wood"], loaded["Wood Log"])) or loaded["Wood Log"] or loaded["Wood"] or 0
+		local syncVal = (loaded["Wood Log"] and loaded["Wood"] and math.max(loaded["Wood"], loaded["Wood Log"]))
+			or loaded["Wood Log"]
+			or loaded["Wood"]
+			or 0
 		loaded["Wood"] = syncVal
 		loaded["Wood Log"] = syncVal
 	end
@@ -207,7 +215,9 @@ end
 local RF = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunctions")
 local markTut = RF:FindFirstChild("MarkTutorialDone")
 if not markTut then
-	markTut = Instance.new("RemoteFunction"); markTut.Name = "MarkTutorialDone"; markTut.Parent = RF
+	markTut = Instance.new("RemoteFunction")
+	markTut.Name = "MarkTutorialDone"
+	markTut.Parent = RF
 end
 markTut.OnServerInvoke = function(player)
 	local d = PlayerDataService.getOrCreate(player)
