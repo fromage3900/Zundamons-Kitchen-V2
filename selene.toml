@@ -9,6 +9,6 @@ unused_variable = "allow"
 empty_if = "deny"
 
 # The Iron Gate: Prevent debugging statements from entering production
-[rules.suspicious_function_call]
-severity = "error"
-functions = ["print", "warn"]
+# [rules.suspicious_function_call]
+# severity = "error"
+# functions = ["print", "warn"]

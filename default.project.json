@@ -4,24 +4,76 @@
     "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
+      "ConfigurationFiles": {
+        "$path": "src/shared/ConfigurationFiles"
+      },
+      "Packages": {
+        "$path": "Packages"
+      },
+      "Models": {
+        "$className": "Folder",
+        "$path": "src/shared/Models"
+      },
+      "Meshes": {
+        "$className": "Folder",
+        "$path": "src/shared/Meshes"
+      },
+      "QuestConfig": {
+        "$path": "src/shared/QuestConfig.lua"
+      },
+      "AssetRegistry": {
+        "$path": "src/shared/AssetRegistry.lua"
+      },
+      "DataSchema": {
+        "$path": "src/shared/DataSchema.lua"
+      },
+      "RemoteEvents": {
+        "$path": "src/shared/RemoteEvents"
+      },
+      "RemoteFunctions": {
+        "$path": "src/shared/RemoteFunctions"
+      },
+      "RewardEvents": {
+        "$path": "src/shared/RewardEvents"
+      },
+      "Loot": {
+        "$path": "src/shared/Loot"
+      },
+      "ToolRemotes": {
+        "$path": "src/shared/ToolRemotes"
+      },
       "Shared": {
-        "$path": "src/shared"
+        "$className": "Folder",
+        "Config": {
+          "$className": "Folder",
+          "$path": "src/shared/Shared/Config"
+        },
+        "Modules": {
+          "$className": "Folder",
+          "$path": "src/shared/Shared/Modules"
+        }
+      },
+      "components": {
+        "$path": "src/shared/components"
       }
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "Server": {
-        "$path": "src/server"
+      "$path": "src/server",
+      "ServerPackages": {
+        "$path": "ServerPackages"
       }
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "StarterPlayerScripts": {
-        "$className": "StarterPlayerScripts",
-        "Client": {
-          "$path": "src/client"
-        }
+        "$path": "src/client"
       }
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "$path": "src/Workspace",
+      "$ignoreUnknownInstances": true
     }
   }
 }
