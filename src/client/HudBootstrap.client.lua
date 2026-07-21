@@ -7,8 +7,9 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 
--- Create ZundaHUD ScreenGui
-local hud = Instance.new("ScreenGui")
+-- Share one persistent root with HudScript regardless of LocalScript start order.
+local existingHud = playerGui:FindFirstChild("ZundaHUD")
+local hud = if existingHud and existingHud:IsA("ScreenGui") then existingHud else Instance.new("ScreenGui")
 hud.Name = "ZundaHUD"
 hud.ResetOnSpawn = false
 hud.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -18,7 +19,8 @@ hud.Parent = playerGui
 print("[HudBootstrap] ZundaHUD created")
 
 -- Create HudButtons container
-local hudButtons = Instance.new("Frame")
+local existingButtons = hud:FindFirstChild("HudButtons")
+local hudButtons = if existingButtons and existingButtons:IsA("Frame") then existingButtons else Instance.new("Frame")
 hudButtons.Name = "HudButtons"
 hudButtons.Size = UDim2.new(0, 400, 0, 60)
 hudButtons.Position = UDim2.new(1, -420, 1, -80)
@@ -28,16 +30,18 @@ hudButtons.BorderSizePixel = 0
 hudButtons.Parent = hud
 Instance.new("UICorner", hudButtons).CornerRadius = UDim.new(0, 12)
 
-local layout = Instance.new("UIListLayout", hudButtons)
+local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
 layout.Padding = UDim.new(0, 8)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = hudButtons
 
-local uiPadding = Instance.new("UIPadding", hudButtons)
+local uiPadding = Instance.new("UIPadding")
 uiPadding.PaddingLeft = UDim.new(0, 8)
 uiPadding.PaddingRight = UDim.new(0, 8)
 uiPadding.PaddingTop = UDim.new(0, 8)
 uiPadding.PaddingBottom = UDim.new(0, 8)
+uiPadding.Parent = hudButtons
 
 print("[HudBootstrap] HudButtons container created")
 
@@ -82,7 +86,8 @@ for _, btnDef in ipairs(BUTTONS) do
 end
 
 -- Create StatBar (for XP, level, etc.)
-local statBar = Instance.new("Frame")
+local existingStatBar = hud:FindFirstChild("StatBar")
+local statBar = if existingStatBar and existingStatBar:IsA("Frame") then existingStatBar else Instance.new("Frame")
 statBar.Name = "StatBar"
 statBar.Size = UDim2.new(0, 300, 0, 40)
 statBar.Position = UDim2.new(0, 20, 1, -60)
