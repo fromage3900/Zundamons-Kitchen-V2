@@ -7,9 +7,8 @@ local function PeaRhythmTrack(props)
 	-- Render mock peas along the track based on time elapsed
 	for i = 1, props.totalPeas do
 		local offset = (i / props.totalPeas) * 100
-		
-		table.insert(peas, React.createElement("TextLabel", {
-			Key = "Pea_" .. i,
+
+		peas["Pea_" .. i] = React.createElement("TextLabel", {
 			Size = UDim2.fromOffset(40, 40),
 			Position = UDim2.new(1 - (props.timeElapsed / props.duration) + (offset / 100), 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -18,7 +17,7 @@ local function PeaRhythmTrack(props)
 			TextSize = 32,
 			-- Fade out peas that have passed the "hit zone"
 			TextTransparency = (1 - (props.timeElapsed / props.duration) + (offset / 100)) < 0.1 and 1 or 0,
-		}))
+		})
 	end
 
 	return React.createElement("Frame", {
@@ -40,13 +39,13 @@ local function PeaRhythmTrack(props)
 			Stroke = React.createElement("UIStroke", {
 				Color = Color3.fromRGB(255, 215, 0),
 				Thickness = 3,
-			})
+			}),
 		}),
 		PeasContainer = React.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
-		}, peas)
+		}, peas),
 	})
 end
 

@@ -11,6 +11,9 @@ local removeRF = RF:WaitForChild("RemoveFurniture")
 
 local DecorationConfig = require(RS.ConfigurationFiles.DecorationConfig)
 
+local refreshGold
+local enterPlacementMode
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "FurniturePlacementGui"
 gui.ResetOnSpawn = false
@@ -60,8 +63,12 @@ tabLayout.FillDirection = Enum.FillDirection.Horizontal
 tabLayout.Padding = UDim.new(0, 6)
 
 local allItems = {}
-for _, item in ipairs(DecorationConfig.garden_items) do table.insert(allItems, item) end
-for _, item in ipairs(DecorationConfig.cottage_items) do table.insert(allItems, item) end
+for _, item in ipairs(DecorationConfig.garden_items) do
+	table.insert(allItems, item)
+end
+for _, item in ipairs(DecorationConfig.cottage_items) do
+	table.insert(allItems, item)
+end
 
 local tabData = {
 	{ id = "garden", label = "🌷 Garden", items = DecorationConfig.garden_items },
@@ -88,14 +95,23 @@ closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 14
 closeBtn.BorderSizePixel = 0
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
-closeBtn.MouseButton1Click:Connect(function() gui.Enabled = false end)
+closeBtn.MouseButton1Click:Connect(function()
+	gui.Enabled = false
+end)
 
 local function renderTab(tabId)
 	for _, c in ipairs(scroll:GetChildren()) do
-		if c:IsA("Frame") then c:Destroy() end
+		if c:IsA("Frame") then
+			c:Destroy()
+		end
 	end
 	local items = {}
-	for _, td in ipairs(tabData) do if td.id == tabId then items = td.items; break end end
+	for _, td in ipairs(tabData) do
+		if td.id == tabId then
+			items = td.items
+			break
+		end
+	end
 	local y = 0
 	local owned = _G.data and _G.data.furniture_unlocked or {}
 	for _, item in ipairs(items) do
@@ -195,10 +211,12 @@ for _, td in ipairs(tabData) do
 	btn.TextColor3 = Color3.fromRGB(80, 40, 30)
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 	tabBtns[td.id] = btn
-	btn.MouseButton1Click:Connect(function() switchTab(td.id) end)
+	btn.MouseButton1Click:Connect(function()
+		switchTab(td.id)
+	end)
 end
 
-local function refreshGold()
+refreshGold = function()
 	local g = _G.data and _G.data.gold or 0
 	goldLbl.Text = "💰 " .. tostring(g)
 end
@@ -209,7 +227,7 @@ local placementItem = nil
 local placementAngle = 0
 local placementConn = nil
 
-local function enterPlacementMode(item)
+enterPlacementMode = function(item)
 	placementItem = item
 	placementAngle = 0
 	placementGhost = Instance.new("Part")
@@ -235,16 +253,24 @@ local function enterPlacementMode(item)
 end
 
 local function exitPlacementMode(placed)
-	if placementGhost then placementGhost:Destroy(); placementGhost = nil end
+	if placementGhost then
+		placementGhost:Destroy()
+		placementGhost = nil
+	end
 	placementItem = nil
-	if placementConn then placementConn:Disconnect(); placementConn = nil end
+	if placementConn then
+		placementConn:Disconnect()
+		placementConn = nil
+	end
 	if not placed then
 		gui.Enabled = true
 	end
 end
 
 local function doPlace(pos)
-	if not placementItem or not pos then return end
+	if not placementItem or not pos then
+		return
+	end
 	local ok, msg = placeRF:InvokeServer(placementItem.id, pos.X, pos.Y, pos.Z, 0, placementAngle, 0)
 	if ok then
 		exitPlacementMode(true)
@@ -255,7 +281,9 @@ end
 
 -- Toggle
 UIS.InputBegan:Connect(function(input, gpe)
-	if gpe then return end
+	if gpe then
+		return
+	end
 	if input.KeyCode == Enum.KeyCode.H then
 		gui.Enabled = not gui.Enabled
 		if gui.Enabled then
@@ -276,7 +304,9 @@ end)
 -- Mouse placement
 local mouse = player:GetMouse()
 mouse.Move:Connect(function()
-	if not placementGhost or not placementItem then return end
+	if not placementGhost or not placementItem then
+		return
+	end
 	local hit = mouse.Target
 	local pos = mouse.Hit.Position
 	if hit then
@@ -287,12 +317,16 @@ mouse.Move:Connect(function()
 end)
 
 local function onPlacementClick()
-	if not placementItem or not placementGhost then return end
+	if not placementItem or not placementGhost then
+		return
+	end
 	doPlace(placementGhost.Position)
 end
 
 mouse.Button1Down:Connect(function()
-	if placementItem then onPlacementClick() end
+	if placementItem then
+		onPlacementClick()
+	end
 end)
 
 -- Manage placed furniture mode (G to toggle)
@@ -316,7 +350,9 @@ mLabel.TextSize = 12
 mLabel.TextColor3 = Color3.fromRGB(240, 230, 255)
 
 UIS.InputBegan:Connect(function(input, gpe)
-	if gpe then return end
+	if gpe then
+		return
+	end
 	if input.KeyCode == Enum.KeyCode.G and not placementItem then
 		manageMode = not manageMode
 		manageFrame.Visible = manageMode
@@ -324,9 +360,13 @@ UIS.InputBegan:Connect(function(input, gpe)
 end)
 
 mouse.Button1Down:Connect(function()
-	if not manageMode then return end
+	if not manageMode then
+		return
+	end
 	local hit = mouse.Target
-	if not hit then return end
+	if not hit then
+		return
+	end
 	-- Check if clicking on a placed furniture mesh
 	local model = hit.Parent
 	if model and model:GetAttribute("FurnitureIndex") then
@@ -342,12 +382,21 @@ end)
 local function restorePlacedFurniture()
 	task.wait(5)
 	local getRF = RF:FindFirstChild("GetPlacedFurniture")
-	if not getRF then return end
+	if not getRF then
+		return
+	end
 	local placements = getRF:InvokeServer()
-	if not placements then return end
+	if not placements then
+		return
+	end
 	for _, p in ipairs(placements) do
 		local item = nil
-		for _, i in ipairs(allItems) do if i.id == p.itemId then item = i; break end end
+		for _, i in ipairs(allItems) do
+			if i.id == p.itemId then
+				item = i
+				break
+			end
+		end
 		if item and item.meshId and item.meshId ~= "" and not item.meshId:find("FILL_") then
 			local numericId = tonumber(string.match(item.meshId, "%d+"))
 			if numericId then
@@ -358,7 +407,8 @@ local function restorePlacedFurniture()
 				mesh.Anchored = true
 				mesh.CanCollide = false
 				mesh.Position = Vector3.new(p.x, p.y, p.z)
-				mesh.CFrame = CFrame.new(p.x, p.y, p.z) * CFrame.Angles(math.rad(p.rx or 0), math.rad(p.ry or 0), math.rad(p.rz or 0))
+				mesh.CFrame = CFrame.new(p.x, p.y, p.z)
+					* CFrame.Angles(math.rad(p.rx or 0), math.rad(p.ry or 0), math.rad(p.rz or 0))
 				mesh.Parent = workspace
 				mesh:SetAttribute("FurnitureIndex", p._index or #placements)
 			end

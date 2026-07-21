@@ -18,7 +18,8 @@ Phase 2 restores a deterministic, reviewable bootstrap without claiming that the
 | Focused StyLua | PASS | All Phase 2 changed Lua files pass `--check`. |
 | Full StyLua baseline | FAIL | Unrelated inherited source remains unformatted. This is no longer masked by Rojo build success. |
 | Selene tool | PASS | 0.27.1 with generated Roblox standard library. |
-| Full Selene baseline | FAIL | 15 errors, 332 warnings, 0 parse errors; tracked separately from build success. |
+| Full Selene error gate | PASS | 0 errors and 0 parse errors after targeted correctness repairs. |
+| Full Selene warning gate | FAIL | 332 inherited warnings, principally deprecated two-argument Instance.new usage; tracked separately from build success. |
 | Rojo serialization | PASS | `build/phase2-boot.rbxl` generated successfully. |
 | Git whitespace | PASS | `git diff --check` succeeds. |
 
@@ -31,6 +32,7 @@ Phase 2 restores a deterministic, reviewable bootstrap without claiming that the
 - `PlayerDataService` initializes default data through a valid forward declaration.
 - The unfinished Profile/Replica replacement is now a dormant `LegacyProfileDataManager` ModuleScript, preventing a second persistence owner from auto-running.
 - Several confirmed startup faults were corrected: HUD syntax, sprint compatibility, guest template shape, material UI fallbacks, inventory UI fallbacks, and HUD button naming.
+- Selene correctness errors were eliminated without bulk-reformatting the repository: invalid forward references, React keys, duplicate branches/keys, empty blocks, an admin command argument, and obsolete type checks were repaired.
 
 ## Explicitly deferred
 

@@ -8,8 +8,7 @@ local function InventoryHUD()
 	-- Populate the unified grid
 	local index = 1
 	for itemName, quantity in pairs(inventory) do
-		table.insert(itemCards, React.createElement("Frame", {
-			Key = itemName,
+		itemCards[itemName] = React.createElement("Frame", {
 			BackgroundColor3 = Color3.fromRGB(30, 30, 35),
 			BackgroundTransparency = 0.5, -- Glassmorphism
 		}, {
@@ -36,8 +35,8 @@ local function InventoryHUD()
 				Font = Enum.Font.GothamBold,
 				TextSize = 16,
 				TextXAlignment = Enum.TextXAlignment.Right,
-			})
-		}))
+			}),
+		})
 		index += 1
 	end
 
@@ -82,7 +81,7 @@ local function InventoryHUD()
 					Font = Enum.Font.GothamBold,
 					TextSize = 20,
 					TextXAlignment = Enum.TextXAlignment.Right,
-				})
+				}),
 			}),
 			-- Grid Layout
 			GridContainer = React.createElement("ScrollingFrame", {
@@ -90,16 +89,16 @@ local function InventoryHUD()
 				Position = UDim2.new(0, 20, 0, 60),
 				BackgroundTransparency = 1,
 				ScrollBarThickness = 4,
-				CanvasSize = UDim2.new(0, 0, 0, math.max(400, math.ceil(index/4) * 110)),
+				CanvasSize = UDim2.new(0, 0, 0, math.max(400, math.ceil(index / 4) * 110)),
 			}, {
 				UIGridLayout = React.createElement("UIGridLayout", {
 					CellSize = UDim2.fromOffset(100, 100),
 					CellPadding = UDim2.fromOffset(10, 10),
 					SortOrder = Enum.SortOrder.LayoutOrder,
 				}),
-				React.createElement(React.Fragment, nil, itemCards)
-			})
-		})
+				React.createElement(React.Fragment, nil, itemCards),
+			}),
+		}),
 	})
 end
 
