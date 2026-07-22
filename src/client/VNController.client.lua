@@ -719,7 +719,6 @@ local function buildCompanionTree()
                     {speaker="zundapal", text="It’s really nice to see your face today, "..player.Name.."."},
                 },
             }},
-            {text="Just chat freely with me \u{1F4AC}", freeChat = true},
             {text="Bye for now",                       next=leafEnd},
         },
     }

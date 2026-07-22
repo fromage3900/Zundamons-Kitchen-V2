@@ -3,27 +3,12 @@
 local RS = game:GetService("ReplicatedStorage")
 local MPS = game:GetService("MarketplaceService")
 local SSS = game:GetService("ServerScriptService")
-local MarketplaceService = require(SSS.Services.MarketplaceService)
+local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
 
 -- ── PRODUCT CATALOGUE ────────────────────────────────────────────────────────
 -- Format: [productId] = { type, key, displayName }
 -- type: "companion" | "recipe" | "accessory"
 -- key:  stored as _G.data[playerName]["companion_owned_KEY"] = true
-local PRODUCTS = {
-	-- COMPANIONS  (replace IDs!)
-	[1111111101] = { type = "companion", key = "zundacat", name = "ZundaCat Companion" },
-	[1111111102] = { type = "companion", key = "zundabunny", name = "ZundaBunny Companion" },
-	[1111111103] = { type = "companion", key = "tantanmon", name = "TantanMon Companion" },
-	-- PREMIUM RECIPES
-	[1111111104] = { type = "recipe", key = "Premium Ramen", name = "Premium Ramen Recipe" },
-	[1111111105] = { type = "recipe", key = "Party Cake", name = "Party Cake Recipe" },
-	[1111111106] = { type = "recipe", key = "Truffle Soup", name = "Truffle Soup Recipe" },
-	-- ACCESSORIES (cosmetic flags)
-	[1111111107] = { type = "accessory", key = "crown", name = "Gold Crown" },
-	[1111111108] = { type = "accessory", key = "bow", name = "Pink Bow" },
-	[1111111109] = { type = "accessory", key = "chefhat", name = "Chef Hat" },
-}
-
 -- Notify client of purchase result
 local RE = RS:WaitForChild("RemoteEvents")
 local purchaseEv = RE:FindFirstChild("PurchaseResult")
@@ -32,8 +17,6 @@ if not purchaseEv then
 	purchaseEv.Name = "PurchaseResult"
 	purchaseEv.Parent = RE
 end
-
-local PlayerDataService = require(SSS.Services.PlayerDataService)
 
 -- ProcessReceipt delegated to MarketplaceService.lua (unified handler)
 
@@ -48,7 +31,11 @@ end
 
 -- Wire prompt: client asks to purchase → server opens Roblox purchase dialog
 promptRF.OnServerInvoke = function(player, productId)
-	if not PRODUCTS[productId] then
+	if
+		not MarketplaceConfig.enabled
+		or type(productId) ~= "number"
+		or not MarketplaceConfig.isValidProductId(productId)
+	then
 		return false
 	end
 	MPS:PromptProductPurchase(player, productId)

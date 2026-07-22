@@ -4,6 +4,10 @@
 
 local MarketplaceConfig = {}
 
+-- Fail closed until placeholders are replaced and receipts are verified in a
+-- private published experience.
+MarketplaceConfig.enabled = false
+
 -- Server receipt catalog: [productId] = { type, key, name }
 MarketplaceConfig.products = {
 	[1111111101] = { type = "companion", key = "zundacat", name = "ZundaCat Companion" },
@@ -31,9 +35,30 @@ MarketplaceConfig.companionDevProductIds = {
 -- Client StoreScript display (derived from products; edit copy here)
 MarketplaceConfig.storeDisplay = {
 	companions = {
-		{ id = 1111111101, name = "ZundaCat", emoji = "🐱", desc = "A playful feline companion", robux = 80, key = "zundacat" },
-		{ id = 1111111102, name = "ZundaBunny", emoji = "🐰", desc = "Fluffy bunny bestie", robux = 80, key = "zundabunny" },
-		{ id = 1111111103, name = "TantanMon", emoji = "🌶️", desc = "Spicy & spirited companion", robux = 100, key = "tantanmon" },
+		{
+			id = 1111111101,
+			name = "ZundaCat",
+			emoji = "🐱",
+			desc = "A playful feline companion",
+			robux = 80,
+			key = "zundacat",
+		},
+		{
+			id = 1111111102,
+			name = "ZundaBunny",
+			emoji = "🐰",
+			desc = "Fluffy bunny bestie",
+			robux = 80,
+			key = "zundabunny",
+		},
+		{
+			id = 1111111103,
+			name = "TantanMon",
+			emoji = "🌶️",
+			desc = "Spicy & spirited companion",
+			robux = 100,
+			key = "tantanmon",
+		},
 	},
 	recipes = {
 		{ id = 1111111104, name = "Premium Ramen", emoji = "🍜", desc = "Exclusive ramen recipe", robux = 60 },

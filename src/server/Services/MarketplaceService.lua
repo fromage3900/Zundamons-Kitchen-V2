@@ -11,7 +11,9 @@ local RE = RS:WaitForChild("RemoteEvents")
 
 local purchaseEv = RE:FindFirstChild("PurchaseResult")
 if not purchaseEv then
-	purchaseEv = Instance.new("RemoteEvent"); purchaseEv.Name = "PurchaseResult"; purchaseEv.Parent = RE
+	purchaseEv = Instance.new("RemoteEvent")
+	purchaseEv.Name = "PurchaseResult"
+	purchaseEv.Parent = RE
 end
 
 local CompanionOwnedSync = RE:FindFirstChild("CompanionOwnedSync")
@@ -27,23 +29,31 @@ function MarketplaceSvc.processReceipt(receiptInfo)
 	end
 
 	local prod = MarketplaceConfig.products[productId]
-	if not prod then
+	if not MarketplaceConfig.enabled or not prod then
 		warn("[MarketplaceService] Unknown product: " .. productId)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 
-	local d = PlayerDataService.getOrCreate(player)
-
-	if prod.type == "companion" then
-		d["companion_owned_" .. prod.key] = true
-		if CompanionOwnedSync then
-			CompanionOwnedSync:FireClient(player, prod.key, true)
+	local granted = PlayerDataService.mutate(player, "developer_product_receipt", function(data)
+		if prod.type == "companion" then
+			data["companion_owned_" .. prod.key] = true
+		elseif prod.type == "recipe" then
+			data.recipes_unlocked = data.recipes_unlocked or {}
+			if not table.find(data.recipes_unlocked, prod.key) then
+				table.insert(data.recipes_unlocked, prod.key)
+			end
+		elseif prod.type == "accessory" then
+			data["accessory_" .. prod.key] = true
+		else
+			return false, "unsupported_product_type"
 		end
-	elseif prod.type == "recipe" then
-		if not d.recipes_unlocked then d.recipes_unlocked = {} end
-		d.recipes_unlocked[prod.key] = true
-	elseif prod.type == "accessory" then
-		d["accessory_" .. prod.key] = true
+		return true
+	end)
+	if not granted then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+	if prod.type == "companion" and CompanionOwnedSync then
+		CompanionOwnedSync:FireClient(player, prod.key, true)
 	end
 
 	purchaseEv:FireClient(player, prod.name, prod.type)
