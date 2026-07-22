@@ -12,12 +12,13 @@ local CraftConfig = require(ReplicatedStorage.ConfigurationFiles.CraftConfig)
 local ChefLevelConfig = require(ReplicatedStorage.ConfigurationFiles.ChefLevelConfig)
 local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
 local RewardCore = require(ServerScriptService.Services.RewardCore)
+local CompanionConfig = require(ReplicatedStorage.ConfigurationFiles.CompanionConfig)
 
 local cookingResult = ReplicatedStorage.RemoteEvents:WaitForChild("CookingResult") :: RemoteEvent
 
 local START_DELAY = 2.0
 local NOTE_INTERVAL = 1.0
-local PERFECT_WINDOW = 0.2
+local BASE_PERFECT_WINDOW = 0.2
 local GREAT_WINDOW = 0.42
 local OK_WINDOW = 0.72
 local BEGIN_COOLDOWN = 1.0
@@ -209,6 +210,17 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 
 	local totalNotes = CraftConfig.difficulty[recipeName] and CraftConfig.difficulty[recipeName].notes
 		or CraftConfig.defaultDifficulty.notes
+
+	-- Companion perfect_window buff (Cardamon)
+	local data = PlayerDataService.get(player)
+	local activeComp = data and data.active_companion
+	local def = activeComp and CompanionConfig.companions[activeComp]
+	local buff = def and def.buff
+	local perfectWindow = BASE_PERFECT_WINDOW
+	if buff and buff.stat == "perfect_window" and buff.magnitude > 0 then
+		perfectWindow = BASE_PERFECT_WINDOW * (1 + buff.magnitude)
+	end
+
 	local firstTargetAt = workspace:GetServerTimeNow() + START_DELAY
 	local entityId = activeWorld:spawn(CookingSession({
 		sessionId = sessionId,
@@ -218,6 +230,7 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 		firstTargetAt = firstTargetAt,
 		noteInterval = NOTE_INTERVAL,
 		totalNotes = totalNotes,
+		perfectWindow = perfectWindow,
 		nextExpected = 1,
 		perfectHits = 0,
 		greatHits = 0,
@@ -266,7 +279,7 @@ function CookingService.hit(player: Player, sessionId: any, noteIndex: any)
 		if difference > OK_WINDOW then
 			return
 		end
-		if difference <= PERFECT_WINDOW then
+		if difference <= (session.perfectWindow or BASE_PERFECT_WINDOW) then
 			nextSession.perfectHits += 1
 		elseif difference <= GREAT_WINDOW then
 			nextSession.greatHits += 1

@@ -80,9 +80,9 @@ if not gui or not panel or not listFrame then
 	listFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 
-	local layout = Instance.new("UIGridLayout", listFrame)
-	layout.CellSize = UDim2.new(0, 118, 0, 118)
-	layout.CellPadding = UDim2.new(0, 10, 0, 10)
+	local layout = Instance.new("UIListLayout", listFrame)
+	layout.Padding = UDim.new(0, 8)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
 end
 if not toggleBtn then
 	toggleBtn = Instance.new("TextButton", gui)
@@ -306,15 +306,15 @@ end
 -- ---- SKY SYNC ----
 -- Adjust panel title color based on time of day to feel alive
 local function updateSkyColors()
-    local titleBar = panel:FindFirstChild("TitleBar")
+	local title = panel:FindFirstChild("Title")
 	local hour = Lighting:GetAttribute("CurrentHour") or 12
 	local t = hour % 24
 	local isNight = t < 6 or t > 19
 	if isNight then
-		if titleBar then titleBar.BackgroundColor3 = Color3.fromRGB(80, 60, 120) end
+		if title then title.TextColor3 = Color3.fromRGB(160, 140, 200) end
 		toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 150)
 	else
-		if titleBar then titleBar.BackgroundColor3 = Color3.fromRGB(220, 180, 200) end
+		if title then title.TextColor3 = Color3.fromRGB(200, 240, 230) end
 		toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50)
 	end
 end

@@ -47,7 +47,7 @@ local function setupWaterShimmer()
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 230, 245)),
 			ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 240, 255)),
 		})
-		e.LightEmission = 0.6
+		e.LightEmission = 0.2
 		e.LightInfluence = 0
 		e.Enabled = true
 		e.Parent = fx

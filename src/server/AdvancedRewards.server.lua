@@ -123,6 +123,7 @@ local function gatherMetrics(d)
         loginStreak      = d.daily.streak,
         powerupsUsed     = d.stats and d.stats.powerupsUsed or 0,
         dailyQuestsDone  = d.stats and d.stats.dailyQuestsDone or 0,
+        craft            = d.stats and d.stats.craft or 0,
     }
 end
 
@@ -204,6 +205,7 @@ NotifyAction.Event:Connect(function(player, action, payload)
         progressDaily(player, "serve", 1)
 
     elseif action == "craft" then
+        bumpStat(d, "craft", 1)
         if payload.quality == "perfect" then
             bumpStat(d, "perfectCooks", 1)
             progressDaily(player, "perfect", 1)

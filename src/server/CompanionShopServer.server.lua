@@ -64,7 +64,7 @@ GetCompanionCatalog.OnServerInvoke = function(player)
 end
 
 GetOwnedCompanions.OnServerInvoke = function(player)
-	local owned = { zundamon = true, zundacat = true, zundabunny = true, tantanmon = true }
+	local owned = { zundapal = true, zundamon = true, zundacat = true, zundabunny = true, tantanmon = true, dog = true, parrot = true, cat = true }
 	local data = PlayerDataService.get(player)
 	if data then
 		for k, v in pairs(data) do
@@ -75,7 +75,7 @@ GetOwnedCompanions.OnServerInvoke = function(player)
 				end
 			end
 		end
-		owned.__active = data.active_companion or "zundamon"
+		owned.__active = data.active_companion or "zundapal"
 	end
 	return owned
 end

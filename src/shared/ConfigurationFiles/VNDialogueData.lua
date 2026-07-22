@@ -202,6 +202,18 @@ GUEST_BY_TYPE.zundamon = {
     timeout = "Zunda... too slow... leaving now! 😤",
     wrong_dish = "Not zunda enough! 😠",
 }
+GUEST_BY_TYPE.female2 = {
+    spawn = "Pardon me, could I trouble you for some {recipe}? 💕",
+    served = "Absolutely wonderful, thank you! ✨",
+    timeout = "I'm afraid I must be going... 💔",
+    wrong_dish = "Oh, this isn't quite what I ordered... 😢",
+}
+GUEST_BY_TYPE.male2 = {
+    spawn = "Hey there! Got any {recipe} ready? 🍽️",
+    served = "Nice one, thanks chef! 👍",
+    timeout = "Can't hang around forever! 🚶",
+    wrong_dish = "Whoops, wrong order! 😕",
+}
 
 -- Add guest speaker to SPEAKERS table
 SPEAKERS.guest = { name = "Guest", emoji = "🍽️", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) }

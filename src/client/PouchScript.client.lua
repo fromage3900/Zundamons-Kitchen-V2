@@ -18,15 +18,14 @@ local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 
 -- ─── COLORS ──────────────────────────────────────────────
-local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local C = {
-    bg      = UIConfig.COLORS.CreamWhite,
-    panel   = UIConfig.COLORS.CreamLight,
-    border  = UIConfig.COLORS.ZundamonPink,
+    bg      = UIConfig.COLORS.MochiCream,
+    panel   = UIConfig.COLORS.MintCanvas,
+    border  = UIConfig.COLORS.ZundaDark,
     text    = UIConfig.COLORS.TextDark,
     subtext = UIConfig.COLORS.TextDarkSec,
-    btnAct  = UIConfig.COLORS.ZundamonPink,
-    btnIdle = UIConfig.COLORS.CreamDark,
+    btnAct  = UIConfig.COLORS.ZundaPrimary,
+    btnIdle = UIConfig.COLORS.PeaAccent,
     gold    = UIConfig.COLORS.ZundamonGold,
 }
 

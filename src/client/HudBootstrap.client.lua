@@ -43,7 +43,6 @@ uiPadding.PaddingTop = UDim.new(0, 8)
 uiPadding.PaddingBottom = UDim.new(0, 8)
 uiPadding.Parent = hudButtons
 
-local RS = game:GetService("ReplicatedStorage")
 local UIHelper = require(RS.Shared.Modules.UIHelper)
 
 print("[HudBootstrap] HudButtons container created")
@@ -53,10 +52,11 @@ local BUTTONS = {
 	{ name = "HudBtn_inventory", text = "🎒", tooltip = "Inventory (I)", order = 1 },
 	{ name = "HudBtn_crafting", text = "🍳", tooltip = "Crafting (K)", order = 2 },
 	{ name = "HudBtn_quests", text = "📋", tooltip = "Quests (J)", order = 3 },
-	{ name = "HudBtn_compendium", text = "📚", tooltip = "Compendium (C)", order = 4 },
-	{ name = "HudBtn_materials", text = "🧪", tooltip = "Materials (M)", order = 5 },
-	{ name = "HudBtn_settings", text = "⚙️", tooltip = "Settings", order = 6 },
-	{ name = "HudBtn_shop", text = "🛒", tooltip = "Shop", order = 7 },
+	{ name = "HudBtn_daily", text = "📅", tooltip = "Daily Planner", order = 4 },
+	{ name = "HudBtn_compendium", text = "📚", tooltip = "Compendium (C)", order = 5 },
+	{ name = "HudBtn_materials", text = "🧪", tooltip = "Materials (M)", order = 6 },
+	{ name = "HudBtn_settings", text = "⚙️", tooltip = "Settings", order = 7 },
+	{ name = "HudBtn_shop", text = "🛒", tooltip = "Shop", order = 8 },
 }
 
 for _, btnDef in ipairs(BUTTONS) do
@@ -89,6 +89,9 @@ for _, btnDef in ipairs(BUTTONS) do
 	btn.MouseButton1Click:Connect(function()
 		local pos = btn.AbsolutePosition
 		UIHelper.spawnSparkles(btn, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, UIConfig.COLORS.Primary, 6)
+		if btnDef.name == "HudBtn_daily" and _G.DailyChecklist then
+			_G.DailyChecklist.toggle()
+		end
 	end)
 
 	print("[HudBootstrap] Created button:", btnDef.name)

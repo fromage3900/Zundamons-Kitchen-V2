@@ -52,18 +52,28 @@ local UIConfig = {
 		RarityEpic    = Color3.fromRGB(184, 159, 247),
 		RarityLegendary = Color3.fromRGB(255, 207, 80),
 
-		-- Zundamon Brand Colors
-		ZundamonGreen = Color3.fromRGB(124, 184, 124),
-		PeaGreen = Color3.fromRGB(143, 201, 143),
-		PeaLight = Color3.fromRGB(184, 224, 184),
-		PeaDark = Color3.fromRGB(110, 175, 110),
-		ZundamonPink = Color3.fromRGB(232, 152, 168),
-		ZundamonGold = Color3.fromRGB(255, 200, 80),
+	-- Zundamon Brand Colors
+	ZundamonGreen = Color3.fromRGB(124, 184, 124),
+	PeaGreen = Color3.fromRGB(143, 201, 143),
+	PeaLight = Color3.fromRGB(184, 224, 184),
+	PeaDark = Color3.fromRGB(110, 175, 110),
+	ZundamonPink = Color3.fromRGB(232, 152, 168),
+	ZundamonGold = Color3.fromRGB(255, 200, 80),
 
-		-- Kitchen Theme
-		KitchenCream = Color3.fromRGB(252, 248, 240),
-		KitchenWood = Color3.fromRGB(196, 180, 148),
-	},
+	-- Website Zen Edamame Palette (site/style.css token bridge)
+	ZundaDark      = Color3.fromRGB(46, 125, 50),   -- #2e7d32 deep edamame
+	ZundaPrimary   = Color3.fromRGB(76, 175, 80),   -- #4caf50 fresh green
+	Sprout         = Color3.fromRGB(139, 195, 74),  -- #8bc34a bright sprout
+	MintCanvas     = Color3.fromRGB(232, 245, 233), -- #e8f5e9 soft mint bg
+	PeaAccent      = Color3.fromRGB(200, 230, 201), -- #c8e6c9 pastel highlight
+	MochiCream     = Color3.fromRGB(241, 248, 233), -- #f1f8e9 warm cream
+	SurfaceHighlight = Color3.fromRGB(255, 255, 255), -- light bevel
+	SurfaceShadow    = Color3.fromRGB(27, 94, 32),    -- dark bevel
+
+	-- Kitchen Theme
+	KitchenCream = Color3.fromRGB(252, 248, 240),
+	KitchenWood = Color3.fromRGB(196, 180, 148),
+},
 
 	-- Transparency presets (0 = opaque, 1 = invisible)
 	TRANSPARENCY = {

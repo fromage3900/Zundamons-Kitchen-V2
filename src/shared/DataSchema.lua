@@ -1,27 +1,4 @@
-local DataSchema = {
-	-- Starter Pack for new players
-	Gold = 100,
-	
-	-- Inventory Mapping (ItemName -> Quantity)
-	Inventory = {
-		["Basic Pan"] = 1,
-		["Apple"] = 5,
-	},
-
-	-- Unlocked Recipes
-	UnlockedRecipes = {
-		["Zunda Apple Pie"] = true,
-	},
-
-	-- Meta progression
-	ChefLevel = 1,
-	Experience = 0,
-
-	-- Companions
-	EquippedCompanion = "Mini Zunda",
-	UnlockedCompanions = {
-		["Mini Zunda"] = true,
-	},
-}
-
-return DataSchema
+-- [[DEPRECATED]] Legacy schema for the now-removed LegacyProfileDataManager.
+-- The active data schema is defined inline in PlayerDataService.createDefaultData().
+-- This file is kept only to prevent broken require() calls on disk.
+return {}

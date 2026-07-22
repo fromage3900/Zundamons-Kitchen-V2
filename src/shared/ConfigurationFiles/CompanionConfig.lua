@@ -3,15 +3,6 @@
 
 local CompanionConfig = {}
 
--- Default Studio mesh path (sphere fallback if missing)
-CompanionConfig.defaultMeshPath = {
-	"GameplayLoopArea",
-	"GatheringNodes",
-	"Loop_AppleTree_1",
-	"mesh",
-	"zundapal",
-}
-
 -- Speakers that count toward npc_chat quests when VN dialogue plays
 CompanionConfig.npcSpeakers = {
 	elder = "Elder",
@@ -20,6 +11,66 @@ CompanionConfig.npcSpeakers = {
 }
 
 CompanionConfig.companions = {
+	zundapal = {
+		emoji = "🫛",
+		glow = Color3.fromRGB(180, 200, 255),
+		glowRange = 18,
+		sparkleColors = {
+			Color3.fromRGB(200, 220, 255),
+			Color3.fromRGB(180, 180, 255),
+			Color3.fromRGB(230, 200, 255),
+		},
+		buff = nil,
+		free = true,
+		displayName = "Zundapal",
+		flavor = "Your Zundamon companion from the Downloads.",
+		llmPersona = "You appear as the imported Zundamon mesh companion.",
+	},
+	dog = {
+		emoji = "🐕",
+		glow = Color3.fromRGB(255, 200, 150),
+		glowRange = 16,
+		sparkleColors = {
+			Color3.fromRGB(255, 220, 180),
+			Color3.fromRGB(255, 190, 130),
+			Color3.fromRGB(255, 240, 200),
+		},
+		buff = nil,
+		free = true,
+		displayName = "Dog",
+		flavor = "A faithful furry friend.",
+		llmPersona = "You are a loyal dog companion beside the player.",
+	},
+	parrot = {
+		emoji = "🦜",
+		glow = Color3.fromRGB(255, 180, 100),
+		glowRange = 14,
+		sparkleColors = {
+			Color3.fromRGB(255, 220, 150),
+			Color3.fromRGB(255, 170, 80),
+			Color3.fromRGB(255, 240, 200),
+		},
+		buff = nil,
+		free = true,
+		displayName = "Parrot",
+		flavor = "A colourful chatterbox.",
+		llmPersona = "You are a chatty parrot companion beside the player.",
+	},
+	cat = {
+		emoji = "🐱",
+		glow = Color3.fromRGB(255, 200, 200),
+		glowRange = 14,
+		sparkleColors = {
+			Color3.fromRGB(255, 220, 220),
+			Color3.fromRGB(255, 180, 180),
+			Color3.fromRGB(255, 240, 230),
+		},
+		buff = nil,
+		free = true,
+		displayName = "Cat",
+		flavor = "A purring little menace.",
+		llmPersona = "You are a cat companion beside the player.",
+	},
 	zundamon = {
 		emoji = "🫛",
 		glow = Color3.fromRGB(140, 255, 160),
@@ -148,14 +199,6 @@ CompanionConfig.companions = {
 
 function CompanionConfig.getCompanion(compType: string)
 	return CompanionConfig.companions[compType] or CompanionConfig.companions.zundamon
-end
-
-function CompanionConfig.resolveMeshPath(compType: string): { string }
-	local def = CompanionConfig.getCompanion(compType)
-	if def.meshPath then
-		return def.meshPath
-	end
-	return CompanionConfig.defaultMeshPath
 end
 
 -- Backward compatibility for scripts still reading shared catalog

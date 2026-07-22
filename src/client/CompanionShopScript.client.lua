@@ -190,10 +190,10 @@ local aStroke = Instance.new("UIStroke", actionBtn); aStroke.Color = Color3.from
 -- ── State
 local catalog = {}
 local owned = {}
-local currentKey = "zundamon"
+local currentKey = "zundapal"
 
 -- Stable tab order so Premium ones appear at the right
-local TAB_ORDER = { "zundamon", "zundacat", "zundabunny", "tantanmon", "ankomon", "cardamon", "antimon", "sakuradamon" }
+local TAB_ORDER = { "zundapal", "zundamon", "zundacat", "zundabunny", "tantanmon", "dog", "parrot", "cat", "ankomon", "cardamon", "antimon", "sakuradamon" }
 
 local tabBtns = {}
 

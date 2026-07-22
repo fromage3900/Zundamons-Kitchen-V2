@@ -9,47 +9,53 @@ local function getCloudTarget()
     local weather = workspace:GetAttribute("CurrentWeather") or "clear"
     local hour    = Lighting:GetAttribute("CurrentHour") or 12
 
-    -- Base coverage per weather
+    -- Base coverage per weather (increased for richer dream depth)
     local coverMap = {
-        clear          = 0.32,
-        cloudy         = 0.72,
-        cherry_blossom = 0.44,
-        rain           = 0.85,
-        snow           = 0.78,
-        aurora         = 0.20,
+        clear          = 0.38,
+        cloudy         = 0.80,
+        cherry_blossom = 0.50,
+        rain           = 0.90,
+        snow           = 0.85,
+        aurora         = 0.25,
+        fog            = 0.70,
+        storm          = 0.95,
     }
     local densMap = {
-        clear          = 0.22,
-        cloudy         = 0.45,
-        cherry_blossom = 0.30,
-        rain           = 0.60,
-        snow           = 0.55,
-        aurora         = 0.15,
+        clear          = 0.28,
+        cloudy         = 0.55,
+        cherry_blossom = 0.35,
+        rain           = 0.70,
+        snow           = 0.65,
+        aurora         = 0.18,
+        fog            = 0.50,
+        storm          = 0.80,
     }
     local colorMap = {
-        clear          = Color3.fromRGB(232, 220, 255),
-        cloudy         = Color3.fromRGB(180, 180, 195),
-        cherry_blossom = Color3.fromRGB(255, 210, 225),
-        rain           = Color3.fromRGB(160, 165, 180),
-        snow           = Color3.fromRGB(240, 245, 255),
-        aurora         = Color3.fromRGB(180, 230, 210),
+        clear          = Color3.fromRGB(225, 212, 255),
+        cloudy         = Color3.fromRGB(172, 172, 202),
+        cherry_blossom = Color3.fromRGB(255, 200, 228),
+        rain           = Color3.fromRGB(152, 158, 188),
+        snow           = Color3.fromRGB(235, 238, 255),
+        aurora         = Color3.fromRGB(172, 225, 218),
+        fog            = Color3.fromRGB(195, 198, 220),
+        storm          = Color3.fromRGB(120, 130, 165),
     }
 
-    local cover = coverMap[weather] or 0.32
-    local density = densMap[weather] or 0.22
-    local color = colorMap[weather] or Color3.fromRGB(232, 220, 255)
+    local cover = coverMap[weather] or 0.38
+    local density = densMap[weather] or 0.28
+    local color = colorMap[weather] or Color3.fromRGB(225, 212, 255)
 
-    -- Dawn/dusk boost (hours 6-8, 17-19)
-    local isDawnDusk = (hour >= 6 and hour <= 8) or (hour >= 17 and hour <= 19)
+    -- Dawn/dusk boost (hours 5-9, 16-20 for wider golden windows)
+    local isDawnDusk = (hour >= 5 and hour <= 9) or (hour >= 16 and hour <= 20)
     if isDawnDusk then
-        cover   = math.min(cover * 1.25, 0.90)
-        density = math.min(density * 1.20, 0.70)
+        cover   = math.min(cover * 1.30, 0.92)
+        density = math.min(density * 1.25, 0.75)
     end
 
-    -- Night: thin out clouds a bit so stars shine
+    -- Night: keep some cloud depth for mood, thin less aggressively
     if hour < 5 or hour > 21 then
-        cover   = cover * 0.75
-        density = density * 0.80
+        cover   = cover * 0.82
+        density = density * 0.85
     end
 
     return cover, density, color

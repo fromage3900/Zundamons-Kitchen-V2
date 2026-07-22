@@ -7,6 +7,10 @@ local InsertService = game:GetService("InsertService")
 
 -- Per-companion mesh IDs
 local COMPANION_MESHES = {
+    zundapal   = "rbxassetid://81331860128238",
+    dog        = "rbxassetid://123070508686616",
+    parrot     = "rbxassetid://100814736457956",
+    cat        = "rbxassetid://131662379743903",
     zundamon   = "rbxassetid://121481310719137",
     zundacat   = "rbxassetid://101663144452966",
     zundabunny = "rbxassetid://76425192775041",
@@ -44,6 +48,18 @@ local function loadCompanionModel(compType)
         warn("[CompanionManager] Authored companion has no BasePart:", compType)
     end
 
+    -- In-world model wins (zundapal already placed in workspace)
+    local worldModel = workspace:FindFirstChild("zundapalupdate2")
+    if compType == "zundapal" and worldModel then
+        print("[CompanionManager.loadCompanionModel] Using in-world zundapalupdate2")
+        local clone = worldModel:Clone()
+        clone.PrimaryPart = clone:FindFirstChildWhichIsA("BasePart")
+        if clone.PrimaryPart then
+            companionModelCache[compType] = clone
+            return clone:Clone()
+        end
+    end
+
     local meshId = COMPANION_MESHES[compType] or DEFAULT_COMPANION_MESH
     print("[CompanionManager.loadCompanionModel] Loading model for", compType, "meshId:", meshId)
 
@@ -71,49 +87,9 @@ local function loadCompanionModel(compType)
     return model:Clone()
 end
 
--- ── Companion catalog ──────────────────────────────────────────
-local COMPANIONS = {
-    zundamon   = { emoji="🫛", glow=Color3.fromRGB(140,255,160), glowRange=16,
-        sparkleColors={ Color3.fromRGB(180,255,180), Color3.fromRGB(255,220,100), Color3.fromRGB(200,240,255) },
-        buff = nil, free = true,
-        displayName = "Zundamon", flavor = "The original. A loyal pea spirit." },
-    zundacat   = { emoji="🐱", glow=Color3.fromRGB(255,200,140), glowRange=14,
-        sparkleColors={ Color3.fromRGB(255,210,180), Color3.fromRGB(255,180,120), Color3.fromRGB(255,240,200) },
-        buff = nil, free = true,
-        displayName = "Zundacat", flavor = "A curious cat-shaped friend." },
-    zundabunny = { emoji="🐰", glow=Color3.fromRGB(220,180,255), glowRange=14,
-        sparkleColors={ Color3.fromRGB(240,210,255), Color3.fromRGB(200,160,255), Color3.fromRGB(255,220,255) },
-        buff = nil, free = true,
-        displayName = "Zundabunny", flavor = "Hops alongside with twinkling ears." },
-    tantanmon  = { emoji="🌶️", glow=Color3.fromRGB(255,100,60), glowRange=18,
-        sparkleColors={ Color3.fromRGB(255,140,100), Color3.fromRGB(255,60,40), Color3.fromRGB(255,200,100) },
-        buff = nil, free = true,
-        displayName = "Tantanmon", flavor = "Spicy little firework." },
-
-    -- Premium tier (500 Robux each)
-    ankomon = { emoji="🫘", glow=Color3.fromRGB(220,90,90), glowRange=18,
-        sparkleColors={ Color3.fromRGB(240,120,120), Color3.fromRGB(220,80,80), Color3.fromRGB(255,200,200) },
-        buff = { stat = "gold", magnitude = 0.15, description = "+15% gold from serving guests" },
-        free = false, price = 500,
-        displayName = "Ankomon", flavor = "A red bean spirit. Sweetens every payday." },
-    cardamon = { emoji="🍋", glow=Color3.fromRGB(240,200,80), glowRange=18,
-        sparkleColors={ Color3.fromRGB(255,230,140), Color3.fromRGB(240,200,80), Color3.fromRGB(255,250,200) },
-        buff = { stat = "perfect_window", magnitude = 0.30, description = "+30% wider perfect cooking window" },
-        free = false, price = 500,
-        displayName = "Cardamon", flavor = "A cardamom seedling. Steadies your hands." },
-    antimon = { emoji="🌿", glow=Color3.fromRGB(120,220,200), glowRange=18,
-        sparkleColors={ Color3.fromRGB(160,240,220), Color3.fromRGB(120,220,200), Color3.fromRGB(255,250,250) },
-        buff = { stat = "extra_drop", magnitude = 0.20, description = "+20% chance of extra drop on gather" },
-        free = false, price = 500,
-        displayName = "Antimon", flavor = "A minty wisp. Whispers where to dig." },
-    sakuradamon = { emoji="🌸", glow=Color3.fromRGB(255,180,220), glowRange=18,
-        sparkleColors={ Color3.fromRGB(255,200,230), Color3.fromRGB(255,160,210), Color3.fromRGB(255,230,250) },
-        buff = { stat = "xp", magnitude = 0.25, description = "+25% XP from crafting & serving" },
-        free = false, price = 500,
-        displayName = "Sakuradamon", flavor = "A blossom spirit. Carries good lessons on the breeze." },
-}
-
-shared.ZundaCompanionCatalog = COMPANIONS
+-- Companion catalog sourced from Canonical CompanionConfig
+local CompanionConfig = require(RS.ConfigurationFiles.CompanionConfig)
+local COMPANIONS = CompanionConfig.companions
 
 -- ── RemoteEvents ───────────────────────────────────────────────
 local RE      = RS:WaitForChild("RemoteEvents")
@@ -192,8 +168,8 @@ local function buildCompanion(player, compType)
     sparkle.Name = "CompanionSparkles"
     sparkle.Texture = "rbxassetid://241685484"
     sparkle.Rate = 10
-    sparkle.LightEmission = 0.9
-    sparkle.LightInfluence = 0.2
+    sparkle.LightEmission = 0.3
+    sparkle.LightInfluence = 0.4
     sparkle.SpreadAngle = Vector2.new(180, 180)
     sparkle.Speed = NumberRange.new(1.5, 4)
     sparkle.Lifetime = NumberRange.new(0.6, 1.8)
@@ -218,11 +194,11 @@ local function buildCompanion(player, compType)
 
     -- ── Point light glow ──────────────────────────────────────
     local pl = Instance.new("PointLight", body)
-    pl.Brightness = 1.2
+    pl.Brightness = 0.6
     pl.Range      = def.glowRange
     pl.Color      = def.glow
-    Tween:Create(pl, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
-        {Brightness = 2.2}):Play()
+    Tween:Create(pl, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        {Brightness = 1.0}):Play()
 
     -- ── Face emoji BillboardGui ────────────────────────────────
     local sz = body.Size.Z / 2 + 0.2
@@ -255,7 +231,7 @@ local function buildCompanion(player, compType)
     local nLbl = Instance.new("TextLabel", pill)
     nLbl.Size = UDim2.new(1,-8,1,0); nLbl.Position = UDim2.new(0,4,0,0)
     nLbl.BackgroundTransparency = 1
-    nLbl.Text = player.Name .. "'s Zundapal ✨"
+    nLbl.Text = player.Name .. "'s " .. (def.displayName or "Companion") .. " ✨"
     nLbl.Font = Enum.Font.FredokaOne
     nLbl.TextSize = 12
     nLbl.TextColor3 = Color3.fromRGB(240,230,255)
@@ -312,7 +288,7 @@ local function onPlayerAdded(player)
         print("[CompanionManager.onPlayerAdded] Character added for", player.Name)
         task.wait(2)
         local data = PlayerDataService.getOrCreate(player)
-        local compType = data.active_companion or "zundamon"
+        local compType = data.active_companion or "zundapal"
         print("[CompanionManager.onPlayerAdded] Building companion type:", compType)
         buildCompanion(player, compType)
     end)

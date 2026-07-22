@@ -1,978 +1,281 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="zunda-classic">
+<html lang="en" data-theme="cozy-launch">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub">
-    <meta name="keywords" content="Zundamon, Roblox, Luau, Zunda-OS 95, CLI, Retro Web, Cookbook, Visual Novel">
+    <meta name="description" content="Zundamon's Kitchen V2 — Official Roblox Game Launch Hub & Creative Webfront">
+    <meta name="keywords" content="Zundamon, Roblox, Kitchen Simulator, Rhythm Cooking, Cozy Games, Luau, Matter ECS">
     <meta name="author" content="Zundamon's Kitchen Team">
 
     <!-- Open Graph / Social Tags -->
-    <meta property="og:title" content="Zundamon's Kitchen V2 — Zunda-OS 95">
-    <meta property="og:description" content="Retro Win95 CLI Launch Page & Creative Hub for Zundamon's Kitchen V2">
+    <meta property="og:title" content="Zundamon's Kitchen V2 — Official Roblox Launch Page">
+    <meta property="og:description" content="Cozy cooperative kitchen life-sim experience on Roblox. Gather ingredients, cook rhythm dishes, and explore with Zundamon!">
     <meta property="og:type" content="website">
 
-    <title>Zundamon's Kitchen V2 — Zunda-OS 95</title>
+    <title>Zundamon's Kitchen V2 — Official Roblox Game Launch Hub</title>
 
-    <!-- Embedded Favicon (Edamame Pea SVG Data URI) -->
+    <!-- Embedded Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫛</text></svg>">
 
-    <!-- Primary Stylesheets -->
+    <!-- Primary Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="zunda-os95">
+<body class="game-launch-body">
 
-    <!-- CRT Scanline & Curved Glass CRT Overlay -->
-    <div id="crt-overlay" class="crt-enabled" aria-hidden="true">
-        <div class="crt-scanlines"></div>
-        <div class="crt-glow"></div>
+    <!-- Ambient Sparkle Canvas (No creepy blobs!) -->
+    <canvas id="star-sparkle-canvas"></canvas>
+
+    <!-- Sticky Game Navigation Bar -->
+    <header class="game-navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">
+                <span class="brand-emoji">🫛</span>
+                <span class="brand-title">Zundamon's Kitchen <small class="v-badge">V2</small></span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#companions">Companions</a>
+                <a href="#promos">Codes 🎁</a>
+                <button id="nav-cli-btn" class="nav-btn cli-link-btn" data-open-window="window-zundacli">💻 ZundaCLI</button>
+                <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" class="nav-btn play-roblox-nav-btn">🎮 Play on Roblox</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Game Launch Hero Section -->
+    <section class="game-hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="status-pill">
+                    <span class="pill-dot">🟢</span>
+                    <span class="pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS</span>
+                </div>
+
+                <h1 class="hero-title">
+                    Cook, Gather & Build Your <span class="highlight-text">Kitchen Empire!</span> 🫛✨
+                </h1>
+
+                <p class="hero-subtitle">
+                    Step into the cozy world of <strong>Zundamon's Kitchen V2</strong>! Gather wild ingredients across magical forests, master rhythm-game cooking recipes, serve hungry NPC guests, and team up with adorable Zundamon companions!
+                </p>
+
+                <div class="hero-actions">
+                    <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" class="cta-btn primary-cta">
+                        <span class="cta-icon">🎮</span>
+                        <span class="cta-text">PLAY ON ROBLOX NOW</span>
+                    </a>
+                    <button class="cta-btn secondary-cta" data-open-window="window-zundamon">
+                        <span class="cta-icon">🫛</span>
+                        <span class="cta-text">Meet Zundamon</span>
+                    </button>
+                    <button class="cta-btn terminal-cta" data-open-window="window-zundacli">
+                        <span class="cta-icon">💻</span>
+                        <span class="cta-text">ZundaCLI Console</span>
+                    </button>
+                </div>
+
+                <div class="hero-pills">
+                    <span class="hero-tag">🌾 Wild Gathering</span>
+                    <span class="hero-tag">🍳 Rhythm Minigames</span>
+                    <span class="hero-tag">🫛 Companion Buffs</span>
+                    <span class="hero-tag">🏠 Plot Decorating</span>
+                    <span class="hero-tag">📜 68+ Quests</span>
+                </div>
+            </div>
+
+            <div class="hero-card-preview">
+                <div class="zunda-hero-avatar-box">
+                    <svg viewBox="0 0 200 200" width="160" height="160" class="hero-zunda-svg">
+                        <!-- Ears -->
+                        <ellipse cx="55" cy="40" rx="24" ry="42" fill="#8bc34a" transform="rotate(-25 55 40)"/>
+                        <ellipse cx="145" cy="40" rx="24" ry="42" fill="#8bc34a" transform="rotate(25 145 40)"/>
+                        <ellipse cx="55" cy="40" rx="14" ry="28" fill="#a5d6a7" transform="rotate(-25 55 40)"/>
+                        <ellipse cx="145" cy="40" rx="14" ry="28" fill="#a5d6a7" transform="rotate(25 145 40)"/>
+                        <!-- Head -->
+                        <circle cx="100" cy="115" r="60" fill="#4caf50"/>
+                        <!-- Chef Hat -->
+                        <path d="M 70 65 C 70 40, 130 40, 130 65 Z" fill="#ffffff"/>
+                        <rect x="70" y="60" width="60" height="12" rx="4" fill="#ffb7c5"/>
+                        <!-- Face -->
+                        <circle cx="78" cy="108" r="7.5" fill="#1b5e20"/>
+                        <circle cx="122" cy="108" r="7.5" fill="#1b5e20"/>
+                        <circle cx="80" cy="105" r="2.5" fill="#ffffff"/>
+                        <circle cx="124" cy="105" r="2.5" fill="#ffffff"/>
+                        <ellipse cx="68" cy="118" rx="9" ry="4.5" fill="#ff85a1" opacity="0.8"/>
+                        <ellipse cx="132" cy="118" rx="9" ry="4.5" fill="#ff85a1" opacity="0.8"/>
+                        <path d="M 90 118 Q 100 128 110 118" fill="none" stroke="#1b5e20" stroke-width="3.5" stroke-linecap="round"/>
+                    </svg>
+                    <div class="hero-avatar-badge">
+                        <span class="badge-title">Zundamon</span>
+                        <span class="badge-sub">Level 24 Master Companion 🫛</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Features Showcase Section -->
+    <section id="features" class="game-section">
+        <div class="section-container">
+            <h2 class="section-title">✨ WHY PLAY ZUNDAMON'S KITCHEN?</h2>
+            <p class="section-subtitle">Discover a heartwarming culinary adventure built for cozy players on Roblox!</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feat-icon">🌾</div>
+                    <h3>Gather Wild Ingredients</h3>
+                    <p>Harvest fresh berries, sacred wheat, and crystal mushrooms from lush interactive resource nodes across Zunda Village.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feat-icon">🍳</div>
+                    <h3>Rhythm Cooking Minigame</h3>
+                    <p>Tap along to catchy culinary beats! Land Perfect combos to craft S-Rank dishes like Zunda Mochi and Edamame Parfait.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feat-icon">🫛</div>
+                    <h3>Companion Spirit Buffs</h3>
+                    <p>Unlock 5 unique companion spirits! Zundamon, Sakuradamon, Ankomon, Cardamon, and Antimon grant XP, Gold, and Gather boosts!</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feat-icon">🏠</div>
+                    <h3>Build Your Restaurant</h3>
+                    <p>Place furniture, design your kitchen plot, and serve hungry NPC guests to earn gold and level up your chef rank!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Companion Roster Showcase Section -->
+    <section id="companions" class="game-section alt-bg">
+        <div class="section-container">
+            <h2 class="section-title">🫛 MEET THE COMPANION SPIRITS</h2>
+            <p class="section-subtitle">Your loyal companions follow you through the village and boost your kitchen abilities!</p>
+
+            <div class="companions-grid">
+                <div class="companion-card active-card">
+                    <div class="comp-emoji">🫛</div>
+                    <h3>Zundamon</h3>
+                    <span class="comp-role">Original Pea Spirit</span>
+                    <p class="comp-desc">"I will stay close while you gather and cook nanoda!"</p>
+                    <div class="comp-buff-badge">Free Starting Companion</div>
+                    <button class="win95-btn chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('nanoda_arpeggio')">🔊 Voice Line</button>
+                </div>
+
+                <div class="companion-card">
+                    <div class="comp-emoji">🌸</div>
+                    <h3>Sakuradamon</h3>
+                    <span class="comp-role">Blossom Spirit</span>
+                    <p class="comp-desc">"Blossom petals drift on the breeze... Carries good lessons on the wind!"</p>
+                    <div class="comp-buff-badge">+25% Chef XP</div>
+                    <button class="win95-btn chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('chirp')">🔊 Voice Line</button>
+                </div>
+
+                <div class="companion-card">
+                    <div class="comp-emoji">🫘</div>
+                    <h3>Ankomon</h3>
+                    <span class="comp-role">Red Bean Spirit</span>
+                    <p class="comp-desc">"Training begins at dawn! Sweetens every guest payday."</p>
+                    <div class="comp-buff-badge">+15% Gold Revenue</div>
+                    <button class="win95-btn chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('chirp')">🔊 Voice Line</button>
+                </div>
+
+                <div class="companion-card">
+                    <div class="comp-emoji">🍋</div>
+                    <h3>Cardamon</h3>
+                    <span class="comp-role">Cardamom Seedling</span>
+                    <p class="comp-desc">"A steady hand makes the finest dishes."</p>
+                    <div class="comp-buff-badge">+30% Perfect Window</div>
+                    <button class="win95-btn chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('chirp')">🔊 Voice Line</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Active Promo Codes & Rewards Section -->
+    <section id="promos" class="game-section">
+        <div class="section-container">
+            <h2 class="section-title">🎁 ACTIVE RECURRING PLAYER PROMO CODES</h2>
+            <p class="section-subtitle">Copy these active codes and redeem them inside Zundamon's Kitchen on Roblox!</p>
+
+            <div class="codes-grid">
+                <div class="code-box">
+                    <div class="code-header">
+                        <span class="code-val">ZUNDAMOCHI2026</span>
+                        <button class="win95-btn copy-code-btn" data-code="ZUNDAMOCHI2026">📋 Copy Code</button>
+                    </div>
+                    <span class="code-reward">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
+                </div>
+
+                <div class="code-box">
+                    <div class="code-header">
+                        <span class="code-val">SOUPSEASON</span>
+                        <button class="win95-btn copy-code-btn" data-code="SOUPSEASON">📋 Copy Code</button>
+                    </div>
+                    <span class="code-reward">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
+                </div>
+
+                <div class="code-box">
+                    <div class="code-header">
+                        <span class="code-val">HYBRIDECS</span>
+                        <button class="win95-btn copy-code-btn" data-code="HYBRIDECS">📋 Copy Code</button>
+                    </div>
+                    <span class="code-reward">Reward: +250 Gold, Matter ECS Developer Badge</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Container for ZundaCLI Console and App Windows -->
+    <div id="window-container">
+        <!-- ZundaCLI.exe Window -->
+        <section id="window-zundacli" class="window hidden" data-window-id="zundacli" style="top: 60px; left: 80px; width: 680px; height: 440px;" tabindex="0">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon"><img src="assets/crt_monitor.svg" width="16" height="16" alt="Icon"></span>
+                    <span class="window-title-text">ZundaCLI.exe — Pastel Dev Console</span>
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                    <button class="win-btn win-maximize" data-action="maximize" title="Maximize">🗖</button>
+                    <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                </div>
+            </div>
+
+            <div class="window-body cli-body" data-term-theme="pastel">
+                <div id="cli-output" class="cli-terminal-log" role="log" aria-live="polite">
+                    <p class="cli-welcome">Zundamon's Kitchen V2 [Pastel Web Terminal v4.09]</p>
+                    <p class="cli-welcome">Type <span class="cli-highlight">'help'</span>, <span class="cli-highlight">'recipes'</span>, or <span class="cli-highlight">'promos'</span> for commands.</p>
+                </div>
+                <form id="cli-input-form" class="cli-prompt-line" autocomplete="off" onsubmit="return false;">
+                    <label for="cli-input" class="cli-prompt-label">zunda&gt;</label>
+                    <input type="text" id="cli-input" class="cli-input-field" placeholder="Type command (e.g. help, recipes, promo)..." spellcheck="false">
+                </form>
+            </div>
+        </section>
     </div>
 
-    <!-- Main Desktop Area -->
-    <main id="desktop" role="main">
-        <!-- Background Floating Edamame Particle Canvas -->
-        <canvas id="particle-canvas"></canvas>
-
-        <!-- Desktop Shortcuts Grid -->
-        <div id="desktop-icons" role="region" aria-label="Desktop Shortcuts">
-            <button class="desktop-shortcut" data-open-window="window-zundamon" tabindex="0">
-                <div class="shortcut-icon character-icon">🫛✨</div>
-                <span class="shortcut-label">Zundamon.app</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-zundacli" tabindex="0">
-                <div class="shortcut-icon cli-icon">
-                    <img src="assets/crt_monitor.svg" alt="CLI Icon">
-                </div>
-                <span class="shortcut-label">ZundaCLI.exe</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-cookbook" tabindex="0">
-                <div class="shortcut-icon book-icon">
-                    <img src="assets/disc_icon.svg" alt="Cookbook Icon">
-                </div>
-                <span class="shortcut-label">Cookbook.app</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-vntalk" tabindex="0">
-                <div class="shortcut-icon vn-icon">
-                    <img src="assets/zundamon_mochi.svg" alt="VN Icon">
-                </div>
-                <span class="shortcut-label">VNTalk.app</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-promos" tabindex="0">
-                <div class="shortcut-icon promo-icon">🎁</div>
-                <span class="shortcut-label">Promos.app</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-updates" tabindex="0">
-                <div class="shortcut-icon update-icon">📜</div>
-                <span class="shortcut-label">Updates.log</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-calculator" tabindex="0">
-                <div class="shortcut-icon calc-icon">🧮</div>
-                <span class="shortcut-label">Calculator.app</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-quickstart" tabindex="0">
-                <div class="shortcut-icon txt-icon">📝</div>
-                <span class="shortcut-label">QuickStart.txt</span>
-            </button>
-
-            <button class="desktop-shortcut" data-open-window="window-trash" tabindex="0">
-                <div class="shortcut-icon trash-icon">🗑️</div>
-                <span class="shortcut-label">Zunda Bin</span>
-            </button>
-        </div>
-
-        <!-- Y2K Cozy Desktop Widgets Panel -->
-        <div id="desktop-widgets" role="region" aria-label="Desktop Widgets">
-
-            <!-- 1. Clock & Weather Y2K Widget -->
-            <div class="y2k-widget clock-widget">
-                <div class="widget-header">
-                    <span class="widget-title">⏰ Zunda Time & Weather</span>
-                    <span class="widget-sparkle">✨</span>
-                </div>
-                <div class="widget-body">
-                    <div id="widget-clock" class="widget-big-time">12:00:00 PM</div>
-                    <div class="widget-sub-info">
-                        <span class="weather-badge">🌤️ Cozy Sunny (22°C)</span>
-                        <span class="players-online-badge">🟢 120 Chefs Playing</span>
-                    </div>
-                </div>
+    <!-- Main Game Footer -->
+    <footer class="game-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p><strong>Zundamon's Kitchen V2</strong> — All-Ages Family Friendly Roblox Experience</p>
+                <p class="copyright">© 2026 Zundamon's Kitchen Team. Built with Luau, Matter ECS, and Roblox Studio.</p>
             </div>
-
-            <!-- 2. Interactive Zundamon Sticker Widget -->
-            <div id="zunda-sticker-widget" class="y2k-widget zunda-sticker-card" title="Click me for a chirp, nanoda!">
-                <div class="zunda-bubble-talk" id="widget-speech-bubble">"Welcome to Zunda-OS 95, nanoda! 🫛✨"</div>
-                <div class="sticker-avatar-wrap">
-                    <svg viewBox="0 0 100 100" width="70" height="70">
-                        <circle cx="50" cy="55" r="32" fill="#4caf50"/>
-                        <ellipse cx="28" cy="25" rx="12" ry="22" fill="#8bc34a" transform="rotate(-20 28 25)"/>
-                        <ellipse cx="72" cy="25" rx="12" ry="22" fill="#8bc34a" transform="rotate(20 72 25)"/>
-                        <circle cx="40" cy="50" r="4" fill="#1b5e20"/>
-                        <circle cx="60" cy="50" r="4" fill="#1b5e20"/>
-                        <ellipse cx="34" cy="56" rx="5" ry="2.5" fill="#ff85a1" opacity="0.8"/>
-                        <ellipse cx="66" cy="56" rx="5" ry="2.5" fill="#ff85a1" opacity="0.8"/>
-                        <path d="M 45 56 Q 50 61 55 56" stroke="#1b5e20" stroke-width="2" fill="none"/>
-                    </svg>
-                </div>
-                <span class="sticker-label">Tap Zundamon! 🫛</span>
+            <div class="footer-right">
+                <a href="https://github.com/fromage3900/Zundamons-Kitchen-V2" target="_blank" rel="noopener noreferrer">GitHub Repo</a> · 
+                <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer">Roblox Game Page</a>
             </div>
-
-            <!-- 3. Cozy Jukebox Lo-Fi Player Widget -->
-            <div class="y2k-widget jukebox-widget">
-                <div class="widget-header">
-                    <span class="widget-title">🎵 Kitchen Lo-Fi Beats</span>
-                    <span class="widget-sparkle">💖</span>
-                </div>
-                <div class="widget-body">
-                    <div class="song-title-row">
-                        <span class="disc-spin">💿</span>
-                        <span class="song-name" id="jukebox-song-name">Zunda Village Afternoon BGM</span>
-                    </div>
-                    <div class="jukebox-controls">
-                        <button id="widget-play-bgm" class="win95-btn primary-btn">▶ Play BGM</button>
-                        <button id="widget-toggle-rain" class="win95-btn">🌧️ Rain FX</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Quick Promo Code Scratch Widget -->
-            <div class="y2k-widget promo-scratch-widget">
-                <div class="widget-header">
-                    <span class="widget-title">🎁 Quick Promo Codes</span>
-                    <span class="widget-sparkle">🎀</span>
-                </div>
-                <div class="widget-body">
-                    <div class="quick-code-row">
-                        <span class="q-code">ZUNDAMOCHI2026</span>
-                        <button class="win95-btn copy-code-btn mini-copy" data-code="ZUNDAMOCHI2026">Copy</button>
-                    </div>
-                    <div class="quick-code-row">
-                        <span class="q-code">SOUPSEASON</span>
-                        <button class="win95-btn copy-code-btn mini-copy" data-code="SOUPSEASON">Copy</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Window Manager Floating Window Stack -->
-        <div id="window-container">
-
-            <!-- 1. ZundaCLI.exe Window -->
-            <section id="window-zundacli" class="window active-window" data-window-id="zundacli" style="top: 40px; left: 60px; width: 680px; height: 440px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon"><img src="assets/crt_monitor.svg" width="16" height="16" alt="Icon"></span>
-                        <span class="window-title-text">ZundaCLI.exe — Command Prompt</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-                
-                <div class="window-menu-bar">
-                    <span class="menu-item">File</span>
-                    <span class="menu-item">Edit</span>
-                    <span class="menu-item">View</span>
-                    <span class="menu-item">Help</span>
-                </div>
-
-                <div class="window-body cli-body" data-term-theme="classic-green">
-                    <div class="cli-scanline-overlay"></div>
-                    <div id="cli-output" class="cli-terminal-log" role="log" aria-live="polite">
-                        <p class="cli-welcome">Zunda-OS 95 [Version 4.09.1995]</p>
-                        <p class="cli-welcome">(C) Zundamon's Kitchen V2. Type <span class="cli-highlight">'help'</span> or <span class="cli-highlight">'recipes'</span> for commands.</p>
-                        <p class="cli-line"><span class="cli-tag cli-tag-system">[SYSTEM]</span> Initialized edamame kernel matrix... nanoda!</p>
-                    </div>
-                    <button id="cli-scroll-bottom-btn" class="cli-scroll-bottom-btn hidden" title="Scroll to Bottom">↓ New Output Below</button>
-                    <form id="cli-input-form" class="cli-prompt-line" autocomplete="off" onsubmit="return false;">
-                        <label for="cli-input" class="cli-prompt-label">zunda&gt;</label>
-                        <input type="text" id="cli-input" class="cli-input-field" placeholder="Enter command (e.g., help, gather, recipes)..." spellcheck="false">
-                    </form>
-                    <div id="cli-mobile-toolbar" class="cli-mobile-toolbar">
-                        <button type="button" class="cli-vkey" data-key="Tab">TAB ⇥</button>
-                        <button type="button" class="cli-vkey" data-key="ArrowUp">▲ HIST</button>
-                        <button type="button" class="cli-vkey" data-key="ArrowDown">▼ HIST</button>
-                        <button type="button" class="cli-vkey" data-cmd="help">HELP</button>
-                        <button type="button" class="cli-vkey" data-cmd="clear">CLEAR</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 0. Zundamon.app Window (Character Showcase & Real Game Companion Stats) -->
-            <section id="window-zundamon" class="window active-window" data-window-id="zundamon" style="top: 30px; left: 50px; width: 700px; height: 500px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon">🫛✨</span>
-                        <span class="window-title-text">Zundamon.app — Companion Hub & Real Game Stats</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body zundamon-body">
-                    <div class="zunda-hero-panel">
-                        <div class="zunda-avatar-card">
-                            <div class="zunda-avatar-frame">
-                                <svg class="zunda-svg-avatar" viewBox="0 0 200 200" width="140" height="140">
-                                    <!-- Green Pea Ears -->
-                                    <ellipse cx="60" cy="45" rx="22" ry="40" fill="#8bc34a" transform="rotate(-25 60 45)"/>
-                                    <ellipse cx="140" cy="45" rx="22" ry="40" fill="#8bc34a" transform="rotate(25 140 45)"/>
-                                    <ellipse cx="60" cy="45" rx="14" ry="28" fill="#a5d6a7" transform="rotate(-25 60 45)"/>
-                                    <ellipse cx="140" cy="45" rx="14" ry="28" fill="#a5d6a7" transform="rotate(25 140 45)"/>
-                                    <!-- Body & Head -->
-                                    <circle cx="100" cy="115" r="55" fill="#4caf50"/>
-                                    <!-- Cute Chef Hat -->
-                                    <path d="M 75 65 C 75 45, 125 45, 125 65 Z" fill="#ffffff"/>
-                                    <rect x="75" y="62" width="50" height="10" rx="3" fill="#ffe5ec"/>
-                                    <!-- Face Features -->
-                                    <circle cx="80" cy="108" r="7" fill="#1b5e20"/>
-                                    <circle cx="120" cy="108" r="7" fill="#1b5e20"/>
-                                    <circle cx="82" cy="105" r="2.5" fill="#ffffff"/>
-                                    <circle cx="122" cy="105" r="2.5" fill="#ffffff"/>
-                                    <!-- Blush Cheeks -->
-                                    <ellipse cx="70" cy="118" rx="8" ry="4" fill="#ff85a1" opacity="0.75"/>
-                                    <ellipse cx="130" cy="118" rx="8" ry="4" fill="#ff85a1" opacity="0.75"/>
-                                    <!-- Smile -->
-                                    <path d="M 92 118 Q 100 126 108 118" fill="none" stroke="#1b5e20" stroke-width="3" stroke-linecap="round"/>
-                                    <!-- Zunda Mochi Stick -->
-                                    <line x1="140" y1="130" x2="165" y2="155" stroke="#d7ccc8" stroke-width="4"/>
-                                    <circle cx="142" cy="132" r="10" fill="#ffffff"/>
-                                    <circle cx="142" cy="132" r="8" fill="#8bc34a" opacity="0.8"/>
-                                </svg>
-                            </div>
-                            <div class="zunda-name-badge">
-                                <span class="zunda-name">Zundamon (ずんだもん)</span>
-                                <span class="zunda-title">Pea Spirit Companion 🫛</span>
-                            </div>
-                            <div class="zunda-mood-bar">
-                                <span class="mood-label">Mood:</span>
-                                <button class="win95-btn mood-btn active" data-mood="happy">🟢 Happy</button>
-                                <button class="win95-btn mood-btn" data-mood="cooking">🍳 Cooking</button>
-                                <button class="win95-btn mood-btn" data-mood="sleeping">💤 Sleeping</button>
-                            </div>
-                        </div>
-
-                        <div class="zunda-stats-panel">
-                            <h3 class="panel-header">📊 REAL IN-GAME COMPANION STATS</h3>
-                            <div class="stat-grid">
-                                <div class="stat-box">
-                                    <span class="stat-lbl">Chef Level</span>
-                                    <span class="stat-val">Lv. 24 Master</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-lbl">Affinity</span>
-                                    <span class="stat-val">⭐⭐⭐⭐⭐ Max</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-lbl">Active Buff</span>
-                                    <span class="stat-val">+25% Chef XP</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-lbl">Fav Dish</span>
-                                    <span class="stat-val">Zunda Mochi 🍡</span>
-                                </div>
-                            </div>
-
-                            <div class="vn-dialogue-card">
-                                <div class="vn-speaker-bar">
-                                    <span class="vn-speaker">🫛 Zundamon:</span>
-                                    <button id="zunda-voice-btn" class="win95-btn mini-btn">🔊 Chirp</button>
-                                </div>
-                                <p id="zunda-dialogue-text" class="vn-quote">"Morning, {player}! The garden is sparkling nanoda! Let us make one dish we are proud of today!"</p>
-                            </div>
-
-                            <div class="companion-catalog-strip">
-                                <span class="strip-label">Companions:</span>
-                                <button class="comp-chip active" data-comp="zundamon">🫛 Zundamon</button>
-                                <button class="comp-chip" data-comp="sakuradamon">🌸 Sakuradamon (+25% XP)</button>
-                                <button class="comp-chip" data-comp="ankomon">🫘 Ankomon (+15% Gold)</button>
-                                <button class="comp-chip" data-comp="cardamon">🍋 Cardamon (+30% Perfect)</button>
-                                <button class="comp-chip" data-comp="antimon">🌿 Antimon (+20% Gather)</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 2. Cookbook.app Window -->
-            <section id="window-cookbook" class="window hidden" data-window-id="cookbook" style="top: 80px; left: 140px; width: 720px; height: 500px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon"><img src="assets/disc_icon.svg" width="16" height="16" alt="Icon"></span>
-                        <span class="window-title-text">Cookbook.app — Zunda Recipe Book</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body cookbook-body">
-                    <div class="recipe-toolbar">
-                        <input type="search" id="recipe-search" class="win95-input" placeholder="Search recipes (e.g. Mochi, Shake, Dango)...">
-                        <div class="recipe-filter-tags">
-                            <button class="win95-btn active" data-filter="all">All Recipes</button>
-                            <button class="win95-btn" data-filter="classic">Classic Zunda</button>
-                            <button class="win95-btn" data-filter="desserts">Sweets & Desserts</button>
-                            <button class="win95-btn" data-filter="drinks">Drinks</button>
-                        </div>
-                    </div>
-
-                    <div id="recipe-grid" class="recipe-grid-container">
-                        <article class="recipe-card" data-category="classic" data-recipe-name="Zunda Mochi">
-                            <div class="recipe-thumbnail">🫛🍡</div>
-                            <div class="recipe-info">
-                                <h3 class="recipe-title">Zunda Mochi (ずんだ餅)</h3>
-                                <p class="recipe-desc">Sweetened crushed edamame paste draped over warm, chewy rice cakes.</p>
-                                <span class="recipe-badge">Signature Dish</span>
-                            </div>
-                        </article>
-
-                        <article class="recipe-card" data-category="drinks" data-recipe-name="Zunda Shake">
-                            <div class="recipe-thumbnail">🫛🥤</div>
-                            <div class="recipe-info">
-                                <h3 class="recipe-title">Zunda Shake (ずんだシェイク)</h3>
-                                <p class="recipe-desc">Rich vanilla cream blended with freshly crushed green zunda beans.</p>
-                                <span class="recipe-badge">Refreshing</span>
-                            </div>
-                        </article>
-
-                        <article class="recipe-card" data-category="desserts" data-recipe-name="Zunda Parfait">
-                            <div class="recipe-thumbnail">🫛🍨</div>
-                            <div class="recipe-info">
-                                <h3 class="recipe-title">Zunda Parfait (ずんだパフェ)</h3>
-                                <p class="recipe-desc">Layered dessert with green tea ice cream, zunda paste, and fresh fruit.</p>
-                                <span class="recipe-badge">Deluxe Sweets</span>
-                            </div>
-                        </article>
-
-                        <article class="recipe-card" data-category="classic" data-recipe-name="Zunda Dango">
-                            <div class="recipe-thumbnail">🫛🍡</div>
-                            <div class="recipe-info">
-                                <h3 class="recipe-title">Zunda Dango (ずんだ団子)</h3>
-                                <p class="recipe-desc">Tri-color skewered dumplings coated in sweet green edamame paste.</p>
-                                <span class="recipe-badge">Traditional</span>
-                            </div>
-                        </article>
-
-                        <article class="recipe-card" data-category="drinks" data-recipe-name="Zunda Latte">
-                            <div class="recipe-thumbnail">🫛☕</div>
-                            <div class="recipe-info">
-                                <h3 class="recipe-title">Zunda Matcha Latte (ずんだ抹茶)</h3>
-                                <p class="recipe-desc">Steamed oat milk poured over ceremonial matcha and edamame syrup.</p>
-                                <span class="recipe-badge">Warm Cozy</span>
-                            </div>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. VNTalk.app Window -->
-            <section id="window-vntalk" class="window hidden" data-window-id="vntalk" style="top: 100px; left: 220px; width: 640px; height: 460px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon"><img src="assets/zundamon_mochi.svg" width="16" height="16" alt="Icon"></span>
-                        <span class="window-title-text">VNTalk.app — Zundamon Visual Novel</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body vn-body">
-                    <div id="vn-stage" class="vn-stage-background">
-                        <div id="vn-portrait" class="vn-character-portrait" data-expression="happy">
-                            <div class="portrait-avatar">
-                                <img src="assets/zundamon_mochi.svg" width="96" height="96" alt="Zundamon Mochi">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="vn-dialogue-box" class="vn-dialogue-panel">
-                        <div id="vn-speaker" class="vn-speaker-tag">Zundamon (ずんだもん)</div>
-                        <div id="vn-text" class="vn-text-content">
-                            Welcome to Zundamon's Kitchen V2 nanoda! What delicious edamame treats shall we cook today?
-                        </div>
-                        <div id="vn-choices" class="vn-choices-container">
-                            <button class="vn-choice-btn" data-vn-choice="1">Let's check the recipe book!</button>
-                            <button class="vn-choice-btn" data-vn-choice="2">Launch Roblox Zundamon's Kitchen!</button>
-                            <button class="vn-choice-btn" data-vn-choice="3">Tell me a fun Zunda fact, nanoda!</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 4. QuickStart.txt Window -->
-            <section id="window-quickstart" class="window hidden" data-window-id="quickstart" style="top: 60px; left: 300px; width: 600px; height: 420px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon">📝</span>
-                        <span class="window-title-text">QuickStart.txt — Notepad</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body notepad-body">
-                    <textarea class="notepad-editor" readonly spellcheck="false">
-=====================================================
-  ZUNDAMON'S KITCHEN V2 — QUICK START GUIDE (Zunda-OS 95)
-=====================================================
-
-Welcome to Zunda-OS 95!
-
-[KEYBOARD SHORTCUTS & NAVIGATION]
-• Click desktop icons or taskbar items to open/focus apps.
-• Open Start Menu: Click [Start Zunda 🫛] or press Ctrl+Esc.
-• Toggle CRT Overlay: Use Start Menu -> Toggle CRT Scanlines or System Tray.
-• Execute CLI Commands: Type commands into ZundaCLI.exe (try 'help', 'status', 'cook').
-
-[FEATURES & APPS]
-1. ZundaCLI.exe : Terminal interface to inspect game state & build tools.
-2. Cookbook.app : Discover signature Zundamon edamame recipes & stats.
-3. VNTalk.app   : Interactive visual novel dialogue with Zundamon.
-4. System Tray  : Procedural BGM & SFX synthesizers with live time clock.
-
-[GAME & REPO LINKS]
-• Roblox Game Page : https://www.roblox.com/
-• GitHub Repository: https://github.com/
-
-Enjoy your cozy culinary experience nanoda! 🫛
-                    </textarea>
-                </div>
-            </section>
-
-            <!-- 5. Promos.app Window (Roblox Game Codes & Rewards) -->
-            <section id="window-promos" class="window hidden" data-window-id="promos" style="top: 100px; left: 180px; width: 620px; height: 460px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon">🎁</span>
-                        <span class="window-title-text">Promos.app — Zundamon Roblox Promo Codes</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body promos-body">
-                    <div class="promos-banner">
-                        <h3>🎁 ACTIVE RECURRING PLAYER CODES</h3>
-                        <p>Redeem these codes inside Zundamon's Kitchen on Roblox for bonus Gold, Zunda Paste & Recipe Keys, nanoda!</p>
-                    </div>
-
-                    <div class="promos-list">
-                        <div class="promo-card">
-                            <div class="promo-info">
-                                <span class="promo-code">ZUNDAMOCHI2026</span>
-                                <span class="promo-desc">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
-                            </div>
-                            <button class="win95-btn copy-code-btn" data-code="ZUNDAMOCHI2026">📋 Copy Code</button>
-                        </div>
-
-                        <div class="promo-card">
-                            <div class="promo-info">
-                                <span class="promo-code">SOUPSEASON</span>
-                                <span class="promo-desc">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
-                            </div>
-                            <button class="win95-btn copy-code-btn" data-code="SOUPSEASON">📋 Copy Code</button>
-                        </div>
-
-                        <div class="promo-card">
-                            <div class="promo-info">
-                                <span class="promo-code">HYBRIDECS</span>
-                                <span class="promo-desc">Reward: +250 Gold, Matter ECS Developer Title Badge</span>
-                            </div>
-                            <button class="win95-btn copy-code-btn" data-code="HYBRIDECS">📋 Copy Code</button>
-                        </div>
-
-                        <div class="promo-card">
-                            <div class="promo-info">
-                                <span class="promo-code">ZUNDAOS95</span>
-                                <span class="promo-desc">Reward: Retro CRT Kitchen TV Furniture Item</span>
-                            </div>
-                            <button class="win95-btn copy-code-btn" data-code="ZUNDAOS95">📋 Copy Code</button>
-                        </div>
-                    </div>
-                    <div class="promos-footer">
-                        <a href="https://www.roblox.com/" target="_blank" class="win95-btn primary-btn roblox-launch-btn">🎮 Play & Redeem on Roblox</a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 6. Updates.log Window (Patch Notes & Changelog) -->
-            <section id="window-updates" class="window hidden" data-window-id="updates" style="top: 120px; left: 220px; width: 640px; height: 480px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon">📜</span>
-                        <span class="window-title-text">Updates.log — Zundamon Patch Notes</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body updates-body">
-                    <div class="update-entry">
-                        <div class="update-badge">v2.4.0 — HYBRID ECS & ZUNDA-OS 95 LAUNCH</div>
-                        <div class="update-date">July 2026</div>
-                        <ul>
-                            <li><strong>Matter ECS System Architecture:</strong> Integrated deterministic client/server ECS systems.</li>
-                            <li><strong>Zunda-OS 95 Web Hub:</strong> Launched interactive terminal (`ZundaCLI.exe`), cookbook, and live promo redeemers.</li>
-                            <li><strong>68+ Quests Restored:</strong> Restored harvest, cook, and guest service questlines.</li>
-                            <li><strong>Cozy Ambient Soundscapes:</strong> Procedural Web Audio synth & custom Zundamon VN dialogue soundboards.</li>
-                        </ul>
-                    </div>
-
-                    <div class="update-entry">
-                        <div class="update-badge">v2.3.1 — RHYTHM COOKING BALANCING</div>
-                        <div class="update-date">June 2026</div>
-                        <ul>
-                            <li>Improved rhythm minigame combo multipliers for S-Rank dish quality.</li>
-                            <li>Added 5 new Zundamon companion dialogue scenes in `VNTalk.app`.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 7. Calculator.app Window (Dish Profit & Ingredient Calculator) -->
-            <section id="window-calculator" class="window hidden" data-window-id="calculator" style="top: 140px; left: 260px; width: 580px; height: 440px;" tabindex="0">
-                <div class="window-header">
-                    <div class="window-title">
-                        <span class="window-icon">🧮</span>
-                        <span class="window-title-text">Calculator.app — Dish Profit & Crafter Calculator</span>
-                    </div>
-                    <div class="window-controls">
-                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
-                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
-                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
-                    </div>
-                </div>
-
-                <div class="window-body calc-body">
-                    <div class="calc-panel">
-                        <label for="calc-dish-select">Select Recipe:</label>
-                        <select id="calc-dish-select" class="win95-select">
-                            <option value="zunda-mochi" data-cost="20" data-sell="120">Zunda Mochi (Cost: 20g | Sell: 120g)</option>
-                            <option value="mushroom-soup" data-cost="15" data-sell="75">Mushroom Soup (Cost: 15g | Sell: 75g)</option>
-                            <option value="berry-tea" data-cost="10" data-sell="45">Berry Tea (Cost: 10g | Sell: 45g)</option>
-                            <option value="edamame-parfait" data-cost="35" data-sell="220">Edamame Parfait (Cost: 35g | Sell: 220g)</option>
-                        </select>
-
-                        <div class="calc-field">
-                            <label for="calc-qty">Quantity to Cook:</label>
-                            <input type="number" id="calc-qty" value="10" min="1" max="999" class="win95-input">
-                        </div>
-
-                        <div id="calc-results" class="calc-results-box">
-                            <p><strong>Total Crafting Cost:</strong> <span id="res-cost">200</span> Gold</p>
-                            <p><strong>Estimated NPC Revenue:</strong> <span id="res-sell">1,200</span> Gold</p>
-                            <p class="profit-line"><strong>Net Kitchen Profit:</strong> <span id="res-profit" class="profit-good">+1,000 Gold</span> 🎉</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </div>
-    </main>
-
-    <!-- Vintage Taskbar & Start Menu -->
-    <footer id="taskbar" role="contentinfo">
-        <!-- Start Button -->
-        <button id="start-btn" class="win95-start-btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
-            <span class="start-icon"><img src="assets/pea_pod.svg" width="18" height="18" alt="Start Icon"></span>
-            <span class="start-text">Start Zunda</span>
-        </button>
-
-        <!-- Start Menu Popup -->
-        <div id="start-menu" class="start-menu-popup hidden" role="menu" aria-label="Start Menu">
-            <div class="start-menu-banner">
-                <span class="banner-text">Zunda-OS <strong>95</strong></span>
-            </div>
-            <div class="start-menu-items">
-                <button class="start-item" data-open-window="window-zundacli" role="menuitem">
-                    <span class="item-icon">💻</span> ZundaCLI.exe
-                </button>
-                <button class="start-item" data-open-window="window-cookbook" role="menuitem">
-                    <span class="item-icon">📖</span> Cookbook.app
-                </button>
-                <button class="start-item" data-open-window="window-vntalk" role="menuitem">
-                    <span class="item-icon">💬</span> VNTalk.app
-                </button>
-                <button class="start-item" data-open-window="window-quickstart" role="menuitem">
-                    <span class="item-icon">📝</span> QuickStart.txt
-                </button>
-
-                <div class="start-divider"></div>
-
-                <button id="menu-toggle-crt" class="start-item" role="menuitem">
-                    <span class="item-icon">📺</span> Toggle CRT Scanlines
-                </button>
-                <button id="menu-toggle-theme" class="start-item" role="menuitem">
-                    <span class="item-icon">🎨</span> Toggle Theme Mode
-                </button>
-
-                <div class="start-divider"></div>
-
-                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="start-item" role="menuitem">
-                    <span class="item-icon">🌐</span> GitHub Repository
-                </a>
-                <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" class="start-item" role="menuitem">
-                    <span class="item-icon">🎮</span> Roblox Game Page
-                </a>
-
-                <div class="start-divider"></div>
-
-                <button id="menu-shutdown" class="start-item" role="menuitem">
-                    <span class="item-icon">🔌</span> Shut Down Zunda-OS...
-                </button>
-            </div>
-        </div>
-
-        <!-- Active Windows List Container -->
-        <div id="taskbar-windows" class="taskbar-windows-container">
-            <button class="taskbar-item active" data-window-target="window-zundacli">
-                <span class="tb-icon">💻</span> ZundaCLI.exe
-            </button>
-        </div>
-
-        <!-- System Tray -->
-        <div id="taskbar-tray" class="taskbar-tray-container">
-            <button id="bgm-toggle" class="tray-btn" title="Toggle Cozy BGM Music" aria-label="Toggle BGM">
-                <span class="tray-icon">🎵</span>
-            </button>
-            <button id="sfx-toggle" class="tray-btn" title="Toggle Sound Effects" aria-label="Toggle SFX">
-                <span class="tray-icon">🔊</span>
-            </button>
-            <div id="taskbar-clock" class="tray-clock" title="Current Time">12:00:00 PM</div>
         </div>
     </footer>
 
-    <!-- Audio Synthesizer Engine -->
+    <!-- Application Scripts -->
     <script src="assets/audio_engine.js"></script>
-
-    <!-- Window Manager Engine -->
     <script src="window_manager.js"></script>
-
-    <!-- Interactive CRT Phosphor Terminal Engine -->
     <script src="terminal.js"></script>
-
-    <!-- Front-End Client Application Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. Audio Engine Helper Wrappers ---
-            function playClick(type = 'down') {
-                if (typeof window.playClickSFX === 'function') {
-                    window.playClickSFX(type);
-                }
-            }
-
-            function playWinSFX(action = 'focus') {
-                if (typeof window.playWindowSFX === 'function') {
-                    window.playWindowSFX(action);
-                }
-            }
-
-            function playKey(key = '') {
-                if (typeof window.playKeySFX === 'function') {
-                    window.playKeySFX(key);
-                }
-            }
-
-            // --- 2. Live Digital Clock ---
-            function updateClock() {
-                const clockEl = document.getElementById('taskbar-clock');
-                if (clockEl) {
-                    const now = new Date();
-                    clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                }
-            }
-            setInterval(updateClock, 1000);
-            updateClock();
-
-            // --- 3. Window Manager Initialization ---
-            const windowManager = new WindowManager();
-            windowManager.init();
-            window.windowManager = windowManager;
-
-            function openWindow(winId) {
-                windowManager.openWindow(winId);
-            }
-
-            // Desktop shortcut click handlers
-            document.querySelectorAll('.desktop-shortcut').forEach(shortcut => {
-                shortcut.addEventListener('click', () => {
-                    playClick('down');
-                    const targetId = shortcut.dataset.openWindow;
-                    if (targetId) openWindow(targetId);
-                });
-
-                shortcut.addEventListener('dblclick', () => {
-                    const targetId = shortcut.dataset.openWindow;
-                    if (targetId) openWindow(targetId);
-                });
-            });
-
-            // --- 4. Start Menu Management ---
-            const startBtn = document.getElementById('start-btn');
-            const startMenu = document.getElementById('start-menu');
-
-            if (startBtn && startMenu) {
-                startBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    playClick('start');
-                    const isHidden = startMenu.classList.contains('hidden');
-                    if (isHidden) {
-                        startMenu.classList.remove('hidden');
-                        startBtn.classList.add('start-btn-active');
-                    } else {
-                        startMenu.classList.add('hidden');
-                        startBtn.classList.remove('start-btn-active');
-                    }
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!startMenu.contains(e.target) && e.target !== startBtn) {
-                        startMenu.classList.add('hidden');
-                        startBtn.classList.remove('start-btn-active');
-                    }
-                });
-
-                startMenu.querySelectorAll('.start-item[data-open-window]').forEach(item => {
-                    item.addEventListener('click', () => {
-                        playClick('down');
-                        const targetId = item.dataset.openWindow;
-                        if (targetId) openWindow(targetId);
-                        startMenu.classList.add('hidden');
-                        startBtn.classList.remove('start-btn-active');
-                    });
-                });
-
-                // Start menu toggle options
-                const menuCrtBtn = document.getElementById('menu-toggle-crt');
-                if (menuCrtBtn) {
-                    menuCrtBtn.addEventListener('click', () => {
-                        playClick('down');
-                        const crtOverlay = document.getElementById('crt-overlay');
-                        if (crtOverlay) {
-                            crtOverlay.classList.toggle('crt-off');
-                        }
-                    });
-                }
-
-                const menuThemeBtn = document.getElementById('menu-toggle-theme');
-                if (menuThemeBtn) {
-                    menuThemeBtn.addEventListener('click', () => {
-                        playClick('down');
-                        const currentTheme = document.documentElement.getAttribute('data-theme');
-                        const nextTheme = currentTheme === 'zunda-classic' ? 'zunda-dark' : 'zunda-classic';
-                        document.documentElement.setAttribute('data-theme', nextTheme);
-                    });
-                }
-
-                const shutdownBtn = document.getElementById('menu-shutdown');
-                if (shutdownBtn) {
-                    shutdownBtn.addEventListener('click', () => {
-                        playClick('down');
-                        alert("Shutting down Zunda-OS 95... See you soon, nanoda! 🫛");
-                        location.reload();
-                    });
-                }
-            }
-
-            // --- 5. System Tray Toggles ---
-            const bgmToggle = document.getElementById('bgm-toggle');
-            if (bgmToggle) {
-                bgmToggle.addEventListener('click', () => {
-                    if (typeof window.toggleCozyBGM === 'function') {
-                        const isPlaying = window.toggleCozyBGM();
-                        bgmToggle.style.opacity = isPlaying ? '1' : '0.5';
-                    }
-                });
-            }
-
-            const sfxToggle = document.getElementById('sfx-toggle');
-            if (sfxToggle) {
-                sfxToggle.addEventListener('click', () => {
-                    if (window.ZundaAudio) {
-                        const muted = window.ZundaAudio.toggleMute();
-                        sfxToggle.style.opacity = muted ? '0.4' : '1';
-                        sfxToggle.querySelector('.tray-icon').textContent = muted ? '🔇' : '🔊';
-                    }
-                });
-            }
-
-            // --- 6. CLI Terminal Initialized via terminal.js (ZundaTerminal class) ---
-
-            // --- 7. Cookbook Filtering Logic ---
-            const recipeSearch = document.getElementById('recipe-search');
-            const recipeGrid = document.getElementById('recipe-grid');
-            const filterBtns = document.querySelectorAll('.recipe-filter-tags .win95-btn');
-
-            function filterRecipes() {
-                const query = recipeSearch ? recipeSearch.value.toLowerCase().trim() : '';
-                const activeBtn = document.querySelector('.recipe-filter-tags .win95-btn.active');
-                const category = activeBtn ? activeBtn.dataset.filter : 'all';
-
-                const cards = document.querySelectorAll('.recipe-card');
-                cards.forEach(card => {
-                    const cardCategory = card.dataset.category;
-                    const cardName = card.dataset.recipeName.toLowerCase();
-                    const cardText = card.textContent.toLowerCase();
-
-                    const matchesCategory = (category === 'all' || cardCategory === category);
-                    const matchesSearch = (!query || cardName.includes(query) || cardText.includes(query));
-
-                    if (matchesCategory && matchesSearch) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-
-            if (recipeSearch) {
-                recipeSearch.addEventListener('input', filterRecipes);
-            }
-
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    playClick('down');
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    filterRecipes();
-                });
-            });
-
-            document.querySelectorAll('.recipe-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    playClick('down');
-                    const name = card.dataset.recipeName || 'Recipe';
-                    alert(`Selected ${name}! Open ZundaCLI.exe and type 'cook ${name}' to prepare!`);
-                });
-            });
-
-            // --- 8. Visual Novel Dialogue Interaction ---
-            const vnText = document.getElementById('vn-text');
-            const vnChoices = document.querySelectorAll('.vn-choice-btn');
-
-            vnChoices.forEach(choiceBtn => {
-                choiceBtn.addEventListener('click', () => {
-                    playClick('down');
-                    const choiceNum = choiceBtn.dataset.vnChoice;
-
-                    if (choiceNum === '1') {
-                        openWindow('window-cookbook');
-                        if (vnText) vnText.textContent = "Opening the Cookbook for you nanoda! Check out the Zunda Mochi!";
-                    } else if (choiceNum === '2') {
-                        if (vnText) vnText.textContent = "Launching Roblox Zundamon's Kitchen experience! Prepare for cooking adventures, nanoda!";
-                        window.open('https://www.roblox.com/', '_blank');
-                    } else if (choiceNum === '3') {
-                        const facts = [
-                            "Zunda paste is made by crushing young green edamame beans with sugar and salt, nanoda!",
-                            "Zundamon loves warm mochi draped in rich, sweet edamame cream!",
-                            "Zunda-OS 95 runs entirely on green bean power and Web Audio synthesis!"
-                        ];
-                        const randomFact = facts[Math.floor(Math.random() * facts.length)];
-                        if (vnText) vnText.textContent = `Fact time: ${randomFact}`;
-                    }
-                });
-            });
-
-            // --- 9. Background Floating Edamame Particle System ---
-            const canvas = document.getElementById('particle-canvas');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                let particles = [];
-
-                function resizeCanvas() {
-                    canvas.width = canvas.parentElement.clientWidth;
-                    canvas.height = canvas.parentElement.clientHeight;
-                }
-                window.addEventListener('resize', resizeCanvas);
-                resizeCanvas();
-
-                class Particle {
-                    constructor() {
-                        this.reset();
-                    }
-
-                    reset() {
-                        this.x = Math.random() * canvas.width;
-                        this.y = canvas.height + Math.random() * 50;
-                        this.size = Math.random() * 8 + 4;
-                        this.speedY = Math.random() * 1.2 + 0.4;
-                        this.speedX = Math.random() * 0.6 - 0.3;
-                        this.opacity = Math.random() * 0.5 + 0.2;
-                        this.rotation = Math.random() * Math.PI * 2;
-                        this.rotSpeed = (Math.random() - 0.5) * 0.02;
-                    }
-
-                    update() {
-                        this.y -= this.speedY;
-                        this.x += this.speedX;
-                        this.rotation += this.rotSpeed;
-                        if (this.y < -20) this.reset();
-                    }
-
-                    draw() {
-                        ctx.save();
-                        ctx.translate(this.x, this.y);
-                        ctx.rotate(this.rotation);
-                        ctx.globalAlpha = this.opacity;
-                        
-                        // Draw small floating edamame bean
-                        ctx.fillStyle = '#8bc34a';
-                        ctx.strokeStyle = '#2e7d32';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-
-                        ctx.restore();
-                    }
-                }
-
-                for (let i = 0; i < 35; i++) {
-                    particles.push(new Particle());
-                }
-
-                function animateParticles() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    particles.forEach(p => {
-                        p.update();
-                        p.draw();
-                    });
-                    requestAnimationFrame(animateParticles);
-                }
-                animateParticles();
-            }
-
-            // Initial setup
-            windowManager.updateTaskbar();
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

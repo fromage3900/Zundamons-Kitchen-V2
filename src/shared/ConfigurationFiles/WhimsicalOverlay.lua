@@ -86,45 +86,46 @@ local function updateGradient(hour, weatherKey)
 
 	local topColor, bottomColor
 	if isDawn then
-		topColor = Color3.fromRGB(255, 200, 185)
-		bottomColor = Color3.fromRGB(255, 220, 210)
+		topColor = Color3.fromRGB(255, 195, 210)
+		bottomColor = Color3.fromRGB(255, 215, 225)
 	elseif isDusk then
-		topColor = Color3.fromRGB(255, 180, 165)
-		bottomColor = Color3.fromRGB(200, 150, 180)
+		topColor = Color3.fromRGB(255, 165, 185)
+		bottomColor = Color3.fromRGB(210, 140, 195)
 	elseif isNight then
-		topColor = Color3.fromRGB(60, 50, 100)
-		bottomColor = Color3.fromRGB(30, 25, 60)
+		topColor = Color3.fromRGB(65, 45, 115)
+		bottomColor = Color3.fromRGB(35, 22, 68)
 	else
-		topColor = Color3.fromRGB(230, 230, 250)
-		bottomColor = Color3.fromRGB(255, 245, 240)
+		topColor = Color3.fromRGB(225, 222, 250)
+		bottomColor = Color3.fromRGB(245, 238, 248)
 	end
 
 	if weatherKey == "cherry_blossom" then
-		topColor = Color3.fromRGB(255, 215, 220)
-		bottomColor = Color3.fromRGB(255, 235, 240)
+		topColor = Color3.fromRGB(255, 205, 222)
+		bottomColor = Color3.fromRGB(255, 225, 240)
 	elseif weatherKey == "rain" or weatherKey == "storm" then
-		topColor = Color3.fromRGB(150, 155, 180)
-		bottomColor = Color3.fromRGB(120, 130, 160)
+		topColor = Color3.fromRGB(145, 148, 190)
+		bottomColor = Color3.fromRGB(115, 122, 168)
 	elseif weatherKey == "fog" then
-		topColor = Color3.fromRGB(180, 185, 195)
-		bottomColor = Color3.fromRGB(200, 205, 215)
+		topColor = Color3.fromRGB(175, 172, 205)
+		bottomColor = Color3.fromRGB(195, 195, 220)
 	elseif weatherKey == "snow" then
-		topColor = Color3.fromRGB(220, 225, 240)
-		bottomColor = Color3.fromRGB(235, 240, 250)
+		topColor = Color3.fromRGB(215, 218, 242)
+		bottomColor = Color3.fromRGB(230, 234, 250)
 	elseif weatherKey == "aurora" then
-		topColor = Color3.fromRGB(120, 100, 180)
-		bottomColor = Color3.fromRGB(60, 50, 120)
+		topColor = Color3.fromRGB(130, 95, 192)
+		bottomColor = Color3.fromRGB(65, 45, 130)
 	end
 
-	local alpha = isNight and 0.28 or 0.20
+	local alpha = isNight and 0.38 or 0.28
+	local dawnBoost = (isDawn or isDusk) and 1.3 or 1.0
 	gradientUI.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, topColor),
-		ColorSequenceKeypoint.new(0.6, bottomColor),
+		ColorSequenceKeypoint.new(0.5, bottomColor),
 		ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1)),
 	})
 	gradientUI.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(0.6, alpha),
+		NumberSequenceKeypoint.new(0.5, alpha * dawnBoost),
 		NumberSequenceKeypoint.new(1, 1),
 	})
 
@@ -224,12 +225,12 @@ groundGradient.Parent = groundFrame
 
 local function updateGroundWash(weatherKey)
 	local isDark = (weatherKey == "rain" or weatherKey == "storm" or weatherKey == "fog" or weatherKey == "snow")
-	local c = isDark and Color3.fromRGB(30, 25, 45) or Color3.fromRGB(50, 45, 60)
+	local c = isDark and Color3.fromRGB(35, 22, 55) or Color3.fromRGB(55, 42, 72)
 	groundGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
 		ColorSequenceKeypoint.new(1, c),
 	})
-	local a = isDark and 0.30 or 0.20
+	local a = isDark and 0.35 or 0.25
 	groundGradient.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.3, 1 - a * 0.5),
@@ -307,8 +308,8 @@ task.spawn(function()
 	while gui.Parent do
 		local weather = workspace:GetAttribute("CurrentWeather") or "clear"
 		local isDark = (weather == "rain" or weather == "storm" or weather == "fog" or weather == "snow")
-		local base = isDark and 0.30 or 0.20
-		local breath = math.sin(os.clock() * 0.15) * 0.03
+		local base = isDark and 0.35 or 0.25
+		local breath = math.sin(os.clock() * 0.15) * 0.04
 		local a = base + breath
 		groundGradient.Transparency = NumberSequence.new({
 			NumberSequenceKeypoint.new(0, 1),

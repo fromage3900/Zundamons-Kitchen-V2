@@ -140,8 +140,8 @@ local function makeGodRay(pos)
         NumberSequenceKeypoint.new(1, 3),
     })
     e.Color = ColorSequence.new(Color3.fromRGB(255, 240, 220))
-    e.LightEmission = 0.8
-    e.LightInfluence = 0
+    e.LightEmission = 0.25
+    e.LightInfluence = 0.3
     e.ZOffset = 2
     e.Rotation = NumberRange.new(0, 360)
     e.RotSpeed = NumberRange.new(-5, 5)
@@ -306,21 +306,21 @@ local function applyHour(hour)
     local hazeOv = workspace:GetAttribute("WeatherHaze")
     atmo.Haze = hazeOv or CONFIG.atmosphere.haze
 
-    -- Dynamic sun rays per weather
+    -- Dynamic sun rays per weather (reduced for softer look)
     local sr = workspace:FindFirstChild("ZundaSunRays")
     if sr and sr:IsA("SunRaysEffect") then
         if weather == "clear" or weather == "cherry_blossom" then
-            sr.Intensity = 0.18
-            sr.Spread = 0.92
-        elseif weather == "cloudy" then
-            sr.Intensity = 0.10
+            sr.Intensity = 0.08
             sr.Spread = 0.85
+        elseif weather == "cloudy" then
+            sr.Intensity = 0.05
+            sr.Spread = 0.78
         elseif weather == "fog" or weather == "rain" or weather == "storm" then
-            sr.Intensity = 0.04
-            sr.Spread = 0.70
+            sr.Intensity = 0.02
+            sr.Spread = 0.60
         else
-            sr.Intensity = 0.12
-            sr.Spread = 0.95
+            sr.Intensity = 0.05
+            sr.Spread = 0.85
         end
     end
 

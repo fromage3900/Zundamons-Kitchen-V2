@@ -92,7 +92,7 @@ end
 task.spawn(function()
 	task.wait(3)
 	local data = _G.data or {}
-	updateDisplay(data.active_companion or "zundamon")
+	updateDisplay(data.active_companion or "zundapal")
 end)
 
 print("[CompanionHUD] Ready")

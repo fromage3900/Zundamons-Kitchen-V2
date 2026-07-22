@@ -1442,64 +1442,64 @@ class MainApp {
   }
 
   initParticleCanvas() {
-    const canvas = document.getElementById('particle-canvas');
+    const canvas = document.getElementById('star-sparkle-canvas');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     let particles = [];
 
     const resizeCanvas = () => {
-      if (canvas.parentElement) {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-      }
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    class Particle {
+    const starColors = ['#ff85a1', '#ffb7c5', '#a5d6a7', '#ffffe0', '#e8dff5'];
+
+    class SparkleStar {
       constructor() {
         this.reset();
       }
 
       reset() {
-        this.x = Math.random() * (canvas.width || 800);
-        this.y = (canvas.height || 600) + Math.random() * 50;
-        this.size = Math.random() * 8 + 4;
-        this.speedY = Math.random() * 1.2 + 0.4;
-        this.speedX = Math.random() * 0.6 - 0.3;
-        this.opacity = Math.random() * 0.5 + 0.2;
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotSpeed = (Math.random() - 0.5) * 0.02;
+        this.x = Math.random() * (canvas.width || 1200);
+        this.y = Math.random() * (canvas.height || 800);
+        this.size = Math.random() * 5 + 2;
+        this.speedY = -(Math.random() * 0.4 + 0.1);
+        this.opacity = Math.random() * 0.6 + 0.2;
+        this.color = starColors[Math.floor(Math.random() * starColors.length)];
+        this.pulse = Math.random() * Math.PI;
       }
 
       update() {
-        this.y -= this.speedY;
-        this.x += this.speedX;
-        this.rotation += this.rotSpeed;
-        if (this.y < -20) this.reset();
+        this.y += this.speedY;
+        this.pulse += 0.03;
+        this.currentOpacity = this.opacity * (0.6 + Math.sin(this.pulse) * 0.4);
+        if (this.y < -10) this.reset();
       }
 
       draw() {
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
-        ctx.globalAlpha = this.opacity;
+        ctx.globalAlpha = Math.max(0, this.currentOpacity);
 
-        ctx.fillStyle = '#8bc34a';
-        ctx.strokeStyle = '#2e7d32';
-        ctx.lineWidth = 1;
+        // Draw cute 4-point sparkle star
+        ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+        for (let i = 0; i < 4; i++) {
+          ctx.lineTo(Math.cos(i * Math.PI / 2) * this.size, Math.sin(i * Math.PI / 2) * this.size);
+          ctx.lineTo(Math.cos((i + 0.5) * Math.PI / 2) * (this.size * 0.3), Math.sin((i + 0.5) * Math.PI / 2) * (this.size * 0.3));
+        }
+        ctx.closePath();
         ctx.fill();
-        ctx.stroke();
 
         ctx.restore();
       }
     }
 
-    for (let i = 0; i < 35; i++) {
-      particles.push(new Particle());
+    for (let i = 0; i < 40; i++) {
+      particles.push(new SparkleStar());
     }
 
     const animateParticles = () => {

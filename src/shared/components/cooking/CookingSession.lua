@@ -18,6 +18,7 @@ local CookingSession = Matter.component("CookingSession")
 		okHits = number,
 		misses = number,
 		settled = boolean,
+		perfectWindow = number, -- custom per-player (companion buff), defaults to BASE_PERFECT_WINDOW
 	}
 ]]
 

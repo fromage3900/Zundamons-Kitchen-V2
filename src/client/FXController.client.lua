@@ -68,17 +68,37 @@ if grain then
         img.Image = "rbxassetid://74702819388719"
         img.ScaleType = Enum.ScaleType.Tile
         img.TileSize = UDim2.new(0, 4, 0, 4)
-        img.ImageColor3 = Color3.fromRGB(255, 255, 255)
-        img.ImageTransparency = 0.92
+        img.ImageColor3 = Color3.fromRGB(245, 235, 255)
+        img.ImageTransparency = 0.88
         img.ZIndex = 12
     end
     local noise = grain:FindFirstChild("NoiseImage")
-    grain.BackgroundTransparency = 1  -- let the noise image carry the effect
+    grain.BackgroundTransparency = 1
+    -- Add second grain layer for richer texture
+    local grain2 = grain:FindFirstChild("NoiseLayer2")
+    if not grain2 then
+        local g2 = Instance.new("ImageLabel", grain)
+        g2.Name = "NoiseLayer2"
+        g2.BackgroundTransparency = 1
+        g2.Size = UDim2.new(1.3, 0, 1.3, 0)
+        g2.Position = UDim2.new(-0.15, 0, -0.15, 0)
+        g2.Image = "rbxassetid://74702819388719"
+        g2.ScaleType = Enum.ScaleType.Tile
+        g2.TileSize = UDim2.new(0, 8, 0, 8)
+        g2.ImageColor3 = Color3.fromRGB(235, 220, 250)
+        g2.ImageTransparency = 0.94
+        g2.ZIndex = 13
+    end
     task.spawn(function()
         while true do
             if noise then
                 noise.ImageRectOffset = Vector2.new(math.random(0, 512), math.random(0, 512))
-                noise.ImageTransparency = 0.90 + math.sin(os.clock() * 0.6) * 0.025
+                noise.ImageTransparency = 0.85 + math.sin(os.clock() * 0.5) * 0.03
+                local g2 = grain:FindFirstChild("NoiseLayer2")
+                if g2 then
+                    g2.ImageRectOffset = Vector2.new(math.random(0, 512), math.random(0, 512))
+                    g2.ImageTransparency = 0.92 + math.sin(os.clock() * 0.7 + 1) * 0.02
+                end
             end
             task.wait(1/30)
         end

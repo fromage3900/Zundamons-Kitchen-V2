@@ -79,7 +79,7 @@ auroraGui.Parent = sg
 local lightningFrame = Instance.new("Frame", auroraGui)
 lightningFrame.Name = "LightningFlash"
 lightningFrame.Size = UDim2.new(1, 0, 1, 0)
-lightningFrame.BackgroundColor3 = Color3.fromRGB(245, 245, 255)
+		lightningFrame.BackgroundColor3 = Color3.fromRGB(235, 225, 255)
 lightningFrame.BackgroundTransparency = 1
 lightningFrame.BorderSizePixel = 0
 lightningFrame.ZIndex = -8
@@ -231,7 +231,7 @@ applyWeather = function(weatherKey, weatherData, transitionSec)
 			ambient.SoundId = newSound
 			ambient:Play()
 		end
-		Tween:Create(ambient, TweenInfo.new(transitionSec or 0.5), { Volume = (weatherKey == "storm") and 0.5 or 0.25 })
+		Tween:Create(ambient, TweenInfo.new(transitionSec or 0.5), { Volume = (weatherKey == "storm") and 0.15 or 0.08 })
 			:Play()
 	else
 		Tween:Create(ambient, TweenInfo.new(transitionSec or 0.5), { Volume = 0 }):Play()
@@ -255,7 +255,7 @@ if hud then
 			pill.Name = "WeatherPill"
 			pill.Size = UDim2.new(0, 150, 0, 30)
 			pill.Position = UDim2.new(0, 116, 0, 52)
-			pill.BackgroundColor3 = Color3.fromRGB(245, 210, 215)
+			pill.BackgroundColor3 = Color3.fromRGB(235, 215, 245)
 			pill.BorderSizePixel = 0
 			local cr = Instance.new("UICorner", pill)
 			cr.CornerRadius = UDim.new(0, 15)
@@ -268,7 +268,7 @@ if hud then
 			lbl.Size = UDim2.new(1, -12, 1, 0)
 			lbl.Position = UDim2.new(0, 6, 0, 0)
 			lbl.BackgroundTransparency = 1
-			lbl.Text = "\u{2600}\u{FE0F} Clear"
+			lbl.Text = "☀ Clear"
 			lbl.Font = Enum.Font.FredokaOne
 			lbl.TextColor3 = UIConfig.COLORS.TextDark
 			lbl.TextSize = 14

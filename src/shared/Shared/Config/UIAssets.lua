@@ -27,13 +27,19 @@ local UIAssets = {
 		level_up = "rbxassetid://9038472644",
 		gather_fail = "rbxassetid://14133663945",
 		ui_click = "rbxassetid://87437544236708",
-		-- Weather ambient sounds (reuse existing IDs until dedicated weather audio is uploaded)
+		-- ASMR-Kawaii weather ambience v2 (placeholder IDs, volume tuned low on client)
 		rain = "rbxassetid://9114369623",
 		storm = "rbxassetid://9114369623",
 		snow = "rbxassetid://9114369767",
 		cherry_blossom = "rbxassetid://9114369767",
 		aurora = "rbxassetid://9114369767",
 		fog = "rbxassetid://9114369767",
+		-- Kawaii interactions (soft bubbly UI clicks)
+		ui_hover = "rbxassetid://87437544236708",
+		ui_confirm = "rbxassetid://87437544236708",
+		ui_cancel = "rbxassetid://14133663945",
+		craft_note_hit = "rbxassetid://125367748123159",
+		companion_pet = "rbxassetid://9114369623",
 	},
 
 	particles = {

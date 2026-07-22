@@ -12,16 +12,9 @@ local promptRF=RF:WaitForChild("PromptRobuxPurchase",10)
 local purchaseEv=RE:WaitForChild("PurchaseResult",10)
 local compEv=RE:WaitForChild("SetCompanion",10)
 
+-- Companion purchases handled by CompanionBoutique (press O).
+-- This store only handles recipes and accessories via Robux.
 local PRODUCTS = {
-    companions = {
-        { id=1111111101, name="ZundaCat",      emoji="🐱", desc="A playful feline companion", robux=80,  key="zundacat"     },
-        { id=1111111102, name="ZundaBunny",    emoji="🐰", desc="Fluffy bunny bestie",         robux=80,  key="zundabunny"   },
-        { id=1111111103, name="TantanMon",     emoji="🌶️", desc="Spicy & spirited companion",  robux=100, key="tantanmon"    },
-        { id=1111111110, name="Ankomon",       emoji="🫘", desc="+15% gold from serving",      robux=500, key="ankomon"      },
-        { id=1111111111, name="Cardamon",      emoji="🍋", desc="+30% perfect cooking window",  robux=500, key="cardamon"     },
-        { id=1111111112, name="Antimon",       emoji="🌿", desc="+20% extra drop on gather",    robux=500, key="antimon"      },
-        { id=1111111113, name="Sakuradamon",   emoji="🌸", desc="+25% XP from crafting",        robux=500, key="sakuradamon"  },
-    },
     recipes = {
         { id=1111111104, name="Premium Ramen", emoji="🍜", desc="Exclusive ramen recipe",       robux=60  },
         { id=1111111105, name="Party Cake",    emoji="🎂", desc="Fancy celebration cake",       robux=60  },
@@ -35,7 +28,6 @@ local PRODUCTS = {
 }
 
 local CAT_COLORS = {
-    companions = Color3.fromRGB(200, 240, 200),
     recipes    = Color3.fromRGB(255, 230, 180),
     accessories = Color3.fromRGB(220, 200, 255),
 }
@@ -70,7 +62,7 @@ title.TextColor3=Color3.fromRGB(80,52,20); title.TextXAlignment=Enum.TextXAlignm
 
 local subTitle=Instance.new("TextLabel",hBand)
 subTitle.Size=UDim2.new(1,-80,0,18); subTitle.Position=UDim2.new(0,20,1,-20)
-subTitle.BackgroundTransparency=1; subTitle.Text="Companions • Recipes • Accessories"
+subTitle.BackgroundTransparency=1;     subTitle.Text="Recipes • Accessories"
 local ok=pcall(function() subTitle.FontFace=Font.new("rbxasset://fonts/families/Merriweather.json",Enum.FontWeight.Regular) end)
 if not ok then subTitle.Font=Enum.Font.Gotham end
 subTitle.TextSize=12; subTitle.TextColor3=Color3.fromRGB(120,82,30)
@@ -96,9 +88,8 @@ local function mkTab(name,lbl,order)
     b.TextColor3=order==1 and Color3.fromRGB(255,255,255) or C.text; b.BorderSizePixel=0
     Instance.new("UICorner",b).CornerRadius=UDim.new(0,10); return b
 end
-local tabComp=mkTab("companions","🐱  Companions",1)
-local tabRec =mkTab("recipes",   "🍳  Recipes",   2)
-local tabAcc =mkTab("accessories","👑  Accessories",3)
+local tabRec =mkTab("recipes",   "🍳  Recipes",   1)
+local tabAcc =mkTab("accessories","👑  Accessories",2)
 
 local scroll=Instance.new("ScrollingFrame",panel); scroll.Name="Cards"
 scroll.Size=UDim2.new(1,-32,0,408); scroll.Position=UDim2.new(0,16,0,118)
@@ -185,10 +176,14 @@ local function buildProductCard(prod, idx, cat)
 end
 
 local FREE_COMPANIONS = {
+    { key="zundapal",   emoji="🫛", name="Zundapal",   flavor="Your Zundamon companion from the Downloads." },
     { key="zundamon",   emoji="🍡", name="Zundamon",   flavor="The original. A loyal pea spirit." },
     { key="zundacat",   emoji="🐱", name="ZundaCat",   flavor="A curious cat-shaped friend." },
     { key="zundabunny", emoji="🐰", name="ZundaBunny", flavor="Hops alongside with twinkling ears." },
     { key="tantanmon",  emoji="🌶️", name="TantanMon",  flavor="Spicy little firework." },
+    { key="dog",        emoji="🐕", name="Dog",        flavor="A faithful furry friend." },
+    { key="parrot",     emoji="🦜", name="Parrot",     flavor="A colourful chatterbox." },
+    { key="cat",        emoji="🐱", name="Cat",        flavor="A purring little menace." },
 }
 
 local function buildCompanionSelector()
@@ -232,10 +227,10 @@ local function buildCompanionSelector()
     end
 end
 
-local activeTab="companions"
+local activeTab="recipes"
 local function switchTab(id)
     activeTab=id
-    for _,btn in ipairs({tabComp,tabRec,tabAcc}) do
+    for _,btn in ipairs({tabRec,tabAcc}) do
         local active=btn.Name=="Tab_"..id
         btn.BackgroundColor3=active and C.tabAct or C.tabIdle
         btn.TextColor3=active and Color3.new(1,1,1) or C.text
@@ -244,14 +239,12 @@ local function switchTab(id)
     scroll.CanvasPosition=Vector2.new(0,0)
     if id=="companions" then
         buildCompanionSelector()
-        for i,p in ipairs(PRODUCTS.companions) do buildProductCard(p,i+1,"companions") end
     elseif id=="recipes" then
         for i,p in ipairs(PRODUCTS.recipes) do buildProductCard(p,i,"recipes") end
     elseif id=="accessories" then
         for i,p in ipairs(PRODUCTS.accessories) do buildProductCard(p,i,"accessories") end
     end
 end
-tabComp.MouseButton1Click:Connect(function() switchTab("companions") end)
 tabRec.MouseButton1Click:Connect(function()  switchTab("recipes")    end)
 tabAcc.MouseButton1Click:Connect(function()  switchTab("accessories") end)
 
@@ -274,7 +267,7 @@ local open=false
 local function toggle()
     open=not open; panel.Visible=open
     if open then
-        if scroll:FindFirstChildOfClass("Frame")==nil then switchTab("companions") end
+        if scroll:FindFirstChildOfClass("Frame")==nil then switchTab("recipes") end
         panel.Size=UDim2.new(0,580,0,10)
         Tween:Create(panel,TweenInfo.new(0.2,Enum.EasingStyle.Back,Enum.EasingDirection.Out),
             {Size=UDim2.new(0,580,0,560)}):Play()

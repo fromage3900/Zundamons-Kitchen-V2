@@ -20,13 +20,13 @@ end
 
 function ChefLevelConfig.tierForLevel(level: number)
 	if level < 5 then
-		return { name = "Novice", color = Color3.fromRGB(150, 150, 150), badge = "" }
+		return { name = "Sprout", color = Color3.fromRGB(150, 200, 150), badge = "🌱" }
 	elseif level < 15 then
-		return { name = "Apprentice", color = Color3.fromRGB(100, 200, 100), badge = "" }
+		return { name = "Blossom", color = Color3.fromRGB(180, 130, 255), badge = "🌸" }
 	elseif level < 30 then
-		return { name = "Chef", color = Color3.fromRGB(255, 200, 50), badge = "" }
+		return { name = "Zunda Chef", color = Color3.fromRGB(255, 200, 80), badge = "🍡" }
 	else
-		return { name = "Master Chef", color = Color3.fromRGB(255, 100, 100), badge = "" }
+		return { name = "Grand Zunda", color = Color3.fromRGB(255, 150, 200), badge = "✨" }
 	end
 end
 

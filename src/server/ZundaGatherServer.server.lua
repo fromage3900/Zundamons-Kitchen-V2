@@ -27,6 +27,26 @@ end
 local RE_notify = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("NotifyPlayer")
 local RE_SideDlg = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("TriggerSideDialogue")
 local PlayerDataService = require(SSS.Services.PlayerDataService)
+local CompanionConfig = require(RS.ConfigurationFiles.CompanionConfig)
+
+-- Companion extra_drop buff (Antimon): 20% chance for bonus item
+local function applyExtraDropBuff(player, baseItems)
+	local data = PlayerDataService.get(player)
+	if not data then return end
+	local active = data.active_companion
+	if not active then return end
+	local def = CompanionConfig.companions[active]
+	if not def or not def.buff then return end
+	if def.buff.stat ~= "extra_drop" then return end
+	if def.buff.magnitude <= 0 then return end
+	if math.random() > def.buff.magnitude then return end
+	local char = player.Character
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+	local bonus = { baseItems[math.random(#baseItems)] }
+	lootMod.generateLoot(player, bonus, hrp.Position)
+	notify(player, "🍀 Antimon found a bonus " .. bonus[1] .. "!")
+end
 
 -- Respawn timing (seconds)
 local RESPAWN_FLOWER = 25
@@ -157,6 +177,7 @@ if RE_Harvest then
 				table.insert(items, "Zunda Flower")
 			end
 			grantItems(player, items)
+			applyExtraDropBuff(player, items)
 			notify(player, "🌼 +" .. yield .. " Zunda Flower")
 			if not had_before["Zunda Flower"] and RE_SideDlg then
 				pcall(function()
@@ -171,6 +192,7 @@ if RE_Harvest then
 				table.insert(items, "Zunda Pea")
 			end
 			grantItems(player, items)
+			applyExtraDropBuff(player, items)
 			notify(player, "🝒 +" .. yield .. " Zunda Pea")
 			consumeNode(node, RESPAWN_PEA)
 		elseif rtype == "MysteryLoot" then
@@ -180,6 +202,7 @@ if RE_Harvest then
 				table.insert(items, GatherConfig.mysteryLoot[math.random(1, #GatherConfig.mysteryLoot)])
 			end
 			grantItems(player, items)
+			applyExtraDropBuff(player, items)
 			notify(player, "✨ Mystery loot found!")
 			consumeNode(node, RESPAWN_MYSTERY)
 		elseif rtype == "SaltedPeaBouquet" then
@@ -189,6 +212,7 @@ if RE_Harvest then
 				table.insert(items, "Salted Pea Bouquet")
 			end
 			grantItems(player, items)
+			applyExtraDropBuff(player, items)
 			notify(player, "💐 +" .. yield .. " Salted Pea Bouquet")
 			consumeNode(node, RESPAWN_BOUQUET)
 		elseif rtype == "CarrotPlot" then
@@ -204,6 +228,7 @@ if RE_Harvest then
 					table.insert(items, "Carrot")
 				end
 				grantItems(player, items)
+				applyExtraDropBuff(player, items)
 				notify(player, "🥕 +" .. yield .. " Carrot")
 
 				-- Reset to first stage instead of hiding

@@ -9,30 +9,30 @@ end
 
 local bloomAtmo = Instance.new("BloomEffect")
 bloomAtmo.Name = "ZundaBloomAtmo"
-bloomAtmo.Intensity = 0.25
-bloomAtmo.Size = 18
-bloomAtmo.Threshold = 0.50
+bloomAtmo.Intensity = 0.10
+bloomAtmo.Size = 24
+bloomAtmo.Threshold = 0.55
 bloomAtmo.Parent = Lighting
 
 local bloomSun = Instance.new("BloomEffect")
 bloomSun.Name = "ZundaBloomSun"
-bloomSun.Intensity = 0.18
-bloomSun.Size = 24
-bloomSun.Threshold = 0.40
+bloomSun.Intensity = 0.06
+bloomSun.Size = 30
+bloomSun.Threshold = 0.45
 bloomSun.Parent = Lighting
 
 local sunRays = Instance.new("SunRaysEffect")
 sunRays.Name = "ZundaSunRays"
-sunRays.Intensity = 0.18
-sunRays.Spread = 0.92
+sunRays.Intensity = 0.05
+sunRays.Spread = 0.75
 sunRays.Parent = Lighting
 
 local colorCorrection = Instance.new("ColorCorrectionEffect")
 colorCorrection.Name = "ZundaColorCorrection"
-colorCorrection.Brightness = 0.08
-colorCorrection.Contrast = 0.01
-colorCorrection.Saturation = 0.65
-colorCorrection.TintColor = Color3.fromRGB(255, 242, 235)
+colorCorrection.Brightness = 0.04
+colorCorrection.Contrast = 0.02
+colorCorrection.Saturation = 0.30
+colorCorrection.TintColor = Color3.fromRGB(238, 230, 250)
 colorCorrection.Parent = Lighting
 
 local function setupDoF(cam)
@@ -41,10 +41,10 @@ local function setupDoF(cam)
 	if existing then existing:Destroy() end
 	local dof = Instance.new("DepthOfFieldEffect")
 	dof.Name = "ZundaDepthOfField"
-	dof.InFocusRadius = 50
-	dof.FarIntensity = 0.90
-	dof.FocusDistance = 70
-	dof.NearIntensity = 0.30
+	dof.InFocusRadius = 35
+	dof.FarIntensity = 0.95
+	dof.FocusDistance = 55
+	dof.NearIntensity = 0.40
 	dof.Parent = cam
 end
 
@@ -57,11 +57,11 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 	setupDoF(cam)
 end)
 
-local BLoomAtmoBase = 0.25
-local BLoomSunBase = 0.18
+local BLoomAtmoBase = 0.10
+local BLoomSunBase = 0.06
 task.spawn(function()
 	while true do
-		local breath = math.sin(os.clock() * 0.3) * 0.02
+		local breath = math.sin(os.clock() * 0.3) * 0.015
 		bloomAtmo.Intensity = BLoomAtmoBase + breath
 		bloomSun.Intensity = BLoomSunBase + breath * 0.5
 		task.wait(0.05)

@@ -35,7 +35,7 @@ local function enhanceCrystal(part)
 	sa.RoughnessMap = Instance.new("NumberSequence")
 	sa.MetalnessMap = Instance.new("NumberSequence")
 	sa.EmissiveMap = "rbxassetid://121883683025787"
-	sa.EmissiveScale = 2.0
+	sa.EmissiveScale = 0.8
 	sa.Parent = fx
 
 	-- Inner glow neon core (slightly smaller, inside)
@@ -55,8 +55,8 @@ local function enhanceCrystal(part)
 
 	-- PointLight for glow
 	local pl = Instance.new("PointLight")
-	pl.Brightness = 2
-	pl.Range = 12
+	pl.Brightness = 0.8
+	pl.Range = 8
 	pl.Color = Color3.fromRGB(180, 200, 255)
 	pl.Parent = part
 end
@@ -84,8 +84,8 @@ RunService.RenderStepped:Connect(function(dt)
 			local pl = part:FindFirstChildOfClass("PointLight")
 			if pl then
 				local plHue = (t * 0.015 + part.Position.Y * 0.001) % 1
-				pl.Color = Color3.fromHSV(plHue, 0.4, 0.8)
-				pl.Brightness = 1.5 + math.sin(t * 0.4 + part.Position.Z) * 0.8
+				pl.Color = Color3.fromHSV(plHue, 0.3, 0.7)
+				pl.Brightness = 0.6 + math.sin(t * 0.4 + part.Position.Z) * 0.3
 			end
 		end
 	end

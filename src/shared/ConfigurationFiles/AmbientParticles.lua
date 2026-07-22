@@ -31,8 +31,8 @@ local function makeDustEmitter(pos)
 	e.Acceleration = Vector3.new(0, 0.25, 0)
 	e.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.88), NumberSequenceKeypoint.new(1, 1)})
 	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.6), NumberSequenceKeypoint.new(1, 2.5)})
-	e.LightEmission = 0.5
-	e.LightInfluence = 0
+	e.LightEmission = 0.12
+	e.LightInfluence = 0.3
 	e.ZOffset = 2
 	e.Rotation = NumberRange.new(0, 360)
 	e.RotSpeed = NumberRange.new(-15, 15)
@@ -65,8 +65,8 @@ local function makeFireflyEmitter(pos)
 	})
 	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.2)})
 	e.Color = ColorSequence.new(Color3.fromRGB(255, 242, 190), Color3.fromRGB(255, 200, 110))
-	e.LightEmission = 1
-	e.LightInfluence = 0
+	e.LightEmission = 0.2
+	e.LightInfluence = 0.3
 	e.ZOffset = 1
 	e.Rotation = NumberRange.new(0, 360)
 	e.RotSpeed = NumberRange.new(-15, 15)
@@ -96,8 +96,8 @@ local function makeSakuraEmitter(pos)
 	e.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.15), NumberSequenceKeypoint.new(1, 1)})
 	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 1.4), NumberSequenceKeypoint.new(1, 0.6)})
 	e.Color = ColorSequence.new(Color3.fromRGB(255, 178, 198), Color3.fromRGB(255, 218, 228))
-	e.LightEmission = 0.35
-	e.LightInfluence = 0.15
+	e.LightEmission = 0.15
+	e.LightInfluence = 0.4
 	e.ZOffset = 1
 	e.Rotation = NumberRange.new(0, 360)
 	e.RotSpeed = NumberRange.new(-45, 45)
@@ -132,8 +132,8 @@ local function makeBubbleMoteEmitter(pos)
 	})
 	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0.1)})
 	e.Color = ColorSequence.new(Color3.fromRGB(200, 230, 255), Color3.fromRGB(255, 255, 255))
-	e.LightEmission = 0.6
-	e.LightInfluence = 0.2
+	e.LightEmission = 0.2
+	e.LightInfluence = 0.3
 	e.ZOffset = 1
 	e.Rotation = NumberRange.new(0, 360)
 	e.RotSpeed = NumberRange.new(-20, 20)
@@ -166,8 +166,8 @@ local function makeMagicSparkleEmitter(pos)
 	})
 	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0.1)})
 	e.Color = ColorSequence.new(Color3.fromRGB(255, 230, 200), Color3.fromRGB(200, 220, 255))
-	e.LightEmission = 1
-	e.LightInfluence = 0
+	e.LightEmission = 0.25
+	e.LightInfluence = 0.3
 	e.ZOffset = 1
 	e.Rotation = NumberRange.new(0, 360)
 	e.RotSpeed = NumberRange.new(-30, 30)
