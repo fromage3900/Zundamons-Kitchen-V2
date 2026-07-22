@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Mochi Soft Body -->
+  <ellipse cx="32" cy="38" rx="24" ry="18" fill="#f4f8f3" stroke="#2e7d32" stroke-width="2.5"/>
+  <ellipse cx="32" cy="38" rx="22" ry="16" fill="#ffffff"/>
+
+  <!-- Zunda Paste Hair / Ears (Left & Right Edamame Tufts) -->
+  <path d="M 12,28 C 4,20 6,10 16,16 C 20,20 18,28 12,28 Z" fill="#4caf50" stroke="#1b5e20" stroke-width="2"/>
+  <circle cx="11" cy="18" r="2" fill="#aed581"/>
+  
+  <path d="M 52,28 C 60,20 58,10 48,16 C 44,20 46,28 52,28 Z" fill="#4caf50" stroke="#1b5e20" stroke-width="2"/>
+  <circle cx="53" cy="18" r="2" fill="#aed581"/>
+
+  <!-- Center Zunda Crest -->
+  <path d="M 26,22 C 32,12 38,22 32,26 Z" fill="#8bc34a" stroke="#1b5e20" stroke-width="1.5"/>
+
+  <!-- Eyes (Kawaii Retro Anime Style) -->
+  <ellipse cx="22" cy="36" rx="3" ry="4" fill="#1b5e20"/>
+  <circle cx="21" cy="34.5" r="1.2" fill="#ffffff"/>
+  
+  <ellipse cx="42" cy="36" rx="3" ry="4" fill="#1b5e20"/>
+  <circle cx="41" cy="34.5" r="1.2" fill="#ffffff"/>
+
+  <!-- Blushing Cheeks -->
+  <ellipse cx="16" cy="40" rx="3" ry="1.8" fill="#ff8a80" opacity="0.75"/>
+  <ellipse cx="48" cy="40" rx="3" ry="1.8" fill="#ff8a80" opacity="0.75"/>
+
+  <!-- Cute Mouth -->
+  <path d="M 29,40 Q 32,43 35,40" stroke="#1b5e20" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Red Accent Ribbon -->
+  <path d="M 27,52 L 32,48 L 37,52 L 32,54 Z" fill="#e53935" stroke="#b71c1c" stroke-width="1.5"/>
+</svg>

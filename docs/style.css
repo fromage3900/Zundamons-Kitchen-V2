@@ -1,0 +1,1397 @@
+/* ==========================================================================
+   ZUNDA-OS 95 & COZY INFINITY NIKKI ZEN EDAMAME-PEA THEME STYLESHEET
+   ========================================================================== */
+
+:root {
+  /* --- Primary Zunda Greens (Cozy Zen Edamame Palette) --- */
+  --zunda-dark: #2e7d32;         /* Deep forest edamame green */
+  --zunda-primary: #4caf50;      /* Fresh zunda green */
+  --zunda-light: #8bc34a;        /* Bright sprout green */
+  --zunda-bg: #e8f5e9;           /* Soft zen mint desktop background */
+  --zunda-accent: #c8e6c9;       /* Pastel pea pod highlight */
+  --zunda-pastel: #f1f8e9;       /* Warm mochi cream green */
+  --zunda-hover: #3d8b40;        /* Hover state dark green */
+  --zunda-shadow: rgba(46, 125, 50, 0.25); /* Ambient green drop shadow */
+
+  /* --- Retro OS Palette (Zunda-OS 95 Windows & Bevels) --- */
+  --win-bg: #e8f5e9;             /* Window surface background */
+  --win-content-bg: #ffffff;     /* Window inner content panel background */
+  --win-border-light: #ffffff;   /* 3D top/left bevel highlight */
+  --win-border-mid: #a5d6a7;     /* 3D intermediate pastel bevel border */
+  --win-border-dark: #2e7d32;    /* 3D bottom/right dark bevel shadow */
+  --win-border-shadow: #1b5e20;  /* 3D deep edge shadow */
+  --win-title-bg: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%); /* Active titlebar gradient */
+  --win-title-bg-inactive: linear-gradient(90deg, #78909c 0%, #b0bec5 100%); /* Inactive titlebar */
+  --win-title-text: #ffffff;     /* Active titlebar text */
+  --win-title-text-inactive: #eceff1; /* Inactive titlebar text */
+  --win-btn-bg: #c8e6c9;         /* Retro control button background */
+  --win-btn-hover: #a5d6a7;       /* Control button hover color */
+  --win-btn-active: #8bc34a;      /* Control button active/pressed color */
+
+  /* --- Terminal Phosphor Palette (ZundaCLI.exe CRT Console) --- */
+  --term-bg: #0a150a;            /* Dark obsidian phosphor background */
+  --term-green: #33ff66;         /* Classic CRT phosphor green text */
+  --term-green-dim: #1eb844;     /* Secondary dim console text */
+  --term-glow: 0 0 8px rgba(51, 255, 102, 0.6); /* CRT text glow shadow */
+  --term-cursor: #33ff66;        /* Blinking block cursor color */
+  --term-selection: rgba(51, 255, 102, 0.25); /* Console text highlight */
+
+  /* --- Roblox UI Export Mapping Variables --- */
+  --roblox-screengui-bg: var(--zunda-bg);
+  --roblox-frame-border: var(--win-border-dark);
+  --roblox-text-color: #1b5e20;
+  --roblox-corner-radius: 0px;
+  --roblox-titlebar-bg: var(--zunda-dark);
+  --roblox-btn-bg: var(--zunda-accent);
+  --roblox-font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, monospace, sans-serif;
+
+  /* --- Typography & Spacing Tokens --- */
+  --font-os: 'MS Sans Serif', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'VT323', 'Courier New', Consolas, monospace;
+  --font-pixel: 'Press Start 2P', monospace;
+  --taskbar-height: 38px;
+  --start-menu-width: 250px;
+  --border-width-3d: 2px;
+}
+
+[data-theme="zunda-dark"] {
+  --zunda-dark: #1b5e20;
+  --zunda-primary: #2e7d32;
+  --zunda-light: #4caf50;
+  --zunda-bg: #0a1b0e;
+  --zunda-accent: #1e3a23;
+  --zunda-pastel: #142819;
+  --zunda-hover: #2e7d32;
+  --win-bg: #122416;
+  --win-content-bg: #0a180e;
+  --win-border-light: #2e7d32;
+  --win-border-mid: #1b5e20;
+  --win-border-dark: #051408;
+  --win-border-shadow: #000a03;
+  --win-title-bg: linear-gradient(90deg, #1b5e20 0%, #2e7d32 100%);
+  --win-title-text: #e8f5e9;
+  --win-btn-bg: #1e3a23;
+  --win-btn-hover: #2e7d32;
+  --win-btn-active: #4caf50;
+}
+
+/* ==========================================================================
+   GLOBAL RESET & BASE LAYOUT
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-os);
+  font-size: 13px;
+  background-color: #a8d5ba; /* Zen edamame desktop mint tint */
+  color: #1b5e20;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Hidden Utility */
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   3D BEVEL BORDERS (WINDOWS 95 STYLE)
+   ========================================================================== */
+
+.bevel-outset {
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  box-shadow: 
+    inset 1px 1px 0px var(--zunda-pastel),
+    inset -1px -1px 0px var(--win-border-dark);
+}
+
+.bevel-inset {
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  box-shadow: 
+    inset 1px 1px 0px var(--win-border-dark),
+    inset -1px -1px 0px var(--zunda-pastel);
+}
+
+/* Buttons & Inputs 3D Styling */
+.win95-btn {
+  font-family: var(--font-os);
+  font-size: 12px;
+  padding: 4px 10px;
+  background: var(--win-btn-bg);
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  color: #1b5e20;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.win95-btn:hover {
+  background: var(--win-btn-hover);
+}
+
+.win95-btn:active, .win95-btn.active {
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  background: var(--win-btn-active);
+  padding: 5px 9px 3px 11px;
+}
+
+.win95-input {
+  font-family: var(--font-os);
+  font-size: 12px;
+  padding: 4px 8px;
+  background: #ffffff;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  color: #000;
+  outline: none;
+}
+
+/* ==========================================================================
+   DESKTOP & CANVAS AREA
+   ========================================================================== */
+
+#desktop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--taskbar-height);
+  overflow: hidden;
+  background: linear-gradient(135deg, #a8d5ba 0%, #c8e6c9 50%, #8bc34a 100%);
+}
+
+#particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#desktop-icons {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-height: calc(100% - 32px);
+  z-index: 1;
+}
+
+.desktop-shortcut {
+  width: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px transparent dashed;
+  padding: 6px;
+  cursor: pointer;
+  color: #1b5e20;
+  text-align: center;
+  outline: none;
+
+  animation: floatPea 6s ease-in-out infinite;
+}
+
+.desktop-shortcut:nth-child(2) { animation-delay: 1s; }
+.desktop-shortcut:nth-child(3) { animation-delay: 2s; }
+.desktop-shortcut:nth-child(4) { animation-delay: 3s; }
+.desktop-shortcut:nth-child(5) { animation-delay: 4s; }
+
+.desktop-shortcut:hover {
+  background: rgba(200, 230, 201, 0.4);
+  border: 1px dotted var(--zunda-dark);
+}
+
+.desktop-shortcut:focus {
+  background: rgba(46, 125, 50, 0.2);
+  border: 1px dotted var(--zunda-dark);
+}
+
+.shortcut-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 4px;
+  filter: drop-shadow(2px 2px 0px rgba(27, 94, 32, 0.3));
+}
+
+.shortcut-icon img, .shortcut-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.shortcut-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #1b5e20;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1px 4px;
+  border-radius: 2px;
+  word-break: break-word;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+}
+
+#window-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#window-container > .window {
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   WINDOW MANAGER STYLING
+   ========================================================================== */
+
+.window {
+  position: absolute;
+  min-width: 300px;
+  min-height: 200px;
+  background-color: var(--win-bg);
+  padding: 3px;
+  box-sizing: border-box;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  box-shadow: 
+    inset 1px 1px 0px var(--zunda-pastel),
+    inset -1px -1px 0px var(--win-border-dark),
+    4px 4px 12px var(--zunda-shadow);
+}
+
+.window.active-window, .window.window-active {
+  z-index: 100;
+  box-shadow: 
+    4px 4px 16px var(--zunda-shadow),
+    inset 1px 1px 0px var(--win-border-light),
+    inset -1px -1px 0px var(--win-border-dark);
+}
+
+.window.active-window .window-header,
+.window.active-window .window-titlebar,
+.window.window-active .window-header {
+  background: var(--win-title-bg);
+  color: var(--win-title-text);
+}
+
+.window.inactive-window, .window.window-inactive {
+  z-index: 1;
+  opacity: 0.96;
+}
+
+.window.inactive-window .window-header,
+.window.inactive-window .window-titlebar,
+.window.window-inactive .window-header {
+  background: var(--win-title-bg-inactive);
+  color: var(--win-title-text-inactive);
+}
+
+/* Maximized Window */
+.window.maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Window Header / Titlebar */
+.window-header, .window-titlebar {
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  font-family: var(--font-os);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  cursor: move;
+  background: var(--win-title-bg);
+  color: var(--win-title-text);
+}
+
+.window-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.window-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.window-controls {
+  display: flex;
+  gap: 3px;
+}
+
+.win-btn {
+  width: 18px;
+  height: 16px;
+  background: var(--win-btn-bg);
+  border-top: 1px solid var(--win-border-light);
+  border-left: 1px solid var(--win-border-light);
+  border-right: 1px solid var(--win-border-dark);
+  border-bottom: 1px solid var(--win-border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-os);
+  font-size: 10px;
+  font-weight: bold;
+  color: #1b5e20;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  outline: none;
+}
+
+.win-btn:hover {
+  background: var(--win-btn-hover);
+}
+
+.win-btn:active {
+  border-top: 1px solid var(--win-border-dark);
+  border-left: 1px solid var(--win-border-dark);
+  border-right: 1px solid var(--win-border-light);
+  border-bottom: 1px solid var(--win-border-light);
+  padding: 1px 0 0 1px;
+}
+
+.win-close:hover, .win-btn-close:hover {
+  background: #e57373;
+  color: #ffffff;
+}
+
+/* Window Menu Bar */
+.window-menu-bar {
+  display: flex;
+  gap: 12px;
+  padding: 3px 6px;
+  background: var(--win-bg);
+  border-bottom: 1px solid var(--win-border-mid);
+  font-size: 11px;
+}
+
+.menu-item {
+  cursor: pointer;
+  padding: 1px 4px;
+}
+
+.menu-item:hover {
+  background: var(--zunda-dark);
+  color: #ffffff;
+}
+
+/* Window Body */
+.window-body, .window-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--win-content-bg);
+  overflow: hidden;
+  margin-top: 2px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+/* ==========================================================================
+   APP SPECIFIC WINDOW STYLES
+   ========================================================================== */
+
+/* 1. ZundaCLI.exe Window */
+/* 1. ZundaCLI.exe Window & CRT Phosphor Styling */
+
+/* --- CRT Phosphor Visual Themes --- */
+.cli-body[data-term-theme="classic-green"],
+.cli-body[data-theme="classic-green"],
+#window-zundacli[data-term-theme="classic-green"] .cli-body {
+  --term-bg: #0a1a0a;
+  --term-green: #33ff33;
+  --term-green-dim: #00aa44;
+  --term-glow-color: rgba(51, 255, 51, 0.7);
+  --term-glow-far: rgba(0, 255, 102, 0.3);
+  --term-highlight: #66ff66;
+  --term-cursor: #33ff33;
+  --term-glow: 0 0 2px var(--term-green), 0 0 6px var(--term-glow-color), 0 0 12px var(--term-glow-far);
+}
+
+.cli-body[data-term-theme="amber"],
+.cli-body[data-theme="amber"],
+#window-zundacli[data-term-theme="amber"] .cli-body {
+  --term-bg: #140a00;
+  --term-green: #ffb000;
+  --term-green-dim: #b37b00;
+  --term-glow-color: rgba(255, 176, 0, 0.7);
+  --term-glow-far: rgba(255, 140, 0, 0.3);
+  --term-highlight: #ffd166;
+  --term-cursor: #ffb000;
+  --term-glow: 0 0 2px var(--term-green), 0 0 6px var(--term-glow-color), 0 0 12px var(--term-glow-far);
+}
+
+.cli-body[data-term-theme="matrix"],
+.cli-body[data-theme="matrix"],
+#window-zundacli[data-term-theme="matrix"] .cli-body {
+  --term-bg: #020d04;
+  --term-green: #00ff66;
+  --term-green-dim: #008833;
+  --term-glow-color: rgba(0, 255, 102, 0.85);
+  --term-glow-far: rgba(0, 200, 80, 0.4);
+  --term-highlight: #80ffb3;
+  --term-cursor: #00ff66;
+  --term-glow: 0 0 2px var(--term-green), 0 0 6px var(--term-glow-color), 0 0 12px var(--term-glow-far);
+}
+
+.cli-body[data-term-theme="cozy-pea"],
+.cli-body[data-theme="cozy-pea"],
+#window-zundacli[data-term-theme="cozy-pea"] .cli-body {
+  --term-bg: #0f1f10;
+  --term-green: #a3e048;
+  --term-green-dim: #5c9422;
+  --term-glow-color: rgba(163, 224, 72, 0.6);
+  --term-glow-far: rgba(139, 195, 74, 0.35);
+  --term-highlight: #c5f084;
+  --term-cursor: #a3e048;
+  --term-glow: 0 0 2px var(--term-green), 0 0 6px var(--term-glow-color), 0 0 12px var(--term-glow-far);
+}
+
+.cli-body {
+  position: relative;
+  background-color: var(--term-bg);
+  color: var(--term-green);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  padding: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85), inset 0 0 4px var(--term-green-dim);
+  border: 1px solid rgba(51, 255, 102, 0.2);
+}
+
+.cli-scanline-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+  background-size: 100% 4px;
+  z-index: 2;
+  opacity: 0.65;
+}
+
+@keyframes crtPhosphorFlicker {
+  0% { opacity: 0.99; }
+  20% { opacity: 0.96; }
+  40% { opacity: 0.99; }
+  60% { opacity: 0.95; }
+  80% { opacity: 1.0; }
+  100% { opacity: 0.98; }
+}
+
+.cli-flicker {
+  animation: crtPhosphorFlicker 0.18s infinite;
+}
+
+.cli-terminal-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px;
+  line-height: 1.4;
+  text-shadow: var(--term-glow);
+}
+
+.cli-terminal-log::-webkit-scrollbar {
+  width: 8px;
+}
+.cli-terminal-log::-webkit-scrollbar-track {
+  background: var(--term-bg);
+  border-left: 1px solid var(--term-green-dim);
+}
+.cli-terminal-log::-webkit-scrollbar-thumb {
+  background: var(--term-green-dim);
+  border-radius: 0px;
+  box-shadow: 0 0 4px var(--term-green);
+}
+.cli-terminal-log::-webkit-scrollbar-thumb:hover {
+  background: var(--term-green);
+}
+
+.cli-welcome {
+  color: var(--term-green);
+  margin-bottom: 4px;
+}
+
+.cli-highlight {
+  color: var(--term-highlight);
+  font-weight: bold;
+}
+
+.cli-system {
+  color: var(--term-green);
+  font-weight: bold;
+}
+
+.cli-line {
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+
+.cli-prompt-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--term-green-dim);
+}
+
+.cli-prompt-label {
+  color: var(--term-green);
+  font-weight: bold;
+  text-shadow: var(--term-glow);
+}
+
+.cli-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--term-green);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  text-shadow: var(--term-glow);
+  caret-color: var(--term-cursor);
+}
+
+/* Colored Status Tags */
+.cli-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-right: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.cli-tag-ok     { background: rgba(51, 255, 102, 0.15); color: var(--term-green); border: 1px solid var(--term-green); }
+.cli-tag-recipe { background: rgba(139, 195, 74, 0.15); color: #8bc34a; border: 1px solid #8bc34a; }
+.cli-tag-audio  { background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid #00e5ff; }
+.cli-tag-info   { background: rgba(51, 153, 255, 0.15); color: #3399ff; border: 1px solid #3399ff; }
+.cli-tag-warn   { background: rgba(255, 170, 0, 0.15); color: #ffaa00; border: 1px solid #ffaa00; }
+.cli-tag-err, .cli-tag-error { background: rgba(255, 68, 68, 0.15); color: #ff4444; border: 1px solid #ff4444; }
+.cli-tag-system { background: rgba(168, 224, 99, 0.15); color: #a8e063; border: 1px solid #a8e063; }
+
+/* Table Layout */
+.cli-table {
+  margin: 6px 0;
+  border: 1px dashed var(--term-green-dim);
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.25);
+}
+.cli-table-head {
+  border-bottom: 1px solid var(--term-green-dim);
+  font-weight: bold;
+  color: var(--term-highlight);
+}
+.cli-table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+.cli-col {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ASCII Banner */
+.cli-ascii-banner {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.15;
+  color: var(--term-green);
+  text-shadow: var(--term-glow);
+  white-space: pre;
+  margin: 6px 0;
+  overflow-x: auto;
+}
+
+/* Scroll to Bottom Pill */
+.cli-scroll-bottom-btn {
+  position: absolute;
+  bottom: 45px;
+  right: 15px;
+  background: var(--term-bg);
+  color: var(--term-green);
+  border: 1px solid var(--term-green);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--term-glow-color);
+  z-index: 5;
+  transition: opacity 0.2s ease;
+}
+.cli-scroll-bottom-btn:hover {
+  background: var(--term-green);
+  color: var(--term-bg);
+}
+
+/* Mobile Touch Helper Toolbar */
+.cli-mobile-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(10, 26, 10, 0.95);
+  border-top: 1px solid var(--term-green-dim);
+  overflow-x: auto;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.cli-vkey {
+  background: rgba(51, 255, 102, 0.1);
+  color: var(--term-green);
+  border: 1px solid var(--term-green-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.cli-vkey:active {
+  background: var(--term-green);
+  color: var(--term-bg);
+}
+
+/* 2. Cookbook.app Window */
+.cookbook-body {
+  background: #f4f8f3;
+  padding: 10px;
+  gap: 10px;
+}
+
+.recipe-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recipe-filter-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.recipe-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 4px;
+}
+
+.recipe-card {
+  background: #ffffff;
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-2px);
+  background: var(--zunda-pastel);
+}
+
+.recipe-thumbnail {
+  font-size: 36px;
+}
+
+.recipe-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recipe-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #1b5e20;
+}
+
+.recipe-desc {
+  font-size: 11px;
+  color: #424242;
+}
+
+.recipe-badge {
+  font-size: 10px;
+  background: var(--zunda-accent);
+  color: #1b5e20;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: bold;
+  align-self: center;
+}
+
+/* 3. VNTalk.app Window */
+.vn-body {
+  background: #000000;
+  position: relative;
+}
+
+.vn-stage-background {
+  flex: 1;
+  background: linear-gradient(180deg, #c8e6c9 0%, #e8f5e9 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vn-character-portrait {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: floatPea 4s ease-in-out infinite;
+}
+
+.portrait-avatar {
+  font-size: 96px;
+  filter: drop-shadow(0 8px 12px rgba(46, 125, 50, 0.4));
+}
+
+.vn-dialogue-panel {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.vn-speaker-tag {
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 13px;
+  border-bottom: 1px solid var(--zunda-primary);
+  padding-bottom: 2px;
+}
+
+.vn-text-content {
+  font-size: 13px;
+  color: #2e7d32;
+  line-height: 1.4;
+  min-height: 38px;
+}
+
+.vn-choices-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.vn-choice-btn {
+  font-family: var(--font-os);
+  font-size: 12px;
+  text-align: left;
+  padding: 4px 8px;
+  background: var(--win-btn-bg);
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  color: #1b5e20;
+  cursor: pointer;
+}
+
+.vn-choice-btn:hover {
+  background: var(--zunda-primary);
+  color: #ffffff;
+}
+
+/* 4. QuickStart.txt Window */
+.notepad-body {
+  background: #ffffff;
+}
+
+.notepad-editor {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #1b5e20;
+  background: #ffffff;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   TASKBAR & START MENU
+   ========================================================================== */
+
+#taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--taskbar-height);
+  background-color: var(--win-bg);
+  border-top: 2px solid var(--win-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px;
+  z-index: 9999;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* Start Button */
+#start-btn, .win95-start-btn {
+  height: 30px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-os);
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--win-border-shadow);
+  background: var(--win-btn-bg);
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  cursor: pointer;
+  outline: none;
+}
+
+#start-btn.start-btn-active, #start-btn:active {
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  background: var(--zunda-accent);
+}
+
+.start-icon {
+  font-size: 16px;
+}
+
+/* Start Menu Popup */
+#start-menu, .start-menu-popup {
+  position: fixed;
+  bottom: calc(var(--taskbar-height) + 2px);
+  left: 2px;
+  width: var(--start-menu-width);
+  background: var(--win-bg);
+  display: flex;
+  z-index: 10000;
+  padding: 3px;
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+}
+
+.start-menu-banner {
+  width: 32px;
+  background: linear-gradient(180deg, #1b5e20 0%, #4caf50 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
+}
+
+.start-menu-banner .banner-text, .start-menu-banner-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-os);
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+
+.start-menu-items, .start-menu-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.start-item, .start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-family: var(--font-os);
+  font-size: 13px;
+  color: #1b5e20;
+  cursor: pointer;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.start-item:hover, .start-menu-item:hover {
+  background-color: var(--zunda-dark);
+  color: #ffffff;
+}
+
+.start-divider, .start-menu-divider {
+  height: 1px;
+  border-top: 1px solid var(--win-border-dark);
+  border-bottom: 1px solid var(--win-border-light);
+  margin: 4px 2px;
+}
+
+/* Taskbar Windows List */
+#taskbar-windows, .taskbar-windows-container {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  margin: 0 8px;
+  overflow-x: auto;
+}
+
+.taskbar-item, .taskbar-btn {
+  height: 28px;
+  min-width: 120px;
+  max-width: 180px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-os);
+  font-size: 12px;
+  color: #1b5e20;
+  background: var(--win-btn-bg);
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-shadow);
+  border-bottom: 2px solid var(--win-border-shadow);
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  outline: none;
+}
+
+.taskbar-item.active, .taskbar-btn.active {
+  font-weight: bold;
+  background: var(--zunda-pastel);
+  border-top: 2px solid var(--win-border-dark);
+  border-left: 2px solid var(--win-border-dark);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+/* System Tray */
+#taskbar-tray, .taskbar-tray-container, #system-tray {
+  height: 28px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-os);
+  font-size: 12px;
+  color: var(--win-border-shadow);
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.tray-btn, .tray-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+  padding: 0 2px;
+}
+
+.tray-btn:hover, .tray-icon:hover {
+  opacity: 1;
+}
+
+.tray-clock, #taskbar-clock, #tray-clock {
+  font-weight: bold;
+  font-size: 11px;
+  color: #1b5e20;
+}
+
+/* ==========================================================================
+   CRT SCANLINES OVERLAY
+   ========================================================================== */
+
+#crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9000;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  background-size: 100% 3px, 6px 100%;
+  box-shadow: inset 0 0 80px rgba(10, 21, 10, 0.35);
+  transition: opacity 0.3s ease;
+}
+
+body.crt-off #crt-overlay,
+#crt-overlay.crt-off {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* ==========================================================================
+   KEYFRAME ANIMATIONS
+   ========================================================================== */
+
+@keyframes floatPea {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) rotate(4deg) scale(1.04);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+}
+
+.floating-pea-asset {
+  animation: floatPea 4s ease-in-out infinite;
+}
+
+@keyframes terminalPulse {
+  0%, 100% {
+    text-shadow: 0 0 8px rgba(51, 255, 102, 0.6);
+  }
+  50% {
+    text-shadow: 0 0 14px rgba(51, 255, 102, 0.9), 0 0 3px rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes cursorBlink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background-color: var(--term-cursor);
+  animation: cursorBlink 1s infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+@media screen and (max-width: 1024px) {
+  .window {
+    max-width: 92vw;
+    max-height: 80vh;
+  }
+  
+  .taskbar-item, .taskbar-btn {
+    min-width: 90px;
+    max-width: 130px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :root {
+    --taskbar-height: 42px;
+  }
+
+  .window {
+    width: 100vw !important;
+    height: calc(100vh - var(--taskbar-height)) !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    min-width: 100vw;
+  }
+
+  #start-menu {
+    width: calc(100vw - 4px);
+    left: 2px;
+  }
+
+  .win-btn {
+    width: 24px;
+    height: 22px;
+    font-size: 12px;
+  }
+
+  #taskbar {
+    height: 42px;
+  }
+
+  #start-btn {
+    height: 34px;
+    padding: 0 12px;
+  }
+
+  .cli-body {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+/* Promos.app, Updates.log & Calculator.app Win95 Hub Styles */
+.promos-body, .updates-body, .calc-body {
+  padding: 12px;
+  background: var(--win-bg);
+  color: var(--text-dark);
+  font-family: var(--font-os);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.promos-banner {
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 4px;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.3);
+}
+
+.promos-banner h3 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.promos-banner p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.promos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.promo-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.promo-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-code {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 14px;
+}
+
+.promo-desc {
+  font-size: 11px;
+  color: #555;
+}
+
+.copy-code-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.promos-footer {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.roblox-launch-btn {
+  text-decoration: none;
+  background: #2e7d32;
+  color: #fff !important;
+  padding: 6px 14px;
+  font-weight: bold;
+}
+
+.update-entry {
+  background: #ffffff;
+  padding: 10px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.update-badge {
+  font-family: var(--font-os);
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 13px;
+}
+
+.update-date {
+  font-size: 11px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.update-entry ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+}
+
+.calc-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #ffffff;
+  padding: 14px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.win95-select, .win95-input {
+  font-family: var(--font-os);
+  font-size: 13px;
+  padding: 4px 6px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.calc-results-box {
+  background: #f4fbf4;
+  border: 1px solid #a5d6a7;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.profit-good {
+  color: #2e7d32;
+  font-weight: bold;
+  font-size: 15px;
+}
+

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Outer Beige Cabinet Body -->
+  <rect x="3" y="4" width="26" height="20" rx="2" fill="#e0e0e0" stroke="#424242" stroke-width="2"/>
+  <rect x="5" y="6" width="22" height="16" rx="1" fill="#bdbdbd"/>
+  
+  <!-- CRT Phosphor Screen (Retro Green Glow) -->
+  <rect x="7" y="8" width="18" height="12" rx="2" fill="#051f08" stroke="#1b5e20" stroke-width="1.5"/>
+  <rect x="8" y="9" width="16" height="10" rx="1" fill="#00e676" opacity="0.25"/>
+  
+  <!-- Terminal Prompt Symbol (>_) inside CRT -->
+  <path d="M 10,12 L 13,14 L 10,16" stroke="#00e676" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="15" y1="16" x2="18" y2="16" stroke="#00e676" stroke-width="1.5"/>
+
+  <!-- Power LED & Knobs -->
+  <circle cx="24" cy="20" r="1" fill="#00e676"/>
+  <line x1="20" y1="20" x2="22" y2="20" stroke="#616161" stroke-width="1"/>
+
+  <!-- CRT Monitor Stand Base -->
+  <path d="M 11,24 L 21,24 L 23,28 L 9,28 Z" fill="#9e9e9e" stroke="#424242" stroke-width="1.5"/>
+</svg>
