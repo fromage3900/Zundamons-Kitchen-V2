@@ -47,12 +47,34 @@ function CozyModalShell.wrap(panel, options)
 	options = options or {}
 	applyCozyTokens(panel)
 
+	-- Store original size for animation
+	local originalSize = panel.Size
+	local originalPosition = panel.Position
+
 	local function openShell()
 		-- Play panel open sound
 		local zsc = _G.ZundaSoundController
 		if zsc and zsc.play then
 			zsc.play("PanelOpen")
 		end
+
+		-- Animate: scale pop from 0 to full size with bouncy Back easing
+		panel.Visible = true
+		if not UserInputService.ReducedMotionEnabled then
+			panel.Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0)
+			panel.Position = UDim2.new(originalPosition.X.Scale, 0, originalPosition.Y.Scale, 0)
+			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Normal, UIConfig.EASING.Bounce, Enum.EasingDirection.Out), {
+				Size = originalSize,
+			}):Play()
+			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+				BackgroundTransparency = UIConfig.TRANSPARENCY.Panel,
+			}):Play()
+		else
+			panel.Size = originalSize
+			panel.Position = originalPosition
+			panel.BackgroundTransparency = UIConfig.TRANSPARENCY.Panel
+		end
+
 		if options.open then
 			options.open()
 		end
@@ -65,10 +87,66 @@ function CozyModalShell.wrap(panel, options)
 		if zsc and zsc.play then
 			zsc.play("PanelClose")
 		end
+
+		-- Animate: scale shrink to 0 with smooth Quad easing
+		if not UserInputService.ReducedMotionEnabled then
+			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth, Enum.EasingDirection.In), {
+				Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0),
+			}):Play()
+			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+				BackgroundTransparency = 1,
+			}):Play()
+			task.delay(UIConfig.ANIMATION.Fast + 0.05, function()
+				panel.Visible = false
+				panel.Size = originalSize
+				panel.Position = originalPosition
+				panel.BackgroundTransparency = UIConfig.TRANSPARENCY.Panel
+			end)
+		else
+			panel.Visible = false
+		end
+
 		if options.close then
 			options.close()
 		end
 	end
+
+	-- Universal button hover effect: scale up + glow + sound
+	local function setupButtonHover(btn)
+		if btn:GetAttribute("HoverWired") then return end
+		btn:SetAttribute("HoverWired", true)
+		local origSize = btn.Size
+		btn.MouseEnter:Connect(function()
+			if not UserInputService.ReducedMotionEnabled then
+				TweenService:Create(btn, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+					Size = UDim2.new(origSize.X.Scale * 1.05, 0, origSize.Y.Scale * 1.05, 0),
+				}):Play()
+			end
+			local zsc = _G.ZundaSoundController
+			if zsc and zsc.play then
+				zsc.play("ButtonHover")
+			end
+		end)
+		btn.MouseLeave:Connect(function()
+			if not UserInputService.ReducedMotionEnabled then
+				TweenService:Create(btn, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+					Size = origSize,
+				}):Play()
+			end
+		end)
+	end
+
+	-- Wire hover effects to all buttons in panel
+	for _, child in ipairs(panel:GetDescendants()) do
+		if child:IsA("TextButton") or child:IsA("ImageButton") then
+			setupButtonHover(child)
+		end
+	end
+	panel.DescendantAdded:Connect(function(desc)
+		if desc:IsA("TextButton") or desc:IsA("ImageButton") then
+			setupButtonHover(desc)
+		end
+	end)
 
 	-- Escape key closes the topmost modal if this panel is the current one
 	-- Uses options.actionId (the UIRouter action ID) for comparison, not panel.Name
