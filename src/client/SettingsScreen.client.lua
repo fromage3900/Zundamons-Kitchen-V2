@@ -38,7 +38,7 @@ local titleLbl = Instance.new("TextLabel", panel)
 titleLbl.Size = UDim2.new(1, -20, 0, 30)
 titleLbl.Position = UDim2.new(0, 10, 0, 10)
 titleLbl.BackgroundTransparency = 1
-titleLbl.Text = "⚙ Settings"
+titleLbl.Text = "⚙ Settings ⚙"
 titleLbl.Font = Enum.Font.GothamBold
 titleLbl.TextSize = 20
 titleLbl.TextColor3 = Color3.fromRGB(80, 40, 30)
@@ -117,6 +117,9 @@ local function setVolume(val)
 end
 
 local RS = game:GetService("ReplicatedStorage")
+local UIHelper = require(RS.Shared.Modules.UIHelper)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local function loadVolume()
 	local attr = player:GetAttribute("VolumeLevel")
 	if attr then
@@ -146,29 +149,48 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
+local shell = CozyModalShell.wrap(panel, {
+	open = function()
+		gui.Enabled = true
+		backdrop.Visible = true; panel.Visible = true
+		panel.BackgroundTransparency = 1; pStroke.Transparency = 1
+		closeBtn.BackgroundTransparency = 1; closeBtn.TextTransparency = 1
+		panel.Size = UDim2.new(0, 0, 0, 0)
+		panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+		TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+			Size = UDim2.new(0, 320, 0, 200), Position = UDim2.new(0.5, -160, 0.5, -100)
+		}):Play()
+		task.wait(0.15)
+		panel.BackgroundTransparency = 0; pStroke.Transparency = 0
+		closeBtn.BackgroundTransparency = 0; closeBtn.TextTransparency = 0
+		loadVolume()
+	end,
+	close = function()
+		gui.Enabled = false
+		backdrop.Visible = false; panel.Visible = false
+	end,
+})
+
 local function show()
-	gui.Enabled = true
-	backdrop.Visible = true; panel.Visible = true
-	panel.BackgroundTransparency = 1; pStroke.Transparency = 1
-	closeBtn.BackgroundTransparency = 1; closeBtn.TextTransparency = 1
-	panel.Size = UDim2.new(0, 0, 0, 0)
-	panel.Position = UDim2.new(0.5, 0, 0.5, 0)
-	TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Size = UDim2.new(0, 320, 0, 200), Position = UDim2.new(0.5, -160, 0.5, -100)
-	}):Play()
-	task.wait(0.15)
-	panel.BackgroundTransparency = 0; pStroke.Transparency = 0
-	closeBtn.BackgroundTransparency = 0; closeBtn.TextTransparency = 0
-	loadVolume()
+	UIRouter.open("settings")
+	shell.open()
 end
 
 local function hide()
-	gui.Enabled = false
-	backdrop.Visible = false; panel.Visible = false
+	UIRouter.close("settings")
+	shell.close()
 end
 
-closeBtn.MouseButton1Click:Connect(hide)
-backdrop.MouseButton1Click:Connect(hide)
+closeBtn.MouseButton1Click:Connect(function()
+	hide()
+	local pos = closeBtn.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
+end)
+backdrop.MouseButton1Click:Connect(function()
+	hide()
+	local pos = backdrop.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 10, pos.Y + 10, Color3.fromRGB(255,255,255), 4)
+end)
 
 local RS_gui = RS:WaitForChild("RemoteEvents")
 local toggleEv = RS_gui:WaitForChild("ToggleSettingsUI")

@@ -117,8 +117,12 @@ src/server/                         adapters, services, systems, and validation
 src/shared/ConfigurationFiles/      canonical gameplay and UI configuration
 src/shared/components/              Matter component definitions
 src/shared/Models/                  repository-authored reusable models
+src/shared/AssetRegistry.lua        asset ID single source of truth
 src/Workspace/                      Rojo-owned world scaffolding only
 docs/                               recovery, authoring, production, and UX plans
+docs/ASSET_MANAGEMENT.md           asset collaboration guide
+docs/MCP_WORKFLOW.md               live Studio automation guide
+scripts/                            build and extraction pipelines
 site/                               Zunda-OS creative hub and design reference
 default.project.json                Rojo DataModel mapping
 wally.toml                          Roblox dependencies
@@ -138,6 +142,8 @@ Read these in order:
 3. [Production and Level Design Handoff](docs/PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md)
 4. [Phase 3 Acceptance Status](docs/PHASE3_ACCEPTANCE_STATUS.md)
 5. [Collaborator Prompts](docs/COLLABORATOR_PROMPTS.md)
+6. [Asset Management & Collaboration Guide](docs/ASSET_MANAGEMENT.md)
+7. [MCP Workflow Guide](docs/MCP_WORKFLOW.md)
 
 One task, one concern, one reviewable commit. Report static checks separately from Studio evidence. Stop and ask before changing schemas, production remotes, paid-product configuration, receipt ownership, terrain preservation, or publishing.
 

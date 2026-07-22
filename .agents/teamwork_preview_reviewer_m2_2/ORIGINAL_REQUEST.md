@@ -1,12 +1,14 @@
-## 2026-07-21T14:02:50-04:00
-You are Reviewer 2 for Milestone 2 (R2: Cooking & Rhythm Minigame System).
-Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_2
-Project root: g:\Zundamons-kItchen-V2
-Plan file: g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md
-Workspace rules: g:\Zundamons-kItchen-V2\AGENTS.md
-Worker Handoff: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2\handoff.md
+## 2026-07-21T20:48:22Z
+You are Reviewer 2 for Milestone 2 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
+Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_2
+Target Site Directory: g:\Zundamons-kItchen-V2\site
 
-Task:
-1. Review implementation details of Cooking & Rhythm Minigame features (10-note spawning, timing windows, Spacebar/Touch/Gamepad inputs, floating rating text visuals, combo meter updates, ingredient deduction, quality bonus rewards, and direct dish delivery into inventory).
-2. Confirm that legacy CookingSession.server.lua is deactivated, preventing event collisions.
-3. Report pass/fail verdict and detailed findings in g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_2\handoff.md.
+Your task:
+Review window lifecycle, state engine, and Roblox export features in `site/window_manager.js`:
+1. Verify Z-index depth stack (100 to 8999) and active state styling (`.window-active` / `.window-inactive`).
+2. Verify Active Focus Fallback (`transferFocusToTopVisibleWindow()`) when closing or minimizing windows.
+3. Verify Taskbar Sync: Taskbar buttons MUST retain minimized windows (`#taskbar-windows`). Click matrix: active window -> minimizes; inactive or minimized window -> restores & focuses.
+4. Verify Keyboard Shortcuts: `Ctrl+Esc` and `Escape` toggling/closing Start Menu (`#start-menu`).
+5. Verify `WindowManager.exportScreenGuiLayout()` metadata format maps DOM layout to Roblox ScreenGui frame hierarchy.
+
+Document your review in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_2\review.md` and deliver `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_2\handoff.md`. Send a message to orchestrator with your verdict (APPROVED / REJECTED).

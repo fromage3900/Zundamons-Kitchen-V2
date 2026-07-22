@@ -1,107 +1,137 @@
-# Handoff Report — Challenger 1: Milestone 1 R1 Empirical Verification
+# Handoff Report — Milestone 1 Zunda-OS 95 CLI Launch Page Empirical Testing
 
-## Observation
-
-Empirical testing was conducted using custom test harness `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\test_harness_m1.py` and Rojo build verification `rojo build default.project.json -o build/Zundamons-kItchen.rbxl`.
-
-Out of 16 empirical test cases evaluated across the 6 specified R1 subsystems, **10 PASSED** and **6 FAILED**:
-
-### 1. Tool Hit Detection & Position Safety
-- **PASS**: `Tools.server.lua` lines 45-68 (`TOOL_NODE_MATCHES`) correctly maps PickAxe -> Rock/MarbleRock/GoldRock, Axe -> AppleTree/PineTree, Sickle -> Wheat/ZundaMushroom/ZundaBerry/ZundaRoot.
-- **PASS**: `Tools.server.lua` line 16 configures `HIT_RADIUS = 8` studs.
-- **FAIL**: `Tools.server.lua` line 76: `local dist = (node.Position - origin).Magnitude`.
-  - *Direct Observation*: `findHitTargets` directly accesses `node.Position` on instances tagged with `Mineable`. If a `Mineable` instance is a `Model` (or parented under a Model tagged as `Mineable`), `node.Position` throws a Luau runtime crash (`Position is not a valid member of Model`). In contrast, `HarvestController.client.lua` line 465 checks `if node:IsA("BasePart") then node.Position else (node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)`.
-
-### 2. Node Health Reduction & Multiplayer Cooldown
-- **PASS**: `Tools.server.lua` line 127 (`node:SetAttribute("Health", math.max(health - damage, 0))`) correctly reduces health down to a lower bound of 0.
-- **FAIL**: `Mineable.server.lua` lines 46-101.
-  - *Direct Observation*: `Tools.server.lua` line 124 calls `CollectionService:AddTag(node, player.Name .. "|" .. tier)` on swing. `Mineable.server.lua` NEVER removes these wildcard tags upon health reaching 0 or upon node respawn (`obj.Parent = parent`). Stale tags linger across respawns indefinitely.
-- **FAIL**: `Mineable.server.lua` line 51 & `HarvestValidator.lua` line 118.
-  - *Direct Observation*: In `Mineable.server.lua`, when node health reaches 0, it iterates `for _, player in pairs(Players:GetPlayers()) do` and calls `validateHarvest(player, item)`. The first tagged player evaluated passes `validateHarvest`, which executes `node:SetAttribute("LastHarvested", tick())`. When the loop moves to the next tagged player (e.g. the player who actually dealt the final hit), `validateCooldown` evaluates `tick() - LastHarvested`, sees `< HARVEST_COOLDOWN` (1.0s), and rejects the second player with `"Node is on cooldown"`. The legitimate player is denied loot.
-
-### 3. Particle Spawning & Feedback
-- **PASS**: `HarvestController.client.lua` lines 97-129 (`createHarvestParticles`) creates particle emitters on harvest completion.
-- **PASS**: `HarvestController.client.lua` lines 413-462 (`createToolHitFX`) differentiates particle colors/textures between rocks (sparks/dust), trees (wood chips), and crops (leaf bits).
-- **PASS**: Particle parts are automatically cleaned up after lifetime via `task.delay(1.0, function() part:Destroy() end)`.
-
-### 4. Loot Drops & Security
-- **FAIL**: `LootModule.lua` line 116 (`local myloot = loot:FindFirstChild(lootname)`).
-  - *Direct Observation*: `ZundaGatherServer.server.lua` grants items `"Salted Pea Bouquet"` (line 230) and `"Carrot"` (line 246). `MineableConfig.lua` drops `"Marble Rock"`. None of these items exist in `ReplicatedStorage.Loot` (`src/shared/Loot`). Calling `loot:FindFirstChild(lootname)` evaluates to `nil`, causing `GiveLoot` to return `false`. Items cannot be picked up or added to player inventory.
-- **FAIL**: `LootModule.lua` lines 111-123 & `searchforCode` line 70.
-  - *Direct Observation*: `GiveLoot` calls `searchforCode(player, genCode, lootname, false)`. `searchforCode` with `isRemoving = false` does NOT remove the generated code from `codes[player.Name]`. `GiveLoot` does not consume the code; consumption relies on client firing `removeCode:FireServer(...)`. A client can invoke `GiveLoot` multiple times concurrently before `removeCode` arrives, multiplying item rewards arbitrarily.
-
-### 5. Inventory Save
-- **PASS**: `PlayerDataService.lua` lines 41-91 (`createDefaultData`) establishes canonical player state including `gold = 50`, `gathered_items = {}`, and initial inventory quantities.
-- **PASS**: `PlayerDataService.lua` lines 135-152 (`savePlayer`) and lines 213-226 (periodic 60s auto-save) persist data via `DataStoreService:GetDataStore("KitchenProgression")`.
-
-### 6. UI Progress Bar Responsiveness
-- **PASS**: `HarvestController.client.lua` lines 48-94 (`createProgressBar`) initializes `HarvestProgressGui` and container.
-- **PASS**: Cancellation triggers operate on movement threshold (line 213), range threshold (line 223), movement keys W/A/S/D/Space/Shift (line 558), and character respawn (line 547).
-- **FAIL**: `HarvestController.client.lua` lines 270-331 (`startHarvest`).
-  - *Direct Observation*: If `startHarvest` is invoked while harvesting, it calls `cancelHarvest("New harvest started")` which sets `isHarvesting = false`. Then `startHarvest` immediately sets `isHarvesting = true` and binds a new `Heartbeat` connection. On the next frame, the OLD `Heartbeat` callback runs, evaluates `if not isHarvesting then`, finds `isHarvesting == true`, remains connected, and runs concurrently with the new heartbeat—causing premature harvest completion.
+**Agent**: Challenger 1 (`teamwork_preview_challenger_m1_1`)  
+**Role**: Empirical Challenger (critic, specialist)  
+**Date**: 2026-07-22  
+**Target Files**: `site/index.html`, `site/assets/audio_engine.js`  
+**Verdict**: **FAILED**
 
 ---
 
-## Logic Chain
+## 1. Observation
 
-1. **Observation**: `Tools.server.lua:76` reads `node.Position` without type checking.
-   -> **Inference**: If a developer tags a `Model` instance as `Mineable`, calling `node.Position` throws a runtime exception in Luau (`Position is not a valid member of Model`).
-   -> **Conclusion**: Hit detection is vulnerable to crashes when `Mineable` instances are Models.
+Direct observations obtained by writing and executing an automated empirical JSDOM test suite (`run_empirical_tests.js`) and analyzing source code in `site/index.html` and `site/assets/audio_engine.js`:
 
-2. **Observation**: `Tools.server.lua:124` adds wildcard tags `player.Name .. "|" .. tier`, but `Mineable.server.lua` never calls `CollectionService:RemoveTag`.
-   -> **Inference**: Wildcard tags accumulate permanently on node instances across respawns.
-   -> **Conclusion**: Stale player tags persist indefinitely, allowing players who previously hit a node to continue receiving loot drops on future respawns.
+1. **Window Drag Boundary Omission**:
+   - `site/index.html` lines 477–483:
+     ```javascript
+     function onMouseMove(e) {
+         if (!isDragging) return;
+         const dx = e.clientX - startX;
+         const dy = e.clientY - startY;
+         win.style.left = `${initialLeft + dx}px`;
+         win.style.top = `${initialTop + dy}px`;
+     }
+     ```
+   - *Test Observation*: Dragging window header with `clientX: -1000, clientY: -1000` resulted in `win.style.left = "-1100px"` and `win.style.top = "-1100px"`. Window disappears off-screen.
 
-3. **Observation**: `Mineable.server.lua:51` iterates `Players:GetPlayers()` calling `validateHarvest`, and `HarvestValidator.lua:118` sets `node:SetAttribute("LastHarvested", tick())`.
-   -> **Inference**: The first tagged player in `Players:GetPlayers()` triggers `LastHarvested = tick()`. When the loop reaches subsequent tagged players, `validateCooldown` sees `tick() - LastHarvested < 1.0` and returns `false, "Node is on cooldown"`.
-   -> **Conclusion**: Multiple players damaging the same node results in the second player being denied loot due to server-side cooldown timestamp collision.
+2. **Mobile Touch Drag Omission**:
+   - `site/index.html` lines 466–494: Window header drag logic only attaches `mousedown`, `mousemove`, and `mouseup` listeners.
+   - *Test Observation*: Header contains 0 listeners for `touchstart`, `touchmove`, or `touchend`. Touch gestures on mobile viewports fail to drag windows.
 
-4. **Observation**: `LootModule.lua:116` checks `loot:FindFirstChild(lootname)`, but `"Carrot"`, `"Salted Pea Bouquet"`, and `"Marble Rock"` do not exist in `src/shared/Loot`.
-   -> **Inference**: `loot:FindFirstChild(lootname)` returns `nil` for these items. `GiveLoot` returns `false`.
-   -> **Conclusion**: Items harvested from Carrot plots, Salted Pea Bouquets, and Marble Rocks can never be picked up or saved to inventory.
+3. **Taskbar Minimized Window Button Deletion**:
+   - `site/index.html` lines 433–457 (`updateTaskbar` function):
+     ```javascript
+     windows.forEach(win => {
+         if (!win.classList.contains('hidden')) {
+             // ... create taskbar button
+         }
+     });
+     ```
+   - *Test Observation*: Clicking minimize `_` button adds `.hidden` to window and calls `updateTaskbar()`. `updateTaskbar()` excludes all `.hidden` windows. Taskbar button is destroyed, leaving user with no way to restore minimized window from taskbar.
 
-5. **Observation**: `LootModule.lua:117` uses `searchforCode(..., false)` which does not mutate `codes[player.Name]`.
-   -> **Inference**: Until `RemoveCode` is received from the client, `searchforCode` continues returning `true`.
-   -> **Conclusion**: Concurrent or repeated `GiveLoot` RemoteFunction invocations exploit this to duplicate loot.
+4. **Focus Fallback Omission on Close / Minimize**:
+   - `site/index.html` lines 405–419: `closeWindow()` and `minimizeWindow()` add `.hidden` to the target window and call `updateTaskbar()`, but do not update active window class or z-index for remaining visible windows.
+   - *Test Observation*: Closing the top active window leaves `Remaining active window: NONE`. Visible windows remain in `.window-inactive` state.
 
-6. **Observation**: `HarvestController.client.lua:270` calls `cancelHarvest()` then immediately sets `isHarvesting = true` before creating a new `Heartbeat` connection.
-   -> **Inference**: The old `Heartbeat` callback sees `isHarvesting == true` on its next frame and does not disconnect.
-   -> **Conclusion**: Multiple heartbeat loops run in parallel, completing progress bar fills prematurely.
+5. **Missing Keyboard Shortcut Listeners**:
+   - `site/index.html` lines 527–592 (Start Menu controller): Zero `keydown` listeners attached for `Ctrl+Esc` or `Escape`.
+   - *Test Observation*: `site/index.html` line 242 (`QuickStart.txt`) advertises `Open Start Menu: Click [Start Zunda 🫛] or press Ctrl+Esc`. Dispatching `KeyboardEvent('keydown', { key: 'Escape', ctrlKey: true })` does not trigger Start Menu.
+
+6. **LocalStorage Volume Persistence Omission**:
+   - `site/assets/audio_engine.js` lines 19–46 (`ZundaAudio.init()`):
+     ```javascript
+     const savedMute = localStorage.getItem('zunda_os_muted');
+     if (savedMute !== null) {
+       this.setMute(savedMute === 'true');
+     }
+     ```
+   - *Test Observation*: `ZundaAudio.setVolume(val)` writes `localStorage.setItem('zunda_os_volume', ...)`, but `ZundaAudio.init()` never reads `zunda_os_volume`. Volume resets to `0.7` on init.
+
+7. **Un-attenuated Square Wave Beep on Invalid SFX Variant**:
+   - `site/assets/audio_engine.js` lines 83–117 (`playClickSFX`):
+     ```javascript
+     osc.type = variant === 'start' ? 'triangle' : 'square';
+     if (variant === 'down') { ... }
+     else if (variant === 'up') { ... }
+     else if (variant === 'start') { ... }
+     osc.connect(gain);
+     gain.connect(ZundaAudio.sfxGain);
+     osc.start(now);
+     osc.stop(now + 0.03);
+     ```
+   - *Test Observation*: Passing an unrecognized variant (e.g. `'invalid'`) bypasses all `if` blocks. `gain.gain.setValueAtTime` is never scheduled. Web Audio API GainNode defaults to `1.0`, emitting a full-volume square wave beep.
+
+8. **BGM Rapid Toggle Race Condition**:
+   - `site/assets/audio_engine.js` lines 320–341 (`stopCozyBGM`):
+     ```javascript
+     setTimeout(() => {
+       if (ZundaAudio.bgmPadOscs) {
+         ZundaAudio.bgmPadOscs.forEach(osc => { try { osc.stop(); } catch(e){} });
+         ZundaAudio.bgmPadOscs = null;
+       }
+     }, 1050);
+     ```
+   - *Test Observation*: Rapidly toggling BGM (start -> stop -> start within 500ms) re-populates `ZundaAudio.bgmPadOscs`. When the 1050ms `setTimeout` from the previous stop completes, it stops the new pad Oscillators and sets `bgmPadOscs` to `null`.
 
 ---
 
-## Caveats
+## 2. Logic Chain
 
-- Tests were executed via static analysis harness `test_harness_m1.py` and Rojo project build compilation (`rojo build`). Live Roblox server physics simulation was not executed.
-- Network latency/jitter exceeding 500ms was not simulated.
-
----
-
-## Conclusion
-
-Milestone 1 R1 (Harvesting & Resource Node System) contains solid base structures (clean progress bar UI creation, sound/particle customization, DataStore persistence, tool tier damage mapping). However, **it is NOT ready for production release** due to **6 critical empirical bugs**:
-
-1. **Model position crash** in `Tools.server.lua`.
-2. **Permanent wildcard tag accumulation** in `Mineable.server.lua`.
-3. **Multiplayer cooldown loot denial** in `Mineable.server.lua` + `HarvestValidator.lua`.
-4. **Missing loot models** (`Carrot`, `Salted Pea Bouquet`, `Marble Rock`) in `ReplicatedStorage.Loot`.
-5. **Server-side duplicate item exploit** in `LootModule.lua`.
-6. **Heartbeat connection leak** in `HarvestController.client.lua`.
+1. *From Observation 1*: In `onMouseMove`, `win.style.left` and `win.style.top` are calculated strictly as `initialLeft + dx` and `initialTop + dy` without `Math.max` or viewport boundary limits. Therefore, dragging past screen edges moves windows off-screen, breaking window recovery.
+2. *From Observation 2*: Window header drag event handlers are registered exclusively for mouse events (`mousedown`). Therefore, touch inputs on mobile screens do not trigger drag handlers, failing cross-device compatibility.
+3. *From Observation 3*: `updateTaskbar()` filters `windows` array using `if (!win.classList.contains('hidden'))`. Minimized windows have `.hidden` class applied. Therefore, minimizing a window removes its taskbar button entirely, violating Windows 95 UI specifications and preventing window un-minimization from the taskbar.
+4. *From Observation 4*: `closeWindow()` and `minimizeWindow()` hide the active window but do not calculate or set `.window-active` / `.active-window` on the highest remaining `z-index` window. Therefore, closing a top window leaves all remaining windows in inactive states.
+5. *From Observation 5*: `site/index.html` contains text advertising `Ctrl+Esc` keyboard navigation in `QuickStart.txt`, but lacks a global `keydown` event listener for keyboard navigation. Therefore, advertised keyboard shortcuts fail to work.
+6. *From Observation 6*: `ZundaAudio.init()` checks `localStorage.getItem('zunda_os_muted')` on line 42, but contains no call to `localStorage.getItem('zunda_os_volume')`. Therefore, custom volume settings are lost upon page reload.
+7. *From Observation 7*: `playClickSFX` creates an oscillator and gain node regardless of `variant`, but only sets gain ramps inside specific `if/else if` blocks. Passing an unhandled variant leaves `GainNode.gain` at its default `1.0` value, producing full-volume audio output.
+8. *From Observation 8*: `stopCozyBGM` schedules an asynchronous 1050ms timer to clean up pad oscillators without tracking or canceling previous timeout handles. Restarting BGM before the timer fires allows the stale timer to terminate active BGM pad oscillators.
 
 ---
 
-## Verification Method
+## 3. Caveats
 
-To verify these results independently:
+- **CSS & Rendering Engine**: Verification was performed via DOM structure, event dispatching, and Web Audio API node state inspection. Visual rendering (such as physical CRT scanlines or exact pixel layout) was not evaluated on hardware screens.
+- **Review-Only Constraint**: In accordance with agent constraints, no source code fixes were applied to `site/index.html` or `site/assets/audio_engine.js`. Failure modes are handed off for developer remediation.
 
-1. **Run Test Harness**:
-   ```powershell
-   python g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\test_harness_m1.py
+---
+
+## 4. Conclusion
+
+Empirical testing of Milestone 1 (`site/index.html` and `site/assets/audio_engine.js`) resulted in **12 FAILED tests out of 25 total execution tests**.
+
+**Final Verdict**: **FAILED**
+
+The implementation requires fixes for:
+1. Window drag boundary clamping (preventing negative and off-screen positions).
+2. Mobile touch support (`touchstart`, `touchmove`, `touchend` event handlers).
+3. Taskbar button retention for minimized windows (Win95 standard behavior).
+4. Active window fallback focus on window close / minimize.
+5. Keyboard shortcut event listener (`Ctrl+Esc` / `Escape` for Start Menu).
+6. LocalStorage volume persistence in `ZundaAudio.init()`.
+7. Guard / fallback gain setting for invalid `playClickSFX` variants.
+8. Cancellation of pending `setTimeout` handle when restarting BGM.
+
+---
+
+## 5. Verification Method
+
+To independently verify these findings:
+
+1. Navigate to `.agents/teamwork_preview_challenger_m1_1`
+2. Run the empirical test harness command:
+   ```bash
+   node run_empirical_tests.js
    ```
-   *Expected Output*: 16 tests run, 10 PASS, 6 FAIL.
-
-2. **Verify Rojo Build**:
-   ```powershell
-   rojo build default.project.json -o build/Zundamons-kItchen.rbxl
-   ```
-   *Expected Output*: Project builds successfully to `build/Zundamons-kItchen.rbxl`.
+3. Inspect output log for test results and failure details (or read `challenge.md`).
+4. Invalidation conditions: The implementation is verified (PASS) if all 25 test assertions in `run_empirical_tests.js` pass with 0 failures.

@@ -51,7 +51,7 @@ if not gui or not panel or not listFrame then
 	title.Size = UDim2.new(1, -60, 0, 44)
 	title.Position = UDim2.new(0, 16, 0, 8)
 	title.BackgroundTransparency = 1
-	title.Text = "🎒  Materials Inventory"
+	title.Text = "🎒  Materials Inventory 🎀"
 	title.Font = Enum.Font.FredokaOne
 	title.TextSize = 24
 	title.TextColor3 = Color3.fromRGB(200, 240, 230)
@@ -107,6 +107,8 @@ local notify = RE:FindFirstChild("NotifyPlayer")
 local makeLoot = RE:FindFirstChild("MakeLootEvent")
 local requestData = RS:WaitForChild("RemoteFunctions"):FindFirstChild("RequestData")
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 
 local function styleFor(name)
 	return { color = UIHelper.getItemColor(name), icon = nil }
@@ -229,8 +231,23 @@ local function spawnToast(text, color)
 end
 
 -- ---- TOGGLE ----
+local shell = CozyModalShell.wrap(panel, {
+	open = function()
+		panel.Visible = true
+	end,
+	close = function()
+		panel.Visible = false
+	end,
+})
+
 local function setOpen(state)
-	panel.Visible = state
+	if state then
+		UIRouter.open("materials")
+		shell.open()
+	else
+		UIRouter.close("materials")
+		shell.close()
+	end
 end
 toggleBtn.MouseButton1Click:Connect(function()
 	setOpen(not panel.Visible)
@@ -256,6 +273,8 @@ task.spawn(function()
 end)
 closeBtn.MouseButton1Click:Connect(function()
 	setOpen(false)
+	local pos = closeBtn.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
 end)
 UIS.InputBegan:Connect(function(input, processed)
 	if processed then

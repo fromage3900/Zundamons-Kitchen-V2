@@ -1,13 +1,11 @@
-## 2026-07-21T13:59:06-04:00
-You are Explorer 3 for Milestone 2 (R2: Cooking & Rhythm Minigame System).
-Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_3
-Project root: g:\Zundamons-kItchen-V2
-Plan file: g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md
-Workspace rules: g:\Zundamons-kItchen-V2\AGENTS.md
+## 2026-07-21T20:46:04Z
+Analyze and design Audio Engine Remediation & Roblox UI Export Hooks for `site/assets/audio_engine.js` and `site/window_manager.js`.
+Requirements to cover:
+1. Audio Engine Remediation (`site/assets/audio_engine.js`):
+   - LocalStorage Volume Persistence: In `ZundaAudio.init()`, read `localStorage.getItem('zunda_os_volume')` and set `this.volume = parseFloat(savedVol)`.
+   - Attenuated SFX Beep: Ensure `playClickSFX('invalid')` or unknown variants apply exponential gain ramp down over 0.03s (never un-attenuated full volume 1.0).
+   - BGM Rapid Toggle Race Condition: Clear any pending BGM pad stop timeouts (`clearTimeout(this.bgmStopTimeout)`) when `startCozyBGM()` is called.
+2. Roblox UI ScreenGui Export Mapping Metadata:
+   - Expose `WindowManager.exportScreenGuiLayout()` function returning JSON layout object mapping window positions, sizes, titlebar properties, and CSS variables directly to Roblox ScreenGui Frame hierarchy for Studio import.
 
-Task:
-1. Audit RewardCore service (src/server/Services/RewardCore.lua) and its integration with CookingValidationSystem and PlayerDataService.
-2. Examine quality bonus calculations (based on accuracy grades: perfect, great, ok), gold rewards, chef XP, level progression formulas, and dish inventory delivery.
-3. Check AGENTS.md rules compliance across reward events and data saves.
-4. Identify any reward scaling bugs, XP calculation mismatches, or save failures.
-5. Report findings to g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_3\handoff.md.
+Write your specification in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_3\analysis.md` and handoff in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_3\handoff.md`. Send a message when finished.

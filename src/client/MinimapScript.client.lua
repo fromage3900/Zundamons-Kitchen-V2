@@ -3,7 +3,10 @@ local Players  = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local RunSvc   = game:GetService("RunService")
 local player   = Players.LocalPlayer
-local gui      = require(game:GetService("ReplicatedStorage").ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "MinimapGui", 10)
+local RS       = game:GetService("ReplicatedStorage")
+local gui      = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "MinimapGui", 10)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 
 -- ── CONFIG ─────────────────────────────────────────────────────────────────
 -- World bounds (from terrain survey)
@@ -30,7 +33,7 @@ ost.Thickness = 2; ost.Color = Color3.fromRGB(180, 150, 220); ost.Transparency =
 -- Title bar inside
 local titleBar = Instance.new("TextLabel", outer)
 titleBar.Size = UDim2.new(1,-8,0,20); titleBar.Position = UDim2.new(0,4,0,3)
-titleBar.BackgroundTransparency = 1; titleBar.Text = "🗺  Map"
+titleBar.BackgroundTransparency = 1; titleBar.Text = "🗺  Mini Map 🗺"
 titleBar.Font = Enum.Font.FredokaOne; titleBar.TextSize = 14
 titleBar.TextColor3 = Color3.fromRGB(220,210,240)
 titleBar.TextXAlignment = Enum.TextXAlignment.Left
@@ -161,4 +164,31 @@ task.spawn(function()
     end
 end)
 
-print("[Minimap] Active — top-right corner")
+-- ─── MODAL ROUTING ────────────────────────────────────────
+local shell = CozyModalShell.wrap(outer, {
+	open = function()
+		outer.Visible = true
+	end,
+	close = function()
+		outer.Visible = false
+	end,
+})
+
+local function toggle()
+	if outer.Visible then
+		UIRouter.close("map")
+	else
+		UIRouter.open("map")
+		shell.open()
+	end
+end
+
+-- Double-click map to toggle
+outer.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		toggle()
+	end
+end)
+
+print("[Minimap] Active — top-right corner | right-click to toggle")

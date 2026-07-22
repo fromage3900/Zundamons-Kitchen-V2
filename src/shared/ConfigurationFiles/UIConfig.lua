@@ -1,4 +1,4 @@
---!strict
+ --!strict
 -- [[ModuleScript] UIConfig]]
 -- Centralized design tokens for all UI elements.
 -- Colors, typography, spacing, corner radii, and animation curves live here.
@@ -202,6 +202,31 @@ local UIConfig = {
 		Modal        = 40,
 		Tooltip      = 50,
 		Notification = 60,
+	},
+
+	-- Feature flags
+	FEATURES = {
+		UsePeaWheel = true, -- Master switch for the Pea Wheel radial menu
+	},
+
+	-- Pea Wheel radial menu tokens
+	PEA_WHEEL = {
+		SliceSize     = 72,
+		HubSize       = 88,
+		OpenScale     = 1.0,
+		SelectedScale = 1.12,
+		AnimDuration  = 0.18,
+		TouchTarget   = 64,
+		Colors = {
+			Slice       = Color3.fromRGB(60, 50, 70),
+			SliceHover  = Color3.fromRGB(100, 200, 80),
+			SliceActive = Color3.fromRGB(124, 184, 124),
+			Stroke      = Color3.fromRGB(200, 160, 240),
+			StrokeDim   = Color3.fromRGB(100, 90, 110),
+			Center      = Color3.fromRGB(30, 25, 20),
+			CenterText  = Color3.fromRGB(255, 250, 245),
+			Disabled    = Color3.fromRGB(80, 75, 85),
+		},
 	},
 
 	-- Helper: get color by name with fallback

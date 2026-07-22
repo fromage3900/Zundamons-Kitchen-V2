@@ -43,6 +43,9 @@ uiPadding.PaddingTop = UDim.new(0, 8)
 uiPadding.PaddingBottom = UDim.new(0, 8)
 uiPadding.Parent = hudButtons
 
+local RS = game:GetService("ReplicatedStorage")
+local UIHelper = require(RS.Shared.Modules.UIHelper)
+
 print("[HudBootstrap] HudButtons container created")
 
 -- Create action buttons
@@ -80,6 +83,12 @@ for _, btnDef in ipairs(BUTTONS) do
 	btn.MouseLeave:Connect(function()
 		btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
 		btn.TextColor3 = UIConfig.COLORS.TextPrimary
+	end)
+
+	-- Cute sparkle on every HUD button click
+	btn.MouseButton1Click:Connect(function()
+		local pos = btn.AbsolutePosition
+		UIHelper.spawnSparkles(btn, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, UIConfig.COLORS.Primary, 6)
 	end)
 
 	print("[HudBootstrap] Created button:", btnDef.name)

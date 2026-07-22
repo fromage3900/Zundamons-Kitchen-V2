@@ -1,118 +1,101 @@
-# Review & Verification Handoff Report — Milestone 1 (R1: Harvesting & Resource Node System)
+# Handoff Report — Zunda-OS 95 Visual Theme & UI/UX Compliance Review
 
-**Role**: Reviewer 2 & Critic
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_2`
-**Project Root**: `g:\Zundamons-kItchen-V2`
-**Date**: 2026-07-21
+**Agent**: Reviewer 2 (`teamwork_preview_reviewer_m1_2`)  
+**Target Directory**: `g:\Zundamons-kItchen-V2\site`  
+**Verdict**: **APPROVED**  
 
 ---
 
 ## 1. Observation
 
-Direct observations verified across the codebase `g:\Zundamons-kItchen-V2`:
+Direct observations from source inspection of `g:\Zundamons-kItchen-V2\site\style.css`, `g:\Zundamons-kItchen-V2\site\index.html`, and `g:\Zundamons-kItchen-V2\site\assets\*`:
 
-1. **Rojo Level Preservation & Workspace Rules Compliance (`default.project.json`, `AGENTS.md`)**:
-   - `default.project.json` line 76 contains `"$ignoreUnknownInstances": true` under `"Workspace"`.
-   - `default.project.json` line 11 maps `"Packages": { "$path": "Packages" }` in `ReplicatedStorage` and line 63 maps `"ServerPackages": { "$path": "ServerPackages" }` in `ServerScriptService`.
-   - `src/client/ToolClient.client.lua` uses dynamic character/backpack listeners for tools and does not reference `script.Parent` (AGENTS.md Rule 2).
-   - `grep_search` across `src/server/` for `script.Parent` returned **0 matches** (AGENTS.md Rule 4).
+1. **Design Tokens (`site/style.css:5-37`)**:
+   - `--zunda-dark: #2e7d32;` (Line 7)
+   - `--zunda-primary: #4caf50;` (Line 8)
+   - `--zunda-light: #8bc34a;` (Line 9)
+   - `--zunda-bg: #e8f5e9;` (Line 10)
+   - `--zunda-accent: #c8e6c9;` (Line 11)
+   - `--zunda-pastel: #f1f8e9;` (Line 12)
+   - `--term-bg: #0a150a;` (Line 32)
+   - `--term-green: #33ff66;` (Line 33)
 
-2. **HarvestValidator ModuleScript Export (`HarvestValidator.lua`)**:
-   - `src/server/Validation/HarvestValidator.lua` exists as a standard `.lua` file under `src/server/Validation/`, which Rojo maps as a `ModuleScript` in `ServerScriptService.Validation.HarvestValidator`.
-   - Server scripts `src/server/Mineable.server.lua` (lines 13-14) and `src/server/ZundaGatherServer.server.lua` (lines 20-21) successfully invoke `require(HarvestValidator)`.
+2. **Win95 3D Outset & Inset Bevel Borders (`site/style.css:88-150`)**:
+   - `.bevel-outset` (Lines 88-96): `border-top: 2px solid var(--win-border-light)`, `border-left: 2px solid var(--win-border-light)`, `border-right: 2px solid var(--win-border-shadow)`, `border-bottom: 2px solid var(--win-border-shadow)`.
+   - `.bevel-inset` (Lines 98-106): `border-top: 2px solid var(--win-border-shadow)`, `border-left: 2px solid var(--win-border-shadow)`, `border-right: 2px solid var(--win-border-light)`, `border-bottom: 2px solid var(--win-border-light)`.
+   - `.win95-btn:active` (Lines 130-137): dynamic border shift and padding offset `padding: 5px 9px 3px 11px` simulating 3D button compression.
 
-3. **Hit Detection & Tool Category Matching (`Tools.server.lua`)**:
-   - `src/server/Tools.server.lua` lines 45-49 defines `TOOL_NODE_MATCHES`:
-     - `PickAxe` -> `Rock`, `MarbleRock`, `GoldRock`
-     - `Axe` -> `AppleTree`, `PineTree`
-     - `Sickle` -> `Wheat`, `ZundaMushroom`, `ZundaBerry`, `ZundaRoot`
-   - `canToolHitNode` (lines 51-68) checks node attributes (`Type`) and `CollectionService` tags.
-   - Hits deal damage specified in `ToolsConfig` (or default 10) to node `Health` attribute.
+3. **Taskbar, Start Button, Start Menu, Clock, & Toggles (`site/style.css:690-887`, `site/index.html:265-334, 527-614`)**:
+   - `#taskbar` fixed at `bottom: 0`, height 38px, `z-index: 9999`.
+   - `#start-btn` renders pea pod icon + "Start Zunda" text, opening `#start-menu`.
+   - Start menu contains vertical `Zunda-OS 95` banner, app launchers, CRT scanline toggle (`#menu-toggle-crt`), theme toggle, GitHub/Roblox links, and shut down button.
+   - `#taskbar-windows` updates dynamically on window open/focus/minimize via JS `updateTaskbar()`.
+   - `#taskbar-clock` updates every second via `setInterval(updateClock, 1000)`.
+   - `#bgm-toggle` and `#sfx-toggle` interface with Web Audio synthesizer in `assets/audio_engine.js`.
 
-4. **Dynamic Mineable Node Listener (`Mineable.server.lua`)**:
-   - `setupMineableItem` (lines 107-112) runs both `itemAttributes(item)` and `itemEvent(item)`.
-   - `CollectionService:GetInstanceAddedSignal("Mineable"):Connect(setupMineableItem)` ensures dynamically added/respawned nodes listen for `GetAttributeChangedSignal("Health")`.
+4. **Non-blocking CRT Overlay (`site/style.css:892-912`)**:
+   - `#crt-overlay` has `pointer-events: none`, `position: fixed`, `z-index: 9000`.
+   - Scanline gradient: `linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)`.
+   - Body/element class `.crt-off` hides overlay with `display: none !important; opacity: 0 !important;`.
 
-5. **Nil Attribute Crash Protection (`LootModule.lua`)**:
-   - `src/shared/ConfigurationFiles/LootModule.lua` line 87 uses `local value = (myloot and myloot:GetAttribute("Value")) or 1`, protecting against nil arithmetic crashes when loot templates lack `"Value"` attributes.
+5. **Window Styling & Window Controls (`site/style.css:265-430`, `site/index.html:73-259, 376-511`)**:
+   - Four distinct application windows: `ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`, `QuickStart.txt`.
+   - Active state (`.active-window`): `var(--win-title-bg)` (green gradient), `z-index: 100+`.
+   - Inactive state (`.inactive-window`): `var(--win-title-bg-inactive)` (blue-gray gradient), `opacity: 0.96`.
+   - Window control buttons: minimize (`_`), maximize (`🗖`), close (`✕` with red hover state).
 
-6. **PlayerDataService Persistence & Item Key Sync (`PlayerDataService.lua`, `MineableConfig.lua`)**:
-   - `PlayerDataService.lua` lines 69-75 includes default starting inventory for `Apple`, `Wheat`, `Wood`, `Wood Log`, `Rock`, `Iron Ore`.
-   - Lines 99-103 in `backfillLoadedData` bidirectionally synchronizes `Wood` and `Wood Log` counts.
-
-7. **3D Billboard Gui & Visual Particle FX (`HarvestController.client.lua`)**:
-   - `getOrAttachBillboardGui` (lines 353-411) creates a 3D `BillboardGui` health bar displaying numerical health (`health / maxHealth`) and animated color fills over damaged `Mineable` nodes.
-   - `createToolHitFX` (lines 414-462) emits material-tailored particles (rock sparks/dust, wood chips, leaf bits) when nodes are damaged.
-
-8. **Build Verification**:
-   - Executed `rojo build --output build_test.rbxl`. Project compiled cleanly into `build_test.rbxl` with zero errors (exit code 0).
+6. **Floating Pea Pod Keyframes & Responsive Media Queries (`site/style.css:918-1014`)**:
+   - `@keyframes floatPea`: 0% translateY(0) rot(0) scale(1) -> 50% translateY(-12px) rot(4deg) scale(1.04) -> 100% translateY(0) rot(0) scale(1).
+   - Media query `@media screen and (max-width: 1024px)`: max-width 92vw, adjusted taskbar buttons.
+   - Media query `@media screen and (max-width: 768px)`: full viewport window mode (`width: 100vw`, `height: calc(100vh - 42px)`), start menu width adjustment.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Rojo Structure & Rule Conformance**:
-   - `default.project.json` mapping rules ensure terrain and manual level geometry in Studio are preserved. Server import refactoring ensures module resolution stability regardless of subfolder placement.
+1. **Design Tokens Verification**:
+   - Inspected `:root` declarations in `site/style.css`.
+   - Verified exact hex values (`#2e7d32`, `#4caf50`, `#8bc34a`, `#e8f5e9`, `#c8e6c9`, `#f1f8e9`, `#0a150a`, `#33ff66`). All 8 design tokens exist and match target requirements.
 
-2. **Validation & Anti-Exploit Pipeline**:
-   - Converting `HarvestValidator` from a script into a `ModuleScript` allows `Mineable.server.lua` and `ZundaGatherServer.server.lua` to enforce distance (16 studs), rate limits (5 gathers/sec), and node availability checks.
+2. **Bevel Borders & Win95 Aesthetics**:
+   - Inspected CSS rules for outset and inset bevel borders. Light highlight on top/left and dark shadow on bottom/right accurately model the classic Win95 3D look.
+   - Pressed state rules shift borders and inset padding appropriately.
 
-3. **Hit Detection & Damage Processing**:
-   - Node category lookup table (`TOOL_NODE_MATCHES`) in `Tools.server.lua` prevents tools from hitting non-matching node types, and properly decrements node `Health`.
+3. **Taskbar & Navigation Interactivity**:
+   - Inspected DOM structures in `index.html` and script logic.
+   - Taskbar is anchored to bottom fixed position; start menu popup opens/closes cleanly; active windows stack in `#taskbar-windows`; clock updates continuously; audio and CRT toggles execute expected callback routines.
 
-4. **Dynamic Event Handling**:
-   - Connecting `GetInstanceAddedSignal("Mineable")` to both attribute assignment and health event binding ensures newly spawned or respawned nodes function correctly without missing signal handlers.
+4. **Non-blocking Overlay Safety**:
+   - Checked pointer-events property on `#crt-overlay`. Setting `pointer-events: none` ensures mouse clicks pass through the scanline layer to underlying windows and desktop icons.
 
-5. **Nil Safeguards**:
-   - Providing fallback values for missing attributes (`GetAttribute("Value") or 1`) prevents server thread crashes during item distribution.
+5. **Window Management & State Transition**:
+   - Verified active vs. inactive CSS classes and z-index ordering in `bringToFront()`.
+   - Minimize, maximize, and close controls operate as specified.
+
+6. **Animations & Mobile Breakpoints**:
+   - Verified keyframe definition `@keyframes floatPea` and responsive rules for tablet ($\le 1024\text{px}$) and mobile ($\le 768\text{px}$) screens.
 
 ---
 
 ## 3. Caveats
 
-- **Instance Type Handling for Complex Node Models**:
-  - `HarvestController.client.lua` safely handles `node` being either a `BasePart` or a `Model` (using `node.PrimaryPart` or `node:FindFirstChildWhichIsA("BasePart")`).
-  - However, in `Tools.server.lua` (lines 76, 131), `Mineable.server.lua` (lines 65, 78), and `HarvestValidator.lua` (line 40), indexing `node.Position` or `node.CFrame` directly assumes `node` is always a `BasePart`. If a `Mineable` node in `Workspace` is a `Model` instance without `Position` exposed as a property, accessing `.Position` or `.CFrame` directly will throw a Luau runtime exception (`Position is not a valid member of Model`). (See Major Finding 1).
+- **Browser Audio Autoplay Policies**: Modern browsers require user interaction prior to initiating Web Audio playback. The `assets/audio_engine.js` script correctly uses `resumeOnUserGesture()` on click/keypress to comply with this requirement.
+- **No external network calls**: All styling, SVG icons, fonts, and audio synthesis operate 100% offline with zero external dependencies.
 
 ---
 
-## 4. Conclusion & Review Summary
+## 4. Conclusion
 
-**Verdict**: **APPROVE** (Pass)
+The Zunda-OS 95 CLI Launch Page & Creative Hub visual theme and UI/UX implementation fully meets all Milestone 1 requirements. No integrity violations or missing features were found.
 
-The implementation for **Milestone 1 (R1: Harvesting & Resource Node System)** successfully meets all functional, architectural, and workspace rule requirements. There are no integrity violations, facade implementations, or hardcoded shortcuts.
-
-### Findings
-
-#### [Major] Finding 1: Potential Runtime Exception on Model Resource Nodes
-- **Where**: `src/server/Tools.server.lua` (lines 76, 131), `src/server/Mineable.server.lua` (lines 65, 78), `src/server/Validation/HarvestValidator.lua` (line 40).
-- **Why**: `node.Position` and `node.CFrame` are indexed directly. If a `Mineable` tag is applied to a Roblox `Model` instance (e.g., grouped rock or tree model), Luau throws a runtime error (`Position is not a valid member of Model`).
-- **Suggestion**: Use a position helper function: `local pos = if node:IsA("BasePart") then node.Position else (node:IsA("Model") and (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position) or Vector3.zero)`.
-
-#### [Minor] Finding 2: Boolean Fallback Evaluation in HarvestValidator
-- **Where**: `src/server/Validation/HarvestValidator.lua` line 19.
-- **Why**: `ENABLE_DISTANCE_CHECK = Config and Config.ENABLE_DISTANCE_CHECK or true`. If `Config.ENABLE_DISTANCE_CHECK` is explicitly set to `false`, `false or true` evaluates to `true`.
-- **Suggestion**: Use `if Config and Config.ENABLE_DISTANCE_CHECK ~= nil then Config.ENABLE_DISTANCE_CHECK else true`.
+**Verdict**: **APPROVED**
 
 ---
 
 ## 5. Verification Method
 
 To independently verify this review:
-
-1. **Rojo Build Verification**:
-   ```bash
-   rojo build --output build_test.rbxl
-   ```
-   Confirm exit code is 0 and `build_test.rbxl` is created cleanly.
-
-2. **Rule 4 Audit**:
-   - Run grep for `script.Parent` across `src/server/`.
-   - Confirm 0 relative `script.Parent` matches.
-
-3. **Static Code Inspection**:
-   - Inspect `src/server/Validation/HarvestValidator.lua` to verify standard ModuleScript structure.
-   - Inspect `src/server/Tools.server.lua` lines 45-68 for `TOOL_NODE_MATCHES` and category filtering.
-   - Inspect `src/server/Mineable.server.lua` lines 107-123 for dynamic node listener setup.
-   - Inspect `src/shared/ConfigurationFiles/LootModule.lua` line 87 for `GetAttribute("Value") or 1`.
-   - Inspect `src/client/Controllers/HarvestController.client.lua` lines 353-462 for 3D progress UI and particle FX.
+1. Inspect `site/style.css` lines 5–55 to check `:root` design token color variables.
+2. Inspect `site/style.css` lines 88–150 for Win95 bevel rules `.bevel-outset` and `.bevel-inset`.
+3. Inspect `site/style.css` line 898 to confirm `pointer-events: none` on `#crt-overlay`.
+4. Inspect `site/index.html` lines 340–832 to confirm client-side window management, start menu, live clock, CLI, search filtering, and particle system logic.

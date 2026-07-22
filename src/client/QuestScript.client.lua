@@ -6,6 +6,8 @@ local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "QuestGui", 25)
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local RE = RS:WaitForChild("RemoteEvents")
 local ev = RE:WaitForChild("UpdateQuests", 15)
 local C = {
@@ -35,7 +37,7 @@ local hdr = Instance.new("TextLabel", panel)
 hdr.Size = UDim2.new(1, -70, 0, 52)
 hdr.Position = UDim2.new(0, 18, 0, 12)
 hdr.BackgroundTransparency = 1
-hdr.Text = "📋  Quests"
+hdr.Text = "📋  Quests 📝"
 hdr.Font = Enum.Font.FredokaOne
 hdr.TextSize = 28
 hdr.TextColor3 = C.text
@@ -269,21 +271,36 @@ spawnPopup = function(kind, text, color)
 end
 
 local open = false
-local function toggle()
-	open = not open
-	panel.Visible = open
-	if open then
+local shell = CozyModalShell.wrap(panel, {
+	open = function()
 		panel.Size = UDim2.new(0, 420, 0, 10)
 		Tween:Create(
 			panel,
-			TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
 			{ Size = UDim2.new(0, 420, 0, 520) }
 		):Play()
+	end,
+	close = function()
+		panel.Visible = false
+		open = false
+	end,
+})
+
+local function toggle()
+	if open then
+		UIRouter.close("quests")
+		open = false
+	else
+		UIRouter.open("quests")
+		open = true
+		shell.open()
 	end
 end
 closeBtn.MouseButton1Click:Connect(function()
 	open = true
 	toggle()
+	local pos = closeBtn.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, Color3.fromRGB(255,255,255), 6)
 end)
 task.spawn(function()
 	local pg = player:WaitForChild("PlayerGui")

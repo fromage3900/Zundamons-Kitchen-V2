@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="zunda-classic">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub">
+    <meta name="keywords" content="Zundamon, Roblox, Luau, Zunda-OS 95, CLI, Retro Web, Cookbook, Visual Novel">
+    <meta name="author" content="Zundamon's Kitchen Team">
+
+    <!-- Open Graph / Social Tags -->
+    <meta property="og:title" content="Zundamon's Kitchen V2 — Zunda-OS 95">
+    <meta property="og:description" content="Retro Win95 CLI Launch Page & Creative Hub for Zundamon's Kitchen V2">
+    <meta property="og:type" content="website">
+
+    <title>Zundamon's Kitchen V2 — Zunda-OS 95</title>
+
+    <!-- Embedded Favicon (Edamame Pea SVG Data URI) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫛</text></svg>">
+
+    <!-- Primary Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="zunda-os95">
+
+    <!-- CRT Scanline & Curved Glass CRT Overlay -->
+    <div id="crt-overlay" class="crt-enabled" aria-hidden="true">
+        <div class="crt-scanlines"></div>
+        <div class="crt-glow"></div>
+    </div>
+
+    <!-- Main Desktop Area -->
+    <main id="desktop" role="main">
+        <!-- Background Floating Edamame Particle Canvas -->
+        <canvas id="particle-canvas"></canvas>
+
+        <!-- Desktop Shortcuts Grid -->
+        <div id="desktop-icons" role="region" aria-label="Desktop Shortcuts">
+            <button class="desktop-shortcut" data-open-window="window-zundacli" tabindex="0">
+                <div class="shortcut-icon cli-icon">
+                    <img src="assets/crt_monitor.svg" alt="CLI Icon">
+                </div>
+                <span class="shortcut-label">ZundaCLI.exe</span>
+            </button>
+
+            <button class="desktop-shortcut" data-open-window="window-cookbook" tabindex="0">
+                <div class="shortcut-icon book-icon">
+                    <img src="assets/disc_icon.svg" alt="Cookbook Icon">
+                </div>
+                <span class="shortcut-label">Cookbook.app</span>
+            </button>
+
+            <button class="desktop-shortcut" data-open-window="window-vntalk" tabindex="0">
+                <div class="shortcut-icon vn-icon">
+                    <img src="assets/zundamon_mochi.svg" alt="VN Icon">
+                </div>
+                <span class="shortcut-label">VNTalk.app</span>
+            </button>
+
+            <button class="desktop-shortcut" data-open-window="window-quickstart" tabindex="0">
+                <div class="shortcut-icon txt-icon">📝</div>
+                <span class="shortcut-label">QuickStart.txt</span>
+            </button>
+
+            <button class="desktop-shortcut" data-open-window="window-trash" tabindex="0">
+                <div class="shortcut-icon trash-icon">🗑️</div>
+                <span class="shortcut-label">Zunda Bin</span>
+            </button>
+        </div>
+
+        <!-- Window Manager Floating Window Stack -->
+        <div id="window-container">
+
+            <!-- 1. ZundaCLI.exe Window -->
+            <section id="window-zundacli" class="window active-window" data-window-id="zundacli" style="top: 40px; left: 60px; width: 680px; height: 440px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon"><img src="assets/crt_monitor.svg" width="16" height="16" alt="Icon"></span>
+                        <span class="window-title-text">ZundaCLI.exe — Command Prompt</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+                
+                <div class="window-menu-bar">
+                    <span class="menu-item">File</span>
+                    <span class="menu-item">Edit</span>
+                    <span class="menu-item">View</span>
+                    <span class="menu-item">Help</span>
+                </div>
+
+                <div class="window-body cli-body" data-term-theme="classic-green">
+                    <div class="cli-scanline-overlay"></div>
+                    <div id="cli-output" class="cli-terminal-log" role="log" aria-live="polite">
+                        <p class="cli-welcome">Zunda-OS 95 [Version 4.09.1995]</p>
+                        <p class="cli-welcome">(C) Zundamon's Kitchen V2. Type <span class="cli-highlight">'help'</span> or <span class="cli-highlight">'recipes'</span> for commands.</p>
+                        <p class="cli-line"><span class="cli-tag cli-tag-system">[SYSTEM]</span> Initialized edamame kernel matrix... nanoda!</p>
+                    </div>
+                    <button id="cli-scroll-bottom-btn" class="cli-scroll-bottom-btn hidden" title="Scroll to Bottom">↓ New Output Below</button>
+                    <form id="cli-input-form" class="cli-prompt-line" autocomplete="off" onsubmit="return false;">
+                        <label for="cli-input" class="cli-prompt-label">zunda&gt;</label>
+                        <input type="text" id="cli-input" class="cli-input-field" placeholder="Enter command (e.g., help, gather, recipes)..." spellcheck="false">
+                    </form>
+                    <div id="cli-mobile-toolbar" class="cli-mobile-toolbar">
+                        <button type="button" class="cli-vkey" data-key="Tab">TAB ⇥</button>
+                        <button type="button" class="cli-vkey" data-key="ArrowUp">▲ HIST</button>
+                        <button type="button" class="cli-vkey" data-key="ArrowDown">▼ HIST</button>
+                        <button type="button" class="cli-vkey" data-cmd="help">HELP</button>
+                        <button type="button" class="cli-vkey" data-cmd="clear">CLEAR</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Cookbook.app Window -->
+            <section id="window-cookbook" class="window hidden" data-window-id="cookbook" style="top: 80px; left: 140px; width: 720px; height: 500px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon"><img src="assets/disc_icon.svg" width="16" height="16" alt="Icon"></span>
+                        <span class="window-title-text">Cookbook.app — Zunda Recipe Book</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body cookbook-body">
+                    <div class="recipe-toolbar">
+                        <input type="search" id="recipe-search" class="win95-input" placeholder="Search recipes (e.g. Mochi, Shake, Dango)...">
+                        <div class="recipe-filter-tags">
+                            <button class="win95-btn active" data-filter="all">All Recipes</button>
+                            <button class="win95-btn" data-filter="classic">Classic Zunda</button>
+                            <button class="win95-btn" data-filter="desserts">Sweets & Desserts</button>
+                            <button class="win95-btn" data-filter="drinks">Drinks</button>
+                        </div>
+                    </div>
+
+                    <div id="recipe-grid" class="recipe-grid-container">
+                        <article class="recipe-card" data-category="classic" data-recipe-name="Zunda Mochi">
+                            <div class="recipe-thumbnail">🫛🍡</div>
+                            <div class="recipe-info">
+                                <h3 class="recipe-title">Zunda Mochi (ずんだ餅)</h3>
+                                <p class="recipe-desc">Sweetened crushed edamame paste draped over warm, chewy rice cakes.</p>
+                                <span class="recipe-badge">Signature Dish</span>
+                            </div>
+                        </article>
+
+                        <article class="recipe-card" data-category="drinks" data-recipe-name="Zunda Shake">
+                            <div class="recipe-thumbnail">🫛🥤</div>
+                            <div class="recipe-info">
+                                <h3 class="recipe-title">Zunda Shake (ずんだシェイク)</h3>
+                                <p class="recipe-desc">Rich vanilla cream blended with freshly crushed green zunda beans.</p>
+                                <span class="recipe-badge">Refreshing</span>
+                            </div>
+                        </article>
+
+                        <article class="recipe-card" data-category="desserts" data-recipe-name="Zunda Parfait">
+                            <div class="recipe-thumbnail">🫛🍨</div>
+                            <div class="recipe-info">
+                                <h3 class="recipe-title">Zunda Parfait (ずんだパフェ)</h3>
+                                <p class="recipe-desc">Layered dessert with green tea ice cream, zunda paste, and fresh fruit.</p>
+                                <span class="recipe-badge">Deluxe Sweets</span>
+                            </div>
+                        </article>
+
+                        <article class="recipe-card" data-category="classic" data-recipe-name="Zunda Dango">
+                            <div class="recipe-thumbnail">🫛🍡</div>
+                            <div class="recipe-info">
+                                <h3 class="recipe-title">Zunda Dango (ずんだ団子)</h3>
+                                <p class="recipe-desc">Tri-color skewered dumplings coated in sweet green edamame paste.</p>
+                                <span class="recipe-badge">Traditional</span>
+                            </div>
+                        </article>
+
+                        <article class="recipe-card" data-category="drinks" data-recipe-name="Zunda Latte">
+                            <div class="recipe-thumbnail">🫛☕</div>
+                            <div class="recipe-info">
+                                <h3 class="recipe-title">Zunda Matcha Latte (ずんだ抹茶)</h3>
+                                <p class="recipe-desc">Steamed oat milk poured over ceremonial matcha and edamame syrup.</p>
+                                <span class="recipe-badge">Warm Cozy</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. VNTalk.app Window -->
+            <section id="window-vntalk" class="window hidden" data-window-id="vntalk" style="top: 100px; left: 220px; width: 640px; height: 460px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon"><img src="assets/zundamon_mochi.svg" width="16" height="16" alt="Icon"></span>
+                        <span class="window-title-text">VNTalk.app — Zundamon Visual Novel</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body vn-body">
+                    <div id="vn-stage" class="vn-stage-background">
+                        <div id="vn-portrait" class="vn-character-portrait" data-expression="happy">
+                            <div class="portrait-avatar">
+                                <img src="assets/zundamon_mochi.svg" width="96" height="96" alt="Zundamon Mochi">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="vn-dialogue-box" class="vn-dialogue-panel">
+                        <div id="vn-speaker" class="vn-speaker-tag">Zundamon (ずんだもん)</div>
+                        <div id="vn-text" class="vn-text-content">
+                            Welcome to Zundamon's Kitchen V2 nanoda! What delicious edamame treats shall we cook today?
+                        </div>
+                        <div id="vn-choices" class="vn-choices-container">
+                            <button class="vn-choice-btn" data-vn-choice="1">Let's check the recipe book!</button>
+                            <button class="vn-choice-btn" data-vn-choice="2">Launch Roblox Zundamon's Kitchen!</button>
+                            <button class="vn-choice-btn" data-vn-choice="3">Tell me a fun Zunda fact, nanoda!</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. QuickStart.txt Window -->
+            <section id="window-quickstart" class="window hidden" data-window-id="quickstart" style="top: 60px; left: 300px; width: 600px; height: 420px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">📝</span>
+                        <span class="window-title-text">QuickStart.txt — Notepad</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body notepad-body">
+                    <textarea class="notepad-editor" readonly spellcheck="false">
+=====================================================
+  ZUNDAMON'S KITCHEN V2 — QUICK START GUIDE (Zunda-OS 95)
+=====================================================
+
+Welcome to Zunda-OS 95!
+
+[KEYBOARD SHORTCUTS & NAVIGATION]
+• Click desktop icons or taskbar items to open/focus apps.
+• Open Start Menu: Click [Start Zunda 🫛] or press Ctrl+Esc.
+• Toggle CRT Overlay: Use Start Menu -> Toggle CRT Scanlines or System Tray.
+• Execute CLI Commands: Type commands into ZundaCLI.exe (try 'help', 'status', 'cook').
+
+[FEATURES & APPS]
+1. ZundaCLI.exe : Terminal interface to inspect game state & build tools.
+2. Cookbook.app : Discover signature Zundamon edamame recipes & stats.
+3. VNTalk.app   : Interactive visual novel dialogue with Zundamon.
+4. System Tray  : Procedural BGM & SFX synthesizers with live time clock.
+
+[GAME & REPO LINKS]
+• Roblox Game Page : https://www.roblox.com/
+• GitHub Repository: https://github.com/
+
+Enjoy your cozy culinary experience nanoda! 🫛
+                    </textarea>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Vintage Taskbar & Start Menu -->
+    <footer id="taskbar" role="contentinfo">
+        <!-- Start Button -->
+        <button id="start-btn" class="win95-start-btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+            <span class="start-icon"><img src="assets/pea_pod.svg" width="18" height="18" alt="Start Icon"></span>
+            <span class="start-text">Start Zunda</span>
+        </button>
+
+        <!-- Start Menu Popup -->
+        <div id="start-menu" class="start-menu-popup hidden" role="menu" aria-label="Start Menu">
+            <div class="start-menu-banner">
+                <span class="banner-text">Zunda-OS <strong>95</strong></span>
+            </div>
+            <div class="start-menu-items">
+                <button class="start-item" data-open-window="window-zundacli" role="menuitem">
+                    <span class="item-icon">💻</span> ZundaCLI.exe
+                </button>
+                <button class="start-item" data-open-window="window-cookbook" role="menuitem">
+                    <span class="item-icon">📖</span> Cookbook.app
+                </button>
+                <button class="start-item" data-open-window="window-vntalk" role="menuitem">
+                    <span class="item-icon">💬</span> VNTalk.app
+                </button>
+                <button class="start-item" data-open-window="window-quickstart" role="menuitem">
+                    <span class="item-icon">📝</span> QuickStart.txt
+                </button>
+
+                <div class="start-divider"></div>
+
+                <button id="menu-toggle-crt" class="start-item" role="menuitem">
+                    <span class="item-icon">📺</span> Toggle CRT Scanlines
+                </button>
+                <button id="menu-toggle-theme" class="start-item" role="menuitem">
+                    <span class="item-icon">🎨</span> Toggle Theme Mode
+                </button>
+
+                <div class="start-divider"></div>
+
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="start-item" role="menuitem">
+                    <span class="item-icon">🌐</span> GitHub Repository
+                </a>
+                <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" class="start-item" role="menuitem">
+                    <span class="item-icon">🎮</span> Roblox Game Page
+                </a>
+
+                <div class="start-divider"></div>
+
+                <button id="menu-shutdown" class="start-item" role="menuitem">
+                    <span class="item-icon">🔌</span> Shut Down Zunda-OS...
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Windows List Container -->
+        <div id="taskbar-windows" class="taskbar-windows-container">
+            <button class="taskbar-item active" data-window-target="window-zundacli">
+                <span class="tb-icon">💻</span> ZundaCLI.exe
+            </button>
+        </div>
+
+        <!-- System Tray -->
+        <div id="taskbar-tray" class="taskbar-tray-container">
+            <button id="bgm-toggle" class="tray-btn" title="Toggle Cozy BGM Music" aria-label="Toggle BGM">
+                <span class="tray-icon">🎵</span>
+            </button>
+            <button id="sfx-toggle" class="tray-btn" title="Toggle Sound Effects" aria-label="Toggle SFX">
+                <span class="tray-icon">🔊</span>
+            </button>
+            <div id="taskbar-clock" class="tray-clock" title="Current Time">12:00:00 PM</div>
+        </div>
+    </footer>
+
+    <!-- Audio Synthesizer Engine -->
+    <script src="assets/audio_engine.js"></script>
+
+    <!-- Window Manager Engine -->
+    <script src="window_manager.js"></script>
+
+    <!-- Interactive CRT Phosphor Terminal Engine -->
+    <script src="terminal.js"></script>
+
+    <!-- Front-End Client Application Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. Audio Engine Helper Wrappers ---
+            function playClick(type = 'down') {
+                if (typeof window.playClickSFX === 'function') {
+                    window.playClickSFX(type);
+                }
+            }
+
+            function playWinSFX(action = 'focus') {
+                if (typeof window.playWindowSFX === 'function') {
+                    window.playWindowSFX(action);
+                }
+            }
+
+            function playKey(key = '') {
+                if (typeof window.playKeySFX === 'function') {
+                    window.playKeySFX(key);
+                }
+            }
+
+            // --- 2. Live Digital Clock ---
+            function updateClock() {
+                const clockEl = document.getElementById('taskbar-clock');
+                if (clockEl) {
+                    const now = new Date();
+                    clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // --- 3. Window Manager Initialization ---
+            const windowManager = new WindowManager();
+            windowManager.init();
+            window.windowManager = windowManager;
+
+            function openWindow(winId) {
+                windowManager.openWindow(winId);
+            }
+
+            // Desktop shortcut click handlers
+            document.querySelectorAll('.desktop-shortcut').forEach(shortcut => {
+                shortcut.addEventListener('click', () => {
+                    playClick('down');
+                    const targetId = shortcut.dataset.openWindow;
+                    if (targetId) openWindow(targetId);
+                });
+
+                shortcut.addEventListener('dblclick', () => {
+                    const targetId = shortcut.dataset.openWindow;
+                    if (targetId) openWindow(targetId);
+                });
+            });
+
+            // --- 4. Start Menu Management ---
+            const startBtn = document.getElementById('start-btn');
+            const startMenu = document.getElementById('start-menu');
+
+            if (startBtn && startMenu) {
+                startBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    playClick('start');
+                    const isHidden = startMenu.classList.contains('hidden');
+                    if (isHidden) {
+                        startMenu.classList.remove('hidden');
+                        startBtn.classList.add('start-btn-active');
+                    } else {
+                        startMenu.classList.add('hidden');
+                        startBtn.classList.remove('start-btn-active');
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!startMenu.contains(e.target) && e.target !== startBtn) {
+                        startMenu.classList.add('hidden');
+                        startBtn.classList.remove('start-btn-active');
+                    }
+                });
+
+                startMenu.querySelectorAll('.start-item[data-open-window]').forEach(item => {
+                    item.addEventListener('click', () => {
+                        playClick('down');
+                        const targetId = item.dataset.openWindow;
+                        if (targetId) openWindow(targetId);
+                        startMenu.classList.add('hidden');
+                        startBtn.classList.remove('start-btn-active');
+                    });
+                });
+
+                // Start menu toggle options
+                const menuCrtBtn = document.getElementById('menu-toggle-crt');
+                if (menuCrtBtn) {
+                    menuCrtBtn.addEventListener('click', () => {
+                        playClick('down');
+                        const crtOverlay = document.getElementById('crt-overlay');
+                        if (crtOverlay) {
+                            crtOverlay.classList.toggle('crt-off');
+                        }
+                    });
+                }
+
+                const menuThemeBtn = document.getElementById('menu-toggle-theme');
+                if (menuThemeBtn) {
+                    menuThemeBtn.addEventListener('click', () => {
+                        playClick('down');
+                        const currentTheme = document.documentElement.getAttribute('data-theme');
+                        const nextTheme = currentTheme === 'zunda-classic' ? 'zunda-dark' : 'zunda-classic';
+                        document.documentElement.setAttribute('data-theme', nextTheme);
+                    });
+                }
+
+                const shutdownBtn = document.getElementById('menu-shutdown');
+                if (shutdownBtn) {
+                    shutdownBtn.addEventListener('click', () => {
+                        playClick('down');
+                        alert("Shutting down Zunda-OS 95... See you soon, nanoda! 🫛");
+                        location.reload();
+                    });
+                }
+            }
+
+            // --- 5. System Tray Toggles ---
+            const bgmToggle = document.getElementById('bgm-toggle');
+            if (bgmToggle) {
+                bgmToggle.addEventListener('click', () => {
+                    if (typeof window.toggleCozyBGM === 'function') {
+                        const isPlaying = window.toggleCozyBGM();
+                        bgmToggle.style.opacity = isPlaying ? '1' : '0.5';
+                    }
+                });
+            }
+
+            const sfxToggle = document.getElementById('sfx-toggle');
+            if (sfxToggle) {
+                sfxToggle.addEventListener('click', () => {
+                    if (window.ZundaAudio) {
+                        const muted = window.ZundaAudio.toggleMute();
+                        sfxToggle.style.opacity = muted ? '0.4' : '1';
+                        sfxToggle.querySelector('.tray-icon').textContent = muted ? '🔇' : '🔊';
+                    }
+                });
+            }
+
+            // --- 6. CLI Terminal Initialized via terminal.js (ZundaTerminal class) ---
+
+            // --- 7. Cookbook Filtering Logic ---
+            const recipeSearch = document.getElementById('recipe-search');
+            const recipeGrid = document.getElementById('recipe-grid');
+            const filterBtns = document.querySelectorAll('.recipe-filter-tags .win95-btn');
+
+            function filterRecipes() {
+                const query = recipeSearch ? recipeSearch.value.toLowerCase().trim() : '';
+                const activeBtn = document.querySelector('.recipe-filter-tags .win95-btn.active');
+                const category = activeBtn ? activeBtn.dataset.filter : 'all';
+
+                const cards = document.querySelectorAll('.recipe-card');
+                cards.forEach(card => {
+                    const cardCategory = card.dataset.category;
+                    const cardName = card.dataset.recipeName.toLowerCase();
+                    const cardText = card.textContent.toLowerCase();
+
+                    const matchesCategory = (category === 'all' || cardCategory === category);
+                    const matchesSearch = (!query || cardName.includes(query) || cardText.includes(query));
+
+                    if (matchesCategory && matchesSearch) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            if (recipeSearch) {
+                recipeSearch.addEventListener('input', filterRecipes);
+            }
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    playClick('down');
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterRecipes();
+                });
+            });
+
+            document.querySelectorAll('.recipe-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    playClick('down');
+                    const name = card.dataset.recipeName || 'Recipe';
+                    alert(`Selected ${name}! Open ZundaCLI.exe and type 'cook ${name}' to prepare!`);
+                });
+            });
+
+            // --- 8. Visual Novel Dialogue Interaction ---
+            const vnText = document.getElementById('vn-text');
+            const vnChoices = document.querySelectorAll('.vn-choice-btn');
+
+            vnChoices.forEach(choiceBtn => {
+                choiceBtn.addEventListener('click', () => {
+                    playClick('down');
+                    const choiceNum = choiceBtn.dataset.vnChoice;
+
+                    if (choiceNum === '1') {
+                        openWindow('window-cookbook');
+                        if (vnText) vnText.textContent = "Opening the Cookbook for you nanoda! Check out the Zunda Mochi!";
+                    } else if (choiceNum === '2') {
+                        if (vnText) vnText.textContent = "Launching Roblox Zundamon's Kitchen experience! Prepare for cooking adventures, nanoda!";
+                        window.open('https://www.roblox.com/', '_blank');
+                    } else if (choiceNum === '3') {
+                        const facts = [
+                            "Zunda paste is made by crushing young green edamame beans with sugar and salt, nanoda!",
+                            "Zundamon loves warm mochi draped in rich, sweet edamame cream!",
+                            "Zunda-OS 95 runs entirely on green bean power and Web Audio synthesis!"
+                        ];
+                        const randomFact = facts[Math.floor(Math.random() * facts.length)];
+                        if (vnText) vnText.textContent = `Fact time: ${randomFact}`;
+                    }
+                });
+            });
+
+            // --- 9. Background Floating Edamame Particle System ---
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+
+                function resizeCanvas() {
+                    canvas.width = canvas.parentElement.clientWidth;
+                    canvas.height = canvas.parentElement.clientHeight;
+                }
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+
+                class Particle {
+                    constructor() {
+                        this.reset();
+                    }
+
+                    reset() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = canvas.height + Math.random() * 50;
+                        this.size = Math.random() * 8 + 4;
+                        this.speedY = Math.random() * 1.2 + 0.4;
+                        this.speedX = Math.random() * 0.6 - 0.3;
+                        this.opacity = Math.random() * 0.5 + 0.2;
+                        this.rotation = Math.random() * Math.PI * 2;
+                        this.rotSpeed = (Math.random() - 0.5) * 0.02;
+                    }
+
+                    update() {
+                        this.y -= this.speedY;
+                        this.x += this.speedX;
+                        this.rotation += this.rotSpeed;
+                        if (this.y < -20) this.reset();
+                    }
+
+                    draw() {
+                        ctx.save();
+                        ctx.translate(this.x, this.y);
+                        ctx.rotate(this.rotation);
+                        ctx.globalAlpha = this.opacity;
+                        
+                        // Draw small floating edamame bean
+                        ctx.fillStyle = '#8bc34a';
+                        ctx.strokeStyle = '#2e7d32';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.restore();
+                    }
+                }
+
+                for (let i = 0; i < 35; i++) {
+                    particles.push(new Particle());
+                }
+
+                function animateParticles() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.update();
+                        p.draw();
+                    });
+                    requestAnimationFrame(animateParticles);
+                }
+                animateParticles();
+            }
+
+            // Initial setup
+            windowManager.updateTaskbar();
+        });
+    </script>
+</body>
+</html>

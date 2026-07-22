@@ -20,6 +20,8 @@ sourcemap.json
 Saved/
 *.log
 *.tmp
+*.blend1
+*.assbin
 
 # Local MCP and editor state
 .roblox-mcp/

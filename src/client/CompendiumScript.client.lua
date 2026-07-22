@@ -6,6 +6,8 @@ local player  = Players.LocalPlayer
 local gui     = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "CompendiumGui", 20)
 
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local craftConfig = require(RS.ConfigurationFiles.CraftConfig)
 
 local C = {
@@ -83,7 +85,7 @@ local bst = Instance.new("UIStroke", panel); bst.Thickness = 3; bst.Color = C.bo
 
 local title = Instance.new("TextLabel", panel)
 title.Size = UDim2.new(1, -80, 0, 52); title.Position = UDim2.new(0, 18, 0, 12)
-title.BackgroundTransparency = 1; title.Text = "📚  Compendium"
+title.BackgroundTransparency = 1; title.Text = "📚  Compendium 🧚"
 title.Font = Enum.Font.FredokaOne; title.TextSize = 30
 title.TextColor3 = C.text; title.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -372,24 +374,50 @@ searchBox.Changed:Connect(function(prop)
 	end
 end)
 
-tabRecipes.MouseButton1Click:Connect(function() render("recipes") end)
-tabItems.MouseButton1Click:Connect(function() render("items") end)
-tabZones.MouseButton1Click:Connect(function() render("zones") end)
+tabRecipes.MouseButton1Click:Connect(function()
+	render("recipes")
+	local pos = tabRecipes.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + tabRecipes.AbsoluteSize.X/2, pos.Y + tabRecipes.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 3)
+end)
+tabItems.MouseButton1Click:Connect(function()
+	render("items")
+	local pos = tabItems.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + tabItems.AbsoluteSize.X/2, pos.Y + tabItems.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 3)
+end)
+tabZones.MouseButton1Click:Connect(function()
+	render("zones")
+	local pos = tabZones.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + tabZones.AbsoluteSize.X/2, pos.Y + tabZones.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 3)
+end)
 
 local open = false
-local function toggle()
-	open = not open
-	panel.Visible = open
-	if open then
+local shell = CozyModalShell.wrap(panel, {
+	open = function()
 		render("recipes")
 		panel.Size = UDim2.new(0, 600, 0, 10)
-		Tween:Create(panel, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		Tween:Create(panel, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
 			{ Size = UDim2.new(0, 600, 0, 580) }):Play()
+	end,
+	close = function()
+		panel.Visible = false
+		open = false
+	end,
+})
+local function toggle()
+	if open then
+		UIRouter.close("compendium")
+		open = false
+	else
+		UIRouter.open("compendium")
+		open = true
+		shell.open()
 	end
-	UIHelper.spawnSparkles(panel, panel.AbsolutePosition.X + 300, panel.AbsolutePosition.Y + 40,
-		Color3.fromRGB(180, 150, 110), 6)
 end
-closeBtn.MouseButton1Click:Connect(function() open = true; toggle() end)
+closeBtn.MouseButton1Click:Connect(function()
+	open = true; toggle()
+	local pos = closeBtn.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 6)
+end)
 
 task.spawn(function()
 	local pg = player:WaitForChild("PlayerGui")

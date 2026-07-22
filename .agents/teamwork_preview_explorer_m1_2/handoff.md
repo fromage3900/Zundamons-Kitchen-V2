@@ -1,145 +1,108 @@
-# Handoff Report: Harvesting & Resource Node System (Milestone 1 - R1)
+# Handoff Report: CSS3 Styling Architecture (Zunda-OS 95 & Zen Aesthetic)
+
+**From**: Explorer 2 (`teamwork_preview_explorer_m1_2`)  
+**To**: Orchestrator (`281d54cf-b9e8-4061-a866-77c4825337fd`) & Implementer Worker (`teamwork_preview_worker_m1`)  
+**Milestone**: Milestone 1 (Zunda-OS 95 CLI Launch Page & Creative Hub)  
+**Target Output File**: `g:\Zundamons-kItchen-V2\site\style.css`  
+**Handoff Type**: Soft Handoff (Design & Architecture Phase -> Implementation Phase)  
+
+---
 
 ## 1. Observation
 
-Direct observations from codebase inspection across `src/`:
+Direct observations from prompt requirements, workspace state, and architecture plan:
 
-### A. Missing Target Files Referenced in Plan / Prompt
-- **`src/shared/Shared/Config/ResourceNodes.lua`**: Does NOT exist in workspace. Config is split across:
-  - `src/shared/ConfigurationFiles/GatherConfig.lua`: lines 16-77 (Click resources: `ZundaFlower`, `ZundaPea`, `Zunda Mushroom`, `Zunda Berry`, `Zunda Root`, `SaltedPeaBouquet`, `CarrotPlot`)
-  - `src/shared/ConfigurationFiles/MineableConfig.lua`: lines 6-68 (Tool nodes: `Rock`, `MarbleRock`, `GoldRock`, `Wheat`, `AppleTree`, `PineTree`, `ZundaMushroom`, `ZundaBerry`, `ZundaRoot`)
-  - `src/shared/ConfigurationFiles/HarvestConfig.lua`: lines 6-55 (Interactions, cooldowns, UI colors, particle settings)
-  - `src/shared/Shared/Config/HarvestNodeVariants.lua`: lines 6-93 (Mesh IDs, scale ranges, sway ranges)
-- **`src/server/services/HarvestService.lua`**: Does NOT exist in workspace. Server harvesting logic is split across:
-  - `src/server/ZundaGatherServer.server.lua`: lines 137-263 (`HarvestNode` remote listener for click-to-gather)
-  - `src/server/Mineable.server.lua`: lines 39-103 (Health listener and loot distribution for mineable tool nodes)
-  - `src/server/Tools.server.lua`: lines 61-120 (`Activated` RemoteFunction handler for tool swinging damage)
-  - `src/server/Validation/HarvestValidator.server.lua`: lines 96-130 (`validateHarvest` function)
+1. **Target Directory & File**:
+   - `Target Site Directory`: `g:\Zundamons-kItchen-V2\site`
+   - `Target CSS File`: `site/style.css`
+   - `Working Directory`: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_2`
 
-### B. Critical Runtime Errors & Broken Connections
-1. **Fatal Require Error on `HarvestValidator.server.lua`**:
-   - `src/server/Validation/HarvestValidator.server.lua` is a `.server.lua` script.
-   - `src/server/ZundaGatherServer.server.lua` line 20-21:
-     `local HarvestValidator = SSS:FindFirstChild("Validation") and SSS.Validation:FindFirstChild("HarvestValidator")`
-     `local validateHarvest = HarvestValidator and require(HarvestValidator).validateHarvest`
-   - `src/server/Mineable.server.lua` line 13-14:
-     `local HarvestValidator = SSS:FindFirstChild("Validation") and SSS.Validation:FindFirstChild("HarvestValidator")`
-     `local validateHarvest = HarvestValidator and require(HarvestValidator).validateHarvest`
-   - **Observation**: Calling `require()` on a Script (`.server.lua`) in Luau fails with runtime error: `Attempt to require a script that is not a ModuleScript`.
+2. **Required CSS Tokens (`:root`)**:
+   - Primary Greens: `--zunda-dark: #2e7d32`, `--zunda-primary: #4caf50`, `--zunda-light: #8bc34a`, `--zunda-bg: #e8f5e9`, `--zunda-accent: #c8e6c9`, `--zunda-pastel: #f1f8e9`.
+   - Retro OS Palette: `--win-bg: #e8f5e9`, `--win-border-light: #ffffff`, `--win-border-dark: #2e7d32`, `--win-title-bg: linear-gradient(90deg, #2e7d32, #4caf50)`, `--win-title-text: #ffffff`.
+   - Terminal Phosphor Palette: `--term-bg: #0a150a`, `--term-green: #33ff66`, `--term-glow: 0 0 8px rgba(51, 255, 102, 0.6)`.
+   - Roblox UI Export Mapping variables: `--roblox-screengui-bg`, `--roblox-frame-border`, `--roblox-text-color`, `--roblox-corner-radius`.
 
-2. **Broken Tool Hit Detection in `Tools.server.lua`**:
-   - `src/server/Tools.server.lua` lines 49-56:
-     ```lua
-     for _, node in pairs(CollectionService:GetTagged("Mineable")) do
-         if node.Parent and CollectionService:HasTag(node, toolType) then
-             local dist = (node.Position - origin).Magnitude
-             if dist <= HIT_RADIUS then table.insert(targets, { node = node, dist = dist }) end
-         end
-     end
-     ```
-   - **Observation**: `toolType` evaluates to `"Axe"`, `"PickAxe"`, or `"Sickle"`. Nodes in workspace only have tags `"Mineable"` and node category (e.g. `"Rock"`). No system adds `"PickAxe"` to `"Rock"` nodes, so `CollectionService:HasTag(node, "PickAxe")` returns `false`, causing all tool swings to hit 0 targets and deal 0 damage.
+3. **Zunda-OS 95 Window Requirements**:
+   - Retro 3D beveled borders (`box-shadow` / `border` outset and inset effects in pastel green).
+   - Retro titlebars with pea pod icon (`🫛`), title text, and square control buttons (`_`, `□`, `X`).
+   - Active vs Inactive window state styling (`.window-active`, `.window-inactive`).
 
-3. **Potential Nil Arithmetic Crash in `LootModule.lua`**:
-   - `src/shared/ConfigurationFiles/LootModule.lua` lines 86-93:
-     ```lua
-     function assignLoot(player, lootname, myloot)
-         local value = myloot:GetAttribute("Value")
-         local data = PlayerDataService.getOrCreate(player)
-         if not data[lootname] then
-             data[lootname] = value
-         else
-             data[lootname] = data[lootname] + value
-         end
-     ```
-   - **Observation**: `myloot:GetAttribute("Value")` returns `nil` if the template item in `ReplicatedStorage.Loot` lacks a `"Value"` attribute. Line 92 then attempts `data[lootname] + nil`, causing a fatal runtime error.
+4. **Taskbar & Start Menu Requirements**:
+   - Vintage 90s taskbar pinned at bottom (`height: 38px`), inset system tray, active window taskbar buttons.
+   - Start Menu popup box with icon list and hover highlights.
 
-4. **Missing UI & Particle Feedback for Tool Mining**:
-   - `src/client/Controllers/HarvestController.client.lua` lines 48-94 & 97-129: Renders a 2D ScreenGui progress bar and particle effects ONLY for `ClickDetector` gathering nodes.
-   - `src/client/LocalTools.client.lua` / `src/server/Tools.server.lua`: Tool swinging at `Mineable` nodes (Rocks/Trees) has NO 3D BillboardGui health bar, NO particle effects on hit (sparks, rock fragments, wood chips), and NO visual progress indicator.
+5. **CRT Overlay & Atmosphere Requirements**:
+   - CRT overlay scanlines effect (`background: linear-gradient(...)`, `pointer-events: none`, toggleable via `.crt-off`).
+   - Floating zunda mochi/pea pod animation keyframes (`@keyframes floatPea`).
 
-5. **Item ID & Naming Mismatches**:
-   - `src/shared/ConfigurationFiles/ItemConfig.lua` lines 8-52 uses snake_case IDs (`zunda_flower`, `zunda_pea`, `zunda_mushroom`, `zunda_berry`, `zunda_root`).
-   - `GatherConfig.lua`, `MineableConfig.lua`, `LootModule.lua`, and `PlayerDataService.lua` use Title Case names (`"Zunda Flower"`, `"Zunda Pea"`, `"Rock"`, `"Gold Ore"`).
-
-### C. AGENTS.md Workspace Rules Audit
-1. **Rule 1 (`$ignoreUnknownInstances`)**:
-   - `default.project.json` line 76: `"Workspace": { "$className": "Workspace", "$path": "src/Workspace", "$ignoreUnknownInstances": true }`.
-   - **Status**: PASSED.
-2. **Rule 2 (Client UI Decoupling & Visibility)**:
-   - `HarvestController.client.lua` line 51: `screenGui.ResetOnSpawn = false`, line 61: `progressContainer.Visible = false`.
-   - **Status**: PASSED (though creating GUI via `ClientGuiBootstrap.createScreenGui` is recommended).
-3. **Rule 3 (Wally Packages)**:
-   - `wally.toml` lines 23-24: `[server-dependencies] ProfileService = "alreadypro/profileservice@1.0.4"`.
-   - `default.project.json` lines 10-12 & 63-65 map `Packages` to `ReplicatedStorage` and `ServerPackages` to `ServerScriptService`.
-   - `.gitignore` lines 1-2 include `Packages/` and `ServerPackages/`.
-   - **Status**: PASSED.
-4. **Rule 4 (ServerScriptService Import Path Consistency)**:
-   - `src/server/ZundaGatherServer.server.lua` line 48: `require(script.Parent.Services.PlayerDataService)`
-   - `src/server/ToolManager.server.lua` line 11: `require(script.Parent.Services.PlayerDataService)`
-   - **Status**: FAILED (relative `script.Parent` path imports break when scripts are organized under subfolders like `ServerScriptService.Garden`). Rule requires using `ServerScriptService.Services.PlayerDataService`.
+6. **Responsive Layout**:
+   - Mobile (<768px), Tablet (768px-1024px), Desktop (>1024px) media queries.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Premise 1**: In Roblox Luau runtime, `require()` can only execute on a `ModuleScript`.
-   - **Step**: `HarvestValidator.server.lua` has extension `.server.lua`, which Rojo builds as a `Script`.
-   - **Deduction**: When `ZundaGatherServer` or `Mineable` invokes `require(HarvestValidator)`, Luau raises a fatal error, disabling server-side harvest validation.
+1. **Token Foundation -> Visual Consistency**:
+   - *Premise*: Defining design tokens in `:root` (Observation 2) establishes a central single source of truth for color themes, terminal phosphors, and Roblox ScreenGui variable mappings.
+   - *Deduction*: Referencing `var(--zunda-dark)`, `var(--win-bg)`, and `var(--term-green)` across window components guarantees seamless visual harmonization across windows, taskbar, start menu, and terminal components.
 
-2. **Premise 2**: Tool hit detection in `Tools.server.lua` checks `CollectionService:HasTag(node, toolType)`.
-   - **Step**: `toolType` for Axe is `"Axe"`, Pickaxe is `"PickAxe"`, Sickle is `"Sickle"`.
-   - **Step**: Mineable nodes in `MineableConfig.lua` (`Rock`, `MarbleRock`, `GoldRock`, `AppleTree`, `PineTree`) only have category tags (e.g., `"Rock"`).
-   - **Deduction**: Because no script maps node category tags (`"Rock"`) to required tool tags (`"PickAxe"`), `findHitTargets` returns an empty array. Tool swinging fails to deal damage to resource nodes.
+2. **3D Bevels & Active/Inactive States -> Retro OS Authenticity**:
+   - *Premise*: Windows 95 UI relies on light/shadow bevels and titlebar color changes (Observation 3).
+   - *Deduction*: Creating `.bevel-outset` (top/left white, bottom/right green-shadow) and `.bevel-inset` classes allows any element (window frame, button, content container, text box) to render authentic 90s relief. Changing titlebars to muted blue-gray gradient (`.window-inactive`) clearly indicates window focus.
 
-3. **Premise 3**: Item drops assign loot using `LootModule.assignLoot`.
-   - **Step**: `assignLoot` executes `local value = myloot:GetAttribute("Value")`.
-   - **Step**: Models in `ReplicatedStorage.Loot` are missing the `"Value"` attribute by default.
-   - **Deduction**: `value` is `nil`, causing `data[lootname] + value` to throw an arithmetic error on line 92, preventing loot collection into inventory.
+3. **Fixed Bottom Taskbar & Start Menu -> OS Layout Hierarchy**:
+   - *Premise*: Desktop OS interactions rely on a bottom-pinned taskbar (38px height) and popup Start Menu (Observation 4).
+   - *Deduction*: Setting `#taskbar` to `position: fixed; bottom: 0; height: 38px; z-index: 9999` reserves screen real estate and ensures window content does not get occluded when maximized or scrolled. The Start Menu (`#start-menu`) sits at `bottom: 40px` with vertical sidebar branding.
 
-4. **Premise 4**: Milestone 1 R1 requirements state players equip tools, deal damage to nodes, see progress bars and particle effects, receive item drops, and save inventory.
-   - **Step**: Current client architecture isolates UI progress bars to `ClickDetector` plant gathering inside `HarvestController.client.lua`. Tool-based mining/woodcutting has no health/progress UI or hit particles.
-   - **Deduction**: Tool mining lacks visual feedback for node damage, health state, and particle rendering.
+4. **CRT Overlay & Floating Keyframes -> Cozy Zen Aesthetics**:
+   - *Premise*: The aesthetic merges retro CRT CLI feel with cozy Infinity Nikki zen edamame theme (Observation 5).
+   - *Deduction*: Layering `#crt-overlay` with `pointer-events: none` and linear gradient scanlines creates CRT cathode immersion without blocking mouse clicks on interactive windows. Toggling `body.crt-off` hides this layer cleanly. `@keyframes floatPea` adds gentle organic movement to background decoration elements.
 
-5. **Premise 5**: Architectural plan requires clean Rojo module organization and strict AGENTS.md path consistency.
-   - **Step**: Configuration is split between `GatherConfig`, `MineableConfig`, `HarvestConfig`, `HarvestNodeVariants`, and `ItemConfig`.
-   - **Step**: Relative imports `script.Parent.Services` violate Rule 4.
-   - **Deduction**: A unified `ResourceNodes.lua` config module and `HarvestService.lua` server service should be constructed, and all imports updated to explicit `ServerScriptService.Services...` paths.
+5. **Responsive Media Queries -> Cross-Device Usability**:
+   - *Premise*: Users access the website on desktop, tablet, and mobile devices (Observation 6).
+   - *Deduction*: Under mobile viewport widths (<768px), windows automatically expand to 100vw/100vh full-screen modals, control buttons enlarge to touchable targets (24px+), and the taskbar scales to 42px height.
 
 ---
 
-## 3. Caveats
+## 3. Caveats & Remaining Work
 
-- **Workspace Level Instances**: Raw `.rbxl` binary level geometry in Roblox Studio was not directly inspected as binary files (`*.rbxl`) are gitignored; findings are based on Rojo project JSON and Luau codebase structure.
-- **Rojo Sync Target Locations**: If `HarvestValidator.server.lua` was intended to be a ModuleScript, renaming its file extension to `HarvestValidator.lua` resolves the require issue cleanly.
-- **No caveats beyond listed assumptions.**
+### Caveats
+- **Font Availability**: System fallback fonts (`'MS Sans Serif'`, `'Segoe UI'`, `monospace`) are specified. Web fonts (`VT323`, `Press Start 2P`) can be loaded via standard `@import` or `<link>` in `index.html`.
+- **Browser Vendors**: `writing-mode: vertical-rl` on Start Menu sidebar is widely supported across all modern browsers (Chrome, Firefox, Edge, Safari).
+
+### Remaining Work (Implementation Steps for `teamwork_preview_worker_m1`)
+1. Create `site/style.css` using the full architecture specified in `analysis.md`.
+2. Connect `style.css` in `site/index.html` (`<link rel="stylesheet" href="style.css">`).
+3. Verify window render states (`.window-active`, `.window-inactive`) with HTML window elements.
+4. Verify `#crt-overlay` rendering and test `.crt-off` toggle logic.
 
 ---
 
 ## 4. Conclusion
 
-Milestone 1 (R1: Harvesting & Resource Node System) requires architectural consolidation and bug fixes before implementation:
-
-1. **Consolidate Resource Definitions**: Create `src/shared/Shared/Config/ResourceNodes.lua` (or `src/shared/ConfigurationFiles/ResourceNodes.lua`) combining `GatherConfig`, `MineableConfig`, `HarvestConfig`, and `HarvestNodeVariants`. Include explicit tool requirements per node (`Axe` for Trees, `PickAxe` for Rocks, `Sickle` for Crops).
-2. **Consolidate Server Harvesting**: Create `src/server/Services/HarvestService.lua` unifying `ZundaGatherServer`, `Mineable`, `Tools`, and `HarvestValidator`.
-3. **Fix `HarvestValidator` Module Type**: Rename `HarvestValidator.server.lua` to `HarvestValidator.lua` (ModuleScript) so it can be required by server services without throwing Luau errors.
-4. **Fix Tool Hit Detection**: Update `Tools.server.lua` hit detection to resolve tool requirements from node type attributes/configs (e.g. `Rock` requires `PickAxe`) rather than requiring raw `PickAxe` tags on node parts.
-5. **Fix `LootModule.lua` Nil Attribute Handling**: Change `local value = myloot:GetAttribute("Value")` to `local value = (myloot and myloot:GetAttribute("Value")) or 1`.
-6. **Implement Health/Progress UI & Particle Effects for Tool Mining**: Extend visual controller (`HarvestController` or `FXController`) to render BillboardGui health bars over damaged nodes and spawn hit particles (sparks, stone dust, wood chips) during tool swings.
-7. **Fix ServerScriptService Imports (Rule 4)**: Replace `script.Parent.Services.PlayerDataService` with `game.ServerScriptService.Services.PlayerDataService`.
+The CSS3 styling architecture for Zunda-OS 95 is fully analyzed, structured, and specified in `analysis.md`. All design token variables (`:root`), 3D bevel definitions, window header/button layouts, pinned bottom taskbar, start menu popup, CRT scanline overlay toggle, floating pea animations, and mobile/tablet responsive breakpoints have been mapped out cleanly.
 
 ---
 
 ## 5. Verification Method
 
-### Recommended Verification Steps
-1. **Luau Static Audit**:
-   - Inspect `HarvestValidator.lua` is a ModuleScript.
-   - Verify `ServerScriptService` imports do not use relative `script.Parent.Services` paths.
-2. **Tool Swinging Verification**:
-   - Equip Pickaxe, swing at Rock node. Confirm `Tools.server.lua` successfully finds hit target, reduces node `Health` from 100 to 0 over multiple swings, and triggers loot drop.
-   - Equip Axe, swing at Tree node. Confirm wood logs drop on node destruction.
-3. **UI & Particle Verification**:
-   - Confirm BillboardGui or ScreenGui progress bar displays remaining health/progress for both click-gather nodes and mineable tool nodes.
-   - Confirm hit particles trigger at hit location on each swing.
-4. **Loot Collection Verification**:
-   - Touch dropped loot item. Verify `LootModule.assignLoot` executes without nil errors and updates `PlayerDataService` inventory.
+To independently verify the implementation once `site/style.css` is written:
+
+1. **File Existence & Integrity Check**:
+   - Verify `g:\Zundamons-kItchen-V2\site\style.css` exists.
+   - Confirm `:root` block contains all required green tokens (`#2e7d32`, `#4caf50`, `#8bc34a`, `#e8f5e9`, `#c8e6c9`, `#f1f8e9`).
+
+2. **Visual & Layout Inspection**:
+   - Open `site/index.html` in browser.
+   - Verify 3D bevel borders render on `.window` and `.bevel-outset`.
+   - Inspect `#taskbar` pinned at viewport bottom (`height: 38px`).
+   - Click CRT toggle button to verify `body.crt-off` hides `#crt-overlay`.
+
+3. **Responsive Verification**:
+   - Resize browser window below 768px width: verify `.window` switches to full-screen viewport dimensions.
+
+4. **Invalidation Conditions**:
+   - Missing required green tokens in `:root`.
+   - Window borders lack 3D bevel effect.
+   - CRT overlay blocks mouse pointer events on UI buttons (would mean `pointer-events: none` was omitted).

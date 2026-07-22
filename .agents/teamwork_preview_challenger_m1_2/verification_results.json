@@ -1,0 +1,95 @@
+{
+  "task1_responsive_and_modals": [
+    {
+      "media_queries_found": [
+        "@media screen and (max-width: 1024px) {",
+        "@media screen and (max-width: 768px) {"
+      ]
+    },
+    {
+      "root_taskbar_height_var": "38px",
+      "mobile_taskbar_element_height": null,
+      "taskbar_height_mismatch": true
+    }
+  ],
+  "task2_css_cascade": [
+    {
+      "declared_in_root_count": 40,
+      "used_vars_count": 27,
+      "missing_vars": []
+    },
+    {
+      "data_theme_in_html_js": true,
+      "data_theme_in_css": false,
+      "theme_toggle_issue": true
+    }
+  ],
+  "task3_svg_validation": [
+    {
+      "file": "pea_pod.svg",
+      "status": "PASS",
+      "viewBox": "0 0 32 32",
+      "width": "32",
+      "height": "32"
+    },
+    {
+      "file": "zundamon_mochi.svg",
+      "status": "PASS",
+      "viewBox": "0 0 64 64",
+      "width": "64",
+      "height": "64"
+    },
+    {
+      "file": "crt_monitor.svg",
+      "status": "PASS",
+      "viewBox": "0 0 32 32",
+      "width": "32",
+      "height": "32"
+    },
+    {
+      "file": "disc_icon.svg",
+      "status": "PASS",
+      "viewBox": "0 0 32 32",
+      "width": "32",
+      "height": "32"
+    }
+  ],
+  "task4_zero_dependency_audit": [
+    {
+      "file": "index.html",
+      "issues": [
+        "Hyperlink text to external site (anchor href): https://www.roblox.com/",
+        "Hyperlink text to external site (anchor href): https://github.com/",
+        "Hyperlink text to external site (anchor href): https://github.com/",
+        "Hyperlink text to external site (anchor href): https://www.roblox.com/",
+        "Hyperlink text to external site (anchor href): https://www.roblox.com/",
+        "Hyperlink text to external site (anchor href): https://www.roblox.com/",
+        "Hyperlink text to external site (anchor href): https://www.roblox.com/"
+      ]
+    },
+    {
+      "file": "style.css",
+      "issues": []
+    },
+    {
+      "file": "assets\\audio_engine.js",
+      "issues": []
+    },
+    {
+      "file": "assets\\pea_pod.svg",
+      "issues": []
+    },
+    {
+      "file": "assets\\zundamon_mochi.svg",
+      "issues": []
+    },
+    {
+      "file": "assets\\crt_monitor.svg",
+      "issues": []
+    },
+    {
+      "file": "assets\\disc_icon.svg",
+      "issues": []
+    }
+  ]
+}

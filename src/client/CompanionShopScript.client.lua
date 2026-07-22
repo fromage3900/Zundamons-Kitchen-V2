@@ -3,12 +3,15 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RS = game:GetService("ReplicatedStorage")
+local UIHelper = require(RS.Shared.Modules.UIHelper)
 
 -- Premium companion receipts: MarketplaceService.ProcessReceipt (RobuxStoreServer init).
 
 local player = Players.LocalPlayer
 local ClientGuiBootstrap = require(RS.ConfigurationFiles.ClientGuiBootstrap)
 local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 
 local gui = ClientGuiBootstrap.createScreenGui(player, "CompanionShopGui", 28)
 
@@ -283,6 +286,8 @@ local function buildTabs()
             btn.MouseButton1Click:Connect(function()
                 currentKey = key
                 refreshDetail()
+                local pos = btn.AbsolutePosition
+                UIHelper.spawnSparkles(panel, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 4)
             end)
             tabBtns[key] = btn
         end
@@ -292,6 +297,8 @@ end
 closeBtn.MouseButton1Click:Connect(function()
     panel.Visible = false
     backdrop.Visible = false
+    local pos = closeBtn.AbsolutePosition
+    UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
 end)
 
 actionBtn.MouseButton1Click:Connect(function()
@@ -307,6 +314,8 @@ actionBtn.MouseButton1Click:Connect(function()
         -- Purchase
         PurchaseCompanion:FireServer(currentKey)
     end
+    local pos = actionBtn.AbsolutePosition
+    UIHelper.spawnSparkles(panel, pos.X + actionBtn.AbsoluteSize.X/2, pos.Y + actionBtn.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 5)
 end)
 
 CompanionOwnedSync.OnClientEvent:Connect(function(compType, isOwned)
@@ -315,51 +324,60 @@ CompanionOwnedSync.OnClientEvent:Connect(function(compType, isOwned)
     refreshTabs()
 end)
 
--- Public API
+local shell = CozyModalShell.wrap(panel, {
+	open = function()
+		backdrop.Visible = true
+		panel.Visible = true
+		print("[CompanionShop.open] Fetching catalog...")
+		local success1, catalogData = pcall(function()
+			return GetCompanionCatalog:InvokeServer()
+		end)
+		print("[CompanionShop.open] Catalog success:", success1)
+		catalog = catalogData or {}
+
+		print("[CompanionShop.open] Fetching owned companions...")
+		local success2, ownedData = pcall(function()
+			return GetOwnedCompanions:InvokeServer()
+		end)
+		print("[CompanionShop.open] Owned success:", success2)
+		owned = ownedData or {}
+
+		if owned.__active then currentKey = owned.__active end
+		print("[CompanionShop.open] Building UI...")
+		buildTabs()
+		refreshDetail()
+		refreshTabs()
+		panel.Size = UDim2.new(0, 780, 0, 510)
+		TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			{ Size = UDim2.new(0, 820, 0, 540) }):Play()
+		print("[CompanionShop.open] Shop opened")
+	end,
+	close = function()
+		panel.Visible = false
+		backdrop.Visible = false
+	end,
+})
+
 local function open()
-    print("[CompanionShop.open] Opening shop...")
-    backdrop.Visible = true
-    panel.Visible = true
-    print("[CompanionShop.open] Fetching catalog...")
-    local success1, catalogData = pcall(function()
-        return GetCompanionCatalog:InvokeServer()
-    end)
-    print("[CompanionShop.open] Catalog success:", success1)
-    catalog = catalogData or {}
-
-    print("[CompanionShop.open] Fetching owned companions...")
-    local success2, ownedData = pcall(function()
-        return GetOwnedCompanions:InvokeServer()
-    end)
-    print("[CompanionShop.open] Owned success:", success2)
-    owned = ownedData or {}
-
-    if owned.__active then currentKey = owned.__active end
-    print("[CompanionShop.open] Building UI...")
-    buildTabs()
-    refreshDetail()
-    refreshTabs()
-    panel.Size = UDim2.new(0, 780, 0, 510)
-    TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-        { Size = UDim2.new(0, 820, 0, 540) }):Play()
-    print("[CompanionShop.open] Shop opened")
+	UIRouter.open("companions")
+	shell.open()
 end
 
 local function close()
-    panel.Visible = false
-    backdrop.Visible = false
+	UIRouter.close("companions")
+	shell.close()
 end
 
 _G.ZundaCompanionShop = { open = open, close = close, toggle = function()
-    if panel.Visible then close() else open() end
+	if panel.Visible then close() else open() end
 end }
 
--- Hotkey: K
+-- Hotkey: O
 UIS.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if input.KeyCode == Enum.KeyCode.O then
-        if panel.Visible then close() else open() end
-    end
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.O then
+		if panel.Visible then close() else open() end
+	end
 end)
 
-print("[CompanionShop] Ready — press K to open")
+print("[CompanionShop] Ready — press O to open")

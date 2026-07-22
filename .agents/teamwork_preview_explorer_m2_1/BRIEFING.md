@@ -1,41 +1,43 @@
-# BRIEFING — 2026-07-21T18:00:16Z
+# BRIEFING — 2026-07-21T20:46:04Z
 
 ## Mission
-Audit client-side cooking and rhythm minigame systems for note hit tracking, timing windows, accuracy grading, visual cues, combo counters, input handling, AGENTS.md compliance, UI overlaps, and client lag/bugs.
+Analyze and design the Modular Window Lifecycle & Drag Engine architecture for `site/window_manager.js` in Zunda-OS 95 CLI Launch Page & Creative Hub.
 
 ## 🔒 My Identity
 - Archetype: Teamwork Explorer
-- Roles: Client-side Cooking & Rhythm Minigame Auditor
+- Roles: Window Manager Architecture Explorer
 - Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1
-- Original parent: 85d1c382-dde2-40bc-9e91-9cae049af0ef
-- Milestone: Milestone 2 (R2: Cooking & Rhythm Minigame System)
+- Original parent: 281d54cf-b9e8-4061-a866-77c4825337fd
+- Milestone: Milestone 2 — Zunda-OS 95 CLI Launch Page & Creative Hub
 
 ## 🔒 Key Constraints
-- Read-only investigation — do NOT implement code changes
-- Audit client-side cooking & rhythm minigame systems
-- Check AGENTS.md rules compliance
-- Write handoff.md in working directory
-- Communicate back to main agent via send_message
+- Read-only investigation — do NOT implement code changes directly in site/ (produce specifications and diffs in working directory)
+- Analyze and design Modular Window Lifecycle & Drag Engine for `site/window_manager.js`
+- Write analysis specification to analysis.md and handoff report to handoff.md
+- Communicate back to parent via send_message
 
 ## Current Parent
-- Conversation ID: 85d1c382-dde2-40bc-9e91-9cae049af0ef
-- Updated: 2026-07-21T18:00:16Z
+- Conversation ID: 281d54cf-b9e8-4061-a866-77c4825337fd
+- Updated: 2026-07-21T20:46:04Z
 
 ## Investigation State
-- **Explored paths**: `src/client/TimedCookingScript.client.lua`, `src/client/CookingResultCard.client.lua`, `src/client/CraftingScript.client.lua`, `src/client/ClientMain.client.lua`, `src/client/systems/cooking/CookingInputSystem.lua`, `src/client/ui/cooking/components/CookingHUD.lua`, `src/client/ui/cooking/components/PeaRhythmTrack.lua`, `src/server/CookingSession.server.lua`, `src/server/systems/cooking/CookingValidationSystem.lua`, `src/shared/ConfigurationFiles/CraftConfig.lua`, `default.project.json`, `wally.toml`, `.gitignore`, `AGENTS.md`.
+- **Explored paths**: `site/index.html`, `site/style.css`, `site/assets/audio_engine.js`.
 - **Key findings**:
-  - `src/client/Controllers/CookingController.lua` is MISSING from workspace.
-  - Dual system fragmentation: Imperative (`TimedCookingScript`) vs Matter ECS/React (`CookingHUD`).
-  - AGENTS.md Rule 2d violation: `ClientMain.client.lua` mounts `CookingHUD` visibly on boot without hidden initial state.
-  - AGENTS.md Rule 2b violation: `TimedCookingScript.client.lua` creates `ScreenGui` directly without `ClientGuiBootstrap`.
-  - Note count & miss desync: Client spawns 8 peas max while server expects 10 notes; passive note misses fail to send `"miss"` remote.
-  - Spacebar-only input, missing floating text visual cues ("PERFECT!", etc.), and duplicate server handlers (`CookingSession.server.lua` vs `CookingValidationSystem.lua`).
-- **Unexplored areas**: None. Audit is comprehensive across client & server cooking codebase.
+  - `site/index.html` contains 4 main desktop application window instances: `window-zundacli` (`ZundaCLI.exe`), `window-cookbook` (`Cookbook.app`), `window-vntalk` (`VNTalk.app`), `window-quickstart` (`QuickStart.txt`), plus `window-trash`.
+  - DOM element structure uses `.window`, `.window-header`, `.window-title`, `.window-controls`, `.win-btn` (with `data-action="minimize|maximize|close"`), and `.window-body`.
+  - Currently, window management & drag logic is embedded inline inside `<script>` in `index.html` (lines 376-525).
+  - Drag logic in inline script lacks touch event support (`touchstart`, `touchmove`, `touchend`) and lacks viewport boundary clamping, allowing windows to be dragged off-screen.
+  - Sound synthesis engine in `site/assets/audio_engine.js` exposes global `playWindowSFX(action)` where `action` supports `'focus'`, `'drag'`, `'minimize'`, `'maximize'`, `'close'`.
+- **Unexplored areas**: None. Codebase layout for `site/` is clean and fully inspected.
 
 ## Key Decisions Made
-- Audited all M2 client cooking & rhythm minigame code, checked AGENTS.md compliance, documented findings, and generated handoff report.
+- Designed object-oriented `WindowManager` and `WindowInstance` modular class architecture for `site/window_manager.js`.
+- Designed dual Mouse & Touch Drag Engine with complete viewport boundary clamping (`left` bounded by `[0, innerWidth - winWidth]`, `top` bounded by `[0, innerHeight - taskbarHeight - winHeight]`).
+- Integrated `playWindowSFX('drag')` trigger on drag start.
 
 ## Artifact Index
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\ORIGINAL_REQUEST.md — Initial request
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\ORIGINAL_REQUEST.md — Request history
 - g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\BRIEFING.md — Persistent memory index
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\handoff.md — Self-contained 5-component audit report
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\progress.md — Progress log
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\analysis.md — Technical specification for window_manager.js
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_1\handoff.md — Self-contained 5-component handoff report

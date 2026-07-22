@@ -1,132 +1,91 @@
-# Handoff & Forensic Audit Report — Milestone 1 (R1: Harvesting & Resource Node System)
+# Handoff Report — Forensic Audit of Zunda-OS 95 CLI Launch Page & Creative Hub
 
-**Auditor**: Forensic Auditor
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_auditor_m1`
-**Target**: Milestone 1 (Harvesting & Resource Node System)
-**Date**: 2026-07-21
+**Role**: Forensic Auditor (`teamwork_preview_auditor_m1`)  
+**Target Work Product**: `g:\Zundamons-kItchen-V2\site`  
+**Verdict**: CLEAN  
+**Handoff Type**: Hard Handoff (Task Complete)  
 
 ---
 
 ## 1. Observation
 
-Empirical verification and code inspection performed across all modified and newly created files for Milestone 1:
+Direct observations from forensic inspection of `g:\Zundamons-kItchen-V2\site`:
 
-### A. Rojo Project Build (`rojo build`)
-- Command: `rojo build --output test.rbxl`
-- Output: `Building project 'Zundamons-kItchen-V2'\nBuilt project to test.rbxl`
-- Status: Exit code 0, 0 compilation or structure errors.
+1. **File Inventory**:
+   - `index.html` (835 lines, 41,695 bytes)
+   - `style.css` (1,014 lines, 23,925 bytes)
+   - `assets/audio_engine.js` (349 lines, 10,465 bytes)
+   - `assets/crt_monitor.svg` (21 lines, 1,085 bytes)
+   - `assets/disc_icon.svg` (16 lines, 804 bytes)
+   - `assets/pea_pod.svg` (21 lines, 1,031 bytes)
+   - `assets/zundamon_mochi.svg` (33 lines, 1,506 bytes)
 
-### B. AGENTS.md Workspace Rules Compliance
-- **Rule 1 ($ignoreUnknownInstances)**: Inspected `default.project.json`. Line 76 contains `"$ignoreUnknownInstances": true` under `"Workspace"`.
-- **Rule 2 (Client UI Decoupling & Visibility)**: Inspected `src/client/ToolClient.client.lua` and `src/client/Controllers/HarvestController.client.lua`.
-  - `ToolClient.client.lua` dynamically binds to `LocalPlayer.Character` and `LocalPlayer.Backpack` without using `script.Parent`. Grep search returned 0 matches for `script.Parent`.
-  - `HarvestController.client.lua` sets `gui.ResetOnSpawn = false` on top-level `HarvestProgressGui` and 3D `BillboardGui`.
-- **Rule 3 (Wally Package Structure & Dependencies)**: Inspected `wally.toml`, `default.project.json`, and `.gitignore`.
-  - `ProfileService` is declared under `[server-dependencies]` in `wally.toml`.
-  - `default.project.json` maps `"Packages": { "$path": "Packages" }` in `ReplicatedStorage` and `"ServerPackages": { "$path": "ServerPackages" }` in `ServerScriptService`.
-  - `.gitignore` contains `Packages/`, `ServerPackages/`, `wally.exe`, and `wally.zip`.
-- **Rule 4 (ServerScriptService Path Consistency)**: Grep search for `script.Parent` across `src/server` returned 0 matches. All server scripts import services via `game:GetService("ServerScriptService").Services.X`.
+2. **Web Audio API Logic (`assets/audio_engine.js`)**:
+   - Line 24: `this.ctx = new AudioCtxClass();`
+   - Lines 90–116 (`playClickSFX`): Uses `ctx.createOscillator()` and `ctx.createGain()` with exponential frequency ramps (900Hz -> 150Hz down, 300Hz -> 800Hz up, C5 to E5 arpeggio start).
+   - Lines 130–193 (`playWindowSFX`): Synthesizes sine and triangle oscillators for window focus, drag, minimize, maximize, and close events.
+   - Lines 200–236 (`playKeySFX`): Synthesizes mechanical keyboard blips using high-frequency square wave oscillators with rapid gain decay.
+   - Lines 255–318 (`startCozyBGM`): Synthesizes ambient drone pads with lowpass-filtered sine/triangle oscillators (164.81Hz & 246.94Hz) and random E Major Pentatonic scale arpeggio notes (329.63Hz to 739.99Hz).
+   - Zero references to `.mp3`, `.wav`, `.ogg`, or external `Audio()` network loading exist in the codebase.
 
-### C. Prohibited Pattern & Integrity Analysis
-- **Hardcoded test results**: Search of codebase revealed NO hardcoded boolean or string test results. Node damage calculations (`math.max(health - damage, 0)`), rate limits (`now - ts <= RATE_LIMIT_WINDOW`), and hit distances (`(rootPart.Position - node.Position).Magnitude`) are calculated dynamically.
-- **Facade implementations**: Inspected `HarvestValidator.lua`, `Tools.server.lua`, `Mineable.server.lua`, `LootModule.lua`, `PlayerDataService.lua`, `HarvestController.client.lua`, and `ToolManager.server.lua`. All modules contain complete logic with no dummy placeholders or stub returns.
-- **Fabricated verification outputs**: 0 pre-populated log files or fake result artifacts exist in the project repository.
-- **Fake progress bars**: Inspected `HarvestController.client.lua`. The progress bar fill is driven by a `RunService.Heartbeat` loop evaluating real elapsed time (`elapsed / duration`), cancel-on-movement logic (`distance > MOVE_THRESHOLD`), and target node availability attributes.
-- **ModuleScript Naming**: Verified `src/server/Validation/HarvestValidator.lua` is a ModuleScript (file extension `.lua` instead of `.server.lua`), allowing `require()` calls in `Mineable.server.lua` to succeed cleanly.
-- **Loot Arithmetic Safety**: Inspected `src/shared/ConfigurationFiles/LootModule.lua` line 87: `local value = (myloot and myloot:GetAttribute("Value")) or 1`. Nil attributes safely fallback to `1`.
+3. **External Dependencies & Tracking Inspection**:
+   - Grep search for `http`/`https` returned 0 remote CDN script references or remote stylesheet links.
+   - External links in `index.html` (Lines 302, 305, 669, 746) are user-navigational anchor tags targeting `https://github.com/` and `https://www.roblox.com/` with `rel="noopener noreferrer"`.
+   - Favicon (Line 18) uses an inline SVG data URI (`data:image/svg+xml,...`). All icon assets reside locally in `assets/`.
+
+4. **CSS Tokens & 3D Bevel Styling (`style.css`)**:
+   - `:root` declares `--win-border-light: #ffffff`, `--win-border-dark: #2e7d32`, `--win-border-shadow: #1b5e20`, `--term-bg: #0a150a`, `--term-green: #33ff66`.
+   - Lines 88–106: `.bevel-outset` and `.bevel-inset` classes define 2px light/shadow borders paired with inset box shadows (`box-shadow: inset 1px 1px 0px var(--zunda-pastel), inset -1px -1px 0px var(--win-border-dark)`).
+   - Lines 109–137: `.win95-btn` and active/hover state rules implement tactile 3D button depression.
+
+5. **Application Functionality (`index.html`)**:
+   - `ZundaCLI.exe`: Interactive terminal form (`#cli-input-form`) parses commands `help`, `recipes`, `cook`, `vn`, `roblox`, `status`, `clear`, `about`.
+   - `Cookbook.app`: `#recipe-search` filters recipe cards dynamically; filter buttons switch categories (`all`, `classic`, `desserts`, `drinks`).
+   - `VNTalk.app`: `#vn-choices` buttons trigger dialogue progression, window navigation, and random Zunda facts.
+   - Window Manager: Header dragging (`mousedown`, `mousemove`, `mouseup`), active window z-index layering (`bringToFront`), taskbar item synchronization (`updateTaskbar`), maximize, minimize, close, start menu popup toggle, CRT toggle, theme mode toggle (`zunda-classic` / `zunda-dark`), and particle canvas loop (`requestAnimationFrame`).
 
 ---
 
 ## 2. Logic Chain
 
-1. **Rojo Build Verification**: Executing `rojo build --output test.rbxl` parsed `default.project.json` and all mapped files under `src/`. Successful output proves all Luau file syntax, tree structures, and JSON configurations are strictly valid.
-2. **Rule 2 Remediation**: In Roblox client architecture, scripts in `StarterPlayerScripts` reside under `LocalPlayer.PlayerScripts` at runtime. Using `script.Parent` breaks UI event bindings. Refactoring `ToolClient.client.lua` to listen to `LocalPlayer.Character` and `LocalPlayer.Backpack` ensures tools fire `InvokeServer` reliably across spawns and respawns.
-3. **ModuleScript Require Fix**: Luau throws an exception when attempting to `require()` a `Script` object. Renaming `HarvestValidator.server.lua` to `HarvestValidator.lua` causes Rojo to sync the file as a `ModuleScript`, satisfying server-side `require()` dependencies.
-4. **Hit Detection & Damage Loop**: `Tools.server.lua` computes distance between tool handle and `Mineable` nodes in Workspace, matching tool types (`PickAxe`, `Axe`, `Sickle`) against target node categories (`Rock`, `AppleTree`, `Wheat`, `ZundaMushroom`, etc.). Node `Health` attributes are decremented dynamically by tool damage.
-5. **Node Destruction & Respawn**: `Mineable.server.lua` listens to `GetAttributeChangedSignal("Health")`. When `Health <= 0`, harvest validation (`validateHarvest`) verifies distance and rate limits, awards loot via `LootModule.generateLoot`, and handles respawn by temporarily detaching the model from `Parent` and restoring it after `Respawn` seconds.
-6. **Data Store Integration**: `LootModule.lua` calls `PlayerDataService.getOrCreate(player)` to mutate inventory counts and award chef XP via `RewardCore.addXP`. `PlayerDataService.lua` handles autosaving every 60s and persisting data via `DataStoreService:GetDataStore("KitchenProgression")`.
+1. **Premise 1 (Authenticity)**: A facade or mock implementation is characterized by empty function bodies, constant dummy return values, or hardcoded fake output strings.
+2. **Observation**: Inspection of `index.html` lines 341–831 and `audio_engine.js` lines 19–348 confirms every function contains complete state handling, DOM manipulation, mathematical frequency calculations, array filtering, canvas drawing, and event listener attachments.
+3. **Deduction 1**: The client logic and Web Audio engine represent genuine, fully realized implementations.
+
+4. **Premise 2 (Audio Synthesis)**: Cheating audio engines wrap missing external `.mp3`/`.wav` media files or fail silently.
+5. **Observation**: `audio_engine.js` creates native Web Audio API `OscillatorNode`, `GainNode`, and `BiquadFilterNode` instances to synthesize all UI SFX and ambient BGM programmatically.
+6. **Deduction 2**: The audio engine is 100% procedurally synthesized without external media file dependencies.
+
+7. **Premise 3 (Security & Cleanliness)**: Hidden tracking or remote CDN calls compromise integrity and offline launch reliability.
+8. **Observation**: Codebase search confirms zero remote CDN scripts, tracking tags, or remote web font references exist in `site/`.
+9. **Deduction 3**: The site is completely self-contained, private, and offline-capable.
+
+10. **Premise 4 (Win95 Aesthetics)**: Retro Win95 aesthetics require proper dual-color 3D bevel borders and inset/outset box shadows.
+11. **Observation**: `style.css` includes exact CSS custom properties and border/box-shadow rules for Windows 95 inset/outset bevels, CRT phosphor scanline overlays, and button press states.
+12. **Deduction 4**: The visual aesthetics authentically follow Windows 95 UI specifications.
 
 ---
 
 ## 3. Caveats
 
-- **Runtime Studio Environment**: Forensic verification confirms static correctness, syntax compliance, build integrity, and logic authenticity. In-game physics and Roblox engine network communication require active Roblox Studio execution or Rojo sync (`rojo serve`).
-- No other caveats.
+- **Browser Audio Autoplay Policy**: Modern web browsers require a user gesture (e.g. clicking anywhere on the page) before `AudioContext` can transition from `suspended` to `running`. The implementation properly handles this via `ZundaAudio.resumeOnUserGesture()`.
+- **Canvas Performance on Legacy Hardware**: The particle canvas animates 35 floating edamame pods; on extremely low-power devices, browser performance depends on canvas hardware acceleration.
 
 ---
 
 ## 4. Conclusion
 
-All code modifications for **Milestone 1 (R1: Harvesting & Resource Node System)** have been thoroughly audited. There are **NO integrity violations**, **NO hardcoded test results**, **NO dummy/facade implementations**, and **NO fake progress bars**. All logic is genuine, robust, and compliant with all workspace rules in `AGENTS.md`.
+All files created in `g:\Zundamons-kItchen-V2\site` (`index.html`, `style.css`, `assets/audio_engine.js`, `assets/*.svg`) pass all forensic integrity checks. There are no mock facades, no dummy stubs, no fake hardcoded test strings, no missing audio dependencies, no external tracking scripts, and no aesthetic violations.
+
+**FINAL VERDICT: CLEAN**
 
 ---
 
 ## 5. Verification Method
 
-To independently reproduce this verification:
-
-1. **Build Verification**:
-   ```bash
-   rojo build --output test.rbxl
-   ```
-   Verify output contains `Built project to test.rbxl` with exit code 0.
-
-2. **Rule 4 Server Import Path Verification**:
-   ```bash
-   grep_search --SearchPath "src/server" --Query "script.Parent"
-   ```
-   Verify 0 matches returned.
-
-3. **Rule 2 Client UI Verification**:
-   ```bash
-   grep_search --SearchPath "src/client/ToolClient.client.lua" --Query "script.Parent"
-   ```
-   Verify 0 matches returned.
-
-4. **ModuleScript Structure Inspection**:
-   Inspect `src/server/Validation/HarvestValidator.lua` to confirm it exports a table and ends with `return HarvestValidator`.
-
----
-
-## Forensic Audit Report
-
-**Work Product**: Milestone 1 (R1: Harvesting & Resource Node System)
-**Profile**: General Project / Roblox Studio & Rojo 7.7.0
-**Verdict**: CLEAN
-
-### Phase Results
-
-| Check Name | Status | Details |
-|------------|--------|---------|
-| 1. Hardcoded Output Detection | **PASS** | 0 hardcoded test results or constant returns found |
-| 2. Facade Implementation Detection | **PASS** | Genuine, complete logic implemented across all services and controllers |
-| 3. Pre-populated Artifact Detection | **PASS** | No pre-populated result artifacts or fake logs in workspace |
-| 4. Fake Progress Bar Detection | **PASS** | Progress bar in `HarvestController.client.lua` is driven by real-time `Heartbeat` loops, distance checks, and node availability |
-| 5. Workspace Rule 1 ($ignoreUnknownInstances) | **PASS** | `"$ignoreUnknownInstances": true` set on Workspace in `default.project.json` |
-| 6. Workspace Rule 2 (Client UI Decoupling) | **PASS** | 0 `script.Parent` in `ToolClient.client.lua`, `ResetOnSpawn = false` on top-level ScreenGuis |
-| 7. Workspace Rule 3 (Wally Packages) | **PASS** | `ProfileService` in `[server-dependencies]`, `default.project.json` and `.gitignore` correctly configured |
-| 8. Workspace Rule 4 (Server Import Paths) | **PASS** | 0 relative `script.Parent` imports in `src/server`, using `ServerScriptService.Services.X` |
-| 9. Project Build Execution | **PASS** | `rojo build --output test.rbxl` built cleanly with zero errors |
-| 10. PlayerDataService Integration | **PASS** | Genuine inventory updates, XP gain, rate limiting, and DataStore saving verified |
-
-### Evidence
-
-#### Rojo Build Output
-```
-Building project 'Zundamons-kItchen-V2'
-Built project to test.rbxl
-```
-
-#### Rule 4 Search (src/server)
-```
-Query: "script.Parent"
-SearchPath: "g:\Zundamons-kItchen-V2\src\server"
-Result: No results found
-```
-
-#### Rule 2 Search (ToolClient.client.lua)
-```
-Query: "script.Parent"
-SearchPath: "g:\Zundamons-kItchen-V2\src\client\ToolClient.client.lua"
-Result: No results found
-```
+To independently verify this audit:
+1. Open `g:\Zundamons-kItchen-V2\site\index.html` in any modern Web browser (Chrome, Firefox, Edge).
+2. Click desktop shortcuts to launch `ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`, `QuickStart.txt`. Verify window dragging, minimizing, maximizing, closing, and taskbar synchronization.
+3. Click the `🎵` (BGM toggle) and `🔊` (SFX toggle) icons in the taskbar system tray, or type commands into `ZundaCLI.exe` to verify procedural sound synthesis via Web Audio API.
+4. Inspect Network tab in Browser Developer Tools to confirm 0 external network requests are made.
+5. Review `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_auditor_m1\audit_report.md` for full detailed check breakdowns.

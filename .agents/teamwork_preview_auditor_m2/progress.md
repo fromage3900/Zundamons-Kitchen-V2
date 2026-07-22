@@ -1,13 +1,12 @@
-# Audit Progress - Milestone 2
+# Audit Progress - Milestone 2 (Web Preview Site Audit)
 
-Last visited: 2026-07-21T18:04:00Z
+Last visited: 2026-07-21T20:49:30Z
 
-- [x] Create ORIGINAL_REQUEST.md & BRIEFING.md
-- [x] Read worker handoff (`.agents/teamwork_preview_worker_m2/handoff.md`)
-- [x] Read plan.md and workspace rules (AGENTS.md)
-- [x] Inspect source code and tests modified for Milestone 2
-- [x] Run test suite using Rojo (`rojo build --output test.rbxl`)
-- [x] Check for prohibited patterns (hardcoded results, facade implementations, pre-populated artifacts, fake rhythm minigames)
-- [x] Adversarial stress-testing (timing calculations, quality grading math, edge cases, note tracking)
-- [x] Write handoff.md with binary verdict and evidence report
-- [x] Send final message to caller
+- [x] Update ORIGINAL_REQUEST.md & BRIEFING.md
+- [x] Inspect `site/window_manager.js`, `site/assets/audio_engine.js`, `site/index.html`, and `site/` files
+- [x] Check `site/window_manager.js` for drag clamping, focus stacking, taskbar sync (0 facades / hardcoded mock strings)
+- [x] Check `site/assets/audio_engine.js` for volume persistence, gain ramps, timeout clearing
+- [x] Check `site/` for external CDN calls, tracking scripts, or remote dependencies
+- [x] Create `audit_report.md` with detailed evidence
+- [x] Create `handoff.md` with forensic audit report and verdict
+- [x] Send final message to orchestrator parent

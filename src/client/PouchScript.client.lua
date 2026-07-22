@@ -14,6 +14,8 @@ local reqData = RF:WaitForChild("RequestData")
 local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local UIAssets = require(RS.Shared.Config.UIAssets)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 
 -- ─── COLORS ──────────────────────────────────────────────
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
@@ -55,7 +57,7 @@ local titleLbl = Instance.new("TextLabel", header)
 titleLbl.Size = UDim2.new(0,260,1,0)
 titleLbl.Position = UDim2.new(0,0,0,0)
 titleLbl.BackgroundTransparency = 1
-titleLbl.Text = "🎒  Zunda Pouch"
+titleLbl.Text = "🎒  Zunda Pouch 🎀"
 titleLbl.FontFace = UIConfig.FONTS.Title
 titleLbl.TextSize = UIConfig.FONT_SIZES.Title
 titleLbl.TextColor3 = C.text
@@ -227,7 +229,11 @@ local function switchTab(id)
 end
 
 for id, btn in pairs(tabBtns) do
-    btn.MouseButton1Click:Connect(function() switchTab(id) end)
+    btn.MouseButton1Click:Connect(function()
+        switchTab(id)
+        local pos = btn.AbsolutePosition
+        UIHelper.spawnSparkles(panel, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 4)
+    end)
 end
 
 -- ─── DATA POLLING ─────────────────────────────────────────
@@ -244,22 +250,35 @@ end
 
 -- ─── TOGGLE ───────────────────────────────────────────────
 local open = false
-local function toggle()
-    open = not open
-    panel.Visible = open
-    if open then
+local shell = CozyModalShell.wrap(panel, {
+    open = function()
         refresh()
-        -- Entrance tween
         panel.Size = UDim2.new(0,580,0,10)
-        Tween:Create(panel, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        Tween:Create(panel, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
             {Size=UDim2.new(0,580,0,520)}):Play()
+    end,
+    close = function()
+        panel.Visible = false
+        open = false
+    end,
+})
+
+local function toggle()
+    if open then
+        UIRouter.close("inventory")
+        open = false
+    else
+        UIRouter.open("inventory")
+        open = true
+        shell.open()
     end
 end
 
 closeBtn.MouseButton1Click:Connect(function()
 	open = true; toggle()
 	local pos = closeBtn.AbsolutePosition
-	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, C.border, 4)
+	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, C.border, 6)
+	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, Color3.fromRGB(255,255,255), 3)
 end)
 
 -- ─── WIRE HUD BUTTON ─────────────────────────────────────

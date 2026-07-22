@@ -1,17 +1,13 @@
-## 2026-07-21T18:02:50Z
-You are Reviewer 1 for Milestone 2 (R2: Cooking & Rhythm Minigame System).
-Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1
-Project root: g:\Zundamons-kItchen-V2
-Plan file: g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md
-Workspace rules: g:\Zundamons-kItchen-V2\AGENTS.md
-Worker Handoff: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2\handoff.md
+## 2026-07-21T20:48:22Z
+You are Reviewer 1 for Milestone 2 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
+Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1
+Target Site Directory: g:\Zundamons-kItchen-V2\site
 
-Task:
-1. Conduct a rigorous code review of all changes in src/ made for Milestone 2 (Cooking & Rhythm Minigame System).
-2. Verify strict compliance with AGENTS.md rules:
-   - $ignoreUnknownInstances: true in default.project.json under Workspace.
-   - PlayerGui decoupling (no script.Parent in StarterPlayerScripts client scripts).
-   - Wally package structures.
-   - ServerScriptService import path consistency (no relative script.Parent or .Server. paths).
-3. Verify that RewardCore.lua is located at src/server/Services/RewardCore.lua and imported correctly.
-4. Report pass/fail verdict and detailed findings in g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1\handoff.md.
+Your task:
+Review code correctness and API design of `site/window_manager.js`, `site/assets/audio_engine.js`, and `site/index.html`:
+1. Verify JavaScript syntax via `node -c site/window_manager.js` and `node -c site/assets/audio_engine.js`.
+2. Inspect `WindowManager` class structure, event listener bindings, and cleanup logic.
+3. Check boundary clamping calculation in mouse and touch drag handlers (`Math.max(0, Math.min(pos, max))`).
+4. Confirm zero external script, font, or audio dependencies.
+
+Document your review in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1\review.md` and deliver `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1\handoff.md`. Send a message to orchestrator with your verdict (APPROVED / REJECTED).

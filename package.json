@@ -13,5 +13,8 @@
   "devDependencies": {
     "@johnnymorganz/stylua-bin": "2.5.2",
     "rojo": "1.0.3-rojo7.6.1"
+  },
+  "dependencies": {
+    "jsdom": "^29.1.1"
   }
 }

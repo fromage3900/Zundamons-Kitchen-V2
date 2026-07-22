@@ -5,6 +5,21 @@ local Tween = game:GetService("TweenService")
 local player = game:GetService("Players").LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Lighting-based post-processing (Bloom x2, SunRays, ColorCorrection, DepthOfField)
+require(game.ReplicatedStorage.ConfigurationFiles.PostProcessing)
+-- Ambient world particles (dust motes, fireflies, sakura petals)
+require(game.ReplicatedStorage.ConfigurationFiles.AmbientParticles)
+-- Watercolour gradient wash, lens flare, vignette breath
+require(game.ReplicatedStorage.ConfigurationFiles.WhimsicalOverlay)
+-- Low-lying ground mist patches (weather-responsive)
+require(game.ReplicatedStorage.ConfigurationFiles.GroundMist)
+-- Rotating magic circle filigree halo at kitchen center
+require(game.ReplicatedStorage.ConfigurationFiles.MagicCircle)
+-- Cel-shaded ink outline overlay (hitline, ink wash, shadow ramp, hatch)
+require(game.ReplicatedStorage.ConfigurationFiles.CelOutline)
+-- Crystal refraction + iridescence (tag parts with "Crystal" in Studio)
+require(game.ReplicatedStorage.ConfigurationFiles.CrystalFX)
+
 local gui, bleed
 for _, g in ipairs(playerGui:GetChildren()) do
 	if g:IsA("ScreenGui") then
@@ -50,7 +65,7 @@ if grain then
         img.BackgroundTransparency = 1
         img.Size = UDim2.new(1.2, 0, 1.2, 0)
         img.Position = UDim2.new(-0.1, 0, -0.1, 0)
-        img.Image = "rbxassetid://9446549339"  -- noise texture (falls back gracefully)
+        img.Image = "rbxassetid://74702819388719"
         img.ScaleType = Enum.ScaleType.Tile
         img.TileSize = UDim2.new(0, 4, 0, 4)
         img.ImageColor3 = Color3.fromRGB(255, 255, 255)

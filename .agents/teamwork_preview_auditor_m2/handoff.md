@@ -1,88 +1,112 @@
-# Forensic Audit Report — Milestone 2 (Cooking & Rhythm Minigame System)
+# FORENSIC AUDIT HANDOFF REPORT — Milestone 2 Web Preview Site
+
+**Work Product**: Zunda-OS 95 Web Launch Page & Creative Hub (`site/window_manager.js`, `site/assets/audio_engine.js`, `site/index.html`)  
+**Profile**: General Project  
+**Verdict**: **CLEAN**  
+
+---
 
 ## 1. Observation
 
-### Binary Verdict
-**Verdict**: **CLEAN**
+Direct observations from source inspection and automated verification:
 
----
+1. **`site/window_manager.js` Drag Clamping & Viewport Math (Lines 318–346)**:
+   ```javascript
+   const maxLeft = Math.max(0, viewportWidth - winWidth);
+   const maxTop = Math.max(0, viewportHeight - winHeight);
 
-## 2. Forensic Audit Details
+   const clampedLeft = Math.max(0, Math.min(rawLeft, maxLeft));
+   const clampedTop = Math.max(0, Math.min(rawTop, maxTop));
 
-**Work Product**: Milestone 2 (R2: Cooking & Rhythm Minigame System)
-**Profile**: General Project
-**Integrity Mode**: Development / General
-
-### Phase Results
-- **Hardcoded Test Result Detection**: **PASS** — Source code inspection confirmed zero hardcoded test outputs, static score returns, or mock pass strings.
-- **Facade & Dummy Implementation Detection**: **PASS** — Full rhythm minigame client controller (`CookingController.lua`) and server validation system (`CookingValidationSystem.lua`) are genuinely implemented with full logic.
-- **Pre-Populated Artifact Detection**: **PASS** — File search verified no pre-existing `.log` files or pre-generated test result artifacts exist in the workspace.
-- **Execution Delegation Check**: **PASS** — Core note tracking, timing calculation, ingredient deduction, quality grading, and inventory dish delivery are natively built in Lua without prohibited delegation.
-- **Workspace & Architectural Rule Compliance**: **PASS** — Project compiles cleanly via Rojo (`rojo build --output test.rbxl`), and code adheres strictly to AGENTS.md Rules 1-4.
-
----
-
-## 3. Empirical Evidence & File-Level Audit
-
-### Evidence A: Client Rhythm Minigame Controller (`src/client/Controllers/CookingController.lua`)
-- **Note Spawning & Track Mechanics** (Lines 30-36, 273-276): Configures `PEA_CONFIG` with `fallDuration = 2.0`s, `totalNotes = 10` (or recipe-specific difficulty override via `craftConfig.difficulty[recipeName].notes`).
-- **Timing Calculation & Accuracy Windows** (Lines 53-63, 202-215): Calculates exact timing offset `diff = math.abs(elapsed - PEA_CONFIG.fallDuration)`. Grades hits dynamically:
-  - Perfect: `|diff| <= 0.15s`
-  - Great: `|diff| <= 0.35s`
-  - OK: `|diff| <= 0.60s`
-  - Miss: `|diff| > 0.60s`
-- **Active & Passive Miss Detection** (Lines 248-253, 347-353): Mistaps outside hit windows trigger active misses (`cookingHitEvent:FireServer(now, "miss")`). Notes falling past progress `1.2` trigger passive misses (`cookingHitEvent:FireServer(now, "miss")`), resetting combos and notifying the server.
-- **Multi-Input Support** (Lines 312-325): Handles `KeyCode.Space` (Keyboard), `KeyCode.ButtonA`/`ButtonX` (Gamepad), `UserInputType.Touch` (Mobile), and on-screen tap button (`tapButton.MouseButton1Click`).
-- **AGENTS.md Rule 2 Compliance** (Lines 97-107, 308): Uses `ClientGuiBootstrap.createScreenGui(player, "CookingControllerGui", 100)`, sets `ResetOnSpawn = false`, and initializes `mainPanel.Visible = false` on startup and hides on cleanup.
-
-### Evidence B: Server Cooking Validation System (`src/server/Services/CookingValidationSystem.lua`)
-- **Ingredient Validation & Deduction** (Lines 26-54): `validateIngredients` checks required recipe quantities against `PlayerDataService.get(player)`. `deductIngredients` deducts ingredients atomically before cooking starts.
-- **ECS Session & Rhythm Score Tracking** (Lines 56-112): Subscribes to `CookingStartEvent` (spawns `CookingSession` and `CookingScore` Matter ECS components) and `CookingHit` RemoteEvents. Validates note hit timing and tracks hit breakdown (`perfectHits`, `greatHits`, `okHits`, `misses`).
-- **Quality Grading & Reward Distribution** (Lines 114-166): Evaluates quality using `craftConfig.calculateQuality(scoreList, totalNotes)`. Invokes `RewardCore.addGold`, `RewardCore.addXP`, `RewardCore.syncLevel`, `RewardCore.bumpCombo` / `RewardCore.breakCombo`.
-- **Direct Inventory Dish Delivery** (Lines 151-165): Cooked dishes are delivered directly to player inventory in `PlayerDataService` (`d[item] = (d[item] or 0) + dishAmount`), including bonus extra dish calculations for perfect cooks.
-
-### Evidence C: Relocated RewardCore Service (`src/server/Services/RewardCore.lua`)
-- **Server Boundary Compliance** (Lines 1-17): Moved from `src/shared/ConfigurationFiles/RewardCore.lua` to `src/server/Services/RewardCore.lua`. Updated internal requires to use `ServerScriptService.Services.PlayerDataService` per AGENTS.md Rule 4.
-- **Total Gold Tracking** (Line 87): Updated `RewardCore.addGold` to compute `d.total_gold_earned = (d.total_gold_earned or 0) + finalAmount`.
-- **Import Path Consistency**: All dependent server scripts (`AdvancedRewards.server.lua`, `CraftManager.server.lua`, `FishingServer.server.lua`, `ServingSystem.server.lua`, `CookingValidationSystem.lua`, `LootModule.lua`) updated requires to `ServerScriptService.Services.RewardCore`.
-
-### Evidence D: Duplicate Auto-Save Removal (`src/server/Services/PlayerDataService.lua`)
-- **Single Auto-Save Loop** (Lines 218-234): Verified that only one 60-second periodic auto-save `task.spawn` loop exists, eliminating duplicate DataStore `SetAsync` write operations.
-
----
-
-## 4. Logic Chain
-
-1. **Verification of Client Logic**: Inspecting `CookingController.lua` confirms genuine time-based note positioning, dynamic hit detection window comparison, multi-input event listening, active/passive miss handling, and AGENTS.md Rule 2 compliance.
-2. **Verification of Server Logic**: Inspecting `CookingValidationSystem.lua` confirms genuine ingredient validation, raw resource deduction in `PlayerDataService`, Matter ECS score tracking for hits sent from client, quality evaluation via `craftConfig.calculateQuality`, reward payout via `RewardCore`, and direct dish delivery into inventory.
-3. **Verification of Architectural & Rule Integrity**: Inspected `default.project.json` (contains `"$ignoreUnknownInstances": true` under `"Workspace"` and valid package mappings), verified `RewardCore.lua` relocation to server-only directory, and confirmed all module requires follow `ServerScriptService.Services.X`.
-4. **Verification of Build Capability**: Executed `rojo build --output test.rbxl`. Build completed with 0 errors.
-
----
-
-## 5. Caveats
-
-No caveats. All files and implementations have been empirically audited and verified.
-
----
-
-## 6. Conclusion
-
-Milestone 2 (R2: Cooking & Rhythm Minigame System) is **CLEAN**. There are no hardcoded test results, no facade implementations, no fake minigames, and no integrity violations.
-
----
-
-## 7. Verification Method
-
-1. **Compilation Check**:
-   ```powershell
-   rojo build --output test.rbxl
+   win.style.left = `${clampedLeft}px`;
+   win.style.top = `${clampedTop}px`;
    ```
-   *Expected result*: `Building project 'Zundamons-kItchen-V2' Built project to test.rbxl` (0 errors).
+   Mouse and touch drag coordinates are bounded between `0` and `viewportDimension - windowDimension`.
 
-2. **File Existence Audit**:
-   - `src/server/Services/RewardCore.lua` (exists)
-   - `src/shared/ConfigurationFiles/RewardCore.lua` (does not exist)
-   - `src/client/Controllers/CookingController.lua` (exists)
-   - `src/server/Services/CookingValidationSystem.lua` (exists)
-   - `src/server/CookingSession.server.lua` (does not exist)
+2. **`site/window_manager.js` Focus Stacking & Focus Transfer (Lines 58–73, 75–100)**:
+   ```javascript
+   this.currentZIndex = Math.min(this.maxZIndex, this.currentZIndex + 1);
+   winEl.style.zIndex = this.currentZIndex;
+   ```
+   `transferFocusToTopVisibleWindow()` iterates through visible window elements, determines the highest z-index, and calls `bringToFront()` on top-most window.
+
+3. **`site/window_manager.js` Taskbar Synchronization (Lines 209–262)**:
+   ```javascript
+   this.taskbarWindows.innerHTML = '';
+   // Rebuilds buttons dynamically with active / minimized state class names
+   ```
+
+4. **`site/assets/audio_engine.js` Volume Persistence & Gain Ramps (Lines 28–40, 68–71, 109, 305, 361)**:
+   ```javascript
+   const savedVol = localStorage.getItem('zunda_os_volume');
+   const savedMute = localStorage.getItem('zunda_os_muted');
+   ...
+   this.masterGain.gain.setTargetAtTime(this.isMuted ? 0 : this.volume, now, 0.02);
+   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+   ```
+
+5. **`site/assets/audio_engine.js` Timeout & Interval Clearing (Lines 277–280, 349–357)**:
+   ```javascript
+   if (ZundaAudio.bgmStopTimeout) {
+     clearTimeout(ZundaAudio.bgmStopTimeout);
+     ZundaAudio.bgmStopTimeout = null;
+   }
+   if (ZundaAudio.bgmInterval) {
+     clearInterval(ZundaAudio.bgmInterval);
+     ZundaAudio.bgmInterval = null;
+   }
+   ```
+
+6. **`site/index.html` Network Dependencies Inspection**:
+   - `grep_search` for `(http|https|cdn|unpkg|cdnjs|jsdelivr|analytics|gtag|google|fontawesome|fonts\.googleapis)` yielded:
+     - 0 remote `<script>` tags.
+     - 0 remote `<link rel="stylesheet">` or font imports.
+     - 0 telemetry/tracking scripts.
+     - SVG `xmlns="http://www.w3.org/2000/svg"` headers and outbound user navigation links (`<a href="https://github.com/">`, `<a href="https://www.roblox.com/">`) present no background HTTP dependencies.
+
+7. **Prohibited Patterns Scan**:
+   - Grep search for `(mock|facade|fake|todo|fixme|dummy|pass_test|test_pass)` returned **0 matches** in `site/`.
+
+---
+
+## 2. Logic Chain
+
+1. **Observation 1 & 2** demonstrate that `site/window_manager.js` implements actual mathematical bounding logic for window positioning and active z-index stacking. This refutes any hypothesis of mock window movement or stubbed window handling.
+2. **Observation 3** shows that `updateTaskbar()` dynamically inspects window visibility and z-index to update taskbar button states rather than using static or mock HTML.
+3. **Observation 4 & 5** verify that `site/assets/audio_engine.js` remediates audio playback issues by persisting settings to `localStorage`, avoiding DC clicks via exponential/linear gain ramps, and preventing oscillator leaks/race conditions via explicit timer clearing (`clearTimeout`, `clearInterval`).
+4. **Observation 6** proves that `site/index.html` operates with complete network self-containment without loading external scripts, styles, fonts, or tracking services.
+5. **Observation 7** confirms zero mock facade or fake return shortcuts exist within the codebase.
+6. Therefore, all requirements set forth for Milestone 2 Web Preview site audit are satisfied without any integrity violations.
+
+---
+
+## 3. Caveats
+
+- Web Audio API behavior depends on browser autoplay policies (requires user interaction before playing audio), which is properly handled by `resumeOnUserGesture()`.
+- LocalStorage persistence requires browser storage permissions, which fallback gracefully if local storage is restricted.
+
+---
+
+## 4. Conclusion
+
+**Final Verdict**: **CLEAN**
+
+The work product (`site/window_manager.js`, `site/assets/audio_engine.js`, `site/index.html`) is fully authentic, zero-dependency, and strictly compliant with all integrity forensic standards.
+
+---
+
+## 5. Verification Method
+
+To independently verify these findings:
+
+1. **Inspect files**:
+   - `site/window_manager.js`: Check lines 318–346 for `Math.max(0, Math.min(rawLeft, maxLeft))`.
+   - `site/assets/audio_engine.js`: Check lines 28–40 for `localStorage` loading and lines 349–357 for `clearTimeout`/`clearInterval`.
+   - `site/index.html`: Inspect `<head>` and `<body>` tags for local relative file paths only.
+
+2. **Run Dependency Scan**:
+   Execute grep for external script/stylesheet links across `site/`:
+   ```bash
+   grep -rn "http" site/ | grep -v "xmlns=" | grep -v "roblox.com" | grep -v "github.com"
+   ```
+   *Invalidation condition*: Any matching remote `<script>` or `<link>` tags.

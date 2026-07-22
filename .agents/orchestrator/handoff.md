@@ -1,66 +1,52 @@
-# Orchestrator Handoff Report — Generation 0 to Generation 1
+# Soft Handoff Report for Successor Orchestrator
 
-**From**: Orchestrator Gen 0
-**To**: Orchestrator Gen 1 (Successor)
-**Date**: 2026-07-21
+**From**: Project Orchestrator (Generation 1, Conv ID: current)
+**To**: Successor Orchestrator (Generation 2)
+**Project**: Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub
+**Target Directory**: `g:\Zundamons-kItchen-V2\site`
 **Working Directory**: `g:\Zundamons-kItchen-V2\.agents\orchestrator`
+**Date**: 2026-07-21
 
 ---
 
 ## 1. Milestone State
 
-| Milestone | Requirement | Status | Verification Status |
-|-----------|-------------|--------|---------------------|
-| **Milestone 1** | R1: Harvesting & Resource Node System | **DONE** | Forensic Auditor CLEAN, 13/13 Stress Harness PASSED, Rojo build 0 errors |
-| **Milestone 2** | R2: Cooking & Rhythm Minigame System | **DONE** | Forensic Auditor CLEAN, Client quality unrolled, Session duration extended, Rojo build 0 errors |
-| **Milestone 3** | R3: Guest Serving & Economy Loop | **PLANNED** | Next for Successor |
-| **Milestone 4** | R4: Real-time HUD Synchronization | **PLANNED** | Scheduled after M3 |
+| Milestone | Scope / Target Files | Status |
+|-----------|----------------------|--------|
+| **Milestone 1**: Visual System, CSS Variables, CRT Overlay, Taskbar & Layout | `index.html`, `style.css`, `assets/audio_engine.js`, SVG assets | **DONE** (Passed gate check & Forensic Audit CLEAN) |
+| **Milestone 2**: Modular Desktop & Window Manager Engine | `window_manager.js`, audio fixes, Roblox UI export hooks | **IN_PROGRESS** (Worker 2 implemented `window_manager.js`; Reviewer 1 & 2 APPROVED; Challenger 1 VERIFIED; Auditor CLEAN; Challenger 2 identified 1 minor BGM oscillator cleanup fix) |
+| **Milestone 3**: Interactive Phosphor Web Terminal (`ZundaCLI.exe`) | `terminal.js` (CLI parser, history, tab completion, commands, easter eggs) | **PLANNED** |
+| **Milestone 4**: Creative Hub Applications & GitHub Pages Package | `app.js`, `Cookbook.app`, `VNTalk.app`, `QuickStart.txt`, zero-dependency package | **PLANNED** |
 
 ---
 
 ## 2. Active Subagents
 
-All subagents from Generation 0 have completed their tasks:
-- Explorers (M1 & M2): Completed.
-- Workers 1, 2, 3, 4: Completed.
-- Reviewers (M1 & M2): Completed.
-- Challengers (M1): Completed.
-- Forensic Auditors (M1 & M2): Completed (CLEAN verdicts).
+No subagents currently running. All 19 subagents spawned in Generation 1 have delivered their handoffs.
 
 ---
 
-## 3. Pending Decisions & Key Discoveries
+## 3. Pending Decisions & Immediate Next Steps for Successor
 
-1. **Rojo Level Preservation**: `$ignoreUnknownInstances: true` is verified under `Workspace` in `default.project.json`.
-2. **UI Architecture**: Client UI scripts use `ClientGuiBootstrap` / `PlayerGui` with `ResetOnSpawn = false` and modal panels `Visible = false` at startup.
-3. **Import Path Standardisation**: All server scripts under `src/server` use `game:GetService("ServerScriptService").Services.X` without relative `script.Parent` paths (AGENTS.md Rule 4).
-4. **RewardCore Location**: Relocated to `src/server/Services/RewardCore.lua`.
-5. **DataStore Auto-Save**: Duplicate 60s auto-save loop removed from `PlayerDataService.lua`.
-
----
-
-## 4. Remaining Work for Successor
-
-1. **Execute Milestone 3 (Requirement R3: Guest Serving & Economy Loop)**:
-   - Customer NPCs spawn in `workspace.Guests`.
-   - Display requested recipes and gold rewards.
-   - Accept dishes from player inventory, trigger despawning smoothly, and award gold and chef XP via `RewardCore`.
-   - Run Explorer -> Worker -> Reviewer -> Challenger -> Forensic Auditor cycle.
-
-2. **Execute Milestone 4 (Requirement R4: Real-time HUD Synchronization)**:
-   - Player stats (Gold, Chef XP, Level, Combo, inventory notifications) update dynamically in HUD UI (`ZundaHUD`, `ChefPill`, `XPBar`, `ComboMeter`) in real-time without manual GUI refreshes.
-   - Run Explorer -> Worker -> Reviewer -> Challenger -> Forensic Auditor cycle.
-
-3. **Final Acceptance & Claim of Victory**:
-   - Verify all acceptance criteria across R1-R4.
-   - Present final claim of victory to main agent / Sentinel (`f631402e-118c-4752-835d-1189716c6c9f`).
+1. **Immediate Step 1**: Dispatch a Worker (`teamwork_preview_worker`) for Milestone 2 Fix Pass to apply the 1-line BGM oscillator cleanup in `site/assets/audio_engine.js` (in `startCozyBGM()`, if `ZundaAudio.bgmPadOscs` exists, stop & disconnect them cleanly before creating new pad oscillators).
+2. **Immediate Step 2**: Mark Milestone 2 **DONE** in `progress.md` and `plan.md`.
+3. **Immediate Step 3**: Execute Milestone 3 (Interactive Phosphor Web Terminal `ZundaCLI.exe` in `site/terminal.js`):
+   - Dispatch 3 Explorers (Command Parser & History Buffer, CLI Phosphor Styling & CRT Integration, Easter Eggs & Sound Triggers).
+   - Dispatch Worker 3 to build `site/terminal.js` and wire terminal window in `site/index.html`.
+   - Dispatch Reviewers, Challengers, and Forensic Auditor for M3 gate check.
+4. **Immediate Step 4**: Execute Milestone 4 (Creative Hub Applications `site/app.js` & GitHub Pages Package Integration):
+   - Implement `Cookbook.app` (recipe card search, ingredient index, rhythm minigame targets).
+   - Implement `VNTalk.app` (Zundamon companion dialogues & voice line previews).
+   - Implement `QuickStart.txt` (developer launch guides & Roblox play links).
+   - Verify 100% SFW safety guarantee and zero external runtime dependencies.
+   - Perform end-to-end browser verification.
 
 ---
 
-## 5. Key Artifacts
+## 4. Key Artifacts Index
 
-- `g:\Zundamons-kItchen-V2\.agents\ORIGINAL_REQUEST.md` — Immutable user request
-- `g:\Zundamons-kItchen-V2\AGENTS.md` — Workspace rules
-- `g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md` — Project milestones plan
-- `g:\Zundamons-kItchen-V2\.agents\orchestrator\progress.md` — Progress tracker
-- `g:\Zundamons-kItchen-V2\.agents\orchestrator\BRIEFING.md` — Persistent briefing memory
+- `g:\Zundamons-kItchen-V2\.agents\ORIGINAL_REQUEST.md` — Original User Request (Timestamp 2026-07-21T20:40:35Z)
+- `g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md` — Detailed Project Plan
+- `g:\Zundamons-kItchen-V2\.agents\orchestrator\progress.md` — Progress Tracker
+- `g:\Zundamons-kItchen-V2\.agents\orchestrator\BRIEFING.md` — Briefing & Team Roster
+- `g:\Zundamons-kItchen-V2\site\` — Target Website Deployment Package

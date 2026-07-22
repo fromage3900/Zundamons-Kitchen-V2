@@ -1,164 +1,41 @@
-# Review Handoff Report — Reviewer 2 (Milestone 2: Cooking & Rhythm Minigame System)
+# Handoff Report — Reviewer 2 (Milestone 2: Window Manager)
 
 ## 1. Observation
-
-### Build & Compilation Verification
-* **Command**: `rojo build --output test.rbxl`
-* **Result**:
-  ```
-  Building project 'Zundamons-kItchen-V2'
-  Built project to test.rbxl
-  ```
-* Project compiles cleanly with 0 errors.
-
-### Implementation Audit
-1. **10-Note Spawning & Difficulty Configuration**:
-   * `src/client/Controllers/CookingController.lua` lines 30-36:
-     ```lua
-     local PEA_CONFIG = {
-         fallDuration = 2.0,
-         hitWindow = 0.15,     -- Perfect <= 0.15s
-         greatWindow = 0.35,   -- Great <= 0.35s
-         okWindow = 0.60,      -- OK <= 0.60s
-         totalNotes = 10,      -- Server default total note count
-     }
-     ```
-   * `CookingController.lua` lines 273-276:
-     ```lua
-     local totalNotesToSpawn = PEA_CONFIG.totalNotes
-     if craftConfig and craftConfig.difficulty and craftConfig.difficulty[recipeName] then
-         totalNotesToSpawn = craftConfig.difficulty[recipeName].notes or PEA_CONFIG.totalNotes
-     end
-     ```
-   * `src/server/Services/CookingValidationSystem.lua` line 64:
-     ```lua
-     local totalNotes = (craftConfig.difficulty and craftConfig.difficulty[item] and craftConfig.difficulty[item].notes) or 10
-     ```
-
-2. **Timing Windows & Rating Text Visuals**:
-   * `src/client/Controllers/CookingController.lua` lines 53-63 (`getHitQuality`):
-     * Perfect: `|diff| <= 0.15s`
-     * Great: `|diff| <= 0.35s`
-     * OK: `|diff| <= 0.60s`
-     * Miss: `|diff| > 0.60s` or note fall progress >= 1.2.
-   * Floating rating popups (`spawnFloatingRating`, lines 65-90): TextLabel animated with `TweenService` (Back Out easing, floating up and fading out, destroyed on completion).
-
-3. **Multi-Input Support**:
-   * `src/client/Controllers/CookingController.lua` lines 312-325:
-     * Keyboard: `Enum.KeyCode.Space`
-     * Gamepad: `Enum.KeyCode.ButtonA`, `Enum.KeyCode.ButtonX`
-     * Touch / Mouse: `Enum.UserInputType.Touch` & `tapButton.MouseButton1Click`
-
-4. **Combo Meter Updates**:
-   * Live combo tracking (`comboCount`, `maxComboCount`) in `CookingController.lua` lines 221, 249, 256, 350, 366.
-   * `comboLabel.Text = string.format("Combo: %d | Max: %d", comboCount, maxComboCount)`.
-
-5. **Ingredient Deduction & Validation**:
-   * `src/server/Services/CookingValidationSystem.lua` lines 26-54:
-     * `CookingValidationSystemModule.validateIngredients`: verifies player has required items from `craftConfig.recipes[recipeName]`.
-     * `CookingValidationSystemModule.deductIngredients`: decrements quantities in `PlayerDataService.getOrCreate(player)` and cleans up zero/negative quantities.
-   * `src/server/CraftManager.server.lua` lines 64-70: invokes validation and deduction before starting session.
-
-6. **Quality Bonus Rewards & Direct Dish Inventory Delivery**:
-   * `src/server/Services/CookingValidationSystem.lua` lines 18-22, 131-165:
-     * Perfect: +25 bonus gold (with combo multiplier), 35% extra dish chance, `craftPerfect` XP.
-     * Great: +10 bonus gold, `craftSuccess` XP.
-     * OK: +0 bonus gold, `craftSuccess` XP, combo reset via `RewardCore.breakCombo`.
-     * Dish delivery: Direct inventory increment into `PlayerDataService` (`d[item] = (d[item] or 0) + dishAmount`).
-
-7. **Legacy Code Deactivation**:
-   * `src/server/CookingSession.server.lua` has been completely deleted.
-   * Workspace grep for `CookingSession.server` returned 0 occurrences in `src/`.
-
-8. **AGENTS.md Workspace Rules Compliance**:
-   * Rule 1: `default.project.json` contains `"$ignoreUnknownInstances": true` under `"Workspace"`.
-   * Rule 2: `CookingController.lua` creates GUI in `PlayerGui` via `ClientGuiBootstrap.createScreenGui(player, "CookingControllerGui", 100)` with `ResetOnSpawn = false` and `mainPanel.Visible = false` on startup (line 106).
-   * Rule 3: Wally packages mapped to `ReplicatedStorage.Packages` and `ServerScriptService.ServerPackages`, ignored in `.gitignore`.
-   * Rule 4: ServerScriptService imports use `ServerScriptService.Services.X` or `ServerScriptService.systems.X` without `.Server.` prepended.
-
-9. **Integrity Violations Audit**:
-   * No hardcoded test results, facade implementations, fake logs, or self-certifying shortcuts were found.
-
----
+- File inspected: `g:\Zundamons-kItchen-V2\site\window_manager.js` (479 lines, 16,158 bytes) and `g:\Zundamons-kItchen-V2\site\index.html`.
+- Evaluated functions:
+  - `constructor()`: Initializes `baseZIndex = 100`, `maxZIndex = 8999`, `currentZIndex = 100`, `windows = new Map()`.
+  - `bringToFront(winTarget)`: Increments `currentZIndex` up to `maxZIndex`, assigns `winEl.style.zIndex`, updates `.window-active` / `.window-inactive` styling and `activeWindow` state.
+  - `transferFocusToTopVisibleWindow()`: Scans non-hidden windows, identifies highest `zIndex`, calls `bringToFront()`, or resets active state to `null`.
+  - `closeWindow(winTarget)` & `minimizeWindow(winTarget)`: Adds `.hidden` class and triggers `transferFocusToTopVisibleWindow()`.
+  - `updateTaskbar()`: Renders `#taskbar-windows` buttons for all registered windows (including minimized ones with `.minimized` class). Attaches click event handlers implementing click matrix (Active -> minimizes; Inactive/Minimized -> restores & focuses).
+  - `bindKeyboardShortcuts()`: Captures `Ctrl+Esc` to toggle `#start-menu` and `Escape` to close `#start-menu`.
+  - `exportScreenGuiLayout()` (instance & static): Constructs Roblox `ScreenGui` layout dictionary mapping DOM elements to Roblox frames using UDim2 offsets and properties (`ResetOnSpawn: false`, `ZIndexBehavior: "Sibling"`).
+- Automated Verification Tool: Custom JSDOM runner script `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_2\test_runner.js`.
+- Command Execution Result: `node .agents/teamwork_preview_reviewer_m2_2/test_runner.js` -> Output: `=== Verification Results: 57 PASSED, 0 FAILED ===`.
 
 ## 2. Logic Chain
-
-1. **Clean Build**: `rojo build --output test.rbxl` builds the project binary without compilation errors, proving syntactical validity.
-2. **Feature Coverage**: 10-note spawning, timing windows, multi-input, rating popups, combo updates, ingredient deduction, quality rewards, direct dish delivery, and legacy script deactivation have all been verified in code.
-3. **Workspace Rule Compliance**: All rules from `AGENTS.md` are satisfied.
-4. **Major Logic & Timing Desync Bug Found**:
-   * In `src/server/Services/CookingValidationSystem.lua` lines 63-72:
-     ```lua
-     local duration = craftConfig.cookingTimes and craftConfig.cookingTimes[item] or 10
-     ...
-     world:spawn(
-         CookingSession({
-             playerId = player.UserId,
-             recipeId = item,
-             position = position or Vector3.new(0, 0, 0),
-             startTime = os.clock(),
-             duration = duration,
-         }), ...
-     )
-     ```
-   * And lines 115-117:
-     ```lua
-     for id, session, score in world:query(CookingSession, CookingScore) do
-         local timeElapsed = os.clock() - session.startTime
-         if timeElapsed >= session.duration + 0.5 then
-             ...
-             world:remove(id, CookingSession)
-             world:remove(id, CookingScore)
-         end
-     end
-     ```
-   * **Problem**: In `CraftConfig.lua`, `cookingTimes` is set to e.g. 3s (`Edamame Snack`), 4s (`Bread`), 5s (`Apple Pie`).
-   * On the client (`CookingController.lua`), notes spawn at 1.0s intervals and take `fallDuration = 2.0s` to fall. For a recipe spawning $N$ notes, note $N$ lands at $t = (N-1) \times 1.0 + 2.0$ seconds. For 10 notes (or even 5 notes at 1s intervals), note hits occur up to $t = 11.0$s (or $t = 6.0$s).
-   * Because `session.duration` is set to `craftConfig.cookingTimes[item]` (e.g. 3s, 4s, 5s), the server session closes and destroys the `CookingSession` / `CookingScore` entities at $t = 3.5\text{s}, 4.5\text{s}, 5.5\text{s}$ — **BEFORE** all client notes reach the target line!
-   * Any subsequent `CookingHit` events sent by the client after $t = 5.5\text{s}$ are silently ignored by `world:query(CookingSession, CookingScore)` because the server entity was already removed.
-   * As a result, the server calculates final quality using truncated hits (`#scores < totalNotes`), wrongly demoting player performance to `"ok"` quality even if the player hit every note perfectly on the client!
-
----
+1. **Observation**: `WindowManager` constructor sets `baseZIndex = 100` and `maxZIndex = 8999`. `bringToFront()` uses `Math.min(8999, currentZIndex + 1)` and toggles `.window-active` / `.window-inactive`.
+   **Inference**: Requirement 1 (Z-index depth stack 100 to 8999 & active state styling) is correctly implemented and verified.
+2. **Observation**: When `closeWindow()` or `minimizeWindow()` is called, `transferFocusToTopVisibleWindow()` checks `win.classList.contains('hidden') || win.style.display === 'none'`. It selects the non-hidden window with the highest `zIndex` and passes it to `bringToFront()`.
+   **Inference**: Requirement 2 (Active Focus Fallback) is logically complete and works as specified.
+3. **Observation**: `updateTaskbar()` queries all registered windows in `winsToRender` regardless of `isHidden` state, retaining buttons for minimized windows (`.minimized` class). The click listener checks `isActive`: if active -> `minimizeWindow()`; if inactive/minimized -> `restoreWindow()`.
+   **Inference**: Requirement 3 (Taskbar Sync & Click Matrix) satisfies all state transition rules.
+4. **Observation**: Keydown listener checks `e.ctrlKey && e.key === 'Escape'` for toggling `#start-menu` and `e.key === 'Escape'` (alone) for closing `#start-menu`.
+   **Inference**: Requirement 4 (Keyboard Shortcuts) is fully implemented.
+5. **Observation**: `exportScreenGuiLayout()` formatsScreenGui hierarchy with `Name: "ZundaOS95ScreenGui"`, `ResetOnSpawn: false`, `ZIndexBehavior: "Sibling"`, mapping window position and size to `UDim2` Scale/Offset structures.
+   **Inference**: Requirement 5 (Roblox ScreenGui Metadata Export) conforms to Roblox Studio ScreenGui specifications.
 
 ## 3. Caveats
-
-* End-to-end player network latency simulation requires launching Roblox Studio playtest session.
-* Client timing authorization is trusted for `CookingHit` events; server enforces hit count cap (`hitCount < score.totalNotes`).
-
----
+- No caveats. All 5 required criteria were independently tested and verified against the production HTML/JS files in `site/`.
 
 ## 4. Conclusion
-
-**Verdict**: **REQUEST_CHANGES**
-
-### Findings
-
-#### [Major] Finding 1: Server Cooking Session Duration Desync with Note Animation Sequence
-* **What**: `session.duration` on the server is set to `craftConfig.cookingTimes[item]` (3s-5s for early recipes), whereas the client rhythm minigame note sequence takes `(totalNotes * 1.0) + fallDuration (2.0s) + 0.5s` (~12.5s for 10 notes, ~6.5s for 5 notes).
-* **Where**: `src/server/Services/CookingValidationSystem.lua` lines 63 and 117.
-* **Why**: The server purges the `CookingSession` ECS entity at `session.duration + 0.5` (e.g. 4.5s for `Bread`), discarding all note hits sent by the client after 4.5s. This causes the server to evaluate quality on incomplete hit counts, artificially capping player quality ratings at `"ok"`.
-* **Suggestion**: Update line 63 in `src/server/Services/CookingValidationSystem.lua` so `session.duration` accounts for the note animation duration:
-  ```lua
-  local minNoteDuration = (totalNotes * 1.0) + 3.0
-  local duration = math.max(craftConfig.cookingTimes and craftConfig.cookingTimes[item] or 10, minNoteDuration)
-  ```
-
-#### [Minor] Finding 2: Wrapper File Duplicate Pathing
-* **What**: `src/server/systems/cooking/CookingValidationSystem.lua` acts as a thin wrapper around `src/server/Services/CookingValidationSystem.lua`.
-* **Where**: `src/server/systems/cooking/CookingValidationSystem.lua`.
-* **Why**: Having two files with identical names in different directories can confuse maintainers.
-* **Suggestion**: Keep file wrapper documented clearly or centralize in `src/server/Services/`.
-
----
+The implementation of `WindowManager` in `site/window_manager.js` is complete, correct, and free of integrity violations. Verdict: **APPROVED**.
 
 ## 5. Verification Method
-
-1. **Rojo Build Verification**:
+To independently verify this review:
+1. Run the JSDOM test suite from the repository root:
    ```bash
-   rojo build --output test.rbxl
+   node .agents/teamwork_preview_reviewer_m2_2/test_runner.js
    ```
-2. **Code Inspection**:
-   * Inspect `src/server/Services/CookingValidationSystem.lua` lines 63-72 & 115-117 to verify `session.duration`.
-   * Inspect `src/client/Controllers/CookingController.lua` lines 282-370 to calculate note animation timeline.
-   * Confirm deletion of `src/server/CookingSession.server.lua`.
-   * Confirm `default.project.json` `$ignoreUnknownInstances: true`.
+2. Inspect test output to confirm all 57 assertions pass with 0 failures.
+3. Inspect `site/window_manager.js` lines 14-16, 54-100, 209-262, 371-401, and 407-470.
