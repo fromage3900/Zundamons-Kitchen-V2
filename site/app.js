@@ -27,97 +27,16 @@ function playKey(key = '') {
 }
 
 /**
- * Synthesizes procedural Zundamon vocal chirps and signature catchphrase arpeggios.
- * @param {'chirp' | 'nanoda_arpeggio' | 'hit_perfect' | 'hit_great' | 'hit_ok' | 'hit_miss'} type 
+ * Delegates procedural Zundamon vocal chirps to audio_engine.js synthesizer.
+ * @param {string} type 
  */
 function playZundaVoiceLine(type = 'chirp') {
-  if (typeof window === 'undefined' || !window.ZundaAudio) return;
-  const ZundaAudio = window.ZundaAudio;
-  ZundaAudio.resumeOnUserGesture();
-  if (!ZundaAudio.ctx || ZundaAudio.isMuted) return;
-
-  const ctx = ZundaAudio.ctx;
-  const now = ctx.currentTime;
-
-  if (type === 'nanoda_arpeggio') {
-    // Signature 3-note ascending major triad catchphrase (F5 -> A5 -> C6)
-    const notes = [698.46, 880.00, 1046.50];
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-      gain.gain.setValueAtTime(0.25, now + idx * 0.07);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.12);
-      osc.connect(gain);
-      gain.connect(ZundaAudio.sfxGain || ctx.destination);
-      osc.start(now + idx * 0.07);
-      osc.stop(now + idx * 0.07 + 0.14);
-    });
-  } else if (type === 'chirp') {
-    // High-pitched cute blip for typewriter voice lines
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const freq = 900 + Math.random() * 400;
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.3, now + 0.03);
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-    osc.connect(gain);
-    gain.connect(ZundaAudio.sfxGain || ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.04);
-  } else if (type === 'hit_perfect') {
-    // Crisp high chime (880Hz -> 1760Hz)
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(880, now);
-    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.08);
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-    osc.connect(gain);
-    gain.connect(ZundaAudio.sfxGain || ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.11);
-  } else if (type === 'hit_great') {
-    // Bright pitch (660Hz)
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(660, now);
-    gain.gain.setValueAtTime(0.25, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-    osc.connect(gain);
-    gain.connect(ZundaAudio.sfxGain || ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.09);
-  } else if (type === 'hit_ok') {
-    // Mid click (440Hz)
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(440, now);
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-    osc.connect(gain);
-    gain.connect(ZundaAudio.sfxGain || ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.06);
-  } else if (type === 'hit_miss') {
-    // Low thud (150Hz)
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-    osc.connect(gain);
-    gain.connect(ZundaAudio.sfxGain || ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.11);
+  if (typeof window !== 'undefined') {
+    if (window.ZundaAudio && typeof window.ZundaAudio.playVoiceLine === 'function') {
+      window.ZundaAudio.playVoiceLine(type);
+    } else if (typeof window.playZundaVoiceLine === 'function' && window.playZundaVoiceLine !== playZundaVoiceLine) {
+      window.playZundaVoiceLine(type);
+    }
   }
 }
 
@@ -1000,7 +919,7 @@ class VNTalkApp {
     if (action === 'open_cookbook' && typeof window !== 'undefined' && window.windowManager) {
       window.windowManager.openWindow('window-cookbook');
     } else if (action === 'open_quickstart' && typeof window !== 'undefined' && window.windowManager) {
-      window.windowManager.openWindow('window-quickstart');
+      window.windowManager.openWindow('window-updates');
     } else if (action === 'launch_roblox' && typeof window !== 'undefined') {
       window.open('https://www.roblox.com/', '_blank');
     }
@@ -1177,17 +1096,20 @@ class MainApp {
   }
 
   initDesktopShortcuts() {
-    document.querySelectorAll('.desktop-shortcut').forEach(shortcut => {
-      const handleOpen = () => {
-        playClick('down');
+    document.querySelectorAll('.desktop-shortcut, .os-app-tile, [data-open-window]').forEach(shortcut => {
+      const handleOpen = (e) => {
+        // Avoid intercepting anchor links unless they target windows
         const targetId = shortcut.dataset.openWindow;
+        if (!targetId) return;
+        if (shortcut.tagName === 'A' && shortcut.getAttribute('href') && shortcut.getAttribute('href').startsWith('#') && !targetId) return;
+        
+        playClick('down');
         if (targetId && window.windowManager) {
           window.windowManager.openWindow(targetId);
         }
       };
 
       shortcut.addEventListener('click', handleOpen);
-      shortcut.addEventListener('dblclick', handleOpen);
     });
   }
 
@@ -1261,6 +1183,19 @@ class MainApp {
   }
 
   initPromosApp() {
+    const showToast = (message) => {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast-message';
+      toast.innerHTML = `<span class="toast-icon">📋</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    };
+
     document.querySelectorAll('.copy-code-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         playClick('down');
@@ -1272,16 +1207,17 @@ class MainApp {
             btn.style.backgroundColor = '#2e7d32';
             btn.style.color = '#fff';
             if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('hit_perfect');
+            showToast(`Code ${code} copied to clipboard! ✨`);
             setTimeout(() => {
               btn.textContent = originalText;
               btn.style.backgroundColor = '';
               btn.style.color = '';
             }, 2000);
           }).catch(() => {
-            alert(`Promo Code: ${code}`);
+            showToast(`Code: ${code}`);
           });
         } else if (code) {
-          alert(`Promo Code: ${code}`);
+          showToast(`Code: ${code}`);
         }
       });
     });
@@ -1371,47 +1307,106 @@ class MainApp {
   }
 
   initDesktopWidgets() {
-    // 1. Clock Widget
-    const widgetClock = document.getElementById('widget-clock');
-    if (widgetClock) {
-      const updateWidgetClock = () => {
+    // 1. Digital Clock & Weather Widget
+    const timeEl = document.getElementById('widget-digital-time') || document.getElementById('widget-clock');
+    if (timeEl) {
+      const updateClock = () => {
         const now = new Date();
-        widgetClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       };
-      setInterval(updateWidgetClock, 1000);
-      updateWidgetClock();
+      setInterval(updateClock, 1000);
+      updateClock();
     }
 
-    // 2. Interactive Zundamon Desktop Sticker Widget
-    const stickerWidget = document.getElementById('zunda-sticker-widget');
+    const weatherPill = document.getElementById('widget-weather-pill');
+    const weatherIcon = document.getElementById('widget-weather-icon');
+    const weatherText = document.getElementById('widget-weather-text');
+    const weatherStates = [
+      { icon: '🌤️', text: 'Zunda Village: 22°C Clear' },
+      { icon: '🌸', text: 'Sakura Forest: 20°C Blossom Breeze' },
+      { icon: '🌧️', text: 'Edamame Fields: 18°C Cozy Rain' },
+      { icon: '🌙', text: 'Starry Heights: 16°C Clear Night' }
+    ];
+    let weatherIdx = 0;
+
+    if (weatherPill) {
+      weatherPill.addEventListener('click', () => {
+        if (typeof playClick === 'function') playClick('down');
+        weatherIdx = (weatherIdx + 1) % weatherStates.length;
+        const state = weatherStates[weatherIdx];
+        if (weatherIcon) weatherIcon.textContent = state.icon;
+        if (weatherText) weatherText.textContent = state.text;
+      });
+    }
+
+    // 2. Lo-Fi Jukebox & Rain FX Widget
+    const widgetPlayBgm = document.getElementById('widget-play-bgm');
+    const widgetNextTrack = document.getElementById('widget-next-track');
+    const trackTitleEl = document.getElementById('jukebox-track-title');
+    const discIconEl = document.getElementById('jukebox-disc-icon');
+    const rainSlider = document.getElementById('rain-sfx-slider');
+
+    if (widgetPlayBgm) {
+      widgetPlayBgm.addEventListener('click', () => {
+        if (typeof playClick === 'function') playClick('down');
+        if (typeof window.toggleCozyBGM === 'function') {
+          const isPlaying = window.toggleCozyBGM();
+          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ BGM';
+          if (discIconEl) {
+            discIconEl.classList.toggle('spinning', isPlaying);
+          }
+        }
+      });
+    }
+
+    if (widgetNextTrack) {
+      widgetNextTrack.addEventListener('click', () => {
+        if (typeof playClick === 'function') playClick('down');
+        if (window.ZundaAudio && typeof window.ZundaAudio.nextBGMTrack === 'function') {
+          const trackName = window.ZundaAudio.nextBGMTrack();
+          if (trackTitleEl) trackTitleEl.textContent = trackName;
+        }
+      });
+    }
+
+    if (rainSlider) {
+      rainSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (window.ZundaAudio && typeof window.ZundaAudio.setRainVolume === 'function') {
+          window.ZundaAudio.setRainVolume(val);
+        }
+      });
+    }
+
+    // 3. Interactive Zundamon Desktop Sticker Widget
+    const stickerWidget = document.getElementById('widget-zunda-sticker') || document.getElementById('zunda-sticker-widget');
     const bubbleTalk = document.getElementById('widget-speech-bubble');
     if (stickerWidget) {
       const quotes = [
         '"Welcome to Zunda-OS 95, nanoda! 🫛✨"',
         '"Have you cooked fresh Zunda Mochi today, nanoda? 🍡"',
         '"Tap ZundaCLI.exe to type commands, nanoda! 💻"',
-        '"Sakura petals are drifting through the kitchen! 🌸"',
-        '"Zundamon loves warm mochi draped in edamame paste! 💚"'
+        '"Sakura petals drift through the kitchen! 🌸"',
+        '"Zundamon loves warm mochi draped in edamame paste! 💚"',
+        '"Master rhythm targets for S-Rank rewards, nanoda! 🍳"'
       ];
-      let quoteIdx = 0;
-      stickerWidget.addEventListener('click', () => {
-        playClick('down');
-        quoteIdx = (quoteIdx + 1) % quotes.length;
-        if (bubbleTalk) bubbleTalk.textContent = quotes[quoteIdx];
-        if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('chirp');
-      });
-    }
+      let quoteIdx = -1;
+      let autoHideTimer = null;
 
-    // 3. Jukebox BGM Widget
-    const widgetPlayBgm = document.getElementById('widget-play-bgm');
-    if (widgetPlayBgm) {
-      widgetPlayBgm.addEventListener('click', () => {
-        playClick('down');
-        if (typeof window.toggleCozyBGM === 'function') {
-          const isPlaying = window.toggleCozyBGM();
-          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ Play BGM';
-          widgetPlayBgm.style.backgroundColor = isPlaying ? '#ff477e' : '';
-          widgetPlayBgm.style.color = isPlaying ? '#ffffff' : '';
+      stickerWidget.addEventListener('click', () => {
+        if (typeof playClick === 'function') playClick('down');
+        if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('companion_click');
+
+        quoteIdx = (quoteIdx + 1) % quotes.length;
+        if (bubbleTalk) {
+          bubbleTalk.textContent = quotes[quoteIdx];
+          bubbleTalk.style.opacity = '1';
+          bubbleTalk.style.transform = 'translateX(-50%) translateY(0)';
+
+          if (autoHideTimer) clearTimeout(autoHideTimer);
+          autoHideTimer = setTimeout(() => {
+            bubbleTalk.style.opacity = '0.9';
+          }, 5000);
         }
       });
     }
@@ -1442,7 +1437,7 @@ class MainApp {
   }
 
   initParticleCanvas() {
-    const canvas = document.getElementById('star-sparkle-canvas');
+    const canvas = document.getElementById('star-canvas') || document.getElementById('star-sparkle-canvas');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');

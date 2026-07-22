@@ -1,49 +1,46 @@
-# BRIEFING — 2026-07-21T20:51:10Z
+# BRIEFING — 2026-07-22T08:33:21Z
 
 ## Mission
-Cleanly stop and disconnect existing `ZundaAudio.bgmPadOscs` in `startCozyBGM()` within `audio_engine.js` before re-creating pad oscillators, and verify syntax.
+Apply targeted Milestone 2 fixes in `site/app.js`, `site/index.html`, and sync to `docs/`.
 
 ## 🔒 My Identity
-- Archetype: worker
+- Archetype: worker_m2_fix
 - Roles: implementer, qa, specialist
-- Working directory: g:\Zundamons-kItchen-V2\.agents\worker_m2_fix
-- Original parent: 7450e87e-39a1-441f-b567-707dd1271ec2
+- Working directory: `g:\Zundamons-kItchen-V2\.agents\worker_m2_fix`
+- Original parent: 6f6f12e3-fe0a-4916-ad9c-95867c756fc2
 - Milestone: Milestone 2 Fix Pass
 
 ## 🔒 Key Constraints
-- CODE_ONLY network mode.
-- Minimal edits to target file `site/assets/audio_engine.js`.
-- Cleanly stop and disconnect existing pad oscillators when `ZundaAudio.bgmPadOscs` exists.
-- Perform static verification (e.g. node -c).
-- Produce self-contained handoff report.
+- Fix `playZundaVoiceLine` shadowing in `site/app.js` (delegate to `window.ZundaAudio.playVoiceLine(type)` or global `playZundaVoiceLine(type)` from `audio_engine.js`).
+- Align initial track title `#jukebox-track-title` in `site/index.html` to `"Zunda Cozy Kitchen"`.
+- Fix sticker quote cycler in `site/app.js` so first click displays quote index 0 (`"Welcome to Zunda-OS 95, nanoda! 🫛✨"`).
+- Run node syntax checks and `site/sync_site.js` script to copy assets from `site/` to `docs/`.
+- Maintain integrity mandate (no cheating, no hardcoded facades).
 
 ## Current Parent
-- Conversation ID: 7450e87e-39a1-441f-b567-707dd1271ec2
-- Updated: 2026-07-21T20:51:10Z
+- Conversation ID: 6f6f12e3-fe0a-4916-ad9c-95867c756fc2
+- Updated: 2026-07-22T08:33:21Z
 
 ## Task Summary
-- **What to build**: In `startCozyBGM()` within `audio_engine.js`, clean up prior `bgmPadOscs` before starting new ones.
-- **Success criteria**: Lingering pad oscillators are stopped and disconnected if `ZundaAudio.bgmPadOscs` is active when `startCozyBGM()` is called; syntax check passes; handoff report written.
-- **Interface contracts**: Web Audio API AudioNode/OscillatorNode stop & disconnect.
-
-## Key Decisions Made
-- Added clean loop over `ZundaAudio.bgmPadOscs` calling `osc.stop()` and `osc.disconnect()` within `try/catch` blocks in `startCozyBGM()` right after clearing `bgmStopTimeout` and before instantiating new pad oscillators.
-
-## Artifact Index
-- g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\ORIGINAL_REQUEST.md — Original prompt
-- g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\BRIEFING.md — Working briefing
-- g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\progress.md — Progress heartbeat log
-- g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\handoff.md — Final handoff report
+- **What to build**: Fix voice line shadowing, jukebox title default text, and quote index initialization in web app scripts. Sync `site/` to `docs/`.
+- **Success criteria**: All JS syntax checks pass (`node -c`), `sync_site.js` syncs successfully, voice lines and sticker quotes work correctly.
 
 ## Change Tracker
-- **Files modified**: `site/assets/audio_engine.js` — added cleanup of `ZundaAudio.bgmPadOscs` (`stop()` and `disconnect()`) in `startCozyBGM()`.
-- **Build status**: Passed (`node -c site/assets/audio_engine.js` clean)
-- **Pending issues**: None
+- **Files modified**: `site/app.js`, `site/assets/audio_engine.js`, `site/index.html`, `docs/app.js`, `docs/assets/audio_engine.js`, `docs/index.html`
+- **Build status**: PASS (node syntax check passed, site/sync_site.js completed)
+- **Pending issues**: none
 
 ## Quality Status
-- **Build/test result**: Passed syntax check and node simulation test
-- **Lint status**: Clean JS syntax
-- **Tests added/modified**: Node simulation test verifying oscillator stopping and disconnection
+- **Build/test result**: PASS
+- **Lint status**: clean
+- **Tests added/modified**: Node syntax checks passed for all target scripts, dual deployment sync validated.
 
 ## Loaded Skills
-None
+- none
+
+## Key Decisions Made
+- Will inspect `site/assets/audio_engine.js`, `site/app.js`, and `site/index.html` before modifying.
+
+## Artifact Index
+- `g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\ORIGINAL_REQUEST.md` — User request copy
+- `g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\BRIEFING.md` — Agent briefing state

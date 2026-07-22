@@ -1,385 +1,512 @@
-# Milestone 3 Analysis Report: Interactive Phosphor Web Terminal (`ZundaCLI.exe`) Command Suite & Zundamon Easter Eggs
-
-**Author**: Explorer 3  
-**Milestone**: Milestone 3 — Interactive Phosphor Web Terminal (`ZundaCLI.exe`)  
-**Target Output**: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3\analysis.md`  
-**Date**: 2026-07-21  
+# CSS Styling & Visual Blueprint Specification (`site/style.css`)
+**Milestone 3 — ZundaCLI.exe, Promos.app, Calculator.app, Updates.log**
+*Working Directory*: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3`  
+*Author*: Explorer 3 (Visual Design & CSS Architecture Specialist)
 
 ---
 
-## 1. Executive Summary & Scope
-
-This report provides the complete architecture and functional specification for the CLI command suite, interactive responses, secret Zundamon easter eggs, and Web Audio API feedback integration in `ZundaCLI.exe` (`site/terminal.js`).
-
-`ZundaCLI.exe` acts as the command-line bridge between the browser user and the *Zundamon's Kitchen V2* universe. Grounded directly in existing game configuration modules (`CraftConfig.lua`, `GatherConfig.lua`, `MineableConfig.lua`, `ZoneLoreConfig.lua`, `VNDialogueData.lua`), workspace setup (`default.project.json`, `wally.toml`), and retro CRT visual design (`style.css`, `audio_engine.js`), this specification details:
-1. **12 Core CLI Commands**: `help`, `info` / `about`, `recipes`, `gather`, `lore`, `play`, `music`, `clear`, `version`, `theme [mode]`, `rojo`, `wally`.
-2. **7 Secret Zundamon Easter Eggs**: `nanoda`, `mochi`, `edamame`, `zunda`, `secret`, `dance`, `matrix`.
-3. **Audio Feedback Integration**: Synthesized sound triggers for command execution, gathering swings, rhythm chimes, theme shifts, BGM toggling, and easter egg audio effects via `ZundaAudio`.
+## Executive Summary
+This document specifies the complete CSS styling blueprint for `site/style.css` covering **ZundaCLI.exe** (Pastel Console Prompt), **Promos.app** (Code Redeemer), **Calculator.app** (Dish Profit Crafter), and **Updates.log** (Patch & ECS Log). It establishes design system integration with the **Y2K Kawaii & CRT Phosphor Design Language** (`--term-bg: #231b2e`, `--term-pink: #f472b6`, `--term-cyan: #38bdf8`, `--term-yellow: #fef08a`, `--sakura-base`, `--zunda-base`).
 
 ---
 
-## 2. Core Command Suite Specifications
+## 1. Pastel Terminal Styling Specification (`ZundaCLI.exe`)
 
-The terminal parser in `site/terminal.js` matches lowercased primary command strings and dispatches sub-arguments to dedicated handler functions. Below is the specification for each core command.
+### 1.1 Container & Layout Architecture
+The terminal uses a deep plum dark obsidian backdrop with high-contrast pastel neon accents and soft glow shadows.
 
----
-
-### Command 1: `help`
-- **Description**: Displays a formatted directory of available terminal commands, organized by category, with syntax usage instructions.
-- **Aliases**: `help`, `?`, `commands`
-- **Arguments**: Optional category filter (e.g., `help core`, `help game`, `help dev`, `help secret`).
-- **Interactive Output Structure**:
-  ```text
-  ┌────────────────────────────────────────────────────────┐
-  │ ZundaCLI.exe v4.09.1995 — COMMAND DIRECTORY            │
-  └────────────────────────────────────────────────────────┘
-  CORE COMMANDS:
-    • help [cat]       - Display command directory or category help
-    • info / about     - System specs, author credits, project info
-    • version          - Kernel version, build details & Rojo sync status
-    • clear            - Clear terminal log buffer
-    • theme [mode]     - Switch CRT visual theme (classic, amber, matrix, cozy)
-
-  GAMEPLAY & EXPLORATION:
-    • recipes [name]   - View edamame dishes & rhythm target scores
-    • gather [node]    - Simulate harvesting tool swing & loot drops
-    • lore [zone]      - Uncover Zundamon backstory & area lore
-    • play             - Launch Roblox Zundamon's Kitchen experience
-
-  AUDIO & DEVS:
-    • music            - Toggle cozy BGM arpeggio synthesizer
-    • rojo             - View Rojo 7.7.0 workspace tree & studio rules
-    • wally            - Inspect Wally package manifest & versions
-
-  EASTER EGGS:
-    • Try typing secret keywords nanoda! (Hint: 'secret')
+- **Classes & Selectors**: `.terminal-window`, `#window-zundacli`, `.cli-body`
+- **Background**: `var(--term-bg)` (`#231b2e`)
+- **Typography**: `var(--font-mono)` (`'VT323', 'Cascadia Code', monospace`), `font-size: 14px`, `line-height: 1.5`
+- **Border & Inset Shadow**:
+  ```css
+  .terminal-window, #window-zundacli .cli-body {
+    background-color: var(--term-bg);
+    color: var(--term-pink);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 12px;
+    box-shadow: inset 0 0 18px rgba(15, 10, 25, 0.95), inset 0 0 4px rgba(244, 114, 182, 0.3);
+    border: 1px solid rgba(244, 114, 182, 0.3);
+  }
   ```
-- **Audio SFX**: `playClickSFX('down')`
 
----
-
-### Command 2: `info` / `about`
-- **Description**: Displays hardware specs simulation, Zunda-OS 95 system diagnostic status, team credits, and project summary.
-- **Aliases**: `info`, `about`, `sysinfo`, `specs`
-- **Arguments**: None
-- **Interactive Output Structure**:
-  ```text
-  [SYSTEM DIAGNOSTICS - Zunda-OS 95]
-  OS Version   : Zunda-OS 95 [Version 4.09.1995]
-  Kernel       : Edamame Engine 2.0 (Phosphor Web CLI)
-  Memory       : 640KB RAM (512KB Free nanoda!)
-  Audio Engine : Native WebAudio Synthesizer (Stereo / 44.1kHz)
-  Workspace    : Rojo 7.7.0 Sync Active | $ignoreUnknownInstances: ON
-  
-  [PROJECT CREDITS]
-  Title        : Zundamon's Kitchen V2 (Roblox & Web Hub)
-  Description  : Cozy Infinity Nikki & Zen Edamame-Pea Cooking Sim
-  Frameworks   : Matter ECS, ReplicaService, React, ProfileService
-  Web UI       : Pure HTML5/CSS3 CRT Phosphor Interface (Zero External Assets)
+### 1.2 Terminal Output Log & Scroll Area
+- **Classes**: `.terminal-output`, `.cli-terminal-log`
+- **Styling**:
+  ```css
+  .terminal-output, .cli-terminal-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    line-height: 1.5;
+    word-break: break-word;
+    text-shadow: 0 0 4px rgba(244, 114, 182, 0.4);
+  }
   ```
-- **Audio SFX**: `playClickSFX('down')`
 
----
+### 1.3 Prompt & Input Line Formatting
+- **Classes**: `.term-prompt`, `.cli-prompt-label`, `.term-input`, `.cli-input-field`, `.cli-prompt-line`
+- **Styling**:
+  ```css
+  .cli-prompt-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(244, 114, 182, 0.2);
+  }
 
-### Command 3: `recipes`
-- **Description**: Displays the complete recipe book sourced directly from `CraftConfig.lua`, showing ingredients, cook times, notes counts, and rhythm score targets (`PERFECT`, `GREAT`, `OK`).
-- **Aliases**: `recipes`, `recipe`, `cook`
-- **Arguments**: Optional dish name (e.g., `recipes mochi`, `cook Zunda Mochi`).
-- **Interactive Output Structure**:
-  - *Default Call (`recipes`)*: Shows recipe overview table categorized by Tier (Tier 1 Starter, Tier 2 Intermediate, Tier 3 Advanced, Tier 4 Expert).
-  - *Detailed Dish Call (`recipes mochi` or `cook Zunda Mochi`)*:
-  ```text
-  ┌────────────────────────────────────────────────────────┐
-  │ [RECIPE CARD] Zunda Mochi (ずんだ餅)                     │
-  ├────────────────────────────────────────────────────────┤
-  │ Tier       : Tier 2 (Intermediate)                   │
-  │ Category   : Signature Dish (Classic Zunda)          │
-  │ Ingredients: 🫛 Zunda Pea x5, 🌾 Wheat x8              │
-  │ Cook Time  : 7 seconds                                 │
-  │ Minigame   : 5 Notes | Speed: 1.7x                     │
-  │ Score Target: PERFECT (>=3 Perfect Notes), GREAT (>=3 Hits)│
-  │ Market Value: 160 Gold Coins                            │
-  └────────────────────────────────────────────────────────┘
-  [COOKING SIMULATION]: Cooking Zunda Mochi... Done! Nanoda! 🫛✨
+  .term-prompt, .cli-prompt-label {
+    color: var(--term-cyan);
+    font-weight: bold;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    user-select: none;
+  }
+
+  .term-input, .cli-input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--term-cyan);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    caret-color: var(--term-pink);
+    text-shadow: 0 0 4px rgba(56, 189, 248, 0.5);
+  }
+
+  .term-input::placeholder, .cli-input-field::placeholder {
+    color: rgba(244, 114, 182, 0.4);
+    font-style: italic;
+  }
   ```
-- **Data Source Reference**: `src/shared/ConfigurationFiles/CraftConfig.lua`
-- **Audio SFX**: `playWindowSFX('maximize')` for recipe card view; `playClickSFX('start')` on cook action.
 
----
-
-### Command 4: `gather`
-- **Description**: Simulates harvesting resources in Zunda Village. Simulates tool swinging (`*swish*... *clang!*`), node durability damage, and calculates drop loot based on `GatherConfig.lua` and `MineableConfig.lua`.
-- **Aliases**: `gather`, `harvest`, `mine`
-- **Arguments**: Optional node name (`gather rock`, `gather pea`, `gather tree`, `gather mushroom`, `gather mystery`).
-- **Interactive Output Structure**:
-  ```text
-  [GATHERING]: Swinging Bronze Pickaxe at node 'GoldRock'...
-  *SWISH* ... *CLANG!* (Hit 1/3 - 35 Damage)
-  *SWISH* ... *CLANG!* (Hit 2/3 - 35 Damage)
-  *SWISH* ... *CRACK!* (Node Harvested!)
-  
-  [LOOT DROPPED]:
-    +2 🪙 Gold Ore
-    +1 🪨 Marble Rock
-    +1 🫛 Zunda Pea (Bonus Drop!)
-  [EXP GAINED]: +25 Chef Gathering XP
-  ```
-- **Data Source Reference**: `src/shared/ConfigurationFiles/GatherConfig.lua` (Click Flora) & `MineableConfig.lua` (Tool Nodes).
-- **Audio SFX**: Multi-stage audio cue: `playWindowSFX('drag')` for swing; high-pitch chime sound for loot drop.
-
----
-
-### Command 5: `lore`
-- **Description**: Displays zone lore entries and dialogue from `ZoneLoreConfig.lua` and `VNDialogueData.lua`.
-- **Aliases**: `lore`, `zone`, `story`
-- **Arguments**: Optional zone ID (`lore village`, `lore kitchen`, `lore ruins`, `lore shrine`, `lore market`).
-- **Interactive Output Structure**:
-  - *Default Call (`lore`)*: Lists available zones in Zunda Village.
-  - *Zone Call (`lore ruins`)*:
-  ```text
-  ┌────────────────────────────────────────────────────────┐
-  │ [ZONE LORE] Ancient Ruins (古代の調理場跡)              │
-  └────────────────────────────────────────────────────────┘
-  Speaker: 👁 Ancient Voice (古代の記録者)
-  
-  "...Who enters the Ancient Kitchen...?"
-  "Long ago, the first Zunda recipe was crafted on this very altar."
-  "The secret ingredient... it slumbers still. Prove your worth, chef."
-  
-  [LORE NOTE]: Ancient Zunda alchemy increases recipe mastery yield by +15%.
-  ```
-- **Data Source Reference**: `src/shared/ConfigurationFiles/ZoneLoreConfig.lua`.
-- **Audio SFX**: `playWindowSFX('focus')` soft dual-tone.
-
----
-
-### Command 6: `play`
-- **Description**: Generates an interactive Roblox launch banner with experience details, status indicators, and direct web link/window action.
-- **Aliases**: `play`, `roblox`, `launch`, `start`
-- **Arguments**: None
-- **Interactive Output Structure**:
-  ```text
-  ┌────────────────────────────────────────────────────────┐
-  │ 🎮 ROBLOX EXPERIENCE — Zundamon's Kitchen V2           │
-  ├────────────────────────────────────────────────────────┤
-  │ Status     : [ONLINE] Server Active                    │
-  │ Players    : 1,420 Chefs Online                        │
-  │ Genre      : Cozy Cooking & Gathering Simulation        │
-  │ Link       : https://www.roblox.com/                   │
-  └────────────────────────────────────────────────────────┘
-  [ACTION]: Click link above or launch via VNTalk.app to play nanoda!
-  ```
-- **Audio SFX**: `playClickSFX('start')`
-
----
-
-### Command 7: `music`
-- **Description**: Toggles ambient cozy background music arpeggio synthesizer on/off via `window.toggleCozyBGM()`.
-- **Aliases**: `music`, `bgm`, `audio`, `soundtrack`
-- **Arguments**: Optional (`on`, `off`, `toggle`).
-- **Interactive Output Structure**:
-  ```text
-  [AUDIO ENGINE]: Toggling Cozy BGM Synthesizer...
-  Status: [AUDIO ACTIVE] Playing E Major Pentatonic Ambient Loop (650ms tempo).
-  Note  : Synthesized procedurally using native Web Audio API oscillators.
-  ```
-- **Audio SFX**: Direct invocation of `toggleCozyBGM()`.
-
----
-
-### Command 8: `clear`
-- **Description**: Flushes the `#cli-output` buffer and resets terminal screen view.
-- **Aliases**: `clear`, `cls`
-- **Arguments**: None
-- **Interactive Output Structure**: Clears DOM elements inside `#cli-output`, re-prints welcome line if configured.
-- **Audio SFX**: `playClickSFX('up')`
-
----
-
-### Command 9: `version`
-- **Description**: Outputs exact build information, CRT renderer parameters, and Roblox Studio Rojo compatibility version.
-- **Aliases**: `version`, `ver`, `v`
-- **Arguments**: None
-- **Interactive Output Structure**:
-  ```text
-  ZundaCLI.exe [Version 4.09.1995]
-  Build Tag   : v2.0.0-Phosphor-Release (2026.07)
-  Rojo Sync   : Rojo 7.7.0 Compliant
-  CRT Renderer: Phosphor Green Monospace Canvas Overlay
-  License     : MIT License (C) Zundamon's Kitchen Team
-  ```
-- **Audio SFX**: `playKeySFX('Enter')`
-
----
-
-### Command 10: `theme [mode]`
-- **Description**: Changes terminal & window visual palette. Supports `classic-green` (default CRT green `#33ff33`), `amber` (warm retro CRT amber `#ffb000`), `matrix` (neon green cyber `#00ff66`), and `cozy-pea` (pastel green `#8bc34a`).
-- **Aliases**: `theme`, `color`, `palette`
-- **Arguments**: `classic`, `amber`, `matrix`, `cozy`
-- **Interactive Output Structure**:
-  ```text
-  [THEME SWITCHER]: Terminal palette updated to 'amber' (CRT Phosphor Amber).
-  [CSS TARGET]    : Applied data-terminal-theme="amber" to #window-zundacli.
-  ```
-- **Audio SFX**: `playWindowSFX('maximize')`
-
----
-
-### Command 11: `rojo`
-- **Description**: Displays Rojo 7.7.0 workspace mapping tree, sync configuration, and highlights workspace rule `#1`: `$ignoreUnknownInstances: true`.
-- **Aliases**: `rojo`, `rojostatus`, `sync`
-- **Arguments**: None
-- **Interactive Output Structure**:
-  ```text
-  ┌────────────────────────────────────────────────────────┐
-  │ 🛠️ ROJO 7.7.0 WORKSPACE STRUCTURE & SYNC CONFIG         │
-  ├────────────────────────────────────────────────────────┤
-  │ Project    : default.project.json                      │
-  │ Mapping    :                                           │
-  │   ├── ReplicatedStorage  -> src/shared & Packages       │
-  │   ├── ServerScriptService-> src/server & ServerPackages│
-  │   ├── StarterPlayer      -> src/client                 │
-  │   └── Workspace          -> src/Workspace              │
-  ├────────────────────────────────────────────────────────┤
-  │ ⚠️ ROJO LEVEL PRESERVATION RULE:                       │
-  │ "$ignoreUnknownInstances": true  [ENABLED]             │
-  │ Prevents Rojo from wiping Studio-built terrain & maps! │
-  └────────────────────────────────────────────────────────┘
-  ```
-- **Data Source Reference**: `g:\Zundamons-kItchen-V2\default.project.json` and `AGENTS.md`.
-- **Audio SFX**: `playClickSFX('down')`
-
----
-
-### Command 12: `wally`
-- **Description**: Displays Wally package manifest, declared dependencies in `wally.toml`, realm mapping, and registry source.
-- **Aliases**: `wally`, `packages`, `deps`
-- **Arguments**: None
-- **Interactive Output Structure**:
-  ```text
-  ┌────────────────────────────────────────────────────────┐
-  │ 📦 WALLY PACKAGE DEPENDENCIES (fromage3900/zundamons-kitchen) │
-  ├────────────────────────────────────────────────────────┤
-  │ SHARED DEPENDENCIES (ReplicatedStorage/Packages):      │
-  │  • Matter         : matter-ecs/matter@0.8.4             │
-  │  • ReplicaService : barenton/replicaservice@1.0.1      │
-  │  • React          : jsdotlua/react@17.1.0               │
-  │  • ReactRoblox    : jsdotlua/react-roblox@17.1.0        │
-  │  • Promise        : evaera/promise@4.0.0                │
-  │  • Signal         : sleitnick/signal@2.0.1             │
-  ├────────────────────────────────────────────────────────┤
-  │ SERVER DEPENDENCIES (ServerScriptService/ServerPackages):│
-  │  • ProfileService : alreadypro/profileservice@1.0.4     │
-  └────────────────────────────────────────────────────────┘
-  ```
-- **Data Source Reference**: `g:\Zundamons-kItchen-V2\wally.toml`.
-- **Audio SFX**: `playClickSFX('down')`
-
----
-
-## 3. Secret Zundamon Easter Eggs Specifications
-
-The terminal features 7 secret Zundamon easter eggs triggered by typing special terms.
-
-| Easter Egg Command | Primary Keyword / Triggers | Interactive Visual Response | Audio SFX Trigger |
-|---|---|---|---|
-| **1. `nanoda`** | `nanoda`, `nanoda!`, `nano` | Prints Zundamon's iconic catchphrase artwork and dialogue: `"Nanoda! 🫛 Nanoda! Zundamon is here to support your cooking journey, nanoda!"` | **Signature Chime**: Multi-frequency rapid ascending melody (E5-G5-B5-E6 arpeggio blip). |
-| **2. `mochi`** | `mochi`, `zundamochi`, `mochi!` | Renders ASCII Zunda Mochi card art: `🍡 [ 🫛🫛🫛 ]` with a recipe fun fact: *"Zunda Mochi paste is made from sweet crushed young edamame beans!"* | **Mochi Squish SFX**: Low-pass filtered pitch-bend slide (`sine` 400Hz -> 600Hz -> 200Hz). |
-| **3. `edamame`** | `edamame`, `pea`, `zundapea` | Triggers a visual burst of green pea emoji floating across the CLI window and prints an edamame trivia card. | **Pea Pop SFX**: Staccato triple high-pitch bubble pop (`1200Hz`, `1500Hz`, `1800Hz` square blips). |
-| **4. `zunda`** | `zunda`, `zundamon` | Renders ASCII Zundamon Avatar portrait and cheerleader ascii banner: `(๑>◡<๑) ZUNDA POWER MAX!` | **Cheer Fanfare**: 4-note victory flourish (C5-E5-G5-C6). |
-| **5. `secret`** | `secret`, `hidden`, `easteregg` | Unlocks secret developer terminal mode `zunda@secret:~$` and reveals the legendary recipe formula for `"Zunda Paradise"`. | **Secret Reveal SFX**: Mystery descending synth chime with low-frequency resonance. |
-| **6. `dance`** | `dance`, `zundadance` | Plays a 4-frame ASCII animation sequence in the CLI log showing Zundamon dancing: `(>'-')>` `^('-')^` `<('-'<)` `v('-')v` `nanoda!` | **Dance Beat SFX**: Rhythmic 4-step upbeat arpeggio synth sequence. |
-| **7. `matrix`** | `matrix`, `hack`, `cyber` | Instantly sets theme to `matrix`, turns text bright neon green `#00ff66`, and outputs a simulated Zunda-OS 95 phosphor code stream: `[KERNEL]: HACKING EDAMAME MAINFRAME... ACCESS GRANTED!` | **Matrix Sound Effect**: Glitchy fast-frequency sweep sound. |
-
----
-
-## 4. Audio Feedback Integration Architecture
-
-Audio feedback is integrated directly with the Web Audio synthesizer in `site/assets/audio_engine.js`. 
-
-To ensure complete modularity without relying on external WAV/MP3 audio files, `terminal.js` invokes synthesized helper functions attached to `window.ZundaAudio` or custom audio functions added to `audio_engine.js`:
-
-```javascript
-// Sound Trigger Interface Map for ZundaCLI.exe:
-1. Typing Input        -> playKeySFX(key)              // Synthesizes mechanical keyboard click
-2. Command Submit      -> playKeySFX('Enter')          // Synthesizes carriage return tone
-3. Core Command Exec   -> playClickSFX('down')         // Standard button press click
-4. Recipe Cooking      -> playClickSFX('start')        // Ascending dual-tone execution chime
-5. Gathering Swing     -> playWindowSFX('drag')        // Pitch-drop swing impact sound
-6. Loot Drop Harvest   -> playWindowSFX('maximize')    // Bright 3-note ascending reward chime
-7. Theme Change        -> playWindowSFX('focus')       // Dual sine tone transition sound
-8. BGM Toggle          -> toggleCozyBGM()              // Starts/Stops ambient pentatonic pad loop
-9. Easter Egg Chimes   -> playEasterEggSFX(eggType)    // Synthesizes specific easter egg fanfare
-```
-
----
-
-## 5. Implementation Design for `site/terminal.js`
-
-To maintain clean separation of concerns and high readability, `terminal.js` should follow this functional structure:
-
-```javascript
-/**
- * ZundaCLI Terminal Engine
- * Interactive CRT Phosphor Terminal for Zunda-OS 95
- */
-(function() {
-  // Command registry
-  const COMMAND_REGISTRY = {
-    help: handleHelp,
-    info: handleInfo,
-    about: handleInfo,
-    recipes: handleRecipes,
-    cook: handleRecipes,
-    gather: handleGather,
-    harvest: handleGather,
-    mine: handleGather,
-    lore: handleLore,
-    play: handlePlay,
-    roblox: handlePlay,
-    launch: handlePlay,
-    music: handleMusic,
-    bgm: handleMusic,
-    clear: handleClear,
-    cls: handleClear,
-    version: handleVersion,
-    ver: handleVersion,
-    theme: handleTheme,
-    rojo: handleRojo,
-    wally: handleWally,
-    // Easter Eggs
-    nanoda: handleNanoda,
-    mochi: handleMochi,
-    edamame: handleEdamame,
-    zunda: handleZunda,
-    secret: handleSecret,
-    dance: handleDance,
-    matrix: handleMatrix
-  };
-
-  // Parser & Dispatcher
-  function parseAndExecute(rawInput) {
-    const trimmed = rawInput.trim();
-    if (!trimmed) return;
-
-    const parts = trimmed.split(/\s+/);
-    const cmd = parts[0].toLowerCase();
-    const args = parts.slice(1);
-
-    if (COMMAND_REGISTRY[cmd]) {
-      COMMAND_REGISTRY[cmd](args, rawInput);
-    } else {
-      handleUnknownCommand(cmd);
+### 1.4 Glowing Cursor Animation (`@keyframes blink`)
+- **Keyframe Animation**:
+  ```css
+  @keyframes blink {
+    0%, 49% {
+      opacity: 1;
+      box-shadow: 0 0 8px var(--term-pink);
+    }
+    50%, 100% {
+      opacity: 0;
+      box-shadow: none;
     }
   }
-})();
+
+  .term-cursor, .cli-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background-color: var(--term-pink);
+    vertical-align: middle;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+  }
+  ```
+
+### 1.5 Pastel Color Highlights Palette
+The terminal output formatter supports 4 signature pastel accent utility classes:
+
+| Class Selector | Hex Color | Role / Purpose | Text Shadow Glow |
+|---|---|---|---|
+| `.term-pink`, `.cli-pink` | `#f472b6` | Zunda Sakura Pink primary, echo labels, borders | `0 0 6px rgba(244,114,182,0.5)` |
+| `.term-green`, `.cli-green` | `#8bc34a` | Fresh Edamame Green success tag, recipe status | `0 0 6px rgba(139,195,74,0.5)` |
+| `.term-cyan`, `.cli-cyan` | `#38bdf8` | User commands, prompts, audio system notes | `0 0 6px rgba(56,189,248,0.5)` |
+| `.term-yellow`, `.cli-yellow` | `#fef08a` | Highlight keywords, warnings, code parameters | `0 0 6px rgba(254,240,138,0.5)` |
+
+```css
+.term-pink, .cli-pink { color: var(--term-pink); text-shadow: 0 0 6px rgba(244, 114, 182, 0.5); }
+.term-green, .cli-green { color: #8bc34a; text-shadow: 0 0 6px rgba(139, 195, 74, 0.5); }
+.term-cyan, .cli-cyan { color: var(--term-cyan); text-shadow: 0 0 6px rgba(56, 189, 248, 0.5); }
+.term-yellow, .cli-yellow { color: var(--term-yellow); text-shadow: 0 0 6px rgba(254, 240, 138, 0.5); }
+```
+
+### 1.6 Custom Pastel Terminal Webkit Scrollbar
+```css
+.cli-terminal-log::-webkit-scrollbar,
+.terminal-output::-webkit-scrollbar {
+  width: 8px;
+}
+.cli-terminal-log::-webkit-scrollbar-track,
+.terminal-output::-webkit-scrollbar-track {
+  background: #191222;
+  border-left: 1px solid rgba(244, 114, 182, 0.2);
+}
+.cli-terminal-log::-webkit-scrollbar-thumb,
+.terminal-output::-webkit-scrollbar-thumb {
+  background: var(--term-pink);
+  border-radius: 4px;
+  box-shadow: 0 0 6px var(--term-pink);
+}
+.cli-terminal-log::-webkit-scrollbar-thumb:hover,
+.terminal-output::-webkit-scrollbar-thumb:hover {
+  background: var(--term-cyan);
+  box-shadow: 0 0 8px var(--term-cyan);
+}
 ```
 
 ---
 
-## 6. Verification Strategy
+## 2. Promos App Layout Specification (`Promos.app`)
 
-1. **Syntactical Verification**: Validate that all 12 core commands and 7 easter egg keywords execute without errors or exceptions in browser console.
-2. **Data Consistency Audit**: Confirm that recipes (`CraftConfig.lua`), gathering nodes (`GatherConfig.lua`, `MineableConfig.lua`), lore (`ZoneLoreConfig.lua`), and packages (`wally.toml`) match project source files exactly.
-3. **Audio Verification**: Verify that every command invocation triggers appropriate synthesized SFX via `ZundaAudio` without missing AudioContext gesture errors.
-4. **Theme Verification**: Verify that `theme` and `matrix` commands correctly apply visual CSS attributes (`data-terminal-theme`) to the CRT container.
+### 2.1 Promo Redeemer Box Container
+- **Classes**: `.promo-redeemer-box`, `#window-promos .promos-body`
+- **Styling**:
+  ```css
+  .promo-redeemer-box, .promos-body {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--sakura-base);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow-soft-pink);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  ```
+
+### 2.2 Promo Code Row Item Layout
+- **Classes**: `.promo-code-item`, `.code-box`
+- **Styling**:
+  ```css
+  .promo-code-item, .code-box {
+    background: #ffffff;
+    border: 2px dashed var(--zunda-soft);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: var(--shadow-soft-mint);
+    transition: var(--transition-bounce);
+  }
+
+  .promo-code-item:hover, .code-box:hover {
+    border-color: var(--zunda-base);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.25);
+  }
+
+  .promo-code-text {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--zunda-deep);
+    letter-spacing: 1px;
+  }
+  ```
+
+### 2.3 Input Field Styling
+- **Classes**: `.promo-input`, `.win95-input`
+- **Styling**:
+  ```css
+  .promo-input, .win95-input {
+    width: 100%;
+    padding: 10px 16px;
+    border: 2px solid var(--sakura-base);
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--zunda-deep);
+    background: #ffffff;
+    outline: none;
+    transition: var(--transition-fast);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .promo-input:focus, .win95-input:focus {
+    border-color: var(--sakura-hot);
+    box-shadow: 0 0 0 3px rgba(255, 71, 126, 0.25);
+  }
+  ```
+
+### 2.4 Candy Redeem Button
+- **Classes**: `.btn-candy`, `.promo-redeem-btn`
+- **Styling**:
+  ```css
+  .promo-redeem-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    font-weight: 800;
+    font-size: 13px;
+    color: #ffffff !important;
+    background: linear-gradient(180deg, var(--sakura-vibrant) 0%, var(--sakura-hot) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--inset-gloss-top), var(--shadow-candy-button);
+    cursor: pointer;
+    transition: var(--transition-bounce);
+    user-select: none;
+  }
+
+  .promo-redeem-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: var(--inset-gloss-top), 0 8px 24px rgba(255, 71, 126, 0.45);
+  }
+  ```
+
+### 2.5 Success Badge
+- **Classes**: `.promo-success-badge`, `.badge-success`
+- **Styling**:
+  ```css
+  .promo-success-badge, .badge-success {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--zunda-light);
+    color: var(--zunda-deep);
+    border: 1px solid var(--zunda-base);
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+  }
+  ```
+
+---
+
+## 3. Calculator Form Styling Specification (`Calculator.app`)
+
+### 3.1 Form Container & Layout
+- **Classes**: `.calc-form`, `.calc-body`, `.calc-form-group`
+- **Styling**:
+  ```css
+  .calc-form, .calc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    background: linear-gradient(180deg, rgba(255, 245, 248, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+  }
+
+  .calc-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .calc-form-group label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--zunda-deep);
+  }
+  ```
+
+### 3.2 Select Dropdown Styling
+- **Classes**: `.calc-select`, `#calc-dish-select`
+- **Styling**:
+  ```css
+  .calc-select, #calc-dish-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    padding: 10px 36px 10px 14px;
+    border: 2px solid var(--sakura-base);
+    border-radius: 12px;
+    background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%3E4caf50' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 14px center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .calc-select:focus, #calc-dish-select:focus {
+    border-color: var(--sakura-hot);
+    box-shadow: 0 0 0 3px rgba(255, 71, 126, 0.2);
+  }
+  ```
+
+### 3.3 Numeric Input Styling
+- **Classes**: `.calc-input`, `#calc-qty`
+- **Styling**:
+  ```css
+  .calc-input, #calc-qty {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--sakura-base);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--zunda-deep);
+    background: #ffffff;
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .calc-input:focus, #calc-qty:focus {
+    border-color: var(--sakura-hot);
+    box-shadow: 0 0 0 3px rgba(255, 71, 126, 0.2);
+  }
+  ```
+
+### 3.4 Profit Display Card Container
+- **Classes**: `.profit-display-card`, `.calc-results`
+- **Styling**:
+  ```css
+  .profit-display-card, .calc-results {
+    background: #ffffff;
+    border: 2px solid var(--zunda-soft);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow-soft-mint);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .calc-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #475569;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(165, 214, 167, 0.5);
+  }
+
+  .calc-result-row:last-child {
+    border-bottom: none;
+  }
+  ```
+
+### 3.5 Profit / Loss Color Highlights
+- **Classes**: `.profit-positive`, `.profit-negative`, `#res-profit`
+- **Styling**:
+  ```css
+  .profit-positive, #res-profit {
+    color: var(--zunda-deep);
+    background: var(--zunda-light);
+    border: 1px solid var(--zunda-soft);
+    padding: 3px 12px;
+    border-radius: 9999px;
+    font-weight: 800;
+    font-size: 14px;
+    text-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+  }
+
+  .profit-negative {
+    color: #e11d48;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    padding: 3px 12px;
+    border-radius: 9999px;
+    font-weight: 800;
+    font-size: 14px;
+  }
+  ```
+
+---
+
+## 4. Updates Log Styling Specification (`Updates.log`)
+
+### 4.1 Container & Body Layout
+- **Classes**: `.updates-log-body`, `.updates-body`
+- **Styling**:
+  ```css
+  .updates-log-body, .updates-body {
+    padding: 20px;
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.7;
+    background: linear-gradient(180deg, rgba(255, 245, 248, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+  }
+  ```
+
+### 4.2 Patch Version Tag
+- **Classes**: `.patch-version-tag`, `h3 .v-badge`
+- **Styling**:
+  ```css
+  .patch-version-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--sakura-hot) 0%, var(--lavender-deep) 100%);
+    color: #ffffff;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(255, 71, 126, 0.3);
+  }
+  ```
+
+### 4.3 Patch Notes List
+- **Classes**: `.patch-notes-list`, `.update-log-list`
+- **Styling**:
+  ```css
+  .patch-notes-list, .update-log-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 16px 0;
+  }
+
+  .patch-notes-list li, .update-log-list li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+    font-size: 13.5px;
+    transition: transform var(--transition-fast);
+  }
+
+  .patch-notes-list li::before, .update-log-list li::before {
+    content: '🫛';
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 14px;
+  }
+
+  .patch-notes-list li:hover, .update-log-list li:hover {
+    transform: translateX(4px);
+    color: var(--zunda-deep);
+  }
+  ```
+
+### 4.4 Technical ECS Badge
+- **Classes**: `.ecs-badge`
+- **Styling**:
+  ```css
+  .ecs-badge {
+    display: inline-block;
+    background: rgba(56, 189, 248, 0.15);
+    color: #0284c7;
+    border: 1px solid #38bdf8;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+  }
+  ```
+
+---
+
+## 5. Verification & Testing Matrix
+
+| Component | Target Selectors | Expected Visual Result | Verification Method |
+|---|---|---|---|
+| ZundaCLI.exe | `.terminal-window`, `.cli-body`, `.term-input`, `.term-prompt` | Dark plum obsidian CRT prompt with cyan prompt, glowing cursor animation, webkit scrollbar | Inspect element styles in browser dev tools |
+| Promos.app | `.promo-redeemer-box`, `.promo-code-item`, `.promo-input`, `.promo-redeem-btn` | Glassmorphic card, dashed code rows, pink candy redeem button, green success badge | Hover & click promo copy button |
+| Calculator.app | `.calc-form`, `.calc-select`, `.calc-input`, `.profit-display-card`, `.profit-positive` | Clean rounded dropdown & quantity input, soft mint profit card, glowing green `+Gold` badge | Select dish & alter quantity |
+| Updates.log | `.updates-log-body`, `.patch-version-tag`, `.patch-notes-list`, `.ecs-badge` | Gradient version tag, edamame bullet points, blue ECS technical badge | Open window-updates & view log list |
+

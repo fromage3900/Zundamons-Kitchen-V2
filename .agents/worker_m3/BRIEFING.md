@@ -1,51 +1,48 @@
-# BRIEFING — 2026-07-21T20:54:01Z
+# BRIEFING — 2026-07-22T04:35:24Z
 
 ## Mission
-Implement Interactive Phosphor Web Terminal ZundaCLI.exe (`site/terminal.js`, `site/index.html`, `site/style.css`) for Milestone 3.
+Implement Milestone 3: Pastel Web Terminal (`ZundaCLI.exe`), Promos.app, Calculator.app & Updates.log.
 
 ## 🔒 My Identity
-- Archetype: worker
+- Archetype: implementer, qa, specialist
 - Roles: implementer, qa, specialist
 - Working directory: g:\Zundamons-kItchen-V2\.agents\worker_m3
-- Original parent: 7450e87e-39a1-441f-b567-707dd1271ec2
-- Milestone: Milestone 3 (ZundaCLI.exe Terminal)
+- Original parent: 6f6f12e3-fe0a-4916-ad9c-95867c756fc2
+- Milestone: Milestone 3
 
 ## 🔒 Key Constraints
-- Follow User Rules (Rojo level preservation `$ignoreUnknownInstances: true`, Client UI decoupling, Wally structure, ServerScriptService path consistency).
-- Maintain genuine implementations (no hardcoding, no facades, full logic).
-- Output following project layout rules.
+- Follow Rojo 7.7.0 & workspace rules
+- Minimal change principle
+- Verify syntax with `node -c` on target js files
+- Sync web assets using `node site/sync_site.js`
+- Write changes.md and handoff.md in worker_m3 folder
 
 ## Current Parent
-- Conversation ID: 7450e87e-39a1-441f-b567-707dd1271ec2
-- Updated: 2026-07-21T20:54:01Z
+- Conversation ID: 6f6f12e3-fe0a-4916-ad9c-95867c756fc2
+- Updated: 2026-07-22T04:35:24Z
 
 ## Task Summary
-- **What to build**: Interactive Phosphor Web Terminal ZundaCLI class (`site/terminal.js`), update `site/index.html` and `site/style.css`.
-- **Success criteria**: Full command parser, history, tab autocomplete with LCP, themes, easter eggs, audio SFX integration, mobile toolbar, CRT phosphor styling, syntax clean, verified with Node.js simulation tests.
+- **What to build**: Pastel Web Terminal, Promos.app, Calculator.app, Updates.log UI & JS engine improvements.
+- **Success criteria**: All commands, apps, styles, syntax check, and sync_site execution complete and verified.
+- **Interface contracts**: Web apps in `site/` directory, synced to `docs/`.
+
+## Key Decisions Made
+- Starting investigation and file reads of `site/terminal.js`, `site/app.js`, `site/index.html`, `site/style.css`.
 
 ## Change Tracker
-- **Files modified**:
-  - `site/terminal.js`: Created `ZundaTerminal` ES6 class with 12 core commands, 7 easter eggs, history, tab completion, audio integration, mobile toolbar handlers.
-  - `site/index.html`: Removed old inline CLI logic, linked `terminal.js`, updated `#window-zundacli` DOM elements, prompt label (`zunda>`), scanline overlay, scroll button, mobile toolbar.
-  - `site/style.css`: Added CRT theme color variables, scanlines, micro-flicker keyframe, status tags, table styles, ASCII banner rules, mobile toolbar, resume scroll button, webkit scrollbars.
-  - `test_terminal_sim.js`: Node.js simulation test suite.
-- **Build status**: PASS (`node -c site/terminal.js` and `node test_terminal_sim.js` passed with 0 errors).
+- **Files modified**: None yet
+- **Build status**: Pending
 - **Pending issues**: None
 
 ## Quality Status
-- **Build/test result**: PASS (100% test coverage across commands, history, autocomplete, easter eggs, audio triggers).
-- **Lint status**: 0 errors.
-- **Tests added/modified**: `test_terminal_sim.js` Node simulation suite.
+- **Build/test result**: Pending
+- **Lint status**: Pending
+- **Tests added/modified**: Pending
 
 ## Loaded Skills
 - None
-
-## Key Decisions Made
-- Implemented `ZundaTerminal` class supporting both browser singleton initialization and Node environment module export.
-- Integrated Web Audio API triggers directly using `window.playKeySFX`, `window.playClickSFX`, `window.playWindowSFX`, `window.toggleCozyBGM`, and `window.ZundaAudio`.
 
 ## Artifact Index
 - g:\Zundamons-kItchen-V2\.agents\worker_m3\ORIGINAL_REQUEST.md
 - g:\Zundamons-kItchen-V2\.agents\worker_m3\BRIEFING.md
 - g:\Zundamons-kItchen-V2\.agents\worker_m3\progress.md
-- g:\Zundamons-kItchen-V2\.agents\worker_m3\handoff.md

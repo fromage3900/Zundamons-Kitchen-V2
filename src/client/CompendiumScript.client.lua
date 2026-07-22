@@ -6,20 +6,21 @@ local player  = Players.LocalPlayer
 local gui     = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "CompendiumGui", 20)
 
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local craftConfig = require(RS.ConfigurationFiles.CraftConfig)
 
 local C = {
-	bg        = Color3.fromRGB(255, 248, 235),
-	border    = Color3.fromRGB(180, 150, 110),
-	text      = Color3.fromRGB(80,  55,  35),
-	sub       = Color3.fromRGB(140, 110, 80),
-	tabAct    = Color3.fromRGB(180, 150, 110),
-	tabIdle   = Color3.fromRGB(240, 230, 215),
-	card      = Color3.fromRGB(250, 242, 228),
-	searchBg  = Color3.fromRGB(245, 238, 222),
-	owned     = Color3.fromRGB(160, 210, 150),
+	bg        = UIConfig.COLORS.MochiCream,
+	border    = UIConfig.COLORS.ZundaDark,
+	text      = UIConfig.COLORS.TextDark,
+	sub       = UIConfig.COLORS.TextDarkSec,
+	tabAct    = UIConfig.COLORS.ZundaPrimary,
+	tabIdle   = UIConfig.COLORS.PeaAccent,
+	card      = UIConfig.COLORS.MintCanvas,
+	searchBg  = UIConfig.COLORS.MochiCream,
+	owned     = UIConfig.COLORS.Sprout,
 }
 
 local ALL_ITEMS = {

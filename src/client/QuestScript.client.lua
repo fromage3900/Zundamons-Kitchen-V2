@@ -6,18 +6,19 @@ local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "QuestGui", 25)
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local RE = RS:WaitForChild("RemoteEvents")
 local ev = RE:WaitForChild("UpdateQuests", 15)
 local C = {
-	bg = Color3.fromRGB(252, 248, 240),
-	border = Color3.fromRGB(130, 195, 120),
-	text = Color3.fromRGB(68, 52, 78),
-	sub = Color3.fromRGB(140, 120, 140),
-	done = Color3.fromRGB(100, 185, 100),
-	bar = Color3.fromRGB(230, 225, 220),
-	fill = Color3.fromRGB(130, 195, 120),
+	bg = UIConfig.COLORS.MochiCream,
+	border = UIConfig.COLORS.ZundaDark,
+	text = UIConfig.COLORS.TextDark,
+	sub = UIConfig.COLORS.TextDarkSec,
+	done = UIConfig.COLORS.ZundaPrimary,
+	bar = UIConfig.COLORS.PeaAccent,
+	fill = UIConfig.COLORS.Sprout,
 }
 
 local panel = Instance.new("Frame", gui)

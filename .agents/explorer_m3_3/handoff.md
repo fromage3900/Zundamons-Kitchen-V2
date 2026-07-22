@@ -1,54 +1,28 @@
-# Handoff Report: Explorer 3 — CLI Command Suite & Zundamon Easter Eggs Specifications
-
-**Agent**: Explorer 3 (Milestone 3)  
-**Target Path**: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3\handoff.md`  
-**Date**: 2026-07-21  
-
----
+# Handoff Report — Explorer 3 (Milestone 3 CSS Styling Analysis)
 
 ## 1. Observation
-
-1. **Plan Scope**: Investigated `g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md` for Milestone 3 (`ZundaCLI.exe` phosphor web terminal engine, CLI command suite, interactive responses, audio integration, and easter eggs).
-2. **Game Data Configurations**:
-   - `CraftConfig.lua` (`src/shared/ConfigurationFiles/CraftConfig.lua`): Contains 19 recipes across 4 tiers (e.g. `Zunda Mochi`, `Zunda Paradise`, `Ultimate Feast`, `Zunda Shake`), cooking times, notes count, and rhythm score targets (`PERFECT`, `GREAT`, `OK`).
-   - `GatherConfig.lua` (`src/shared/ConfigurationFiles/GatherConfig.lua`): Defines click-harvest nodes (`Zunda Pea`, `Zunda Flower`, `Edamame Pod`, `Sweet Pea`, `Salted Pea Bouquet`) with yield counts and respawn rates.
-   - `MineableConfig.lua` (`src/shared/ConfigurationFiles/MineableConfig.lua`): Defines tool mining nodes (`GoldRock`, `MarbleRock`, `Rock`, `AppleTree`, `PineTree`, `ZundaMushroom`, `ZundaBerry`, `ZundaRoot`) with health hit points and multi-tier drop loot tables.
-   - `ZoneLoreConfig.lua` (`src/shared/ConfigurationFiles/ZoneLoreConfig.lua`): Contains narrative entries for `Zone_VillageGate`, `Zone_KitchenCourt`, `Zone_NorthernBridge`, `Zone_MarketPromenade`, `Zone_HilltopShrine`, and `Zone_AncientRuins`.
-   - `VNDialogueData.lua` (`src/shared/ConfigurationFiles/VNDialogueData.lua`): Defines companion dialogues (`Zundamon`, `Zundapal`, `Zundacat`, `Zundabunny`, `Tantanmon`, `Ankomon`, `Cardamon`, `Antimon`, `Sakuradamon`).
-3. **Workspace Configuration**:
-   - `default.project.json` (`g:\Zundamons-kItchen-V2\default.project.json`): Maps `ReplicatedStorage`, `ServerScriptService`, `StarterPlayer`, `Workspace`, and explicitly sets `"$ignoreUnknownInstances": true` for level preservation.
-   - `wally.toml` (`g:\Zundamons-kItchen-V2\wally.toml`): Lists dependencies (`Matter`, `ReplicaService`, `React`, `ReactRoblox`, `Promise`, `Signal`, `ProfileService`).
-4. **Existing Front-End Site Layout & Audio Engine**:
-   - `site/index.html`: Contains `#window-zundacli`, `#cli-output`, `#cli-input-form`, `#cli-input`.
-   - `site/assets/audio_engine.js`: Implements `ZundaAudio`, `playClickSFX`, `playWindowSFX`, `playKeySFX`, and `toggleCozyBGM`.
-
----
+- Analyzed `site/style.css` (1382 lines), `site/index.html` (562 lines), and `site/app.js` (1544 lines).
+- Identified existing CSS custom properties in `site/style.css`:
+  - Lines 43–47: `--term-bg: #231b2e`, `--term-pink: #f472b6`, `--term-cyan: #38bdf8`, `--term-yellow: #fef08a`.
+  - Lines 1092–1121: Existing `.cli-body`, `.cli-input-field`, `.cli-welcome`, `.cli-highlight`, `.cli-prompt-label`.
+  - Lines 545–597: Existing `.codes-grid`, `.code-box`, `.code-val`, `.win95-btn`.
+  - Lines 1156–1162: Existing `.update-log-list`.
+- Reviewed prior explorer analysis reports (`.agents/explorer_m3_1/analysis.md` and `.agents/explorer_m3_2/analysis.md`) for class names and CRT phosphor theme specifications.
 
 ## 2. Logic Chain
-
-1. **Command Suite Completeness**: To provide a rich, immersive retro web CLI experience, the 12 core commands (`help`, `info`/`about`, `recipes`, `gather`, `lore`, `play`, `music`, `clear`, `version`, `theme`, `rojo`, `wally`) map directly to the actual game logic and developer configuration files of Zundamon's Kitchen V2.
-2. **Interactive Command Fidelity**: Commands like `recipes`, `gather`, and `lore` parse user input and output real game data (e.g. recipe ingredients, minigame note counts, mining hit damage, drop loot rolls, zone dialogue quotes), creating an authentic terminal proxy for the Roblox experience.
-3. **Zundamon Easter Eggs**: 7 Easter Eggs (`nanoda`, `mochi`, `edamame`, `zunda`, `secret`, `dance`, `matrix`) enhance user delight and retro CRT charm, triggering custom ASCII art, animations, visual theme swaps, and synthesized audio chimes.
-4. **Zero External Dependency Audio**: Audio triggers map directly to native Web Audio API synthesizer functions in `audio_engine.js`, guaranteeing 100% SFW compliance and static site deployment capability without loading external audio assets.
-
----
+- Step 1: `ZundaCLI.exe` requires a unified pastel console styling framework that maps `.terminal-window`, `.terminal-output`, `.term-prompt`, `.term-input`, glowing `@keyframes blink` cursor, 4 pastel highlight classes (`.term-pink`, `.term-green`, `.term-cyan`, `.term-yellow`), and custom webkit scrollbars.
+- Step 2: `Promos.app` requires `.promo-redeemer-box` container styling, `.promo-code-item` row layouts, `.promo-input` pastel pill inputs, candy button interactions (`.btn-candy`, `.promo-redeem-btn`), and success badge badges (`.promo-success-badge`).
+- Step 3: `Calculator.app` requires form layout alignment (`.calc-form`), custom dropdown select styling (`.calc-select`), quantity input (`.calc-input`), profit display card layout (`.profit-display-card`), and green/red highlight tokens (`.profit-positive` / `.profit-negative`).
+- Step 4: `Updates.log` requires `.updates-log-body` layout, gradient `.patch-version-tag`, custom edamame bullet `.patch-notes-list`, and blue `.ecs-badge` technical tags.
 
 ## 3. Caveats
-
-- **Read-Only Scope**: As Explorer 3, I have analyzed and specified all CLI command handlers and easter eggs, but have NOT modified source files in `site/` directly.
-- **Audio Context Gesture**: Web Audio API requires user gesture before playing sound. Handlers ensure `ZundaAudio.resumeOnUserGesture()` is called prior to synthesizing sound.
-
----
+- Explorer 3 operates under a read-only mandate for `site/` source files. CSS code changes have been fully formulated and blueprinting completed in `analysis.md`, but must be merged into `site/style.css` by an implementer/worker agent.
+- Browser compatibility spot-checks assume standard modern CSS support (`appearance: none`, CSS custom variables, Webkit scrollbars, `@keyframes`).
 
 ## 4. Conclusion
-
-A comprehensive design specification for the CLI command suite, interactive responses, secret Zundamon easter eggs, and Web Audio API integration has been compiled into `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3\analysis.md`. The design is fully actionable, zero-dependency compliant, and directly grounded in the project codebase.
-
----
+The comprehensive CSS styling blueprint for `ZundaCLI.exe`, `Promos.app`, `Calculator.app`, and `Updates.log` has been completed and saved to `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3\analysis.md`. All target class names, color tokens, animations, and container specifications are fully defined and ready for direct implementation in `site/style.css`.
 
 ## 5. Verification Method
-
-To verify the specifications in `analysis.md`:
-1. Inspect `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3\analysis.md` and check that all 12 core commands and 7 easter eggs are defined with syntax, outputs, and SFX triggers.
-2. Cross-reference `CraftConfig.lua`, `GatherConfig.lua`, `MineableConfig.lua`, `ZoneLoreConfig.lua`, `default.project.json`, and `wally.toml` to confirm data accuracy.
-3. Verify that all audio triggers correspond to executable functions in `site/assets/audio_engine.js`.
+1. Inspect `g:\Zundamons-kItchen-V2\.agents\explorer_m3_3\analysis.md` for section completeness across all 4 target modules.
+2. Confirm all required CSS classes (`.terminal-window`, `.terminal-output`, `.term-prompt`, `.term-input`, `@keyframes blink`, `.term-pink`, `.term-green`, `.term-cyan`, `.term-yellow`, `.promo-redeemer-box`, `.promo-code-item`, `.calc-form`, `.calc-select`, `.calc-input`, `.profit-display-card`, `.profit-positive`, `.updates-log-body`, `.patch-version-tag`, `.patch-notes-list`, `.ecs-badge`) are defined with exact properties.
+3. Validate visual alignment with `site/index.html` structure.

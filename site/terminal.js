@@ -638,6 +638,12 @@ class ZundaTerminal {
       `<div class="cli-table-head">│ <span class="cli-tag cli-tag-info">[ZONE LORE]</span> ${entry.title}</div>` +
       `<div class="cli-table-head">└────────────────────────────────────────────────────────┘</div>` +
       `<div class="cli-line"><span class="cli-highlight">Speaker:</span> ${entry.speaker}</div>` +
+      `<div class="cli-line" style="font-style:italic; margin:4px 0;">${entry.quote}</div>` +
+      `<div class="cli-line"><span class="cli-system">[LORE NOTE]:</span> ${entry.note}</div>` +
+      `</div>`;
+
+    this.appendOutput(card);
+  }
 
   /**
    * `promo` / `codes`: List active Roblox redeemable promo codes
@@ -690,12 +696,6 @@ class ZundaTerminal {
       `<div class="cli-line">  • <span class="cli-highlight">NET KITCHEN PROFIT    : +${profit} Gold! 🎉</span></div>` +
       `<div class="cli-line"><i>Opened Calculator.app window nanoda!</i></div>`;
     this.appendOutput(html);
-  }
-      `<div class="cli-line" style="font-style:italic; margin:4px 0;">${entry.quote}</div>` +
-      `<div class="cli-line"><span class="cli-system">[LORE NOTE]:</span> ${entry.note}</div>` +
-      `</div>`;
-
-    this.appendOutput(card);
   }
 
   /**

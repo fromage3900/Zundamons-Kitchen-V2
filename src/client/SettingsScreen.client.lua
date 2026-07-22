@@ -24,13 +24,13 @@ local panel = Instance.new("Frame", gui)
 panel.Name = "Panel"
 panel.Size = UDim2.new(0, 320, 0, 200)
 panel.Position = UDim2.new(0.5, -160, 0.5, -100)
-panel.BackgroundColor3 = Color3.fromRGB(255, 248, 235)
+panel.BackgroundColor3 = UIConfig.COLORS.MochiCream
 panel.BorderSizePixel = 0
 panel.BackgroundTransparency = 1
 panel.Visible = false
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 16)
 local pStroke = Instance.new("UIStroke", panel)
-pStroke.Color = Color3.fromRGB(180, 150, 110)
+pStroke.Color = UIConfig.COLORS.ZundaDark
 pStroke.Thickness = 3
 pStroke.Transparency = 1
 
@@ -41,7 +41,7 @@ titleLbl.BackgroundTransparency = 1
 titleLbl.Text = "⚙ Settings ⚙"
 titleLbl.Font = Enum.Font.GothamBold
 titleLbl.TextSize = 20
-titleLbl.TextColor3 = Color3.fromRGB(80, 40, 30)
+titleLbl.TextColor3 = UIConfig.COLORS.TextDark
 
 local volLbl = Instance.new("TextLabel", panel)
 volLbl.Size = UDim2.new(0, 100, 0, 24)
@@ -50,7 +50,7 @@ volLbl.BackgroundTransparency = 1
 volLbl.Text = "Volume"
 volLbl.Font = Enum.Font.Gotham
 volLbl.TextSize = 16
-volLbl.TextColor3 = Color3.fromRGB(80, 40, 30)
+volLbl.TextColor3 = UIConfig.COLORS.TextDark
 volLbl.TextXAlignment = Enum.TextXAlignment.Left
 
 local volVal = Instance.new("TextLabel", panel)
@@ -61,19 +61,19 @@ volVal.BackgroundTransparency = 1
 volVal.Text = "100%"
 volVal.Font = Enum.Font.Gotham
 volVal.TextSize = 14
-volVal.TextColor3 = Color3.fromRGB(120, 80, 60)
+volVal.TextColor3 = UIConfig.COLORS.ZundamonGold
 
 local sliderBg = Instance.new("Frame", panel)
 sliderBg.Size = UDim2.new(0, 200, 0, 6)
 sliderBg.Position = UDim2.new(0, 16, 0, 84)
-sliderBg.BackgroundColor3 = Color3.fromRGB(180, 160, 140)
+sliderBg.BackgroundColor3 = UIConfig.COLORS.PeaAccent
 sliderBg.BorderSizePixel = 0
 Instance.new("UICorner", sliderBg).CornerRadius = UDim.new(1, 0)
 
 local sliderFill = Instance.new("Frame", sliderBg)
 sliderFill.Name = "SliderFill"
 sliderFill.Size = UDim2.new(1, 0, 1, 0)
-sliderFill.BackgroundColor3 = Color3.fromRGB(120, 200, 120)
+sliderFill.BackgroundColor3 = UIConfig.COLORS.Sprout
 sliderFill.BorderSizePixel = 0
 Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(1, 0)
 
@@ -81,7 +81,7 @@ local sliderBtn = Instance.new("TextButton", sliderBg)
 sliderBtn.Name = "SliderBtn"
 sliderBtn.Size = UDim2.new(0, 18, 0, 18)
 sliderBtn.Position = UDim2.new(1, -9, 0.5, -9)
-sliderBtn.BackgroundColor3 = Color3.fromRGB(100, 180, 100)
+sliderBtn.BackgroundColor3 = UIConfig.COLORS.ZundaPrimary
 sliderBtn.BorderSizePixel = 0
 sliderBtn.Text = ""
 Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 0)
@@ -118,6 +118,7 @@ end
 
 local RS = game:GetService("ReplicatedStorage")
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local function loadVolume()

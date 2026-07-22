@@ -1,78 +1,79 @@
-# Handoff Report: Milestone 3 Explorer 1 Investigation (`site/terminal.js`)
+# Handoff Report — Explorer 1
+
+**Module**: ZundaCLI.exe (Pastel Web Terminal Engine)  
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_1`  
+**Target Files**: `site/terminal.js`, `site/assets/audio_engine.js`, `site/style.css`, `site/index.html`, `test_terminal_sim.js`  
+**Date**: 2026-07-22  
+
+---
 
 ## 1. Observation
-Target objective: Investigate architecture and design specifications for `site/terminal.js` command parser, history buffer, input handler, audio triggers, and DOM integration.
 
-Direct code observations from codebase inspection:
-- **`site/index.html` (Lines 94–104)**:
-  ```html
-  <div class="window-body cli-body">
-      <div id="cli-output" class="cli-terminal-log" role="log" aria-live="polite">...</div>
-      <form id="cli-input-form" class="cli-prompt-line" autocomplete="off" onsubmit="return false;">
-          <label for="cli-input" class="cli-prompt-label">zunda@os95:~$</label>
-          <input type="text" id="cli-input" class="cli-input-field" placeholder="Enter command (e.g., help, cook, launch)..." spellcheck="false">
-      </form>
-  </div>
-  ```
-- **`site/index.html` (Lines 487–553)**: Primitive inline script logic currently handles basic CLI submit events without history buffer, Tab completion, or modular state.
-- **`site/assets/audio_engine.js` (Lines 7, 92, 219, 260)**: `const ZundaAudio`, `playClickSFX(variant)`, `playKeySFX(key)`, and `toggleCozyBGM()` are globally defined and attached to `window`.
-- **`site/style.css` (Lines 32–37, 458–518)**: CSS variables `--term-bg` (`#0a150a`), `--term-green` (`#33ff66`), `--term-glow`, `--term-cursor` are configured for phosphor green styling.
+1. **Terminal Engine Codebase**:
+   - `site/terminal.js` (1189 lines, 50,018 bytes) contains the `ZundaTerminal` engine class, binding DOM elements `#window-zundacli`, `.cli-body`, `#cli-output`, `#cli-input-form`, `#cli-input`, `#cli-scroll-bottom-btn`, `#cli-mobile-toolbar`.
+   - Command history is stored in `this.history` array and traversed via `ArrowUp`/`ArrowDown` with draft string preservation in `this.currentDraft` (lines 136-187).
+   - Tab auto-completion matches candidate strings in `this.commands` using exact match completion or Longest Common Prefix (LCP) math (`getLongestCommonPrefix()`, lines 198-249).
+   - Themes currently handled by `cmdTheme()` include `classic-green`, `amber`, `matrix`, `cozy-pea` (lines 766-809), with HTML container attributes set via `data-term-theme` (line 339 of `site/index.html`).
+
+2. **Audio Synthesizer Engine**:
+   - `site/assets/audio_engine.js` (684 lines, 21,237 bytes) exports `ZundaAudio` and global audio functions `playKeySFX(key)` (lines 372-408), `playClickSFX(variant)` (lines 246-289), `playWindowSFX(action)` (lines 295-365), `playZundaVoiceLine(type)` (lines 414-500), and `toggleCozyBGM()`.
+   - Keyboard typing produces square wave blips (1200Hz) and Enter produces C5 triangle tones; Easter egg triggers call procedural Web Audio sweeps (`playEasterEggSound()`, lines 1089-1173 in `site/terminal.js`).
+
+3. **Headless Simulation Test Suite**:
+   - `test_terminal_sim.js` (329 lines) sets up a mock DOM environment and runs automated tests covering baseline initialization, 14 commands, 7 easter eggs, history navigation, tab completion, LCP math, and audio triggers.
+   - Command execution result: `node test_terminal_sim.js` completed with exit code 0 and output: `🎉 ALL ZUNDATERMINAL SIMULATION TESTS PASSED! (100% COVERAGE)`.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Extraction from Inline Script to `terminal.js`**:
-   - The inline script in `site/index.html` (lines 487-553) should be replaced with `<script src="terminal.js"></script>`.
-   - `ZundaTerminal` ES6 class encapsulates state: prompt label (`zunda>`), history array, history index pointer, current draft string, theme name, edamame count, and command registry.
+1. **Terminal Core Requirements**:
+   - The user request specified parser, prompt (`zunda> `), command history array with Up/Down arrow key traversal, and Tab autocomplete with available command matching.
+   - Inspection of `site/terminal.js` confirms `ZundaTerminal` already implements caret management via `setSelectionRange()`, draft buffer retention on upward traversal, LCP math for tab candidate matching, and prompt customization (including secret mode `zunda@secret:~$ `).
 
-2. **Terminal Prompt State & Focus Handling**:
-   - Prompt label set to `zunda>`.
-   - Command execution echoes `<span class="cli-prompt-label">zunda&gt;</span> <command>` to `#cli-output` log and auto-scrolls (`scrollTop = scrollHeight`).
-   - Clicking `#window-zundacli` or `.cli-body` shifts focus to `#cli-input`.
+2. **Command Registry Coverage & Gaps**:
+   - Specified commands: `help`, `info`/`about`, `recipes`, `spirits`, `quests`, `promos`, `calc`, `clear`, `theme` (pastel, sakura, zunda, dark), `version`, `lore`, `play`, `music`, and easter eggs (`zundamon`, `nanoda`, `mochi`, `nikki`, `secret`).
+   - Observations show `help`, `info`, `recipes`, `promos`, `calc`, `clear`, `version`, `lore`, `play`, `music`, `nanoda`, `mochi`, `secret`, `zundamon`, `edamame`, `dance`, `matrix` are implemented.
+   - **Gaps Identified**:
+     - Explicit command handlers for `spirits` (Spirit Companion registry) and `quests` (active quest log) need to be added to `executeCommand()` switch block.
+     - Easter egg trigger `nikki` (Infinity Nikki cosmetic outfit showcase) needs to be registered.
+     - `theme` command needs explicit keyword mappings for `pastel`, `sakura`, `zunda`, `dark` palette modes.
 
-3. **Command History Buffer Mechanics**:
-   - `ArrowUp`: Saves `inputEl.value` to `currentDraft` if starting from draft state; decrements `historyIndex`; updates input value; positions cursor at end; triggers key SFX.
-   - `ArrowDown`: Increments `historyIndex`; sets input value to `history[historyIndex]` or restores `currentDraft` when returning to end; positions cursor at end; triggers key SFX.
-   - Command submission pushes non-duplicate commands to `history` array and resets `historyIndex` to `history.length`.
-
-4. **Tab Auto-Completion Mechanics**:
-   - Intercepts `Tab` keydown with `e.preventDefault()`.
-   - Matches input prefix against 11 primary commands (`help`, `info`, `recipes`, `gather`, `lore`, `play`, `music`, `clear`, `version`, `theme`, `edamame`).
-   - Single match: Autocompletes command with trailing space.
-   - Multiple matches: Computes Longest Common Prefix (LCP), updates input, and appends match option list to `#cli-output`.
-
-5. **Audio Engine Integration**:
-   - Key typing triggers `window.playKeySFX(e.key)`.
-   - Command return triggers `window.playKeySFX('Enter')`.
-   - Tab completion triggers `window.playKeySFX('Tab')`.
-   - `play` / `music` command invokes `window.toggleCozyBGM()`.
-   - Backwards-compatibility helper alias: `ZundaAudio.playClick = window.playClickSFX`.
+3. **Rich Output Formatting & Audio Hooks**:
+   - Terminal output relies on `.cli-table`, `.cli-table-head`, `.cli-table-row`, `.cli-col`, `.cli-tag-*`, `.cli-highlight`, `.cli-system`, `.cli-prompt-label`, and `<pre class="cli-ascii-banner">`.
+   - Keypress audio feedback connects via `ZundaAudio.playKey()` (`playKeySFX`), window audio sweeps connect via `ZundaAudio.playWinSFX()` (`playWindowSFX`), and focus is retained on `.cli-body` clicks.
 
 ---
 
 ## 3. Caveats
-No caveats. Architecture relies entirely on native browser HTML5, CSS3, ES6 JavaScript, and Web Audio API with zero external dependencies.
+
+- **Browser Context Requirement for Audio**: `ZundaAudio` relies on native `AudioContext`. In non-browser environments (e.g. Node.js test runner), global audio function mocks are supplied by `test_terminal_sim.js` to ensure 100% coverage without DOM or WebAudio crashes.
+- **Rojo / Wally Rules**: Per workspace rules, `default.project.json` must preserve `"$ignoreUnknownInstances": true` for Studio workspace preservation. Terminal command `rojo` displays this rule explicitly to developers.
 
 ---
 
 ## 4. Conclusion
-The technical architecture and specification for `site/terminal.js` is complete, robust, and ready for immediate implementation.
 
-Analysis file produced: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_1\analysis.md`.
+`site/terminal.js` provides a solid, zero-dependency foundation for `ZundaCLI.exe`. The detailed blueprint written to `analysis.md` outlines the complete execution plan covering Terminal Core parser & autocomplete, Command Registry (including recommendations for `spirits`, `quests`, `nikki`, and `pastel`/`sakura`/`zunda`/`dark` themes), Rich CSS Output Blocks, and Web Audio API Hooks.
 
 ---
 
 ## 5. Verification Method
 
-1. **Codebase Inspection**:
-   - View `g:\Zundamons-kItchen-V2\.agents\explorer_m3_1\analysis.md` for full implementation design.
-   - Verify `site/assets/audio_engine.js` exports `playKeySFX`, `playClickSFX`, and `toggleCozyBGM`.
-   - Verify `site/index.html` structure `#window-zundacli`, `#cli-output`, `#cli-input-form`, `#cli-input`.
+To independently verify the terminal simulation and command execution logic:
 
-2. **Browser Execution & Functional Test**:
-   - Launch `site/index.html` in browser.
-   - Test typing commands (`help`, `info`, `recipes`, `gather`, `lore`, `play`, `music`, `clear`, `version`, `theme amber`, `edamame`).
-   - Verify `ArrowUp` / `ArrowDown` history navigation.
-   - Verify `Tab` auto-completion behavior.
-   - Verify Web Audio sound synthesis triggers without console errors.
+1. **Run Simulation Command**:
+   ```powershell
+   node test_terminal_sim.js
+   ```
+   *Expected Output*: Output ends with `🎉 ALL ZUNDATERMINAL SIMULATION TESTS PASSED! (100% COVERAGE)` and exit code 0.
+
+2. **Inspect Blueprint & Specifications**:
+   - `g:\Zundamons-kItchen-V2\.agents\explorer_m3_1\analysis.md`
+   - `g:\Zundamons-kItchen-V2\site\terminal.js`
+   - `g:\Zundamons-kItchen-V2\site\assets\audio_engine.js`
+   - `g:\Zundamons-kItchen-V2\site\style.css`
+
+3. **Invalidation Conditions**:
+   - If `node test_terminal_sim.js` fails or throws an unhandled error.
+   - If command history traversal fails to restore input drafts or caret position.

@@ -1,44 +1,32 @@
-# Handoff Report: Milestone 2 Fix Pass - Cozy BGM Oscillator Cleanup
+# Handoff Report — Milestone 2 Fix Pass
 
 ## 1. Observation
-- Target File: `g:\Zundamons-kItchen-V2\site\assets\audio_engine.js`
-- Prior State: In `audio_engine.js`, `startCozyBGM()` (lines 274-343) cleared `ZundaAudio.bgmStopTimeout` if active, but did not stop or disconnect any active oscillator nodes in `ZundaAudio.bgmPadOscs` before instantiating new pad oscillators and overwriting `ZundaAudio.bgmPadOscs`.
-- Modified lines in `startCozyBGM()` (lines 282-288):
-```javascript
-  if (ZundaAudio.bgmPadOscs) {
-    ZundaAudio.bgmPadOscs.forEach(osc => {
-      try { osc.stop(); } catch (e) {}
-      try { osc.disconnect(); } catch (e) {}
-    });
-    ZundaAudio.bgmPadOscs = null;
-  }
-```
-- Tool verification commands and results:
-  1. `node -c site/assets/audio_engine.js` executed with exit code 0 (clean JavaScript syntax, no errors).
-  2. Node simulation test simulating rapid toggling / re-triggering of `startCozyBGM()` executed with result `Stopped count: 2 Disconnected count: 2`, exiting with 0.
+- `site/app.js` contained a duplicate 90-line `playZundaVoiceLine` function definition (lines 33-122) that shadowed `site/assets/audio_engine.js`'s full implementation and lacked support for `'companion_click'`, `'speech_talk'`, etc.
+- In `site/app.js`, `let quoteIdx = 0;` caused the first mascot sticker click to increment `quoteIdx` to 1, skipping quote index 0 (`"Welcome to Zunda-OS 95, nanoda! 🫛✨"`).
+- In `site/index.html` line 301, `#jukebox-track-title` text was `"Zunda Lo-Fi Beats"`, whereas track 0 in `audio_engine.js` is named `"Zunda Cozy Kitchen"`.
+- `node -c site/window_manager.js; node -c site/app.js; node -c site/assets/audio_engine.js; node -c site/sync_site.js` returned code 0 (all clean).
+- `node site/sync_site.js` executed cleanly, updating 3 files in `docs/` (`app.js`, `assets/audio_engine.js`, `index.html`).
 
 ## 2. Logic Chain
-1. When BGM was stopped (`stopCozyBGM()`), `bgmPadGain` began a 1.0 second fade-out and scheduled a 1050ms timeout (`bgmStopTimeout`) to stop `bgmPadOscs` and clear the reference.
-2. If `startCozyBGM()` was called during that 1050ms fade-out window (or if `startCozyBGM()` was called while `ZundaAudio.bgmPadOscs` still existed), `startCozyBGM()` cleared `bgmStopTimeout`.
-3. Because `bgmStopTimeout` was cleared before its callback fired, the old oscillator nodes in `ZundaAudio.bgmPadOscs` were never stopped or disconnected, while new oscillators were created and stored in `ZundaAudio.bgmPadOscs`.
-4. The un-stopped oscillators remained active in the Web Audio context graph indefinitely, causing audio node leakage on repeated BGM toggling.
-5. By inserting an explicit check `if (ZundaAudio.bgmPadOscs)` inside `startCozyBGM()` that iterates through all existing oscillators, calls `stop()` and `disconnect()` on each (safely inside `try/catch` blocks), and resets `ZundaAudio.bgmPadOscs = null;` before instantiating new oscillators, all lingering pad oscillators are guaranteed to be cleaned up immediately upon starting BGM.
+1. Removing lines 33-122 in `site/app.js` and delegating `playZundaVoiceLine(type)` to `window.ZundaAudio.playVoiceLine(type)` ensures all audio calls route to the comprehensive `site/assets/audio_engine.js` synthesizer.
+2. Adding `playVoiceLine` to `ZundaAudio` and exporting `window.ZundaAudio.playVoiceLine` in `audio_engine.js` provides seamless API compatibility for both window-level and object-level delegates.
+3. Setting `let quoteIdx = -1;` in `site/app.js` ensures that on the first click, `quoteIdx = (quoteIdx + 1) % quotes.length` evaluates to 0, correctly displaying quote index 0.
+4. Setting `#jukebox-track-title` text in `site/index.html` to `"Zunda Cozy Kitchen"` aligns the initial HTML display with track index 0 in `audio_engine.js`.
+5. Running `node site/sync_site.js` propagates all fixes from `site/` into `docs/` for production deployment.
 
 ## 3. Caveats
-No caveats. The fix is self-contained within `startCozyBGM()` in `site/assets/audio_engine.js` and targets Web Audio API standard `AudioNode` / `OscillatorNode` methods (`stop` and `disconnect`).
+No caveats.
 
 ## 4. Conclusion
-`startCozyBGM()` now cleanly stops and disconnects all existing pad oscillators in `ZundaAudio.bgmPadOscs` before starting new ones, preventing lingering audio nodes when toggling BGM off and on repeatedly. The file loads and parses with zero static syntax errors.
+All three targeted Milestone 2 fixes identified by Reviewer 2 and Challenger 2 have been implemented cleanly, syntax-verified, and synced to `docs/`.
 
 ## 5. Verification Method
-- **Syntax Check Command**:
-  ```powershell
-  node -c site/assets/audio_engine.js
-  ```
-  Expected result: Command completes cleanly with no stdout/stderr output and exit code 0.
-
-- **Behavior Simulation Command**:
-  ```powershell
-  node -e "const fs = require('fs'); const window = global; global.window = window; global.localStorage = { getItem: () => null, setItem: () => {} }; const code = fs.readFileSync('./site/assets/audio_engine.js', 'utf8'); (0, eval)(code); let stoppedCount = 0, disconnectedCount = 0; function createMockOsc() { return { type: '', frequency: { setValueAtTime: () => {} }, connect: () => {}, start: () => {}, stop: () => { stoppedCount++; }, disconnect: () => { disconnectedCount++; } }; } const mockCtx = { currentTime: 0, state: 'running', createGain: () => ({ gain: { setValueAtTime: () => {}, setTargetAtTime: () => {}, linearRampToValueAtTime: () => {} }, connect: () => {} }), createBiquadFilter: () => ({ frequency: { setValueAtTime: () => {} }, connect: () => {} }), createOscillator: createMockOsc, destination: {} }; ZundaAudio.ctx = mockCtx; ZundaAudio.masterGain = mockCtx.createGain(); ZundaAudio.bgmGain = mockCtx.createGain(); startCozyBGM(); ZundaAudio.bgmPlaying = false; ZundaAudio.bgmStopTimeout = setTimeout(() => {}, 10000); startCozyBGM(); if (stoppedCount === 2 && disconnectedCount === 2) { console.log('PASS'); process.exit(0); } else { console.log('FAIL'); process.exit(1); }"
-  ```
-  Expected result: Output prints `PASS` and exits with code 0.
+Run the following commands:
+```powershell
+node -c site/window_manager.js; node -c site/app.js; node -c site/assets/audio_engine.js; node -c site/sync_site.js
+node site/sync_site.js
+```
+Inspect files:
+- `site/app.js`: Verify `playZundaVoiceLine` delegates to `window.ZundaAudio.playVoiceLine` and `quoteIdx` is initialized to `-1`.
+- `site/index.html`: Verify `#jukebox-track-title` text is `"Zunda Cozy Kitchen"`.
+- `docs/app.js` & `docs/index.html`: Verify synced updates match `site/`.

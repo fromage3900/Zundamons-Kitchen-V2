@@ -1,42 +1,57 @@
-# Handoff Report — Explorer M3-2 (ZundaCLI.exe Styling & Formatting)
+# Handoff Report — Explorer 2 (Milestone 3)
+
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_2\`  
+**Target Analysis File**: `g:\Zundamons-kItchen-V2\.agents\explorer_m3_2\analysis.md`  
+**Date**: 2026-07-22  
+**Handoff Type**: Hard (Task Complete)  
+
+---
 
 ## 1. Observation
-- **Code Locations Inspected**:
-  - `site/index.html` lines 73-105: Existing `ZundaCLI.exe` HTML structure with `#window-zundacli`, `.cli-body`, `#cli-output`, and `#cli-input-form`.
-  - `site/style.css` lines 31-38: Existing terminal phosphor variables (`--term-bg: #0a150a;`, `--term-green: #33ff66;`, `--term-green-dim: #1eb844;`, `--term-glow: 0 0 8px rgba(51, 255, 102, 0.6);`, `--term-cursor: #33ff66;`).
-  - `site/style.css` lines 458-519: Baseline `.cli-body`, `.cli-terminal-log`, and `.cli-prompt-line` styles.
-  - `site/style.css` lines 955-981: Existing `@keyframes terminalPulse` and `.terminal-cursor`.
-  - `site/window_manager.js` lines 54-73: Window focus and active z-index stack handling (`.active-window`, `.window-active`).
-- **Gaps Identified**:
-  - Absence of custom retro webkit scrollbar in `.cli-terminal-log` (defaults to browser default native scrollbar).
-  - Absence of multi-theme phosphor variables (`amber`, `matrix`, `classic-green`, `cozy-pea`).
-  - Absence of inner CRT screen scanline overlay inside `.cli-body`.
-  - Absence of rich output tag styling (`[OK]`, `[RECIPE]`, `[AUDIO]`, `[INFO]`, `[WARN]`, `[ERROR]`, `[SYSTEM]`).
-  - Absence of user scroll detection lock and bottom resume button (`cli-scroll-bottom-btn`).
-  - Absence of mobile touch toolbar (`.cli-mobile-toolbar`) for `Tab` and `Up/Down` history key emulation.
-  - Absence of 16px iOS input font override to prevent mobile viewport zoom.
+
+Direct examination of `site/index.html`, `site/app.js`, `site/style.css`, and `site/terminal.js` yielded the following exact findings:
+
+1. **`Promos.app` (`site/index.html:429-447`, `site/app.js:1185-1224`)**:
+   * Contains only basic copy buttons (`ZUNDAMOCHI2026`, `SOUPSEASON`, `HYBRIDECS`).
+   * Missing text input field (`#promo-input`), redeem button (`#promo-redeem-btn`), card reward details, toast notification options for redemption states, and `localStorage` memory (`zunda_redeemed_codes`).
+
+2. **`Calculator.app` (`site/index.html:449-482`, `site/app.js:1226-1254`)**:
+   * Contains static select options (`zunda-mochi`, `edamame-parfait`, `zunda-shake`, `dango-trio`) that are hardcoded in HTML rather than dynamically generated from the `RECIPES` data array.
+   * Missing quantity adjustment buttons (`-10`, `-1`, `+1`, `+10`, `+50`), cost/sell per unit breakdowns, and Profit Margin / ROI % indicators with visual rating badges.
+
+3. **`Updates.log` (`site/index.html:484-507`, `site/terminal.js:668-678`)**:
+   * Displays a static 5-bullet summary without version switching or structured category filters.
+   * Missing structured sections for Release Highlights, Hybrid ECS Architecture, Rhythm Cooking Validation updates, Bug Fixes & Stability, and historical version selection.
+
+---
 
 ## 2. Logic Chain
-1. **Observation**: Default browser scrollbars break retro 90s CRT console immersion.
-   **Reasoning**: Applying `::-webkit-scrollbar` styling with `--term-bg` and `--term-green-dim` colors matches the obsidian phosphor green theme seamlessly.
-2. **Observation**: Standard single `text-shadow` lacks depth and bloom on modern screens.
-   **Reasoning**: Multi-tiered `text-shadow` (`0 0 2px var(--term-green), 0 0 6px var(--term-glow-color), 0 0 12px var(--term-glow-far)`) simulates real CRT screen phosphor trail and diffuse glow.
-3. **Observation**: Terminal themes should be switchable dynamically at runtime (e.g. `theme amber`).
-   **Reasoning**: Defining `data-term-theme` attributes (`classic-green`, `amber`, `matrix`, `cozy-pea`) on `.cli-body` allows clean CSS variable swapping without JS style string manipulation.
-4. **Observation**: Unconditional auto-scrolling disrupts users reading historical command output.
-   **Reasoning**: Calculating `output.scrollHeight - output.scrollTop - output.clientHeight > 35` detects when the user has manually scrolled up, pausing auto-scroll and displaying a `[↓ New Output Below]` resume button.
-5. **Observation**: Mobile soft keyboards lack `Tab` and arrow keys.
-   **Reasoning**: Adding `.cli-mobile-toolbar` with `Tab`, `ArrowUp`, and `ArrowDown` buttons enables full CLI usability on touch devices.
+
+* **Step 1**: Analyzed existing DOM structure in `site/index.html` and script logic in `site/app.js`.
+* **Step 2**: Identified gaps between current code and requested Milestone 3 specifications for `Promos.app`, `Calculator.app`, and `Updates.log`.
+* **Step 3**: Designed comprehensive data models (`PROMO_CODES`, enriched `RECIPES` crafting costs, and `UPDATES_LOG_DATA` version categories).
+* **Step 4**: Formulated complete HTML component blueprints and JavaScript class specifications (`PromosApp`, `CalculatorApp`, and enhanced updates log viewer).
+* **Step 5**: Defined state persistence mechanisms (`localStorage` for redeemed promo codes) and toast notification handling.
+
+---
 
 ## 3. Caveats
-- Explorer 2 operates in read-only mode and has created the complete specification in `g:\Zundamons-kItchen-V2\.agents\explorer_m3_2\analysis.md`.
-- Implementation will be performed by Worker M3 in `site/style.css`, `site/index.html`, and `site/terminal.js`.
-- Custom webkit scrollbars are supported on Chromium and Safari; Firefox falls back gracefully to `scrollbar-color: var(--term-green-dim) var(--term-bg)`.
+
+* **Read-only role constraint**: Investigation and blueprint design are complete. Code edits to `site/` files will be performed by the designated Implementer agent.
+* **Storage fallback**: `localStorage` calls should be wrapped in `try/catch` blocks to support private browsing or restricted iframe contexts.
+
+---
 
 ## 4. Conclusion
-The comprehensive design and implementation blueprint for `ZundaCLI.exe` styling, themes, formatting, auto-scroll, and mobile touch support has been fully specified in `analysis.md`. All CSS variables, HTML elements, and JS helper classes are ready for implementation.
+
+The analysis and blueprint for `Promos.app`, `Calculator.app`, and `Updates.log` are fully specified and ready for implementation. The execution blueprint in `g:\Zundamons-kItchen-V2\.agents\explorer_m3_2\analysis.md` provides complete HTML markup, data structures, JS class logic, and CSS styling guidelines for the Implementer.
+
+---
 
 ## 5. Verification Method
-1. **DOM & CSS Verification**: Open `site/index.html` in browser, verify `.cli-body` CRT phosphor styling and theme switching via `data-term-theme`.
-2. **Auto-Scroll Test**: Scroll up in `.cli-terminal-log` and trigger log entries; verify scrolling pauses and `cli-scroll-bottom-btn` appears. Click button to verify instant scroll to bottom.
-3. **Mobile Touch Test**: Set mobile viewport in browser DevTools (375x667), tap `.cli-body` to verify focus, check `.cli-mobile-toolbar` rendering and virtual key events.
+
+1. Inspect `g:\Zundamons-kItchen-V2\.agents\explorer_m3_2\analysis.md` for section completeness (Promos.app, Calculator.app, Updates.log blueprints).
+2. Once implemented by Implementer agent, open `site/index.html` in browser and test:
+   * **Promos**: Enter `ZUNDAMOCHI2026` into promo input, click Redeem, verify toast notification and `localStorage` state persistence.
+   * **Calculator**: Change recipe selection, click `+10` quantity button, verify Total Cost, Revenue, Net Profit, and Margin/ROI % badge update dynamically.
+   * **Updates**: Click category tabs (`Hybrid ECS`, `Rhythm Engine`, `Bug Fixes`) and change version selector to verify dynamic patch notes filtering.

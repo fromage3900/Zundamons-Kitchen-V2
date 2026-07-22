@@ -9,33 +9,50 @@ const ZundaAudio = {
   masterGain: null,
   bgmGain: null,
   sfxGain: null,
+  rainGain: null,
   isMuted: false,
   volume: 0.7,
+
+  // BGM Jukebox State
   bgmPlaying: false,
   bgmInterval: null,
   bgmPadOscs: null,
   bgmPadGain: null,
+  bgmSubOsc: null,
   bgmStopTimeout: null,
+  currentTrackIdx: 0,
+  bgmTracks: [
+    { name: "Zunda Cozy Kitchen", scale: [329.63, 369.99, 415.30, 493.88, 554.37, 659.25, 739.99], padFreqs: [164.81, 246.94], subFreq: 82.41 },
+    { name: "Starlight Lullaby", scale: [220.00, 246.94, 277.18, 329.63, 369.99, 440.00], padFreqs: [110.00, 164.81], subFreq: 55.00 },
+    { name: "Edamame Afternoon Waltz", scale: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], padFreqs: [130.81, 196.00], subFreq: 65.41 }
+  ],
+
+  // Rain Ambient Noise Synthesizer State
+  rainPlaying: false,
+  rainNode: null,
+  rainVolume: 0.4,
 
   init() {
     if (this.ctx) return;
-    const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+    const AudioCtxClass = typeof window !== 'undefined' ? (window.AudioContext || window.webkitAudioContext) : null;
     if (!AudioCtxClass) return;
 
     this.ctx = new AudioCtxClass();
 
     // Load persisted state
-    const savedVol = localStorage.getItem('zunda_os_volume');
-    if (savedVol !== null) {
-      const parsed = parseFloat(savedVol);
-      if (!isNaN(parsed)) {
-        this.volume = Math.max(0, Math.min(1, parsed));
+    if (typeof localStorage !== 'undefined') {
+      const savedVol = localStorage.getItem('zunda_os_volume');
+      if (savedVol !== null) {
+        const parsed = parseFloat(savedVol);
+        if (!isNaN(parsed)) {
+          this.volume = Math.max(0, Math.min(1, parsed));
+        }
       }
-    }
 
-    const savedMute = localStorage.getItem('zunda_os_muted');
-    if (savedMute !== null) {
-      this.setMute(savedMute === 'true');
+      const savedMute = localStorage.getItem('zunda_os_muted');
+      if (savedMute !== null) {
+        this.setMute(savedMute === 'true');
+      }
     }
 
     // Master Gain Node
@@ -52,6 +69,35 @@ const ZundaAudio = {
     this.bgmGain = this.ctx.createGain();
     this.bgmGain.gain.setValueAtTime(0.4, this.ctx.currentTime);
     this.bgmGain.connect(this.masterGain);
+
+    // Rain SFX Bus Gain
+    this.rainGain = this.ctx.createGain();
+    this.rainGain.gain.setValueAtTime(this.rainVolume * 0.15, this.ctx.currentTime);
+    this.rainGain.connect(this.masterGain);
+
+    this.initAutoUnlock();
+  },
+
+  initAutoUnlock() {
+    if (typeof window === 'undefined') return;
+    const events = ['click', 'keydown', 'pointerdown', 'touchstart'];
+    
+    const unlockHandler = () => {
+      if (!this.ctx) {
+        this.init();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().then(() => {
+          events.forEach(evt => window.removeEventListener(evt, unlockHandler, { capture: true }));
+        }).catch(() => {});
+      } else if (this.ctx && this.ctx.state === 'running') {
+        events.forEach(evt => window.removeEventListener(evt, unlockHandler, { capture: true }));
+      }
+    };
+
+    events.forEach(evt => {
+      window.addEventListener(evt, unlockHandler, { capture: true, once: false });
+    });
   },
 
   resumeOnUserGesture() {
@@ -63,7 +109,9 @@ const ZundaAudio = {
 
   setMute(muteState) {
     this.isMuted = muteState;
-    localStorage.setItem('zunda_os_muted', muteState ? 'true' : 'false');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('zunda_os_muted', muteState ? 'true' : 'false');
+    }
     if (this.masterGain && this.ctx) {
       const now = this.ctx.currentTime;
       this.masterGain.gain.cancelScheduledValues(now);
@@ -78,10 +126,116 @@ const ZundaAudio = {
 
   setVolume(val) {
     this.volume = Math.max(0, Math.min(1, val));
-    localStorage.setItem('zunda_os_volume', this.volume.toString());
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('zunda_os_volume', this.volume.toString());
+    }
     if (this.masterGain && this.ctx && !this.isMuted) {
       this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
     }
+  },
+
+  // --- Rain SFX Synthesizer Subsystem ---
+  createRainNoiseBuffer(durationSec = 2.0) {
+    if (!this.ctx) return null;
+    const sampleRate = this.ctx.sampleRate;
+    const bufferSize = sampleRate * durationSec;
+    const buffer = this.ctx.createBuffer(2, bufferSize, sampleRate);
+
+    for (let channel = 0; channel < 2; channel++) {
+      const output = buffer.getChannelData(channel);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        b6 = white * 0.115926;
+        output[i] = pink * 0.08;
+      }
+    }
+    return buffer;
+  },
+
+  startRainSFX() {
+    this.resumeOnUserGesture();
+    if (!this.ctx) return;
+    if (this.rainPlaying) return;
+
+    const noiseBuffer = this.createRainNoiseBuffer(2.0);
+    if (!noiseBuffer) return;
+
+    const whiteNoise = this.ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    // Dual lowpass/highpass filter graph
+    const highpass = this.ctx.createBiquadFilter();
+    highpass.type = 'highpass';
+    highpass.frequency.setValueAtTime(150, this.ctx.currentTime);
+
+    const lowpass = this.ctx.createBiquadFilter();
+    lowpass.type = 'lowpass';
+    lowpass.frequency.setValueAtTime(1100, this.ctx.currentTime);
+
+    whiteNoise.connect(highpass);
+    highpass.connect(lowpass);
+    lowpass.connect(this.rainGain);
+
+    whiteNoise.start();
+    this.rainNode = whiteNoise;
+    this.rainPlaying = true;
+  },
+
+  stopRainSFX() {
+    if (!this.rainPlaying || !this.rainNode) return;
+    try {
+      this.rainNode.stop();
+      this.rainNode.disconnect();
+    } catch (e) {}
+    this.rainNode = null;
+    this.rainPlaying = false;
+  },
+
+  toggleRainSFX() {
+    if (this.rainPlaying) {
+      this.stopRainSFX();
+      return false;
+    } else {
+      this.startRainSFX();
+      return true;
+    }
+  },
+
+  setRainVolume(val) {
+    const norm = Math.max(0, Math.min(1, val / 100));
+    this.rainVolume = norm;
+    if (this.rainGain && this.ctx) {
+      this.rainGain.gain.setValueAtTime(norm * 0.15, this.ctx.currentTime);
+    }
+    if (norm > 0 && !this.rainPlaying) {
+      this.startRainSFX();
+    } else if (norm === 0 && this.rainPlaying) {
+      this.stopRainSFX();
+    }
+  },
+
+  // --- Next BGM Track Selector ---
+  nextBGMTrack() {
+    this.currentTrackIdx = (this.currentTrackIdx + 1) % this.bgmTracks.length;
+    if (this.bgmPlaying) {
+      stopCozyBGM();
+      startCozyBGM();
+    }
+    return this.bgmTracks[this.currentTrackIdx].name;
+  },
+
+  // --- Voice Line Synthesizer Delegate ---
+  playVoiceLine(type = 'chirp') {
+    return playZundaVoiceLine(type);
   }
 };
 
@@ -121,7 +275,6 @@ function playClickSFX(variant = 'down') {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
     duration = 0.085;
   } else {
-    // Fallback gain ramp down (0.15 -> 0.001 over 0.03s) for invalid/unknown variants
     osc.frequency.setValueAtTime(440, now);
     gain.gain.setValueAtTime(0.15, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
@@ -255,6 +408,133 @@ function playKeySFX(key = '') {
 }
 
 /**
+ * Synthesizes Zundamon vocal chirps for interactions, speech bubbles, and minigames.
+ * @param {'chirp' | 'nanoda_arpeggio' | 'speech_talk' | 'companion_click' | 'hit_perfect' | 'hit_great' | 'hit_ok' | 'hit_miss'} type
+ */
+function playZundaVoiceLine(type = 'chirp') {
+  ZundaAudio.resumeOnUserGesture();
+  if (!ZundaAudio.ctx || ZundaAudio.isMuted) return;
+
+  const ctx = ZundaAudio.ctx;
+  const now = ctx.currentTime;
+
+  if (type === 'chirp') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(900, now);
+    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.035);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+    osc.connect(gain);
+    gain.connect(ZundaAudio.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.038);
+  } else if (type === 'nanoda_arpeggio') {
+    const notes = [698.46, 880.00, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+
+      gain.gain.setValueAtTime(0.18, now + idx * 0.07);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.12);
+
+      osc.connect(gain);
+      gain.connect(ZundaAudio.sfxGain);
+      osc.start(now + idx * 0.07);
+      osc.stop(now + idx * 0.07 + 0.125);
+    });
+  } else if (type === 'speech_talk') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const freq = 750 + Math.random() * 400;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+    osc.connect(gain);
+    gain.connect(ZundaAudio.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.028);
+  } else if (type === 'companion_click') {
+    [1046.50, 1567.98].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = idx === 0 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+
+      gain.gain.setValueAtTime(0.16, now + idx * 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.05);
+
+      osc.connect(gain);
+      gain.connect(ZundaAudio.sfxGain);
+      osc.start(now + idx * 0.04);
+      osc.stop(now + idx * 0.04 + 0.055);
+    });
+  } else if (type === 'hit_perfect') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+    osc.connect(gain);
+    gain.connect(ZundaAudio.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.105);
+  } else if (type === 'hit_great') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, now);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+    osc.connect(gain);
+    gain.connect(ZundaAudio.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.085);
+  } else if (type === 'hit_ok') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(440, now);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+    osc.connect(gain);
+    gain.connect(ZundaAudio.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.055);
+  } else if (type === 'hit_miss') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+    osc.connect(gain);
+    gain.connect(ZundaAudio.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.105);
+  }
+}
+
+/**
  * Starts or toggles the ambient cozy background music synthesizer.
  */
 function toggleCozyBGM() {
@@ -288,23 +568,22 @@ function startCozyBGM() {
   }
 
   ZundaAudio.bgmPlaying = true;
-
   const ctx = ZundaAudio.ctx;
 
-  // E Major Pentatonic Scale frequencies (Hz)
-  const scale = [329.63, 369.99, 415.30, 493.88, 554.37, 659.25, 739.99];
+  const track = ZundaAudio.bgmTracks[ZundaAudio.currentTrackIdx] || ZundaAudio.bgmTracks[0];
+  const scale = track.scale;
 
-  // Soft Low Drone Pad (E3 + B3)
+  // Track 1: Warm Low Drone Pad (sine + triangle)
   const padOsc1 = ctx.createOscillator();
   const padOsc2 = ctx.createOscillator();
   const padGain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
 
   padOsc1.type = 'sine';
-  padOsc1.frequency.setValueAtTime(164.81, ctx.currentTime); // E3
+  padOsc1.frequency.setValueAtTime(track.padFreqs[0], ctx.currentTime);
 
   padOsc2.type = 'triangle';
-  padOsc2.frequency.setValueAtTime(246.94, ctx.currentTime); // B3
+  padOsc2.frequency.setValueAtTime(track.padFreqs[1], ctx.currentTime);
 
   filter.type = 'lowpass';
   filter.frequency.setValueAtTime(450, ctx.currentTime);
@@ -320,11 +599,22 @@ function startCozyBGM() {
   padOsc1.start();
   padOsc2.start();
 
-  ZundaAudio.bgmPadOscs = [padOsc1, padOsc2];
-  ZundaAudio.bgmPadGain = padGain;
+  // Track 3: Sub-Bass Foundation Node
+  const subOsc = ctx.createOscillator();
+  const subGain = ctx.createGain();
+  subOsc.type = 'sine';
+  subOsc.frequency.setValueAtTime(track.subFreq, ctx.currentTime);
+  subGain.gain.setValueAtTime(0.01, ctx.currentTime);
+  subGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 1.5);
+  subOsc.connect(subGain);
+  subGain.connect(ZundaAudio.bgmGain);
+  subOsc.start();
 
-  // Arpeggiated Melody Sequence Generator
-  let step = 0;
+  ZundaAudio.bgmPadOscs = [padOsc1, padOsc2, subOsc];
+  ZundaAudio.bgmPadGain = padGain;
+  ZundaAudio.bgmSubOsc = subOsc;
+
+  // Track 2: Arpeggiated Melody Sequence Generator
   ZundaAudio.bgmInterval = setInterval(() => {
     if (!ZundaAudio.bgmPlaying || ZundaAudio.isMuted) return;
 
@@ -345,8 +635,6 @@ function startCozyBGM() {
 
     osc.start(now);
     osc.stop(now + 0.65);
-
-    step++;
   }, 650);
 }
 
@@ -379,9 +667,17 @@ function stopCozyBGM() {
   }
 }
 
-// Global window attachment for convenience
-window.ZundaAudio = ZundaAudio;
-window.playClickSFX = playClickSFX;
-window.playWindowSFX = playWindowSFX;
-window.playKeySFX = playKeySFX;
-window.toggleCozyBGM = toggleCozyBGM;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ZundaAudio;
+}
+if (typeof window !== 'undefined') {
+  window.ZundaAudio = ZundaAudio;
+  window.ZundaAudio.playVoiceLine = playZundaVoiceLine;
+  window.playClickSFX = playClickSFX;
+  window.playWindowSFX = playWindowSFX;
+  window.playKeySFX = playKeySFX;
+  window.playZundaVoiceLine = playZundaVoiceLine;
+  window.toggleCozyBGM = toggleCozyBGM;
+  window.startCozyBGM = startCozyBGM;
+  window.stopCozyBGM = stopCozyBGM;
+}

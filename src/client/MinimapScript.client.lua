@@ -5,6 +5,8 @@ local RunSvc   = game:GetService("RunService")
 local player   = Players.LocalPlayer
 local RS       = game:GetService("ReplicatedStorage")
 local gui      = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "MinimapGui", 10)
+local UIHelper = require(RS.Shared.Modules.UIHelper)
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 
@@ -23,19 +25,19 @@ outer.Name        = "MinimapOuter"
 outer.Size        = UDim2.new(0, 170, 0, 170)
 outer.Position    = UDim2.new(1, -184, 0, 14)
 outer.AnchorPoint = Vector2.new(0, 0)
-outer.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+outer.BackgroundColor3 = UIConfig.COLORS.ZundaDark
 outer.BackgroundTransparency = 0.15
 outer.BorderSizePixel = 0
 Instance.new("UICorner", outer).CornerRadius = UDim.new(0, 16)
 local ost = Instance.new("UIStroke", outer)
-ost.Thickness = 2; ost.Color = Color3.fromRGB(180, 150, 220); ost.Transparency = 0.2
+ost.Thickness = 2; ost.Color = UIConfig.COLORS.PeaAccent; ost.Transparency = 0.2
 
 -- Title bar inside
 local titleBar = Instance.new("TextLabel", outer)
 titleBar.Size = UDim2.new(1,-8,0,20); titleBar.Position = UDim2.new(0,4,0,3)
 titleBar.BackgroundTransparency = 1; titleBar.Text = "🗺  Mini Map 🗺"
 titleBar.Font = Enum.Font.FredokaOne; titleBar.TextSize = 14
-titleBar.TextColor3 = Color3.fromRGB(220,210,240)
+titleBar.TextColor3 = UIConfig.COLORS.TextWhite
 titleBar.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Map canvas

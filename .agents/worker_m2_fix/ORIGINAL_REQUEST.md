@@ -1,13 +1,25 @@
-## 2026-07-21T20:50:24Z
-You are Worker for Milestone 2 Fix Pass on Zundamon's Kitchen V2 Zunda-OS 95 site.
-Working directory for your metadata: g:\Zundamons-kItchen-V2\.agents\worker_m2_fix
-Target file to edit: g:\Zundamons-kItchen-V2\site\assets\audio_engine.js
+## 2026-07-22T08:33:21Z
+<USER_REQUEST>
+You are Worker 2 for Zundamon's Kitchen V2 - Milestone 2 Fix Pass.
+Working directory: `g:\Zundamons-kItchen-V2\.agents\worker_m2_fix`
 
 Task:
-In `startCozyBGM()` within `g:\Zundamons-kItchen-V2\site\assets\audio_engine.js`, ensure that if `ZundaAudio.bgmPadOscs` already exists and contains active oscillator nodes, iterate over them to `stop()` and `disconnect()` them cleanly before creating new pad oscillators and assigning `ZundaAudio.bgmPadOscs`. This prevents lingering oscillators when toggling BGM off and on repeatedly.
+Apply targeted fixes identified by Reviewer 2 and Challenger 2 for Milestone 2:
 
-Run syntax checks or static verification to ensure `audio_engine.js` loads cleanly without errors.
-Write your handoff report in `g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\handoff.md` and report back using send_message to orchestrator.
+1. Fix `playZundaVoiceLine` Function Shadowing in `site/app.js`:
+   - Inspect `site/app.js`. Remove the duplicate `playZundaVoiceLine` function definition in `app.js` (lines 33-122) that shadows the complete implementation in `site/assets/audio_engine.js`.
+   - Ensure `app.js` delegates all voice chirp calls to `window.ZundaAudio.playVoiceLine(type)` or global `playZundaVoiceLine(type)` from `site/assets/audio_engine.js` (which handles `'companion_click'`, `'speech_talk'`, `'chirp'`, etc.).
+
+2. Align Initial Track Title & Sticker Quote Cycler:
+   - In `site/index.html` line 348, set `#jukebox-track-title` initial text to `"Zunda Cozy Kitchen"` (matching track 0 in `audio_engine.js`).
+   - In `site/app.js` mascot sticker click handler, initialize `quoteIdx` so that the first click displays quote index 0 (`"Welcome to Zunda-OS 95, nanoda! 🫛✨"`).
+
+3. Verify & Sync:
+   - Run `node -c site/window_manager.js; node -c site/app.js; node -c site/assets/audio_engine.js; node -c site/sync_site.js`.
+   - Run `node site/sync_site.js` to re-sync updated web assets from `site/` to `docs/`.
 
 MANDATORY INTEGRITY WARNING:
-DO NOT CHEAT. All implementations must be genuine. DO NOT hardcode test results, create dummy/facade implementations, or circumvent the intended task. A Forensic Auditor will independently verify your work. Integrity violations WILL be detected and your work WILL be rejected.
+DO NOT CHEAT. All implementations must be genuine. DO NOT hardcode test results or create dummy facades.
+
+Write your changes to `g:\Zundamons-kItchen-V2\.agents\worker_m2_fix\changes.md` and `handoff.md` and send a message back.
+</USER_REQUEST>

@@ -25,6 +25,7 @@ class WindowManager {
     if (typeof document === 'undefined') return;
     this.registerWindows();
     this.bindWindowEvents();
+    this.bindStartMenuEvents();
     this.bindKeyboardShortcuts();
     this.updateTaskbar();
     this.transferFocusToTopVisibleWindow();
@@ -33,7 +34,7 @@ class WindowManager {
   registerWindows() {
     if (typeof document === 'undefined') return;
 
-    const managedIds = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-quickstart'];
+    const managedIds = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-zundamon', 'window-promos', 'window-calculator', 'window-updates'];
 
     // Discover any elements with .window class
     const foundElements = document.querySelectorAll('.window');
@@ -215,7 +216,7 @@ class WindowManager {
 
     this.taskbarWindows.innerHTML = '';
 
-    const managedOrder = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-quickstart'];
+    const managedOrder = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-zundamon', 'window-promos', 'window-calculator', 'window-updates'];
 
     const winsToRender = [];
     managedOrder.forEach(id => {
@@ -286,6 +287,50 @@ class WindowManager {
         });
       });
     });
+  }
+
+  bindStartMenuEvents() {
+    if (typeof document === 'undefined') return;
+    const startBtn = this.startBtn || document.getElementById('start-btn');
+    const startMenu = this.startMenu || document.getElementById('start-menu');
+
+    if (startBtn && startMenu) {
+      startBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined' && typeof window.playClickSFX === 'function') {
+          window.playClickSFX('start');
+        }
+        const isHidden = startMenu.classList.contains('hidden') || startMenu.style.display === 'none';
+        if (isHidden) {
+          startMenu.classList.remove('hidden');
+          startMenu.style.display = '';
+          startBtn.classList.add('start-btn-active');
+        } else {
+          startMenu.classList.add('hidden');
+          startBtn.classList.remove('start-btn-active');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) {
+          if (!startMenu.classList.contains('hidden')) {
+            startMenu.classList.add('hidden');
+            startBtn.classList.remove('start-btn-active');
+          }
+        }
+      });
+
+      startMenu.querySelectorAll('[data-open-window]').forEach(tile => {
+        tile.addEventListener('click', (e) => {
+          const targetId = tile.dataset.openWindow;
+          if (targetId) {
+            this.openWindow(targetId);
+            startMenu.classList.add('hidden');
+            startBtn.classList.remove('start-btn-active');
+          }
+        });
+      });
+    }
   }
 
   setupDragEngine(win, header) {
@@ -414,7 +459,7 @@ class WindowManager {
       }
     };
 
-    const targetIds = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-quickstart'];
+    const targetIds = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-zundamon', 'window-promos', 'window-calculator', 'window-updates'];
     targetIds.forEach(id => {
       const win = this.getWindow(id);
       if (win) {

@@ -3,7 +3,7 @@
 -- Full bag UI reading _G.data via RequestData RemoteFunction.
 local Players = game:GetService("Players")
 local RS      = game:GetService("ReplicatedStorage")
-local Tween   = game:GetService("TweenService")
+local TweenService = game:GetService("TweenService")
 local UIS     = game:GetService("UserInputService")
 
 local player  = Players.LocalPlayer
@@ -253,7 +253,7 @@ local shell = CozyModalShell.wrap(panel, {
     open = function()
         refresh()
         panel.Size = UDim2.new(0,580,0,10)
-        Tween:Create(panel, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        TweenService:Create(panel, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
             {Size=UDim2.new(0,580,0,520)}):Play()
     end,
     close = function()

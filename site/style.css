@@ -1,33 +1,57 @@
 /* ==========================================================================
-   ZUNDAMON'S KITCHEN V2 — OFFICIAL ROBLOX GAME LAUNCH STYLESHEET
+   ZUNDAMON'S KITCHEN V2 — KAWAII Y2K INFINITY NIKKI DESIGN SYSTEM
+   Official Roblox Game Showcase Launchpad & Interactive PC Desktop Workspace
    ========================================================================== */
 
 :root {
-  /* --- Primary Cozy Anime Palette --- */
-  --brand-green: #2e7d32;
-  --brand-green-light: #4caf50;
-  --brand-mint: #a5d6a7;
-  --pink-pastel: #fff0f5;
-  --pink-soft: #ffe5ec;
-  --pink-accent: #ff85a1;
-  --pink-hot: #ff477e;
-  --lavender: #e8dff5;
+  /* --- 🌸 Sakura Pink Palette --- */
+  --sakura-light: #fff0f5;        /* Softest pastel background tint */
+  --sakura-soft: #ffe5ec;         /* Soft Sakura body/card gradient */
+  --sakura-base: #ffb7c5;         /* Classic Sakura Pink border/accent */
+  --sakura-vibrant: #ff85a1;      /* Active button base & hover highlights */
+  --sakura-hot: #ff477e;          /* High contrast text, badge & accent glow */
 
-  /* --- Game Launch Card & Layout Tokens --- */
-  --bg-gradient: linear-gradient(180deg, #fff5f8 0%, #ffe5ec 50%, #f1f8e9 100%);
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-border: 2px solid #ffb7c5;
-  --card-shadow: 0 10px 30px rgba(255, 133, 161, 0.2);
+  /* --- 🫛 Zunda Edamame Mint Palette --- */
+  --zunda-light: #f1f8e9;         /* Mint tint background transition */
+  --zunda-soft: #a5d6a7;          /* Soft Edamame Mint accent */
+  --zunda-leaf: #8bc34a;          /* Bright leaf highlight */
+  --zunda-base: #4caf50;          /* Primary Zunda Edamame Green */
+  --zunda-deep: #2e7d32;          /* Deep Zunda Green typography & dark CTA */
+  --zunda-dark: #1b5e20;          /* High contrast dark text on light mint */
 
-  /* --- Terminal Palette --- */
+  /* --- ✨ Pearl Lavender & Cream Accents --- */
+  --lavender-pearl: #e8dff5;      /* Magical Pearl Lavender accent */
+  --lavender-deep: #5b21b6;       /* Contrast purple text for CLI pill */
+  --cream-white: #fff5f8;         /* Primary body background top tint */
+
+  /* --- 💎 Glassmorphism & Surface Tokens --- */
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-bg-hover: rgba(255, 255, 255, 0.96);
+  --glass-border: 2px solid rgba(255, 183, 197, 0.6);
+  --glass-border-hover: 2px solid rgba(255, 71, 126, 0.8);
+  --glass-backdrop-filter: blur(14px);
+
+  /* --- 🍬 Gloss & Shadow Tokens --- */
+  --shadow-soft-pink: 0 10px 30px rgba(255, 133, 161, 0.25);
+  --shadow-soft-mint: 0 10px 30px rgba(76, 175, 80, 0.25);
+  --shadow-candy-button: 0 6px 20px rgba(255, 71, 126, 0.35);
+  --shadow-roblox-button: 0 8px 25px rgba(46, 125, 50, 0.4);
+  --shadow-window: 0 16px 48px rgba(91, 33, 182, 0.2);
+  --inset-gloss-top: inset 0 2px 0 rgba(255, 255, 255, 0.85);
+  --inset-gloss-bottom: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+
+  /* --- 💻 Terminal Palette (Pastel Console) --- */
   --term-bg: #231b2e;
   --term-pink: #f472b6;
   --term-cyan: #38bdf8;
   --term-yellow: #fef08a;
 
-  /* --- Typography --- */
-  --font-main: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-  --font-mono: 'VT323', 'Courier New', monospace;
+  /* --- 🔤 Typography & Transitions --- */
+  --font-main: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Nunito', Roboto, sans-serif;
+  --font-mono: 'VT323', 'Cascadia Code', 'Courier New', monospace;
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 * {
@@ -40,32 +64,139 @@ html, body {
   width: 100%;
   min-height: 100vh;
   font-family: var(--font-main);
-  background: var(--bg-gradient);
-  color: #333;
+  background: linear-gradient(180deg, var(--cream-white) 0%, var(--sakura-soft) 35%, var(--lavender-pearl) 70%, var(--zunda-light) 100%);
+  background-attachment: fixed;
+  color: #2d3748;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
-/* Background Sparkle Canvas */
-#star-sparkle-canvas {
+/* ==========================================================================
+   STARBURST CANVAS BACKDROP
+   ========================================================================== */
+#star-canvas, #star-sparkle-canvas {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 1;
+  overflow: hidden;
 }
 
-/* Navbar */
+/* ==========================================================================
+   GLOSSY CANDY BUTTONS & BADGES
+   ========================================================================== */
+.btn-candy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #ffffff !important;
+  background: linear-gradient(180deg, var(--sakura-vibrant) 0%, var(--sakura-hot) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--inset-gloss-top), var(--inset-gloss-bottom), var(--shadow-candy-button);
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-candy:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: var(--inset-gloss-top), var(--inset-gloss-bottom), 0 10px 28px rgba(255, 71, 126, 0.45);
+}
+
+.btn-candy:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Pulsing Roblox CTA */
+.btn-roblox-play, .play-roblox-nav-btn, .pulse-cta {
+  background: linear-gradient(180deg, var(--zunda-leaf) 0%, var(--zunda-base) 50%, var(--zunda-deep) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  color: #ffffff !important;
+  box-shadow: var(--inset-gloss-top), var(--shadow-roblox-button) !important;
+  animation: roblox-glow-pulse 3s infinite ease-in-out;
+}
+
+.btn-roblox-play:hover, .play-roblox-nav-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: var(--inset-gloss-top), 0 12px 32px rgba(76, 175, 80, 0.6) !important;
+}
+
+@keyframes roblox-glow-pulse {
+  0%, 100% { box-shadow: var(--inset-gloss-top), 0 6px 20px rgba(76, 175, 80, 0.4); }
+  50% { box-shadow: var(--inset-gloss-top), 0 10px 32px rgba(139, 195, 74, 0.75); }
+}
+
+/* Sheen Shimmer Overlay */
+.btn-candy::after, .btn-roblox-play::after, .play-roblox-nav-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  transform: rotate(25deg) translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn-candy:hover::after, .btn-roblox-play:hover::after, .play-roblox-nav-btn:hover::after {
+  transform: rotate(25deg) translateX(100%);
+}
+
+/* Live Status Badge */
+.status-pill, .badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: var(--glass-backdrop-filter);
+  border: 2px solid var(--sakura-base);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--zunda-deep);
+  box-shadow: 0 4px 14px rgba(255, 183, 197, 0.3);
+}
+
+.pill-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: var(--zunda-base);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--zunda-base);
+  animation: dot-pulse 2s infinite ease-in-out;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+/* ==========================================================================
+   STICKY GAME NAVBAR
+   ========================================================================== */
 .game-navbar {
   position: sticky;
   top: 0;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 2px solid #ffb7c5;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  border-bottom: 2px solid var(--sakura-base);
+  box-shadow: 0 4px 20px rgba(255, 133, 161, 0.15);
 }
 
 .nav-container {
@@ -82,17 +213,29 @@ html, body {
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 800;
   font-size: 18px;
-  color: var(--brand-green);
+  color: var(--zunda-deep);
+}
+
+.brand-emoji {
+  font-size: 22px;
+  display: inline-block;
+  animation: float-emoji 3s ease-in-out infinite;
+}
+
+@keyframes float-emoji {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .v-badge {
-  background: #ff477e;
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 6px;
+  background: var(--sakura-hot);
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 9999px;
   font-size: 11px;
+  font-weight: 800;
 }
 
 .nav-links {
@@ -103,44 +246,40 @@ html, body {
 
 .nav-links a {
   text-decoration: none;
-  color: #444;
-  font-weight: bold;
+  color: #334155;
+  font-weight: 700;
   font-size: 14px;
-  transition: color 0.2s ease;
+  transition: color var(--transition-fast);
 }
 
 .nav-links a:hover {
-  color: var(--pink-hot);
+  color: var(--sakura-hot);
 }
 
 .nav-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: bold;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-weight: 700;
   font-size: 13px;
   cursor: pointer;
   border: none;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.play-roblox-nav-btn {
-  background: linear-gradient(135deg, #2e7d32, #4caf50);
-  color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.3);
-}
-
-.play-roblox-nav-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(46, 125, 50, 0.4);
+  transition: var(--transition-bounce);
 }
 
 .cli-link-btn {
-  background: #e8dff5;
-  color: #5b21b6;
+  background: var(--lavender-pearl);
+  color: var(--lavender-deep);
 }
 
-/* Hero Section */
+.cli-link-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(91, 33, 182, 0.2);
+}
+
+/* ==========================================================================
+   BIG GAME LAUNCH HERO BANNER
+   ========================================================================== */
 .game-hero {
   position: relative;
   z-index: 10;
@@ -156,37 +295,16 @@ html, body {
   align-items: center;
 }
 
-@media screen and (max-width: 860px) {
-  .hero-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  border: 1px solid #ffb7c5;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--brand-green);
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
 .hero-title {
   font-size: 42px;
   line-height: 1.2;
-  margin: 0 0 16px 0;
-  color: #1a202c;
+  margin: 16px 0;
+  color: #1e293b;
   font-weight: 800;
 }
 
 .highlight-text {
-  background: linear-gradient(135deg, #ff477e, #2e7d32);
+  background: linear-gradient(135deg, var(--sakura-hot), var(--zunda-base));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -194,7 +312,7 @@ html, body {
 .hero-subtitle {
   font-size: 16px;
   line-height: 1.6;
-  color: #4a5568;
+  color: #475569;
   margin-bottom: 28px;
   max-width: 650px;
 }
@@ -206,45 +324,21 @@ html, body {
   margin-bottom: 24px;
 }
 
-.cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 28px;
-  border-radius: 30px;
-  font-size: 15px;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-  border: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
 .primary-cta {
-  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-  color: #ffffff;
-  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35);
-}
-
-.primary-cta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(46, 125, 50, 0.45);
+  background: linear-gradient(180deg, var(--zunda-leaf) 0%, var(--zunda-base) 50%, var(--zunda-deep) 100%);
 }
 
 .secondary-cta {
   background: #ffffff;
-  color: #ff477e;
-  border: 2px solid #ffb7c5;
+  color: var(--sakura-hot) !important;
+  border: 2px solid var(--sakura-base);
   box-shadow: 0 4px 16px rgba(255, 133, 161, 0.2);
 }
 
-.secondary-cta:hover {
-  transform: translateY(-2px);
-}
-
 .terminal-cta {
-  background: #231b2e;
-  color: #f472b6;
+  background: var(--term-bg);
+  color: var(--term-pink) !important;
+  border: 1px solid var(--term-pink);
 }
 
 .hero-pills {
@@ -254,42 +348,50 @@ html, body {
 }
 
 .hero-tag {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #ffb7c5;
-  padding: 4px 12px;
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--sakura-base);
+  padding: 5px 14px;
+  border-radius: 9999px;
   font-size: 12px;
-  font-weight: bold;
-  color: #2e7d32;
+  font-weight: 700;
+  color: var(--zunda-deep);
+  box-shadow: 0 2px 8px rgba(255, 183, 197, 0.2);
 }
 
-/* Avatar Preview Box */
 .zunda-hero-avatar-box {
   background: #ffffff;
-  border: 3px solid #ffb7c5;
+  border: 3px solid var(--sakura-base);
   border-radius: 24px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--shadow-soft-pink);
   text-align: center;
+  transition: transform var(--transition-bounce);
+}
+
+.zunda-hero-avatar-box:hover {
+  transform: translateY(-6px) rotate(1deg);
+  box-shadow: 0 16px 40px rgba(255, 133, 161, 0.35);
 }
 
 .badge-title {
   font-size: 18px;
-  font-weight: bold;
-  color: var(--brand-green);
+  font-weight: 800;
+  color: var(--zunda-deep);
   display: block;
 }
 
 .badge-sub {
   font-size: 12px;
-  color: var(--pink-hot);
-  font-weight: bold;
+  color: var(--sakura-hot);
+  font-weight: 700;
 }
 
-/* Game Sections */
+/* ==========================================================================
+   GAME SHOWCASE SECTIONS & FEATURES GRID
+   ========================================================================== */
 .game-section {
   position: relative;
   z-index: 10;
@@ -298,6 +400,7 @@ html, body {
 
 .alt-bg {
   background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
 }
 
 .section-container {
@@ -308,13 +411,14 @@ html, body {
 .section-title {
   text-align: center;
   font-size: 28px;
-  color: var(--brand-green);
+  font-weight: 800;
+  color: var(--zunda-deep);
   margin: 0 0 8px 0;
 }
 
 .section-subtitle {
   text-align: center;
-  color: #666;
+  color: #64748b;
   margin-bottom: 40px;
   font-size: 15px;
 }
@@ -327,33 +431,42 @@ html, body {
 }
 
 .feature-card {
-  background: #ffffff;
-  border: var(--card-border);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--card-shadow);
-  transition: transform 0.2s ease;
+  background: var(--glass-bg);
+  border: var(--glass-border);
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: var(--shadow-soft-pink);
+  transition: var(--transition-bounce);
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  background: var(--glass-bg-hover);
+  border-color: var(--sakura-hot);
+  box-shadow: 0 14px 36px rgba(255, 71, 126, 0.25);
 }
 
 .feat-icon {
-  font-size: 36px;
+  font-size: 40px;
   margin-bottom: 12px;
+  transition: transform var(--transition-bounce);
+}
+
+.feature-card:hover .feat-icon {
+  transform: scale(1.15) rotate(-5deg);
 }
 
 .feature-card h3 {
   margin: 0 0 8px 0;
-  color: var(--brand-green);
+  font-size: 17px;
+  color: var(--zunda-deep);
 }
 
 .feature-card p {
   margin: 0;
   font-size: 13px;
-  line-height: 1.5;
-  color: #555;
+  line-height: 1.6;
+  color: #475569;
 }
 
 /* Companions Grid */
@@ -365,56 +478,64 @@ html, body {
 
 .companion-card {
   background: #ffffff;
-  border: 2px solid #ffb7c5;
-  border-radius: 16px;
+  border: 2px solid var(--sakura-base);
+  border-radius: 20px;
   padding: 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: var(--shadow-soft-pink);
+  transition: var(--transition-bounce);
+}
+
+.companion-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--sakura-hot);
 }
 
 .comp-emoji {
-  font-size: 40px;
+  font-size: 42px;
   margin-bottom: 8px;
 }
 
 .companion-card h3 {
   margin: 0;
-  color: var(--brand-green);
+  color: var(--zunda-deep);
 }
 
 .comp-role {
   font-size: 11px;
-  color: var(--pink-hot);
-  font-weight: bold;
+  color: var(--sakura-hot);
+  font-weight: 800;
   margin-bottom: 8px;
 }
 
 .comp-desc {
   font-size: 12px;
   font-style: italic;
-  color: #555;
+  color: #475569;
   margin-bottom: 12px;
 }
 
 .comp-buff-badge {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--zunda-light);
+  color: var(--zunda-deep);
   font-size: 12px;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
 }
 
 .chirp-btn {
-  padding: 4px 12px;
+  padding: 6px 14px;
   font-size: 12px;
-  cursor: pointer;
 }
 
-/* Codes Grid */
+/* ==========================================================================
+   ACTIVE PROMO CODES & TOAST SYSTEM
+   ========================================================================== */
 .codes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -423,12 +544,19 @@ html, body {
 
 .code-box {
   background: #ffffff;
-  border: 2px solid #a5d6a7;
-  border-radius: 14px;
-  padding: 16px;
+  border: 2px dashed var(--zunda-soft);
+  border-radius: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: var(--shadow-soft-mint);
+  transition: var(--transition-bounce);
+}
+
+.code-box:hover {
+  border-color: var(--zunda-base);
+  transform: translateY(-3px);
 }
 
 .code-header {
@@ -439,43 +567,418 @@ html, body {
 
 .code-val {
   font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--brand-green);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--zunda-deep);
+  letter-spacing: 1px;
 }
 
 .code-reward {
   font-size: 12px;
-  color: #555;
+  color: #475569;
+  font-weight: 600;
 }
 
 .win95-btn {
-  background: #ffffe0;
-  border: 2px solid #ccc;
-  padding: 4px 10px;
-  font-weight: bold;
+  border: 1px solid var(--sakura-base);
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #ffffff;
+  color: var(--zunda-deep);
+  transition: var(--transition-fast);
+}
+
+.win95-btn:hover {
+  background: var(--sakura-soft);
+  color: var(--sakura-hot);
+}
+
+/* Dynamic Toast Notification System */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast-message {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: var(--glass-backdrop-filter);
+  border: 2px solid var(--sakura-vibrant);
+  padding: 12px 22px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--zunda-deep);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  animation: toast-slide-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast-message.fade-out {
+  animation: toast-fade-out 0.3s ease forwards;
+}
+
+@keyframes toast-slide-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-fade-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(10px) scale(0.95); }
+}
+
+/* ==========================================================================
+   KAWAII PC DESKTOP WORKSPACE & APP TILES
+   ========================================================================== */
+.os-desktop-section {
+  position: relative;
+}
+
+.os-app-launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.os-app-tile {
+  background: var(--glass-bg);
+  border: var(--glass-border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft-pink);
+  transition: var(--transition-bounce);
+  outline: none;
+}
+
+.os-app-tile:hover, .os-app-tile:focus {
+  transform: translateY(-4px) scale(1.03);
+  border-color: var(--sakura-hot);
+  box-shadow: 0 12px 28px rgba(255, 71, 126, 0.3);
+  background: #ffffff;
+}
+
+.tile-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.tile-title {
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--zunda-deep);
+  margin-bottom: 4px;
+}
+
+.tile-desc {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Desktop Viewport & Widgets Container */
+.desktop-viewport {
+  position: relative;
+  min-height: 480px;
+  background: rgba(255, 245, 248, 0.5);
+  border: 2px solid var(--sakura-base);
+  border-radius: 20px;
+  padding: 16px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.desktop-widgets-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.desktop-widget {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  border: 2px solid var(--sakura-base);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--zunda-deep);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(255, 183, 197, 0.25);
+  transition: var(--transition-bounce);
+}
+
+/* --- Widget 1: Digital Clock & Weather Widget --- */
+.clock-weather-widget {
+  gap: 10px;
+}
+
+.clock-weather-widget:hover {
+  border-color: var(--sakura-hot);
+  transform: translateY(-2px);
+}
+
+.clock-display-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--zunda-deep);
+  background: var(--zunda-light);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--zunda-soft);
+  text-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+}
+
+.weather-display-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  transition: background var(--transition-fast);
+}
+
+.weather-display-pill:hover {
+  background: var(--sakura-soft);
+  color: var(--sakura-hot);
+}
+
+.weather-icon {
+  font-size: 15px;
+  display: inline-block;
+  animation: float-emoji 3s ease-in-out infinite;
+}
+
+/* --- Widget 2: Lo-Fi Jukebox BGM & Rain FX Widget --- */
+.jukebox-widget {
+  gap: 10px;
+}
+
+.jukebox-track-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--zunda-deep);
+}
+
+.jukebox-icon {
+  font-size: 16px;
+  display: inline-block;
+  transition: transform var(--transition-bounce);
+}
+
+.jukebox-icon.spinning {
+  animation: spin-disc 4s linear infinite;
+}
+
+@keyframes spin-disc {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.jukebox-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.jukebox-btn {
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  border-radius: 9999px;
+}
+
+.jukebox-btn.mini-btn {
+  padding: 4px 8px !important;
+}
+
+.rain-sfx-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(232, 223, 245, 0.6);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--lavender-pearl);
+}
+
+.rain-icon {
+  font-size: 14px;
+}
+
+.rain-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 55px;
+  height: 6px;
+  background: var(--sakura-soft);
+  border-radius: 9999px;
+  outline: none;
   cursor: pointer;
 }
 
-/* Window Manager Modals */
+.rain-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--zunda-base);
+  border: 1px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.rain-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: var(--sakura-hot);
+}
+
+/* --- Widget 3: Zundamon Desktop Sticker Widget --- */
+.zunda-sticker-widget {
+  position: relative;
+  border-color: var(--zunda-base);
+  padding: 6px 14px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.25);
+  animation: sticker-idle-float 3s ease-in-out infinite;
+}
+
+@keyframes sticker-idle-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+
+.zunda-sticker-widget:hover {
+  transform: scale(1.08) rotate(-2deg);
+  border-color: var(--sakura-hot);
+  box-shadow: 0 8px 24px rgba(255, 71, 126, 0.35);
+}
+
+.zunda-sticker-widget:active {
+  animation: sticker-pop 0.3s ease;
+}
+
+@keyframes sticker-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.88); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1.08); }
+}
+
+.sticker-mascot-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sticker-emoji {
+  font-size: 20px;
+}
+
+.sticker-sparkle {
+  font-size: 12px;
+  animation: float-emoji 2s ease-in-out infinite;
+}
+
+.sticker-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, var(--sakura-hot) 0%, #e11d48 100%);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(255, 71, 126, 0.4);
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sticker-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: #e11d48 transparent transparent transparent;
+}
+
+/* ==========================================================================
+   WINDOW MANAGER CONTAINER & MODAL WINDOWS
+   ========================================================================== */
 #window-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 2000;
+  z-index: 200;
 }
 
 .window {
   position: absolute;
   pointer-events: auto;
-  background: #ffffff;
-  border: 2px solid #ff477e;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  border: 2px solid var(--sakura-base);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(91, 33, 182, 0.2), 0 4px 16px rgba(255, 133, 161, 0.25);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.window.active-window, .window.window-active {
+  border-color: var(--sakura-hot);
+  box-shadow: 0 20px 56px rgba(255, 71, 126, 0.35), 0 0 0 3px rgba(255, 183, 197, 0.5);
+}
+
+.window.inactive-window .window-header,
+.window.window-inactive .window-header {
+  background: linear-gradient(180deg, #ffc1cc 0%, #ffa4b6 100%);
+  opacity: 0.88;
 }
 
 .hidden {
@@ -483,34 +986,113 @@ html, body {
 }
 
 .window-header {
-  background: linear-gradient(90deg, #ff477e, #4caf50);
-  color: #fff;
-  padding: 8px 12px;
+  background: linear-gradient(180deg, var(--sakura-vibrant) 0%, var(--sakura-hot) 100%);
+  color: #ffffff;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: move;
+  user-select: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.7), inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.window-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
 }
 
 .window-title {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
   font-size: 13px;
+  z-index: 2;
 }
 
-.window-controls button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-weight: bold;
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.win-btn {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform var(--transition-bounce), filter var(--transition-fast);
+  outline: none;
+}
+
+.win-minimize {
+  background: linear-gradient(180deg, #a5d6a7 0%, #4caf50 100%) !important; /* Edamame Mint Candy */
+}
+
+.win-maximize {
+  background: linear-gradient(180deg, #ffe082 0%, #ffb300 100%) !important; /* Citrus Yellow Candy */
+}
+
+.win-close {
+  background: linear-gradient(180deg, #ff85a1 0%, #ef4444 100%) !important; /* Hot Sakura Candy */
+}
+
+.win-btn:hover {
+  transform: scale(1.18);
+  filter: brightness(1.15);
+}
+
+.win-btn:active {
+  transform: scale(0.92);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.window-body {
+  padding: 18px;
+  overflow-y: auto;
+  flex: 1;
+  background: linear-gradient(180deg, rgba(255, 245, 248, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border-radius: 0 0 18px 18px;
+}
+
+.window-body::-webkit-scrollbar {
+  width: 8px;
+}
+.window-body::-webkit-scrollbar-track {
+  background: var(--sakura-light);
+  border-radius: 9999px;
+}
+.window-body::-webkit-scrollbar-thumb {
+  background: var(--sakura-base);
+  border-radius: 9999px;
+}
+.window-body::-webkit-scrollbar-thumb:hover {
+  background: var(--sakura-hot);
 }
 
 .cli-body {
   background: var(--term-bg);
   color: var(--term-pink);
-  padding: 12px;
   font-family: var(--font-mono);
-  height: calc(100% - 35px);
-  overflow-y: auto;
 }
 
 .cli-input-field {
@@ -523,10 +1105,179 @@ html, body {
   width: 80%;
 }
 
-/* Footer */
+.cli-welcome {
+  margin: 2px 0;
+}
+
+.cli-highlight {
+  color: var(--term-yellow);
+}
+
+.cli-prompt-label {
+  color: var(--term-cyan);
+  font-weight: bold;
+  margin-right: 6px;
+}
+
+/* Cookbook, VNTalk & Updates Log Body */
+.recipe-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.vn-dialogue-box {
+  background: var(--sakura-light);
+  border: 2px solid var(--sakura-base);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.vn-speaker {
+  font-weight: 800;
+  color: var(--zunda-deep);
+  margin-bottom: 8px;
+}
+
+.vn-text-content {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.vn-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.update-log-list {
+  padding-left: 20px;
+  line-height: 1.8;
+  font-size: 13px;
+  color: #334155;
+}
+
+/* ==========================================================================
+   TASKBAR & START MENU POPOVER
+   ========================================================================== */
+.os-taskbar {
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: var(--glass-backdrop-filter);
+  border: 2px solid var(--sakura-base);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-soft-pink);
+}
+
+.taskbar-start-btn {
+  background: linear-gradient(180deg, var(--zunda-leaf), var(--zunda-base));
+  color: #ffffff;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  transition: transform var(--transition-fast);
+}
+
+.taskbar-start-btn:hover {
+  transform: scale(1.05);
+}
+
+.taskbar-windows-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.taskbar-item {
+  background: var(--sakura-soft);
+  border: 1px solid var(--sakura-base);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--zunda-deep);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.taskbar-item.active {
+  background: var(--sakura-hot);
+  color: #ffffff;
+}
+
+.taskbar-clock {
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--zunda-deep);
+}
+
+.start-menu-popover {
+  position: absolute;
+  bottom: 60px;
+  left: 20px;
+  width: 240px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: var(--glass-backdrop-filter);
+  border: 2px solid var(--sakura-hot);
+  border-radius: 16px;
+  box-shadow: var(--shadow-window);
+  overflow: hidden;
+  z-index: 1500;
+}
+
+.start-menu-header {
+  background: linear-gradient(90deg, var(--sakura-hot), var(--zunda-base));
+  color: #ffffff;
+  padding: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.start-menu-items {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.start-item {
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #334155;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.start-item:hover {
+  background: var(--sakura-soft);
+  color: var(--sakura-hot);
+}
+
+/* ==========================================================================
+   MAIN GAME FOOTER
+   ========================================================================== */
 .game-footer {
   background: #ffffff;
-  border-top: 2px solid #ffb7c5;
+  border-top: 2px solid var(--sakura-base);
   padding: 30px 20px;
   position: relative;
   z-index: 10;
@@ -546,60 +1297,85 @@ html, body {
 }
 
 .copyright {
-  color: #777;
+  color: #64748b;
   font-size: 11px !important;
 }
 
 .footer-right a {
-  color: var(--brand-green);
+  color: var(--zunda-deep);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-/* Zunda-OS PC App Launcher Grid */
-.os-app-launcher-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
+.footer-right a:hover {
+  color: var(--sakura-hot);
 }
 
-.os-app-tile {
-  background: #ffffff;
-  border: 2px solid #ffb7c5;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(255, 133, 161, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  outline: none;
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+@media screen and (max-width: 1024px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-subtitle {
+    margin: 0 auto 28px auto;
+  }
+  .hero-actions {
+    justify-content: center;
+  }
+  .hero-pills {
+    justify-content: center;
+  }
+  .hero-card-preview {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }
 
-.os-app-tile:hover, .os-app-tile:focus {
-  transform: translateY(-4px);
-  border-color: #ff477e;
-  box-shadow: 0 10px 24px rgba(255, 71, 126, 0.25);
-  background: #fff0f5;
+@media screen and (max-width: 768px) {
+  .nav-links a:not(.nav-btn) {
+    display: none;
+  }
+  .hero-title {
+    font-size: 30px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .cta-btn, .btn-candy {
+    width: 100%;
+    justify-content: center;
+  }
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    align-items: center;
+  }
+  .toast-message {
+    width: 100%;
+    justify-content: center;
+  }
+  .window {
+    max-width: 94vw !important;
+    left: 3vw !important;
+  }
+  .footer-container {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
 }
 
-.tile-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
+@media screen and (max-width: 480px) {
+  .hero-title {
+    font-size: 26px;
+  }
+  .os-app-launcher-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
-
-.tile-title {
-  font-weight: bold;
-  font-size: 14px;
-  color: var(--brand-green);
-  margin-bottom: 4px;
-}
-
-.tile-desc {
-  font-size: 11px;
-  color: #666;
-}
-

@@ -107,8 +107,18 @@ local notify = RE:FindFirstChild("NotifyPlayer")
 local makeLoot = RE:FindFirstChild("MakeLootEvent")
 local requestData = RS:WaitForChild("RemoteFunctions"):FindFirstChild("RequestData")
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+
+local C = {
+	bg = UIConfig.COLORS.MochiCream,
+	border = UIConfig.COLORS.ZundaDark,
+	text = UIConfig.COLORS.TextDark,
+	sub = UIConfig.COLORS.TextDarkSec,
+	btnAct = UIConfig.COLORS.ZundaPrimary,
+	btnIdle = UIConfig.COLORS.PeaAccent,
+}
 
 local function styleFor(name)
 	return { color = UIHelper.getItemColor(name), icon = nil }

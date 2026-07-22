@@ -1,456 +1,384 @@
-# ZundaCLI.exe Styling, Layout & Formatting Specification Analysis
+# Milestone 3 Analysis & Blueprint — Promos.app, Calculator.app & Updates.log
 
-## Executive Summary
-This document delivers the complete visual layout, styling, CRT phosphor themes, rich text formatting, auto-scroll management, and mobile touch architecture for `ZundaCLI.exe` (Milestone 3).
-
-`ZundaCLI.exe` serves as the interactive retro console for **Zunda-OS 95**. This analysis establishes a zero-dependency, highly responsive CSS/HTML/JS framework that integrates monochrome CRT aesthetics, dynamic phosphor themes (`classic-green`, `amber`, `matrix`, `cozy-pea`), phosphor glow/flicker animations, structured tag/table/ASCII output formatters, smart non-intrusive auto-scrolling, and mobile touch input management.
-
----
-
-## 1. Retro CRT Phosphor Green Monochrome Theme Styling
-
-### 1.1 Color Token Architecture
-The primary styling relies on high-contrast, glowing CRT phosphor aesthetics against dark obsidian backgrounds.
-
-```css
-/* Core Phosphor CSS Variables */
-:root {
-  --term-bg: #0a1a0a;            /* Dark obsidian phosphor background */
-  --term-green: #33ff33;         /* Vibrant CRT phosphor green primary */
-  --term-green-dim: #00aa44;     /* Secondary dimmed phosphor text */
-  --term-glow-color: rgba(51, 255, 51, 0.7); /* Inner phosphor glow */
-  --term-glow-far: rgba(0, 255, 102, 0.3);   /* Outer ambient diffuse glow */
-  --term-highlight: #66ff66;     /* Command & emphasis highlight */
-  --term-cursor: #33ff33;        /* Blinking block cursor color */
-  --term-selection-bg: rgba(51, 255, 102, 0.3); /* Selection highlight background */
-  --term-selection-text: #ffffff;/* Selection text color */
-}
-```
-
-### 1.2 Multi-Tier Phosphor Glow & Selection
-Standard single `text-shadow` can appear flat. The enhanced multi-tier bloom creates an authentic glowing CRT phosphor tube effect:
-
-```css
-.cli-body {
-  background-color: var(--term-bg);
-  color: var(--term-green);
-  font-family: 'VT323', 'Courier New', Consolas, monospace;
-  font-size: 15px;
-  padding: 8px;
-  position: relative;
-  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85), inset 0 0 4px var(--term-green-dim);
-  border: 1px solid rgba(51, 255, 102, 0.2);
-}
-
-.cli-terminal-log {
-  flex: 1;
-  overflow-y: auto;
-  padding: 6px;
-  line-height: 1.4;
-  text-shadow: 0 0 2px var(--term-green), 0 0 6px var(--term-glow-color), 0 0 12px var(--term-glow-far);
-}
-
-.cli-body ::selection {
-  background-color: var(--term-selection-bg);
-  color: var(--term-selection-text);
-  text-shadow: 0 0 8px var(--term-green);
-}
-```
-
-### 1.3 Retro Phosphor Webkit Scrollbar
-Default browser scrollbars break retro terminal immersion. Custom styling ensures seamless visual integration:
-
-```css
-.cli-terminal-log::-webkit-scrollbar {
-  width: 8px;
-}
-.cli-terminal-log::-webkit-scrollbar-track {
-  background: var(--term-bg);
-  border-left: 1px solid var(--term-green-dim);
-}
-.cli-terminal-log::-webkit-scrollbar-thumb {
-  background: var(--term-green-dim);
-  border-radius: 0px;
-  box-shadow: 0 0 4px var(--term-green);
-}
-.cli-terminal-log::-webkit-scrollbar-thumb:hover {
-  background: var(--term-green);
-}
-```
+**Target Directory**: `g:\Zundamons-kItchen-V2\`  
+**Target Files**: `site/index.html`, `site/app.js`, `site/style.css`, `site/terminal.js`  
+**Author**: Explorer 2 (Milestone 3)  
+**Date**: 2026-07-22  
 
 ---
 
-## 2. CRT Scanline Overlay, Flicker/Glow Effects, & Customizable Themes
+## 1. Observation
 
-### 2.1 Customizable CRT Themes Specification
-Four distinct retro CRT color schemes are supported via `data-term-theme` attributes on `.cli-body` or `#window-zundacli`:
+### 1.1 Existing Architecture & File Audit
+Direct inspection of `site/index.html`, `site/app.js`, `site/style.css`, and `site/terminal.js` reveals the following findings regarding the 3 targeted desktop applications:
 
-| Theme Name | Description | `--term-bg` | `--term-green` | `--term-green-dim` | `--term-glow-color` |
-|------------|-------------|-------------|----------------|--------------------|---------------------|
-| `classic-green` | Classic VT220 Phosphor Green | `#0a1a0a` | `#33ff33` | `#00aa44` | `rgba(51,255,51,0.7)` |
-| `amber` | Retro VT100 Amber Terminal | `#140a00` | `#ffb000` | `#b37b00` | `rgba(255,176,0,0.7)` |
-| `matrix` | Digital Rain Cyber Green | `#020d04` | `#00ff66` | `#008833` | `rgba(0,255,102,0.85)` |
-| `cozy-pea` | Zunda Mochi Pastel Pea | `#0f1f10` | `#a3e048` | `#5c9422` | `rgba(163,224,72,0.6)` |
+#### A. Promos.app (`#window-promos`)
+* **Current State in `site/index.html` (Lines 429–447)**:
+  * The window contains a basic heading `<h3>🎁 Active Roblox Promo Codes</h3>` and three standalone copy buttons with `data-code` attributes (`ZUNDAMOCHI2026`, `SOUPSEASON`, `HYBRIDECS`).
+  * **Missing Elements**:
+    1. No interactive text input field (`#promo-input`) for manually entering or pasting codes.
+    2. No "Redeem" action button (`#promo-redeem-btn`) to submit typed promo codes.
+    3. No individual 1-click "Redeem Code" buttons on code cards (only "Copy").
+    4. No code reward detail cards (only raw buttons without reward descriptions, expiry dates, or icons).
+    5. No state persistence using `localStorage` / `sessionStorage` for redeemed codes (`zunda_redeemed_codes`), meaning codes cannot be tracked as "REDEEMED ✓" or disabled once claimed.
+* **Current State in `site/app.js` (Lines 1185–1224)**:
+  * `initPromosApp()` attaches click handlers to `.copy-code-btn` elements to copy code strings to `navigator.clipboard` and pop up a generic toast notification (`Code ZUNDAMOCHI2026 copied to clipboard! ✨`).
+  * **Missing Logic**:
+    * No promo validation dictionary / data structure mapping code strings to rewards and status.
+    * No redeem code handler, input validation (trim/uppercase handling), error toasts ("Invalid Code", "Code Already Redeemed"), or successful redemption memory storage.
 
-#### Theme CSS Mapping
-```css
-/* Theme 1: Classic Green (Default) */
-.cli-body[data-term-theme="classic-green"] {
-  --term-bg: #0a1a0a;
-  --term-green: #33ff33;
-  --term-green-dim: #00aa44;
-  --term-glow-color: rgba(51, 255, 51, 0.7);
-  --term-glow-far: rgba(0, 255, 102, 0.3);
-  --term-highlight: #66ff66;
-  --term-cursor: #33ff33;
-}
+#### B. Calculator.app (`#window-calculator`)
+* **Current State in `site/index.html` (Lines 449–482)**:
+  * Contains a recipe `<select id="calc-dish-select">` with 4 hardcoded `<option>` elements containing hardcoded `data-cost` and `data-sell` attributes:
+    * `zunda-mochi` (Cost: 20, Sell: 120)
+    * `edamame-parfait` (Cost: 50, Sell: 300)
+    * `zunda-shake` (Cost: 15, Sell: 80)
+    * `dango-trio` (Cost: 30, Sell: 180)
+  * Contains a quantity input `<input type="number" id="calc-qty" value="10">`.
+  * Results panel displays: `#res-cost` (Total Crafting Cost), `#res-sell` (Estimated Revenue), `#res-profit` (Estimated Net Profit).
+  * **Missing Elements**:
+    1. Dropdown options are hardcoded in HTML rather than dynamically populated from `RECIPES` data array in `site/app.js` (which contains `Zunda Mochi`, `Zunda Matcha Latte`, `Zunda Parfait Deluxe`, `Zunda Tempura Udon`).
+    2. Missing quick quantity adjustment controls (e.g., `-`, `+`, `+10`, `+50`, `MAX` buttons).
+    3. Missing explicit Cost Per Unit and Sell Price Per Unit metric callouts alongside total sums.
+    4. Missing **Profit Margin Indicator** (e.g., ROI % `(Profit/Cost)*100`, Profit Margin % `(Profit/Revenue)*100`, and a visual rating badge such as `🌟 EXCELLENT MARGIN (500% ROI)`).
 
-/* Theme 2: Amber VT100 */
-.cli-body[data-term-theme="amber"] {
-  --term-bg: #140a00;
-  --term-green: #ffb000;
-  --term-green-dim: #b37b00;
-  --term-glow-color: rgba(255, 176, 0, 0.7);
-  --term-glow-far: rgba(255, 140, 0, 0.3);
-  --term-highlight: #ffd166;
-  --term-cursor: #ffb000;
-}
-
-/* Theme 3: Matrix Cyber Green */
-.cli-body[data-term-theme="matrix"] {
-  --term-bg: #020d04;
-  --term-green: #00ff66;
-  --term-green-dim: #008833;
-  --term-glow-color: rgba(0, 255, 102, 0.85);
-  --term-glow-far: rgba(0, 200, 80, 0.4);
-  --term-highlight: #80ffb3;
-  --term-cursor: #00ff66;
-}
-
-/* Theme 4: Cozy Pea Pastel Green */
-.cli-body[data-term-theme="cozy-pea"] {
-  --term-bg: #0f1f10;
-  --term-green: #a3e048;
-  --term-green-dim: #5c9422;
-  --term-glow-color: rgba(163, 224, 72, 0.6);
-  --term-glow-far: rgba(139, 195, 74, 0.35);
-  --term-highlight: #c5f084;
-  --term-cursor: #a3e048;
-}
-```
-
-### 2.2 Window-Specific Scanline Overlay & Animations
-```css
-/* CRT In-Window Scanline Grid Overlay */
-.cli-scanline-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
-  background-size: 100% 4px;
-  z-index: 2;
-  opacity: 0.65;
-}
-
-/* Micro CRT Phosphor Flicker */
-@keyframes crtPhosphorFlicker {
-  0% { opacity: 0.99; }
-  20% { opacity: 0.96; }
-  40% { opacity: 0.99; }
-  60% { opacity: 0.95; }
-  80% { opacity: 1.0; }
-  100% { opacity: 0.98; }
-}
-
-.cli-flicker {
-  animation: crtPhosphorFlicker 0.18s infinite;
-}
-
-/* CRT Cold Boot Expansion Animation */
-@keyframes crtPowerOn {
-  0% { transform: scaleY(0.005) scaleX(0.2); filter: brightness(4); }
-  50% { transform: scaleY(0.08) scaleX(1); filter: brightness(2); }
-  100% { transform: scaleY(1) scaleX(1); filter: brightness(1); }
-}
-
-.cli-booting {
-  animation: crtPowerOn 0.32s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-```
+#### C. Updates.log (`#window-updates`)
+* **Current State in `site/index.html` (Lines 484–507)**:
+  * Contains a single static bullet list with 5 high-level summary points under `Version 2.4.0 Patch Notes (Hybrid ECS Release)`.
+  * **Missing Elements**:
+    1. Lacks categorized tabs/sections detailing specific engine components:
+       * **Release Highlights** (Matter ECS integration, 60fps loop, Y2K UI).
+       * **Hybrid ECS Architecture** (Query pipelines, state replication between Server/Client, component storage).
+       * **Rhythm Cooking Validation Updates** (Audio beat sync tolerances, S-Rank accuracy thresholds, voice synthesis).
+       * **Bug Fixes & System Stability** (UI decoupling, `ResetOnSpawn = false`, `$ignoreUnknownInstances` level preservation, memory leak cleanup).
+    2. No version timeline / selector (e.g., v2.4.0, v2.3.0, v2.2.0) to browse historical patch notes.
+    3. Static HTML layout without collapsible change categories or rich status tags (`[ECS]`, `[Rhythm]`, `[UI/UX]`, `[Rojo]`).
 
 ---
 
-## 3. Rich Output Formatting Helpers
+## 2. Logic Chain
 
-### 3.1 Colored Status Tag Framework
-Rich status tags standardize CLI output headers across commands.
+1. **User Experience & Requirements Alignment**:
+   * Desktop simulation apps must feel functional, interactive, and responsive, matching the Y2K Windows 95 aesthetic.
+   * `Promos.app` needs a full redemption cycle: Users can copy active codes or paste/type them into an input field, click "Redeem", receive immediate feedback via toast notifications, and see claimed codes marked as `REDEEMED ✓` across page refreshes.
+   * `Calculator.app` must dynamically sync with `RECIPES` in `site/app.js` so any recipe additions/updates automatically reflect in the crafter calculator. Showing ROI % and Profit Margin % provides player utility for game planning.
+   * `Updates.log` serves as both a dev log and patch notes reader. Structuring notes into clear tabs (Highlights, Architecture, Rhythm Engine, Bug Fixes) with version history creates an authentic software log viewer.
 
-| Tag Name | Output Format | CSS Class | Color Palette |
-|----------|---------------|-----------|---------------|
-| `[OK]` | `[OK]` | `.cli-tag-ok` | Emerald Green (`#33ff33` on translucent bg) |
-| `[RECIPE]` | `[RECIPE]` | `.cli-tag-recipe` | Zunda Sprout (`#8bc34a` on translucent bg) |
-| `[AUDIO]` | `[AUDIO]` | `.cli-tag-audio` | Cyan Synth (`#00e5ff` on translucent bg) |
-| `[INFO]` | `[INFO]` | `.cli-tag-info` | Cobalt Info (`#3399ff` on translucent bg) |
-| `[WARN]` | `[WARN]` | `.cli-tag-warn` | Amber Warning (`#ffaa00` on translucent bg) |
-| `[ERROR]` | `[ERROR]` | `.cli-tag-err` | Crimson Error (`#ff4444` on translucent bg) |
-| `[SYSTEM]` | `[SYSTEM]` | `.cli-tag-system` | Lime System (`#a8e063` on translucent bg) |
+2. **Data Consistency**:
+   * `RECIPES` array in `site/app.js` already defines `id`, `name`, `japaneseName`, `goldReward`, etc. We will add explicit `craftingCost` (e.g., 25 Gold) and `baseSellPrice` (e.g., 150 Gold) properties to `RECIPES` items so `CalculatorApp` stays in 100% sync with `CookbookApp`.
+   * Promo codes data structure in `site/app.js` will specify code, rewards, expiration status, and description.
+   * `localStorage` keys will use clean, prefixed naming conventions (`zunda_redeemed_codes`, `zunda_calc_last_dish`).
 
-#### Tag CSS Styling
-```css
-.cli-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: bold;
-  padding: 1px 5px;
-  border-radius: 2px;
-  margin-right: 6px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
+---
 
-.cli-tag-ok     { background: rgba(51, 255, 102, 0.15); color: #33ff33; border: 1px solid #33ff33; }
-.cli-tag-recipe { background: rgba(139, 195, 74, 0.15); color: #8bc34a; border: 1px solid #8bc34a; }
-.cli-tag-audio  { background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid #00e5ff; }
-.cli-tag-info   { background: rgba(51, 153, 255, 0.15); color: #3399ff; border: 1px solid #3399ff; }
-.cli-tag-warn   { background: rgba(255, 170, 0, 0.15); color: #ffaa00; border: 1px solid #ffaa00; }
-.cli-tag-err    { background: rgba(255, 68, 68, 0.15); color: #ff4444; border: 1px solid #ff4444; }
-.cli-tag-system { background: rgba(168, 224, 99, 0.15); color: #a8e063; border: 1px solid #a8e063; }
+## 3. Caveats
+
+1. **Browser Storage Fallback**:
+   * If `localStorage` is disabled or throws `SecurityError` (e.g. strict third-party cookie blocking or private browsing), code memory must gracefully fall back to an in-memory `Set()` / JS object so app interaction never crashes.
+2. **Read-Only Explorer Mandate**:
+   * This analysis is read-only. Source changes will be executed by the assigned Implementer agent following this blueprint.
+
+---
+
+## 4. Conclusion & Detailed Execution Blueprint
+
+### 4.1 `Promos.app` Blueprint & Implementation Plan
+
+#### Data Structure (`PROMO_CODES`) in `site/app.js`
+```javascript
+const PROMO_CODES = [
+  {
+    code: 'ZUNDAMOCHI2026',
+    rewardText: '+500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron',
+    icon: '🍡',
+    gold: 500,
+    items: ['10x Zunda Mochi', '1x Rare Chef Apron'],
+    category: 'Featured'
+  },
+  {
+    code: 'SOUPSEASON',
+    rewardText: '+1,000 Kitchen EXP, 5x Wild Mushroom Pack',
+    icon: '🍄',
+    exp: 1000,
+    items: ['5x Wild Mushroom Pack'],
+    category: 'Seasonal'
+  },
+  {
+    code: 'HYBRIDECS',
+    rewardText: '+250 Gold, Matter ECS Developer Badge',
+    icon: '⚡',
+    gold: 250,
+    items: ['Matter ECS Developer Badge'],
+    category: 'System'
+  }
+];
 ```
 
-### 3.2 ASCII Banner Renderer
-To avoid text alignment corruption in proportional fallbacks, ASCII banners use clean monospace pre-formatted elements:
-
+#### HTML Markup Blueprint (`#window-promos` in `site/index.html`)
 ```html
-<pre class="cli-ascii-banner">
-███████╗██╗   ██╗███╗   ██╗██████╗  █████╗ 
-╚══███╔╝██║   ██║████╗  ██║██╔══██╗██╔══██╗
-  ███╔╝ ██║   ██║██╔██╗ ██║██║  ██║███████║
- ███╔╝  ██║   ██║██║╚██╗██║██║  ██║██╔══██║
-███████╗╚██████╔╝██║ ╚████║██████╔╝██║  ██║
-╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝
-         [Zunda-OS 95 Kernel 4.09.1995]
-</pre>
-```
+<div class="window window-promos hidden" id="window-promos" data-window-id="promos" style="top: 140px; left: 200px; width: 620px; height: 480px;" tabindex="0">
+    <div class="window-header">
+        <div class="window-title">
+            <span class="window-icon">🎁</span>
+            <span class="window-title-text">Promos.app — Roblox Promo Codes</span>
+        </div>
+        <div class="window-controls">
+            <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+            <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+            <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+        </div>
+    </div>
+    <div class="window-body promos-body">
+        <!-- Interactive Redeem Bar -->
+        <div class="promo-redeem-box bevel-inset">
+            <label for="promo-input" class="promo-label">🎁 Enter Code:</label>
+            <div class="promo-input-group">
+                <input type="text" id="promo-input" class="win95-input" placeholder="e.g. ZUNDAMOCHI2026" autocomplete="off" spellcheck="false">
+                <button id="promo-redeem-btn" class="win95-btn btn-candy">Redeem Code</button>
+            </div>
+            <div id="promo-status-msg" class="promo-status-msg"></div>
+        </div>
 
-```css
-.cli-ascii-banner {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.15;
-  color: var(--term-green);
-  text-shadow: 0 0 6px var(--term-glow-color);
-  white-space: pre;
-  margin: 6px 0;
-  overflow-x: auto;
-}
-```
-
-### 3.3 Retro Table Layout Helper
-CSS Flexbox provides clean responsive tabular layouts for command outputs like `recipes`, `gather`, and `status`:
-
-```html
-<div class="cli-table">
-  <div class="cli-table-row cli-table-head">
-    <span class="cli-col col-code">CODE</span>
-    <span class="cli-col col-name">RECIPE NAME</span>
-    <span class="cli-col col-type">CATEGORY</span>
-    <span class="cli-col col-diff">DIFFICULTY</span>
-  </div>
-  <div class="cli-table-row">
-    <span class="cli-col col-code">R-01</span>
-    <span class="cli-col col-name">Zunda Mochi</span>
-    <span class="cli-col col-type">Classic</span>
-    <span class="cli-col col-diff">★☆☆☆☆</span>
-  </div>
+        <!-- Active Codes List -->
+        <h4 class="promo-section-title">✨ Active Available Codes</h4>
+        <div id="promo-codes-list" class="codes-grid"></div>
+    </div>
 </div>
 ```
 
-```css
-.cli-table {
-  margin: 6px 0;
-  border: 1px dashed var(--term-green-dim);
-  padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.2);
-}
-.cli-table-head {
-  border-bottom: 1px solid var(--term-green-dim);
-  font-weight: bold;
-  color: var(--term-highlight);
-}
-.cli-table-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 2px 0;
-}
-.cli-col {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+#### Class Specification: `PromosApp` in `site/app.js`
+* **Responsibilities**:
+  1. Read redeemed codes array from `localStorage.getItem('zunda_redeemed_codes')`.
+  2. Dynamically render promo code cards with `Copy Code` and `Redeem` buttons.
+  3. Validate input in `#promo-input` against `PROMO_CODES`.
+  4. Display toast notifications and update UI state on redemption.
+  5. Play appropriate voice line / SFX (`hit_perfect` on success, `hit_miss` on invalid/already redeemed).
+
+---
+
+### 4.2 `Calculator.app` Blueprint & Implementation Plan
+
+#### HTML Markup Blueprint (`#window-calculator` in `site/index.html`)
+```html
+<section id="window-calculator" class="window hidden" data-window-id="calculator" style="top: 160px; left: 240px; width: 580px; height: 460px;" tabindex="0">
+    <div class="window-header">
+        <div class="window-title">
+            <span class="window-icon">🧮</span>
+            <span class="window-title-text">Calculator.app — Dish Profit Calculator</span>
+        </div>
+        <div class="window-controls">
+            <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+            <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+            <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+        </div>
+    </div>
+    <div class="window-body calc-body">
+        <div class="calc-panel bevel-inset" style="padding: 14px; background: #ffffff;">
+            <!-- Recipe Selector -->
+            <div class="calc-form-group">
+                <label for="calc-dish-select" class="calc-label">📖 Select Recipe:</label>
+                <select id="calc-dish-select" class="win95-input calc-select"></select>
+            </div>
+
+            <!-- Quantity Counter with Preset Buttons -->
+            <div class="calc-form-group">
+                <label for="calc-qty" class="calc-label">🍳 Quantity to Cook:</label>
+                <div class="qty-control-wrapper">
+                    <button class="win95-btn qty-btn" data-qty-delta="-10">-10</button>
+                    <button class="win95-btn qty-btn" data-qty-delta="-1">-1</button>
+                    <input type="number" id="calc-qty" value="10" min="1" max="999" class="win95-input qty-input">
+                    <button class="win95-btn qty-btn" data-qty-delta="1">+1</button>
+                    <button class="win95-btn qty-btn" data-qty-delta="10">+10</button>
+                    <button class="win95-btn qty-btn" data-qty-delta="50">+50</button>
+                </div>
+            </div>
+
+            <!-- Unit Cost & Sell Rates Breakdown -->
+            <div class="calc-unit-rates-grid">
+                <div class="rate-card">
+                    <span class="rate-label">Unit Cost</span>
+                    <span id="unit-cost-val" class="rate-val">20 Gold</span>
+                </div>
+                <div class="rate-card">
+                    <span class="rate-label">Unit Sell Price</span>
+                    <span id="unit-sell-val" class="rate-val">150 Gold</span>
+                </div>
+                <div class="rate-card">
+                    <span class="rate-label">Profit / Unit</span>
+                    <span id="unit-profit-val" class="rate-val">+130 Gold</span>
+                </div>
+            </div>
+
+            <!-- Calculation Summary Results -->
+            <div class="calc-results-card">
+                <div class="res-row">
+                    <span>Total Crafting Cost:</span>
+                    <strong id="res-cost" class="res-num cost-num">200 Gold</strong>
+                </div>
+                <div class="res-row">
+                    <span>Estimated Revenue:</span>
+                    <strong id="res-sell" class="res-num sell-num">1,500 Gold</strong>
+                </div>
+                <div class="res-row main-profit-row">
+                    <span>Estimated Net Profit:</span>
+                    <strong id="res-profit" class="res-num profit-num">+1,300 Gold</strong>
+                </div>
+                <div class="margin-indicator-box">
+                    <span class="margin-label">Profit Margin / ROI:</span>
+                    <span id="calc-margin-badge" class="margin-badge margin-high">86.7% Margin (650% ROI) 🌟</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+```
+
+#### Class Specification: `CalculatorApp` in `site/app.js`
+```javascript
+class CalculatorApp {
+  init() {
+    this.dishSelect = document.getElementById('calc-dish-select');
+    this.qtyInput = document.getElementById('calc-qty');
+    this.resCost = document.getElementById('res-cost');
+    this.resSell = document.getElementById('res-sell');
+    this.resProfit = document.getElementById('res-profit');
+    this.unitCost = document.getElementById('unit-cost-val');
+    this.unitSell = document.getElementById('unit-sell-val');
+    this.unitProfit = document.getElementById('unit-profit-val');
+    this.marginBadge = document.getElementById('calc-margin-badge');
+
+    this.populateSelectOptions();
+    this.bindEvents();
+    this.calculate();
+  }
+
+  populateSelectOptions() {
+    if (!this.dishSelect) return;
+    this.dishSelect.innerHTML = RECIPES.map(recipe => `
+      <option value="${recipe.id}" data-cost="${recipe.craftingCost || 20}" data-sell="${recipe.goldReward || 150}">
+        ${recipe.name} (${recipe.japaneseName}) — Cost: ${recipe.craftingCost || 20}g, Sell: ${recipe.goldReward || 150}g
+      </option>
+    `).join('');
+  }
+
+  calculate() {
+    // Math formulas:
+    // totalCost = costPerUnit * qty
+    // totalRevenue = sellPerUnit * qty
+    // netProfit = totalRevenue - totalCost
+    // profitMarginPct = (netProfit / totalRevenue) * 100
+    // roiPct = (netProfit / totalCost) * 100
+  }
 }
 ```
 
 ---
 
-## 4. Auto-Scroll Mechanics & Smart User-Scroll Detection
+### 4.3 `Updates.log` Blueprint & Implementation Plan
 
-### 4.1 Non-Intrusive Auto-Scroll Logic
-Automatically scrolling to the bottom on every output line can interrupt users who are reading earlier scrollback history. `ZundaCLI.exe` implements smart user scroll detection:
+#### HTML Markup Blueprint (`#window-updates` in `site/index.html`)
+```html
+<section id="window-updates" class="window hidden" data-window-id="updates" style="top: 180px; left: 280px; width: 680px; height: 500px;" tabindex="0">
+    <div class="window-header">
+        <div class="window-title">
+            <span class="window-icon">📜</span>
+            <span class="window-title-text">Updates.log — Patch Notes & ECS Engine Log</span>
+        </div>
+        <div class="window-controls">
+            <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+            <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+            <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+        </div>
+    </div>
+    <div class="window-body updates-body">
+        <!-- Updates Toolbar with Version Selector & Category Tabs -->
+        <div class="updates-toolbar">
+            <div class="version-select-box">
+                <label for="updates-version-select">Version:</label>
+                <select id="updates-version-select" class="win95-input">
+                    <option value="v2.4.0" selected>v2.4.0 — Hybrid ECS & UI Overhaul (Latest)</option>
+                    <option value="v2.3.0">v2.3.0 — Rhythm Minigame & Voice Synth</option>
+                    <option value="v2.2.0">v2.2.0 — Companion Spirits & Gathering</option>
+                </select>
+            </div>
+            <div class="updates-tabs">
+                <button class="win95-btn update-tab-btn active" data-tab="all">All Logs</button>
+                <button class="win95-btn update-tab-btn" data-tab="ecs">⚡ Hybrid ECS</button>
+                <button class="win95-btn update-tab-btn" data-tab="rhythm">🎵 Rhythm Engine</button>
+                <button class="win95-btn update-tab-btn" data-tab="fixes">🐛 Bug Fixes</button>
+            </div>
+        </div>
 
+        <!-- Log List Container -->
+        <div id="updates-log-content" class="updates-log-content bevel-inset">
+            <!-- Dynamic Log Items Rendered Here -->
+        </div>
+    </div>
+</section>
+```
+
+#### Detailed Patch Notes Data Structure (`UPDATES_LOG_DATA`) in `site/app.js`
 ```javascript
-class TerminalScrollManager {
-  constructor(outputElement) {
-    this.output = outputElement;
-    this.userScrolledUp = false;
-    this.scrollThreshold = 35; // px from bottom
-
-    this.output.addEventListener('scroll', () => this.handleScroll());
-  }
-
-  handleScroll() {
-    const distanceToBottom = this.output.scrollHeight - this.output.scrollTop - this.output.clientHeight;
-    this.userScrolledUp = distanceToBottom > this.scrollThreshold;
-    this.toggleResumePill(!this.userScrolledUp);
-  }
-
-  scrollToBottom(force = false) {
-    if (!this.userScrolledUp || force) {
-      this.output.scrollTop = this.output.scrollHeight;
-      this.userScrolledUp = false;
-      this.toggleResumePill(true);
-    }
-  }
-
-  toggleResumePill(isAtBottom) {
-    const pill = document.getElementById('cli-scroll-bottom-btn');
-    if (pill) {
-      if (isAtBottom) {
-        pill.classList.add('hidden');
-      } else {
-        pill.classList.remove('hidden');
+const UPDATES_LOG_DATA = {
+  'v2.4.0': {
+    version: 'v2.4.0',
+    title: 'Hybrid ECS & Y2K Desktop Launch',
+    date: '2026-07-22',
+    highlights: [
+      'Integrated Matter ECS query pipeline for 60fps server-side updates in Luau.',
+      'Full $ignoreUnknownInstances level preservation sync enabled for Rojo 7.7.0.',
+      'Kawaii PC Desktop workspace with 7 interactive application windows and CRT monitor overlay.'
+    ],
+    sections: [
+      {
+        category: 'ecs',
+        tag: '⚡ HYBRID ECS',
+        title: 'Matter ECS Architecture & Replication',
+        items: [
+          'Implemented entity query loops running at fixed 60Hz tick rates in ServerScriptService.systems.',
+          'Created ClientGuiBootstrap to decouple client UI from script.Parent and handle respawn persistent state.',
+          'Configured Wally packages (Matter, ProfileService, ReplicaService) in default.project.json.'
+        ]
+      },
+      {
+        category: 'rhythm',
+        tag: '🎵 RHYTHM ENGINE',
+        title: 'Beat Sync & S-Rank Validation',
+        items: [
+          'Added 4 signature recipes with Web Audio API beat sync (Zunda Mochi, Latte, Parfait, Udon).',
+          'Calibrated hit tolerances (Perfect: ±50ms, Great: ±120ms, OK: ±200ms).',
+          'Integrated procedural voice synthesizer for catchphrases on Perfect combos.'
+        ]
+      },
+      {
+        category: 'fixes',
+        tag: '🐛 BUG FIXES',
+        title: 'System Stability & Rojo Fixes',
+        items: [
+          'Fixed studio level geometry wipe by adding $ignoreUnknownInstances: true under Workspace in default.project.json.',
+          'Resolved memory leak in rhythm loop by cleaning up frame animation listeners upon window close.',
+          'Fixed ScreenGui ResetOnSpawn behavior for modal dialogue and companion UI widgets.'
+        ]
       }
-    }
+    ]
   }
-}
-```
-
-### 4.2 Resume Scroll Pill UI
-```html
-<button id="cli-scroll-bottom-btn" class="cli-scroll-bottom-btn hidden" title="Scroll to Bottom">
-  ↓ New Output Below
-</button>
-```
-
-```css
-.cli-scroll-bottom-btn {
-  position: absolute;
-  bottom: 45px;
-  right: 15px;
-  background: var(--term-bg);
-  color: var(--term-green);
-  border: 1px solid var(--term-green);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 3px;
-  cursor: pointer;
-  box-shadow: 0 0 8px var(--term-glow-color);
-  z-index: 5;
-  transition: opacity 0.2s ease;
-}
-.cli-scroll-bottom-btn:hover {
-  background: var(--term-green);
-  color: var(--term-bg);
-}
+};
 ```
 
 ---
 
-## 5. Mobile Touch, Virtual Key Toolbar & Focus Management
+## 5. Verification Method
 
-### 5.1 Click/Tap Focus Delegation
-Tapping anywhere inside `.cli-body` delegates focus to `#cli-input`, opening the keyboard on mobile devices:
-
-```javascript
-const cliBody = document.querySelector('.cli-body');
-const cliInput = document.getElementById('cli-input');
-
-if (cliBody && cliInput) {
-  cliBody.addEventListener('click', (e) => {
-    // Only focus if user didn't select text or click a link/button
-    const selection = window.getSelection();
-    if (selection && selection.toString().length > 0) return;
-    if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
-    
-    cliInput.focus();
-  });
-}
-```
-
-### 5.2 iOS Viewport Zoom Prevention
-On iOS mobile browsers, `<input>` font sizes below `16px` trigger automatic screen zoom-in, breaking window frames.
-
-```css
-@media screen and (max-width: 768px) {
-  .cli-input-field {
-    font-size: 16px !important; /* Prevents auto-zoom on mobile safari */
-    touch-action: manipulation;
-  }
-}
-```
-
-### 5.3 Mobile Virtual Key Touch Helper Toolbar
-Mobile keyboards lack physical `Tab` (autocomplete) and `Up/Down` arrow keys. An on-screen touch toolbar provides full CLI control on mobile devices:
-
-```html
-<div id="cli-mobile-toolbar" class="cli-mobile-toolbar">
-  <button type="button" class="cli-vkey" data-key="Tab">TAB ⇥</button>
-  <button type="button" class="cli-vkey" data-key="ArrowUp">▲ HIST</button>
-  <button type="button" class="cli-vkey" data-key="ArrowDown">▼ HIST</button>
-  <button type="button" class="cli-vkey" data-cmd="help">HELP</button>
-  <button type="button" class="cli-vkey" data-cmd="clear">CLEAR</button>
-</div>
-```
-
-```css
-.cli-mobile-toolbar {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: rgba(10, 26, 10, 0.95);
-  border-top: 1px solid var(--term-green-dim);
-  overflow-x: auto;
-  white-space: nowrap;
-  touch-action: manipulation;
-}
-
-.cli-vkey {
-  background: rgba(51, 255, 102, 0.1);
-  color: var(--term-green);
-  border: 1px solid var(--term-green-dim);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 2px;
-  cursor: pointer;
-  user-select: none;
-  touch-action: manipulation;
-}
-
-.cli-vkey:active {
-  background: var(--term-green);
-  color: var(--term-bg);
-}
-```
-
----
-
-## 6. Implementation Checklist & File Reference
-
-| Target File | Required Additions |
-|-------------|-------------------|
-| `site/style.css` | Add phosphor theme variables, status tag styles, ASCII banner rules, custom webkit scrollbars, scanline keyframes, mobile toolbar styles. |
-| `site/index.html` | Add scanline overlay container, scroll-to-bottom resume pill, mobile toolbar buttons, and link `terminal.js`. |
-| `site/terminal.js` | Implement `TerminalUI` manager class covering auto-scroll lock, theme switcher (`theme <name>`), format helper functions, and mobile touch events. |
-
+To verify the implementation once complete:
+1. Open `site/index.html` in browser (or via local HTTP server).
+2. Test `Promos.app`:
+   - Click "Copy Code" on `ZUNDAMOCHI2026` -> Verify toast message pops up and clipboard contains string.
+   - Click "Redeem Code" -> Verify status updates to "REDEEMED ✓", toast shows reward message, voice line plays, and refreshing the page keeps code marked as redeemed (`localStorage`).
+   - Type an invalid code like `INVALID123` into `#promo-input` and click Redeem -> Verify error toast/status message.
+3. Test `Calculator.app`:
+   - Select `Zunda Mochi` -> Verify Unit Cost displays `20g`, Unit Sell displays `150g`, Unit Profit displays `+130g`.
+   - Click `+10` quantity -> Qty changes to `20`, Total Cost updates to `400g`, Revenue to `3,000g`, Net Profit to `+2,600g`.
+   - Check Profit Margin badge -> Displays correct % Margin and ROI rating badge.
+4. Test `Updates.log`:
+   - Click through category tabs (`All Logs`, `⚡ Hybrid ECS`, `🎵 Rhythm Engine`, `🐛 Bug Fixes`) -> Verify filtered log entries match selected category.
+   - Switch version dropdown from `v2.4.0` to `v2.3.0` -> Verify log content updates smoothly.
