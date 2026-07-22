@@ -21,7 +21,7 @@ CompanionConfig.npcSpeakers = {
 
 CompanionConfig.companions = {
 	zundamon = {
-		emoji = "🍡",
+		emoji = "🫛",
 		glow = Color3.fromRGB(140, 255, 160),
 		glowRange = 16,
 		sparkleColors = {

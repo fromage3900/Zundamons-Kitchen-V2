@@ -8,7 +8,7 @@ local RGB = Color3.fromRGB
 
 -- Speaker configurations with companion emojis
 local SPEAKERS = {}
-SPEAKERS.zundamon = { name = "Zundamon", emoji = "🍙", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }
+SPEAKERS.zundamon = { name = "Zundamon", emoji = "🫛", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }
 SPEAKERS.zundapal = { name = "Zundapal", emoji = "🍡", accent = RGB(200, 230, 180), portrait = RGB(210, 235, 195) }
 SPEAKERS.zundacat = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) }
 SPEAKERS.zundabunny = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) }

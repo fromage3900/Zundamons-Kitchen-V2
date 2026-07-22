@@ -73,7 +73,7 @@ end
 
 -- ── Companion catalog ──────────────────────────────────────────
 local COMPANIONS = {
-    zundamon   = { emoji="🍡", glow=Color3.fromRGB(140,255,160), glowRange=16,
+    zundamon   = { emoji="🫛", glow=Color3.fromRGB(140,255,160), glowRange=16,
         sparkleColors={ Color3.fromRGB(180,255,180), Color3.fromRGB(255,220,100), Color3.fromRGB(200,240,255) },
         buff = nil, free = true,
         displayName = "Zundamon", flavor = "The original. A loyal pea spirit." },
