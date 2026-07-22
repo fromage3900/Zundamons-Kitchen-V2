@@ -19,7 +19,8 @@ widget.Title = "Resource Visual Authoring"
 local rootFrame = Instance.new("ScrollingFrame")
 rootFrame.Name = "Root"
 rootFrame.Size = UDim2.fromScale(1, 1)
-rootFrame.CanvasSize = UDim2.fromOffset(0, 760)
+rootFrame.CanvasSize = UDim2.fromOffset(0, 0)
+rootFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 rootFrame.ScrollBarThickness = 6
 rootFrame.BackgroundColor3 = Color3.fromRGB(244, 251, 239)
 rootFrame.BorderSizePixel = 0
@@ -126,6 +127,24 @@ local function parseAssetId(value: string): (number?, string)
 	return numeric, if numeric then "rbxassetid://" .. tostring(numeric) else ""
 end
 
+local function normalizedAssetType(): string
+	return string.lower(string.gsub(typeBox.Text, "%s+", ""))
+end
+
+local function validateFields(): (boolean, string)
+	if string.match(archetypeBox.Text, "^%s*$") then
+		return false, "Resource archetype cannot be empty."
+	end
+	if string.match(variantBox.Text, "^%s*$") then
+		return false, "Variant name cannot be empty."
+	end
+	local assetType = normalizedAssetType()
+	if assetType ~= "mesh" and assetType ~= "model" then
+		return false, "Asset type must be Mesh or Model."
+	end
+	return true, ""
+end
+
 local function parseTransform(): (number, number, number)
 	local values = string.split(transformBox.Text, ",")
 	local scale = math.clamp(tonumber(values[1]) or 1, 0.05, 100)
@@ -169,11 +188,15 @@ local function sanitize(instance: Instance)
 end
 
 local function validateAsset(): (boolean, Instance?, string)
+	local fieldsValid, fieldError = validateFields()
+	if not fieldsValid then
+		return false, nil, fieldError
+	end
 	local numeric, normalized = parseAssetId(assetBox.Text)
 	if not numeric then
 		return false, nil, "No numeric Roblox asset ID found."
 	end
-	local assetType = string.lower(typeBox.Text)
+	local assetType = normalizedAssetType()
 	if assetType == "model" then
 		local ok, loaded = pcall(function()
 			return InsertService:LoadAsset(numeric)
@@ -261,12 +284,20 @@ local function makeVisual(asset: Instance?, normalized: string, root: BasePart):
 		local mesh = Instance.new("SpecialMesh")
 		mesh.MeshType = Enum.MeshType.FileMesh
 		mesh.MeshId = normalized
+		mesh.Scale = Vector3.new(scale, scale, scale)
 		mesh.Parent = part
 		candidate = part
 	end
 	candidate.Name = "Candidate"
-	assert(prepareVisual(candidate, root, scale, offset), "Visual contains no parts")
+	assert(prepareVisual(candidate, root, if asset then scale else 1, offset), "Visual contains no parts")
 	return candidate
+end
+
+local function clearPreview()
+	local preview = workspace:FindFirstChild("_ResourceVisualPreview")
+	if preview then
+		preview:Destroy()
+	end
 end
 
 local function catalogRoot(): Folder
@@ -292,7 +323,7 @@ local function writeCatalogEntry(normalized: string)
 	local entry = entries:FindFirstChild(variant) or Instance.new("Configuration")
 	entry.Name = variant
 	entry:SetAttribute("AssetId", normalized)
-	entry:SetAttribute("AssetType", if string.lower(typeBox.Text) == "model" then "Model" else "Mesh")
+	entry:SetAttribute("AssetType", if normalizedAssetType() == "model" then "Model" else "Mesh")
 	local scale, yOffset, yRotation = parseTransform()
 	entry:SetAttribute("Scale", Vector3.new(scale, scale, scale))
 	entry:SetAttribute("Offset", CFrame.new(0, yOffset, 0) * CFrame.Angles(0, math.rad(yRotation), 0))
@@ -301,6 +332,8 @@ local function writeCatalogEntry(normalized: string)
 end
 
 local function applyToRoot(root: BasePart, loaded: Instance?, normalized: string)
+	-- Build first so malformed imported geometry cannot destroy the current visual.
+	local candidate = makeVisual(loaded, normalized, root)
 	local old = root:FindFirstChild("_ResourceVisual")
 	local backup = root:FindFirstChild("_ResourceVisualBackup")
 	if backup then
@@ -320,7 +353,6 @@ local function applyToRoot(root: BasePart, loaded: Instance?, normalized: string
 	local managed = Instance.new("Folder")
 	managed.Name = "_ResourceVisual"
 	managed.Parent = root
-	local candidate = makeVisual(loaded, normalized, root)
 	candidate.Parent = managed
 	if root:GetAttribute("ResourceRootTransparency") == nil then
 		root:SetAttribute("ResourceRootTransparency", root.Transparency)
@@ -329,7 +361,7 @@ local function applyToRoot(root: BasePart, loaded: Instance?, normalized: string
 	root:SetAttribute("ResourceArchetype", archetypeBox.Text)
 	root:SetAttribute("VisualVariant", variantBox.Text)
 	root:SetAttribute("VisualAssetId", normalized)
-	root:SetAttribute("VisualAssetType", if string.lower(typeBox.Text) == "model" then "Model" else "Mesh")
+	root:SetAttribute("VisualAssetType", if normalizedAssetType() == "model" then "Model" else "Mesh")
 	local scale, yOffset, yRotation = parseTransform()
 	root:SetAttribute("VisualScale", Vector3.new(scale, scale, scale))
 	root:SetAttribute("VisualOffset", CFrame.new(0, yOffset, 0) * CFrame.Angles(0, math.rad(yRotation), 0))
@@ -357,10 +389,7 @@ previewButton.MouseButton1Click:Connect(function()
 		report(detail, "error")
 		return
 	end
-	local oldPreview = workspace:FindFirstChild("_ResourceVisualPreview")
-	if oldPreview then
-		oldPreview:Destroy()
-	end
+	clearPreview()
 	local preview = makeVisual(loaded, detail, roots[1])
 	preview.Name = "_ResourceVisualPreview"
 	preview.Parent = workspace
@@ -385,6 +414,7 @@ applyButton.MouseButton1Click:Connect(function()
 	for _, root in roots do
 		applyToRoot(root, loaded, detail)
 	end
+	clearPreview()
 	writeCatalogEntry(detail)
 	if loaded then
 		loaded:Destroy()
@@ -403,7 +433,8 @@ replaceAllButton.MouseButton1Click:Connect(function()
 	ChangeHistoryService:SetWaypoint("Before batch resource replacement")
 	for _, node in CollectionService:GetTagged("ResourceNode") do
 		local root = if node:IsA("BasePart") then node else node:FindFirstChildWhichIsA("BasePart", true)
-		if root and node:GetAttribute("VisualVariant") == variantBox.Text then
+		local nodeVariant = node:GetAttribute("VisualVariant") or (root and root:GetAttribute("VisualVariant"))
+		if root and nodeVariant == variantBox.Text then
 			applyToRoot(root, loaded, detail)
 			count += 1
 		end
@@ -535,6 +566,14 @@ end)
 toolbarButton.Click:Connect(function()
 	widget.Enabled = not widget.Enabled
 end)
+
+widget:GetPropertyChangedSignal("Enabled"):Connect(function()
+	if not widget.Enabled then
+		clearPreview()
+	end
+end)
+
+plugin.Unloading:Connect(clearPreview)
 
 Selection.SelectionChanged:Connect(function()
 	local roots = selectedRoots()

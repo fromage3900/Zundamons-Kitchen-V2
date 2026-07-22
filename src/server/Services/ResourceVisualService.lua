@@ -342,7 +342,7 @@ end
 local function applyMeshAsync(node: Instance, root: BasePart, managed: Folder, descriptor: any): (boolean, string)
 	local candidate = Instance.new("Part")
 	candidate.Name = CANDIDATE_NAME
-	candidate.Size = Vector3.new(2, 2, 2) * descriptor.scale
+	candidate.Size = Vector3.new(2, 2, 2)
 	candidate.Transparency = 1
 	candidate.CFrame = root.CFrame * descriptor.offset
 	candidate.Parent = managed
@@ -350,6 +350,7 @@ local function applyMeshAsync(node: Instance, root: BasePart, managed: Folder, d
 	local mesh = Instance.new("SpecialMesh")
 	mesh.MeshType = Enum.MeshType.FileMesh
 	mesh.MeshId = Catalog.normalizeAssetId(descriptor.assetId)
+	mesh.Scale = descriptor.scale
 	mesh.Parent = candidate
 	setStatus(node, "loading", mesh.MeshId)
 
