@@ -3,10 +3,12 @@
 -- Studio-authored geometry; designers opt in by tagging entrance parts.
 
 local CollectionService = game:GetService("CollectionService")
+local InsertService = game:GetService("InsertService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Config = require(ReplicatedStorage.ConfigurationFiles.ZundaroomsConfig)
 local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
@@ -51,6 +53,72 @@ local function part(
 	item.Transparency = transparency
 	item.Parent = parent
 	return item
+end
+
+local function loadEntityVisual(): Model?
+	local replicatedModels = ReplicatedStorage:FindFirstChild("Models")
+	local authored = ServerStorage:FindFirstChild("ZundaroomsEntity")
+		or (replicatedModels and replicatedModels:FindFirstChild("ZundaroomsEntity"))
+	local loaded: Instance? = nil
+	if authored and authored:IsA("Model") then
+		loaded = authored:Clone()
+	elseif Config.entityModelAssetId ~= "" then
+		local numericId = tonumber(string.match(Config.entityModelAssetId, "%d+"))
+		if numericId then
+			local ok, result = pcall(function()
+				return InsertService:LoadAsset(numericId)
+			end)
+			if ok then
+				loaded = result
+			end
+		end
+	end
+	if not loaded or not loaded:IsA("Model") then
+		return nil
+	end
+	for _, descendant in loaded:GetDescendants() do
+		if
+			descendant:IsA("LuaSourceContainer")
+			or descendant:IsA("RemoteEvent")
+			or descendant:IsA("RemoteFunction")
+			or descendant:IsA("ClickDetector")
+			or descendant:IsA("ProximityPrompt")
+		then
+			descendant:Destroy()
+		end
+	end
+	if not loaded:FindFirstChildWhichIsA("BasePart", true) then
+		loaded:Destroy()
+		return nil
+	end
+	return loaded
+end
+
+local function attachEntityVisual(entity: BasePart, room: Instance)
+	local visual = loadEntityVisual()
+	if not visual then
+		return
+	end
+	visual.Name = "ZundaroomsEntityVisual"
+	visual.Parent = room
+	if Config.entityVisualScale ~= 1 then
+		visual:ScaleTo(Config.entityVisualScale)
+	end
+	visual:PivotTo(entity.CFrame * Config.entityVisualOffset)
+	for _, descendant in visual:GetDescendants() do
+		if descendant:IsA("BasePart") then
+			descendant.Anchored = false
+			descendant.CanCollide = false
+			descendant.CanQuery = false
+			descendant.CanTouch = false
+			descendant.Massless = true
+			local weld = Instance.new("WeldConstraint")
+			weld.Part0 = entity
+			weld.Part1 = descendant
+			weld.Parent = descendant
+		end
+	end
+	entity.Transparency = 1
 end
 
 local function addUnique(list: { any }, value: any)
@@ -176,6 +244,7 @@ local function createRoom(player: Player, origin: CFrame): Session
 	)
 	entity.Shape = Enum.PartType.Ball
 	entity.CanCollide = false
+	attachEntityVisual(entity, folder)
 	local now = os.clock()
 	local session = {
 		player = player,

@@ -16,4 +16,8 @@ If no tagged entrance exists, the server creates a translucent runtime-only unst
 - Being caught, dying, timing out, leaving, or retrying cleans the runtime room without granting an escape.
 - `locations_unlocked`, `zones_visited.Zundarooms`, and `zundarooms_escapes` persist through `PlayerDataService`.
 
-Tuning lives in `ConfigurationFiles/ZundaroomsConfig.lua`. Designers may replace the runtime fallback later with a handcrafted room while preserving the service contract and `ZundaroomsEntrance` tag.
+Tuning lives in `ConfigurationFiles/ZundaroomsConfig.lua`. To replace the pursuer
+without editing scripts, import the FBX as a Model named `ZundaroomsEntity`, set
+its PrimaryPart, and place it directly under `ServerStorage`. The service clones,
+sanitizes, welds, and moves that authored visual while retaining its invisible
+server-owned chase root. The procedural black pursuer remains the safe fallback.

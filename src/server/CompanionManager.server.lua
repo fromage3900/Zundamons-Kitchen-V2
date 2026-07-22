@@ -4,32 +4,77 @@ local Players    = game:GetService("Players")
 local Tween      = game:GetService("TweenService")
 local RS         = game:GetService("ReplicatedStorage")
 local InsertService = game:GetService("InsertService")
-
--- Per-companion mesh IDs
-local COMPANION_MESHES = {
-    zundapal   = "rbxassetid://71161704530283",
-    dog        = "rbxassetid://123070508686616",
-    parrot     = "rbxassetid://100814736457956",
-    cat        = "rbxassetid://131662379743903",
-    zundamon   = "rbxassetid://121481310719137",
-    zundacat   = "rbxassetid://101663144452966",
-    zundabunny = "rbxassetid://76425192775041",
-    tantanmon  = "rbxassetid://107150527246774",
-    ankomon    = "rbxassetid://110290651922538",
-    cardamon   = "rbxassetid://91041813069462",
-    antimon    = "rbxassetid://94125444857929",
-    sakuradamon = "rbxassetid://128478553136178",
-}
-
-local DEFAULT_COMPANION_MESH = "rbxassetid://103182526409237"
+local ServerStorage = game:GetService("ServerStorage")
+local CompanionVisualConfig = require(RS.ConfigurationFiles.CompanionVisualConfig)
 
 -- Cache loaded companion models
 local companionModelCache = {}
+
+local function sanitizeModel(model)
+    for _, descendant in ipairs(model:GetDescendants()) do
+        if descendant:IsA("LuaSourceContainer") or descendant:IsA("RemoteEvent") or descendant:IsA("RemoteFunction") or descendant:IsA("ClickDetector") or descendant:IsA("ProximityPrompt") then
+            descendant:Destroy()
+        end
+    end
+end
+
+local function studioVisual(compType)
+    local catalog = ServerStorage:FindFirstChild("CompanionVisualCatalog")
+    local entries = catalog and catalog:FindFirstChild("Entries")
+    local entry = entries and entries:FindFirstChild(compType)
+    if not entry then return nil end
+    return {
+        modelAssetId = entry:GetAttribute("ModelAssetId"),
+        basePrefab = entry:GetAttribute("BasePrefab"),
+        colorMap = entry:GetAttribute("ColorMap"),
+        normalMap = entry:GetAttribute("NormalMap"),
+        roughnessMap = entry:GetAttribute("RoughnessMap"),
+        metalnessMap = entry:GetAttribute("MetalnessMap"),
+    }
+end
+
+local function applyAppearance(model, visual)
+    if not visual then return end
+    for _, descendant in ipairs(model:GetDescendants()) do
+        if descendant:IsA("MeshPart") then
+            local appearance = descendant:FindFirstChildOfClass("SurfaceAppearance")
+            if not appearance and (visual.colorMap or visual.normalMap) then
+                appearance = Instance.new("SurfaceAppearance")
+                appearance.Parent = descendant
+            end
+            if appearance then
+                if visual.colorMap and visual.colorMap ~= "" then appearance.ColorMap = visual.colorMap end
+                if visual.normalMap and visual.normalMap ~= "" then appearance.NormalMap = visual.normalMap end
+                if visual.roughnessMap and visual.roughnessMap ~= "" then appearance.RoughnessMap = visual.roughnessMap end
+                if visual.metalnessMap and visual.metalnessMap ~= "" then appearance.MetalnessMap = visual.metalnessMap end
+            end
+        end
+    end
+end
 
 local function loadCompanionModel(compType)
     if companionModelCache[compType] then
         print("[CompanionManager.loadCompanionModel] Using cached model for", compType)
         return companionModelCache[compType]:Clone()
+    end
+
+    local visual = studioVisual(compType) or CompanionVisualConfig.get(compType)
+
+    -- Studio-owned prefabs win. Put Models under
+    -- ServerStorage.CompanionVisualCatalog.Prefabs using companion keys.
+    local studioCatalog = ServerStorage:FindFirstChild("CompanionVisualCatalog")
+    local studioPrefabs = studioCatalog and studioCatalog:FindFirstChild("Prefabs")
+    local studioPrefab = studioPrefabs and (studioPrefabs:FindFirstChild(compType) or studioPrefabs:FindFirstChild(visual.basePrefab or ""))
+    if studioPrefab and studioPrefab:IsA("Model") then
+        local clone = studioPrefab:Clone()
+        sanitizeModel(clone)
+        clone.PrimaryPart = clone.PrimaryPart or clone:FindFirstChildWhichIsA("BasePart", true)
+        if clone.PrimaryPart then
+            applyAppearance(clone, visual)
+            companionModelCache[compType] = clone
+            return clone:Clone()
+        end
+        clone:Destroy()
     end
 
     -- Repository-authored variants win over asset IDs. Add a Model named for
@@ -39,8 +84,10 @@ local function loadCompanionModel(compType)
     local authored = variants and variants:FindFirstChild(compType)
     if authored and authored:IsA("Model") then
         local clone = authored:Clone()
-        clone.PrimaryPart = clone.PrimaryPart or clone:FindFirstChildWhichIsA("BasePart")
+        sanitizeModel(clone)
+        clone.PrimaryPart = clone.PrimaryPart or clone:FindFirstChildWhichIsA("BasePart", true)
         if clone.PrimaryPart then
+            applyAppearance(clone, visual)
             companionModelCache[compType] = clone
             return clone:Clone()
         end
@@ -60,7 +107,7 @@ local function loadCompanionModel(compType)
         end
     end
 
-    local meshId = COMPANION_MESHES[compType] or DEFAULT_COMPANION_MESH
+    local meshId = visual.modelAssetId or CompanionVisualConfig.defaultAssetId
     print("[CompanionManager.loadCompanionModel] Loading model for", compType, "meshId:", meshId)
 
     local success, model = pcall(function()
@@ -73,8 +120,11 @@ local function loadCompanionModel(compType)
         return nil
     end
 
+    sanitizeModel(model)
+    applyAppearance(model, visual)
+
     -- Find the primary part for positioning
-    local primaryPart = model:FindFirstChildWhichIsA("BasePart")
+    local primaryPart = model:FindFirstChildWhichIsA("BasePart", true)
     if not primaryPart then
         warn("[CompanionManager.loadCompanionModel] Model has no BasePart:", compType)
         model:Destroy()

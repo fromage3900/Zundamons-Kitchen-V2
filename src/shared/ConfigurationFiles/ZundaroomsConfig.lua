@@ -6,6 +6,11 @@ local ZundaroomsConfig = {
 	roomWidth = 26,
 	roomLength = 110,
 	entitySpeed = 10,
+	-- Prefer a Studio-authored Model named ZundaroomsEntity in ServerStorage or
+	-- ReplicatedStorage.Models. Set this only after uploading under the game owner.
+	entityModelAssetId = "",
+	entityVisualScale = 1,
+	entityVisualOffset = CFrame.identity,
 	catchDistance = 4,
 	sessionTimeout = 45,
 	escapeGold = 100,

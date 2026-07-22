@@ -6,6 +6,7 @@ local RS = game.ReplicatedStorage
 local RE = RS:WaitForChild("RemoteEvents")
 local RF = RS:WaitForChild("RemoteFunctions")
 local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
+local CompanionConfig = require(RS.ConfigurationFiles.CompanionConfig)
 
 local PurchaseCompanion = RE:WaitForChild("PurchaseCompanion")
 local CompanionOwnedSync = RE:WaitForChild("CompanionOwnedSync")
@@ -31,7 +32,7 @@ local pending = {}
 local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 PurchaseCompanion.OnServerEvent:Connect(function(player, compType)
-	local cat = shared.ZundaCompanionCatalog
+	local cat = CompanionConfig.companions
 	if not cat then
 		return
 	end
@@ -60,7 +61,7 @@ end)
 -- ProcessReceipt delegated to MarketplaceService.lua (unified handler)
 
 GetCompanionCatalog.OnServerInvoke = function(player)
-	return shared.ZundaCompanionCatalog
+	return CompanionConfig.companions
 end
 
 GetOwnedCompanions.OnServerInvoke = function(player)

@@ -12,7 +12,8 @@
       },
       "Models": {
         "$className": "Folder",
-        "$path": "src/shared/Models"
+        "$path": "src/shared/Models",
+        "$ignoreUnknownInstances": true
       },
       "Meshes": {
         "$className": "Folder",
