@@ -555,3 +555,51 @@ html, body {
   text-decoration: none;
   font-weight: bold;
 }
+
+/* Zunda-OS PC App Launcher Grid */
+.os-app-launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.os-app-tile {
+  background: #ffffff;
+  border: 2px solid #ffb7c5;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255, 133, 161, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  outline: none;
+}
+
+.os-app-tile:hover, .os-app-tile:focus {
+  transform: translateY(-4px);
+  border-color: #ff477e;
+  box-shadow: 0 10px 24px rgba(255, 71, 126, 0.25);
+  background: #fff0f5;
+}
+
+.tile-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.tile-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--brand-green);
+  margin-bottom: 4px;
+}
+
+.tile-desc {
+  font-size: 11px;
+  color: #666;
+}
+

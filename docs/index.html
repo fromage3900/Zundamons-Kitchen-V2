@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Zundamon's Kitchen V2 — Official Roblox Game Launch Hub">
+    <meta name="description" content="Zundamon's Kitchen V2 — Official Roblox Game Launch Hub & Zunda-OS Desktop">
     <meta name="keywords" content="Zundamon, Roblox, Kitchen Simulator, Rhythm Cooking, Cozy Games, Luau">
     <meta name="author" content="Zundamon's Kitchen Team">
 
-    <title>Zundamon's Kitchen V2 — Official Roblox Game Launch Hub</title>
+    <title>Zundamon's Kitchen V2 — Official Roblox Game Launch & PC Desktop Hub</title>
 
     <!-- Embedded Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫛</text></svg>">
 
     <!-- Primary Stylesheet with Cache Buster -->
-    <link rel="stylesheet" href="style.css?v=2.4.1">
+    <link rel="stylesheet" href="style.css?v=2.5.0">
 </head>
 <body style="margin:0; padding:0; background:#fff5f8; color:#333; font-family:'Segoe UI', sans-serif;">
 
-    <!-- Background Sparkle Canvas -->
+    <!-- Background Sparkle Canvas (No creepy blobs!) -->
     <canvas id="star-sparkle-canvas"></canvas>
 
     <!-- Sticky Game Navigation Bar -->
@@ -29,6 +29,8 @@
             </a>
 
             <nav class="nav-links">
+                <a href="#hero">Launch</a>
+                <a href="#os-desktop">PC Desktop 💻</a>
                 <a href="#features">Features</a>
                 <a href="#companions">Companions</a>
                 <a href="#promos">Codes 🎁</a>
@@ -39,7 +41,7 @@
     </header>
 
     <!-- Main Game Launch Hero Section -->
-    <section class="game-hero">
+    <section id="hero" class="game-hero">
         <div class="hero-container">
             <div class="hero-content">
                 <div class="status-pill">
@@ -60,13 +62,13 @@
                         <span class="cta-icon">🎮</span>
                         <span class="cta-text">PLAY ON ROBLOX NOW</span>
                     </a>
-                    <button class="cta-btn secondary-cta" data-open-window="window-zundamon">
-                        <span class="cta-icon">🫛</span>
-                        <span class="cta-text">Meet Zundamon</span>
-                    </button>
+                    <a href="#os-desktop" class="cta-btn secondary-cta">
+                        <span class="cta-icon">💻</span>
+                        <span class="cta-text">Zunda-OS PC Desktop</span>
+                    </a>
                     <button class="cta-btn terminal-cta" data-open-window="window-zundacli">
                         <span class="cta-icon">💻</span>
-                        <span class="cta-text">ZundaCLI Console</span>
+                        <span class="cta-text">Open Terminal</span>
                     </button>
                 </div>
 
@@ -106,6 +108,58 @@
                         <span class="badge-sub">Level 24 Master Companion 🫛</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Zunda-OS Interactive PC Desktop Workspace Section -->
+    <section id="os-desktop" class="game-section alt-bg">
+        <div class="section-container">
+            <h2 class="section-title">💻 ZUNDA-OS PC DESKTOP WORKSPACE</h2>
+            <p class="section-subtitle">Click app icons below to open interactive windows, terminal prompts, and recipe tools!</p>
+
+            <div class="os-app-launcher-grid">
+                <button class="os-app-tile" data-open-window="window-zundacli">
+                    <span class="tile-icon">💻</span>
+                    <span class="tile-title">ZundaCLI.exe</span>
+                    <span class="tile-desc">Pastel Console Prompt</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-cookbook">
+                    <span class="tile-icon">📖</span>
+                    <span class="tile-title">Cookbook.app</span>
+                    <span class="tile-desc">Recipes & Score Targets</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-zundamon">
+                    <span class="tile-icon">🫛</span>
+                    <span class="tile-title">Zundamon.app</span>
+                    <span class="tile-desc">Companion Stats & Moods</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-promos">
+                    <span class="tile-icon">🎁</span>
+                    <span class="tile-title">Promos.app</span>
+                    <span class="tile-desc">1-Click Roblox Code Redeem</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-vntalk">
+                    <span class="tile-icon">💬</span>
+                    <span class="tile-title">VNTalk.app</span>
+                    <span class="tile-desc">Companion VN Dialogues</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-calculator">
+                    <span class="tile-icon">🧮</span>
+                    <span class="tile-title">Calculator.app</span>
+                    <span class="tile-desc">Dish Profit Crafter</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-updates">
+                    <span class="tile-icon">📜</span>
+                    <span class="tile-title">Updates.log</span>
+                    <span class="tile-desc">Patch Notes & ECS Log</span>
+                </button>
             </div>
         </div>
     </section>
@@ -224,9 +278,10 @@
         </div>
     </section>
 
-    <!-- Modal Container for ZundaCLI Console and App Windows -->
+    <!-- Modal Container for Zunda-OS Window Manager & App Windows -->
     <div id="window-container">
-        <!-- ZundaCLI.exe Window -->
+
+        <!-- 1. ZundaCLI.exe Window -->
         <section id="window-zundacli" class="window hidden" data-window-id="zundacli" style="top: 60px; left: 80px; width: 680px; height: 440px;" tabindex="0">
             <div class="window-header">
                 <div class="window-title">
@@ -251,6 +306,90 @@
                 </form>
             </div>
         </section>
+
+        <!-- 2. Cookbook.app Window -->
+        <section id="window-cookbook" class="window hidden" data-window-id="cookbook" style="top: 80px; left: 140px; width: 720px; height: 500px;" tabindex="0">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">📖</span>
+                    <span class="window-title-text">Cookbook.app — Zunda Recipe Book</span>
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn win-close" data-action="close">✕</button>
+                </div>
+            </div>
+            <div class="window-body cookbook-body">
+                <div class="recipe-toolbar">
+                    <input type="search" id="recipe-search" class="win95-input" placeholder="Search recipes (e.g. Mochi, Shake, Dango)...">
+                </div>
+                <div id="recipe-grid" class="recipe-cards-grid"></div>
+            </div>
+        </section>
+
+        <!-- 3. Zundamon.app Window -->
+        <section id="window-zundamon" class="window hidden" data-window-id="zundamon" style="top: 100px; left: 180px; width: 680px; height: 480px;" tabindex="0">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">🫛</span>
+                    <span class="window-title-text">Zundamon Companion Hub</span>
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn win-close" data-action="close">✕</button>
+                </div>
+            </div>
+            <div class="window-body zundamon-body">
+                <div class="zunda-hero-panel">
+                    <div class="zunda-avatar-card">
+                        <div class="zunda-name-badge">
+                            <span class="zunda-name">Zundamon (ずんだもん)</span>
+                            <span class="zunda-title">Pea Spirit Companion 🫛</span>
+                        </div>
+                    </div>
+                    <div class="zunda-stats-panel">
+                        <div class="vn-dialogue-card">
+                            <p id="zunda-dialogue-text" class="vn-quote">"Morning, {player}! The garden is sparkling nanoda! Let us make one dish we are proud of today!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Promos.app Window -->
+        <section id="window-promos" class="window hidden" data-window-id="promos" style="top: 120px; left: 200px; width: 600px; height: 440px;" tabindex="0">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">🎁</span>
+                    <span class="window-title-text">Promos.app — Roblox Promo Codes</span>
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn win-close" data-action="close">✕</button>
+                </div>
+            </div>
+            <div class="window-body promos-body">
+                <h3>🎁 Active Roblox Promo Codes</h3>
+                <button class="win95-btn copy-code-btn" data-code="ZUNDAMOCHI2026">Copy ZUNDAMOCHI2026</button>
+                <button class="win95-btn copy-code-btn" data-code="SOUPSEASON">Copy SOUPSEASON</button>
+            </div>
+        </section>
+
+        <!-- 5. Calculator.app Window -->
+        <section id="window-calculator" class="window hidden" data-window-id="calculator" style="top: 140px; left: 240px; width: 560px; height: 420px;" tabindex="0">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">🧮</span>
+                    <span class="window-title-text">Calculator.app — Dish Profit Calculator</span>
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn win-close" data-action="close">✕</button>
+                </div>
+            </div>
+            <div class="window-body calc-body">
+                <label>Quantity to Cook:</label>
+                <input type="number" id="calc-qty" value="10" min="1" class="win95-input">
+                <p>Estimated Net Profit: <strong id="res-profit">+1,000 Gold</strong></p>
+            </div>
+        </section>
+
     </div>
 
     <!-- Main Game Footer -->
@@ -268,9 +407,9 @@
     </footer>
 
     <!-- Application Scripts -->
-    <script src="assets/audio_engine.js?v=2.4.1"></script>
-    <script src="window_manager.js?v=2.4.1"></script>
-    <script src="terminal.js?v=2.4.1"></script>
-    <script src="app.js?v=2.4.1"></script>
+    <script src="assets/audio_engine.js?v=2.5.0"></script>
+    <script src="window_manager.js?v=2.5.0"></script>
+    <script src="terminal.js?v=2.5.0"></script>
+    <script src="app.js?v=2.5.0"></script>
 </body>
 </html>
