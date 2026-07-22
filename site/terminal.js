@@ -357,6 +357,22 @@ class ZundaTerminal {
       case 'deps':
         this.cmdWally();
         break;
+      case 'promo':
+      case 'promos':
+      case 'codes':
+      case 'code':
+        this.cmdPromos();
+        break;
+      case 'updates':
+      case 'patch':
+      case 'changelog':
+        this.cmdUpdates();
+        break;
+      case 'calc':
+      case 'profit':
+      case 'calculator':
+        this.cmdCalc(args);
+        break;
 
       // Secret Zundamon Easter Eggs
       case 'nanoda':
@@ -622,6 +638,59 @@ class ZundaTerminal {
       `<div class="cli-table-head">│ <span class="cli-tag cli-tag-info">[ZONE LORE]</span> ${entry.title}</div>` +
       `<div class="cli-table-head">└────────────────────────────────────────────────────────┘</div>` +
       `<div class="cli-line"><span class="cli-highlight">Speaker:</span> ${entry.speaker}</div>` +
+
+  /**
+   * `promo` / `codes`: List active Roblox redeemable promo codes
+   */
+  cmdPromos() {
+    this.playWinSound('focus');
+    if (window.windowManager) window.windowManager.openWindow('window-promos');
+
+    const html = 
+      `<div class="cli-line"><span class="cli-tag cli-tag-ok">[PROMOS]</span> Active Roblox Redeem Codes:</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">ZUNDAMOCHI2026</span>  : +500 Gold, 10x Fresh Zunda Mochi</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">SOUPSEASON</span>      : +1,000 Kitchen EXP, 5x Wild Mushrooms</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">HYBRIDECS</span>       : +250 Gold, Matter ECS Badge</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">ZUNDAOS95</span>       : Retro CRT TV Furniture Item</div>` +
+      `<div class="cli-line"><i>Opened Promos.app window nanoda! Click 'Copy Code' to redeem in-game.</i></div>`;
+    this.appendOutput(html);
+  }
+
+  /**
+   * `updates` / `patch`: Display patch notes & changelog
+   */
+  cmdUpdates() {
+    this.playWinSound('focus');
+    if (window.windowManager) window.windowManager.openWindow('window-updates');
+
+    const html = 
+      `<div class="cli-line"><span class="cli-tag cli-tag-info">[PATCH NOTES]</span> Zundamon's Kitchen V2 — Update Log:</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">v2.4.0 (Current)</span>: Matter ECS Architecture & Zunda-OS 95 CLI Hub</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">v2.3.1</span>          : Rhythm Minigame combo score multipliers</div>` +
+      `<div class="cli-line"><i>Opened Updates.log window nanoda!</i></div>`;
+    this.appendOutput(html);
+  }
+
+  /**
+   * `calc` / `profit`: Calculate dish crafting costs and profits
+   */
+  cmdCalc(args) {
+    this.playWinSound('focus');
+    if (window.windowManager) window.windowManager.openWindow('window-calculator');
+
+    const qty = parseInt(args[0] || '10', 10);
+    const cost = 20 * qty;
+    const sell = 120 * qty;
+    const profit = sell - cost;
+
+    const html = 
+      `<div class="cli-line"><span class="cli-tag cli-tag-ok">[DISH CALCULATOR]</span> Crafting ${qty}x Zunda Mochi:</div>` +
+      `<div class="cli-line">  • Total Crafting Cost  : ${cost} Gold</div>` +
+      `<div class="cli-line">  • Estimated NPC Revenue: ${sell} Gold</div>` +
+      `<div class="cli-line">  • <span class="cli-highlight">NET KITCHEN PROFIT    : +${profit} Gold! 🎉</span></div>` +
+      `<div class="cli-line"><i>Opened Calculator.app window nanoda!</i></div>`;
+    this.appendOutput(html);
+  }
       `<div class="cli-line" style="font-style:italic; margin:4px 0;">${entry.quote}</div>` +
       `<div class="cli-line"><span class="cli-system">[LORE NOTE]:</span> ${entry.note}</div>` +
       `</div>`;

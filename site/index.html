@@ -56,6 +56,21 @@
                 <span class="shortcut-label">VNTalk.app</span>
             </button>
 
+            <button class="desktop-shortcut" data-open-window="window-promos" tabindex="0">
+                <div class="shortcut-icon promo-icon">🎁</div>
+                <span class="shortcut-label">Promos.app</span>
+            </button>
+
+            <button class="desktop-shortcut" data-open-window="window-updates" tabindex="0">
+                <div class="shortcut-icon update-icon">📜</div>
+                <span class="shortcut-label">Updates.log</span>
+            </button>
+
+            <button class="desktop-shortcut" data-open-window="window-calculator" tabindex="0">
+                <div class="shortcut-icon calc-icon">🧮</div>
+                <span class="shortcut-label">Calculator.app</span>
+            </button>
+
             <button class="desktop-shortcut" data-open-window="window-quickstart" tabindex="0">
                 <div class="shortcut-icon txt-icon">📝</div>
                 <span class="shortcut-label">QuickStart.txt</span>
@@ -264,6 +279,140 @@ Welcome to Zunda-OS 95!
 
 Enjoy your cozy culinary experience nanoda! 🫛
                     </textarea>
+                </div>
+            </section>
+
+            <!-- 5. Promos.app Window (Roblox Game Codes & Rewards) -->
+            <section id="window-promos" class="window hidden" data-window-id="promos" style="top: 100px; left: 180px; width: 620px; height: 460px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🎁</span>
+                        <span class="window-title-text">Promos.app — Zundamon Roblox Promo Codes</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body promos-body">
+                    <div class="promos-banner">
+                        <h3>🎁 ACTIVE RECURRING PLAYER CODES</h3>
+                        <p>Redeem these codes inside Zundamon's Kitchen on Roblox for bonus Gold, Zunda Paste & Recipe Keys, nanoda!</p>
+                    </div>
+
+                    <div class="promos-list">
+                        <div class="promo-card">
+                            <div class="promo-info">
+                                <span class="promo-code">ZUNDAMOCHI2026</span>
+                                <span class="promo-desc">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
+                            </div>
+                            <button class="win95-btn copy-code-btn" data-code="ZUNDAMOCHI2026">📋 Copy Code</button>
+                        </div>
+
+                        <div class="promo-card">
+                            <div class="promo-info">
+                                <span class="promo-code">SOUPSEASON</span>
+                                <span class="promo-desc">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
+                            </div>
+                            <button class="win95-btn copy-code-btn" data-code="SOUPSEASON">📋 Copy Code</button>
+                        </div>
+
+                        <div class="promo-card">
+                            <div class="promo-info">
+                                <span class="promo-code">HYBRIDECS</span>
+                                <span class="promo-desc">Reward: +250 Gold, Matter ECS Developer Title Badge</span>
+                            </div>
+                            <button class="win95-btn copy-code-btn" data-code="HYBRIDECS">📋 Copy Code</button>
+                        </div>
+
+                        <div class="promo-card">
+                            <div class="promo-info">
+                                <span class="promo-code">ZUNDAOS95</span>
+                                <span class="promo-desc">Reward: Retro CRT Kitchen TV Furniture Item</span>
+                            </div>
+                            <button class="win95-btn copy-code-btn" data-code="ZUNDAOS95">📋 Copy Code</button>
+                        </div>
+                    </div>
+                    <div class="promos-footer">
+                        <a href="https://www.roblox.com/" target="_blank" class="win95-btn primary-btn roblox-launch-btn">🎮 Play & Redeem on Roblox</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Updates.log Window (Patch Notes & Changelog) -->
+            <section id="window-updates" class="window hidden" data-window-id="updates" style="top: 120px; left: 220px; width: 640px; height: 480px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">📜</span>
+                        <span class="window-title-text">Updates.log — Zundamon Patch Notes</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body updates-body">
+                    <div class="update-entry">
+                        <div class="update-badge">v2.4.0 — HYBRID ECS & ZUNDA-OS 95 LAUNCH</div>
+                        <div class="update-date">July 2026</div>
+                        <ul>
+                            <li><strong>Matter ECS System Architecture:</strong> Integrated deterministic client/server ECS systems.</li>
+                            <li><strong>Zunda-OS 95 Web Hub:</strong> Launched interactive terminal (`ZundaCLI.exe`), cookbook, and live promo redeemers.</li>
+                            <li><strong>68+ Quests Restored:</strong> Restored harvest, cook, and guest service questlines.</li>
+                            <li><strong>Cozy Ambient Soundscapes:</strong> Procedural Web Audio synth & custom Zundamon VN dialogue soundboards.</li>
+                        </ul>
+                    </div>
+
+                    <div class="update-entry">
+                        <div class="update-badge">v2.3.1 — RHYTHM COOKING BALANCING</div>
+                        <div class="update-date">June 2026</div>
+                        <ul>
+                            <li>Improved rhythm minigame combo multipliers for S-Rank dish quality.</li>
+                            <li>Added 5 new Zundamon companion dialogue scenes in `VNTalk.app`.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Calculator.app Window (Dish Profit & Ingredient Calculator) -->
+            <section id="window-calculator" class="window hidden" data-window-id="calculator" style="top: 140px; left: 260px; width: 580px; height: 440px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🧮</span>
+                        <span class="window-title-text">Calculator.app — Dish Profit & Crafter Calculator</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body calc-body">
+                    <div class="calc-panel">
+                        <label for="calc-dish-select">Select Recipe:</label>
+                        <select id="calc-dish-select" class="win95-select">
+                            <option value="zunda-mochi" data-cost="20" data-sell="120">Zunda Mochi (Cost: 20g | Sell: 120g)</option>
+                            <option value="mushroom-soup" data-cost="15" data-sell="75">Mushroom Soup (Cost: 15g | Sell: 75g)</option>
+                            <option value="berry-tea" data-cost="10" data-sell="45">Berry Tea (Cost: 10g | Sell: 45g)</option>
+                            <option value="edamame-parfait" data-cost="35" data-sell="220">Edamame Parfait (Cost: 35g | Sell: 220g)</option>
+                        </select>
+
+                        <div class="calc-field">
+                            <label for="calc-qty">Quantity to Cook:</label>
+                            <input type="number" id="calc-qty" value="10" min="1" max="999" class="win95-input">
+                        </div>
+
+                        <div id="calc-results" class="calc-results-box">
+                            <p><strong>Total Crafting Cost:</strong> <span id="res-cost">200</span> Gold</p>
+                            <p><strong>Estimated NPC Revenue:</strong> <span id="res-sell">1,200</span> Gold</p>
+                            <p class="profit-line"><strong>Net Kitchen Profit:</strong> <span id="res-profit" class="profit-good">+1,000 Gold</span> 🎉</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 

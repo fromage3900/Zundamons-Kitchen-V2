@@ -1149,6 +1149,9 @@ class MainApp {
 
     this.quickstart = new QuickStartApp();
     this.quickstart.init();
+
+    this.initPromosApp();
+    this.initCalculatorApp();
   }
 
   initClock() {
@@ -1253,6 +1256,63 @@ class MainApp {
         });
       }
     }
+  }
+
+  initPromosApp() {
+    document.querySelectorAll('.copy-code-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClick('down');
+        const code = btn.dataset.code || '';
+        if (navigator.clipboard && code) {
+          navigator.clipboard.writeText(code).then(() => {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ COPIED!';
+            btn.style.backgroundColor = '#2e7d32';
+            btn.style.color = '#fff';
+            if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('hit_perfect');
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.backgroundColor = '';
+              btn.style.color = '';
+            }, 2000);
+          }).catch(() => {
+            alert(`Promo Code: ${code}`);
+          });
+        } else if (code) {
+          alert(`Promo Code: ${code}`);
+        }
+      });
+    });
+  }
+
+  initCalculatorApp() {
+    const dishSelect = document.getElementById('calc-dish-select');
+    const qtyInput = document.getElementById('calc-qty');
+    const resCost = document.getElementById('res-cost');
+    const resSell = document.getElementById('res-sell');
+    const resProfit = document.getElementById('res-profit');
+
+    const updateCalc = () => {
+      if (!dishSelect || !qtyInput || !resCost || !resSell || !resProfit) return;
+      const opt = dishSelect.options[dishSelect.selectedIndex];
+      if (!opt) return;
+
+      const costPerUnit = parseInt(opt.dataset.cost || '10', 10);
+      const sellPerUnit = parseInt(opt.dataset.sell || '50', 10);
+      const qty = Math.max(1, parseInt(qtyInput.value || '1', 10));
+
+      const totalCost = costPerUnit * qty;
+      const totalSell = sellPerUnit * qty;
+      const netProfit = totalSell - totalCost;
+
+      resCost.textContent = totalCost.toLocaleString();
+      resSell.textContent = totalSell.toLocaleString();
+      resProfit.textContent = `+${netProfit.toLocaleString()} Gold`;
+    };
+
+    if (dishSelect) dishSelect.addEventListener('change', () => { playClick('down'); updateCalc(); });
+    if (qtyInput) qtyInput.addEventListener('input', updateCalc);
+    updateCalc();
   }
 
   initSystemTray() {

@@ -1243,3 +1243,155 @@ body.crt-off #crt-overlay,
     padding: 8px;
   }
 }
+
+/* Promos.app, Updates.log & Calculator.app Win95 Hub Styles */
+.promos-body, .updates-body, .calc-body {
+  padding: 12px;
+  background: var(--win-bg);
+  color: var(--text-dark);
+  font-family: var(--font-os);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.promos-banner {
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 4px;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.3);
+}
+
+.promos-banner h3 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.promos-banner p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.promos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.promo-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.promo-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-code {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 14px;
+}
+
+.promo-desc {
+  font-size: 11px;
+  color: #555;
+}
+
+.copy-code-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.promos-footer {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.roblox-launch-btn {
+  text-decoration: none;
+  background: #2e7d32;
+  color: #fff !important;
+  padding: 6px 14px;
+  font-weight: bold;
+}
+
+.update-entry {
+  background: #ffffff;
+  padding: 10px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.update-badge {
+  font-family: var(--font-os);
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 13px;
+}
+
+.update-date {
+  font-size: 11px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.update-entry ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+}
+
+.calc-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #ffffff;
+  padding: 14px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.win95-select, .win95-input {
+  font-family: var(--font-os);
+  font-size: 13px;
+  padding: 4px 6px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.calc-results-box {
+  background: #f4fbf4;
+  border: 1px solid #a5d6a7;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.profit-good {
+  color: #2e7d32;
+  font-weight: bold;
+  font-size: 15px;
+}
+
