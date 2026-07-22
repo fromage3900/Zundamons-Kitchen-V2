@@ -1,33 +1,60 @@
 # Resource Node Authoring
 
-Resource gameplay is mesh-independent. A tree, rock, flower, crop, or future Kenney model receives behavior from its `ResourceArchetype`; scripts never depend on a particular mesh name or hierarchy.
+Harvest behavior and visuals are independent. Loot, durability, tools, yield,
+and respawn come from `ResourceArchetype`; replaceable geometry lives only under
+the interaction root's `_ResourceVisual` folder.
 
-## Collaborator workflow
+## Recommended Studio workflow
 
-1. Place or duplicate a `BasePart`, `MeshPart`, or `Model` without replacing the surrounding Studio-authored world.
-2. Add the CollectionService tag `ResourceNode`.
-3. Add a string attribute `ResourceArchetype` using one supported value below.
-4. For a click-gather `Model`, set its `PrimaryPart`; the bootstrap attaches interaction to that part.
-5. Keep `UseRegistryMesh` false or absent to preserve the placed visual. For a plain `Part` placeholder, set it true to attach a `SpecialMesh` using `MeshAssets.lua`.
-6. Optionally set `VisualVariant` to a key from `MeshAssets.lua`. Changing this key swaps visuals without changing loot, tools, health, or respawn behavior.
+Install the local plugin in `tools/resource-visual-authoring`, then:
 
-Tool archetypes:
+1. Upload a Mesh or Model under the same owner/group as the experience.
+2. Select a resource root Part, or a Model with a PrimaryPart.
+3. Open **Plugins > Zunda Kitchen > Resource Visuals**.
+4. Enter the archetype, stable variant, asset ID, type, and transform.
+5. Click **Validate**, **Preview**, then **Apply to selection**.
+6. Duplicate the configured node normally for additional placements.
 
-- `Rock`, `MarbleRock`, `GoldRock` — PickAxe
-- `AppleTree`, `PineTree` — Axe
-- `Wheat`, `ZundaMushroom`, `ZundaBerry`, `ZundaRoot` — Sickle
+The plugin does not publish or upload assets. Invalid/private assets leave the
+existing visual untouched. One previous `_ResourceVisual` is retained for the
+plugin's Restore action, and Studio Undo remains available.
 
-Click archetypes:
+## Canonical attributes
 
-- `ZundaFlower`, `ZundaPea`, `EdamamePod`, `ZundaLeaf`, `SweetPea`
-- `PeaFlower`, `SaltedPeaBouquet`, `MysteryLoot`
+- `ResourceArchetype`: gameplay identity (`Rock`, `GoldRock`, `AppleTree`, `Wheat`, etc.)
+- `VisualVariant`: reusable catalog name such as `Rock_Common`
+- `VisualAssetId`: optional per-instance Roblox ID override
+- `VisualAssetType`: `Mesh`, `Model`, `Prefab`, or `Fallback`
+- `VisualScale`: visual-only `Vector3`
+- `VisualOffset`: visual-only `CFrame`
+- `UseFallbackOnFailure`: keep true for production nodes
+- `RegistryMeshStatus` / `RegistryMeshDetail`: runtime diagnostics; do not author manually
 
-## Kenney and custom mesh swapping
+Resolution order is per-instance ID, Studio catalog entry, Git-backed default,
+then procedural fallback. The fallback remains visible until a replacement is
+confirmed deliverable, so a failed ID can never make the node blank.
 
-Uploaded Kenney assets belong in `MeshAssets.lua` under a stable visual key such as `Tree`, `Rock`, or `ZundaFlower`. Do not put asset IDs into harvest scripts. A plain `Part` can opt into runtime `SpecialMesh` assignment with `UseRegistryMesh`; imported `MeshPart.MeshId` is runtime read-only and must be selected in Studio. In that case the bootstrap reports `RegistryMeshStatus = "meshpart_requires_studio_authoring"` and preserves the authored mesh. Source FBX/Blender archives remain local or in an approved large-file asset store; Roblox-ready asset IDs and attribution belong in Git.
+## Supported gameplay archetypes
 
-## Overrides
+- PickAxe: `Rock`, `MarbleRock`, `GoldRock`
+- Axe: `AppleTree`, `PineTree`
+- Sickle: `Wheat`, `ZundaMushroom`, `ZundaBerry`, `ZundaRoot`
+- Click: `ZundaFlower`, `ZundaPea`, `EdamamePod`, `ZundaLeaf`, `SweetPea`,
+  `PeaFlower`, `SaltedPeaBouquet`, `MysteryLoot`
 
-The bootstrap supplies safe defaults but preserves authored overrides for `Health`, `MaxHealth`, `Respawn`, `Yield`, and `Available`. This allows a special landmark tree or rare flower to use the same gameplay archetype with bespoke tuning.
+Authored geometry outside `_ResourceVisual` is never removed. Workspace and the
+Studio catalog are protected by Rojo's `$ignoreUnknownInstances` settings.
 
-`default.project.json` keeps `$ignoreUnknownInstances: true` under Workspace, so Rojo synchronization does not remove placed terrain, models, or level geometry.
+## One-time legacy migration
+
+From the Studio command bar, review the dry run first:
+
+```lua
+require(game.ServerScriptService.DevTools.MigrateResourceVisuals).run(false)
+```
+
+Apply only after the listed eight nodes are correct:
+
+```lua
+require(game.ServerScriptService.DevTools.MigrateResourceVisuals).run(true)
+```

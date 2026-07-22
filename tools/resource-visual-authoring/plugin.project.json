@@ -1,0 +1,9 @@
+{
+  "name": "ZundaResourceVisualAuthoring",
+  "tree": {
+    "$className": "Model",
+    "ResourceVisualAuthoringPlugin": {
+      "$path": "ResourceVisualAuthoringPlugin.server.lua"
+    }
+  }
+}
