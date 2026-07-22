@@ -3,7 +3,7 @@
 -- Defines growth stages for harvest nodes using localized meshes
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local MeshProvider = require(ReplicatedStorage.Shared.Modules.MeshProvider)
+local ResourceVisualCatalog = require(ReplicatedStorage.ConfigurationFiles.ResourceVisualCatalog)
 
 local GrowthStageConfig = {}
 
@@ -41,44 +41,34 @@ GrowthStageConfig.CarrotPlot = {
 	},
 }
 
--- Get mesh ID for a growth stage
+function GrowthStageConfig.getDescriptor(stageConfig: table): any
+	return ResourceVisualCatalog.get(stageConfig.name)
+end
+
+-- Compatibility for callers not yet migrated to visual descriptors.
 function GrowthStageConfig.getMeshId(stageConfig: table): string
-	local category = stageConfig.meshCategory
-	local folderName = stageConfig.meshName
-	local stageName = stageConfig.name
-	
-	-- Try to get from MeshProvider (localized meshes)
-	local meshId = MeshProvider.get(category .. "/" .. folderName, stageName)
-	if meshId ~= "" then
-		return meshId
-	end
-	
-	-- Fallback to MeshAssets config (asset IDs)
-	local MeshAssets = require(ReplicatedStorage.ConfigurationFiles.MeshAssets)
-	if MeshAssets.meshes[folderName] and MeshAssets.meshes[folderName][stageName] then
-		return MeshAssets.meshes[folderName][stageName]
-	end
-	
-	warn(`[GrowthStageConfig] No mesh found for {folderName}/{stageName}`)
-	return ""
+	local descriptor = GrowthStageConfig.getDescriptor(stageConfig)
+	return if descriptor and descriptor.enabled then descriptor.assetId else ""
 end
 
 -- Get all stages for a node type
-function GrowthStageConfig.getStages(nodeType: string): {table}
+function GrowthStageConfig.getStages(nodeType: string): { table }
 	return GrowthStageConfig[nodeType] or {}
 end
 
 -- Get harvestable stage
 function GrowthStageConfig.getHarvestableStage(nodeType: string): table?
 	local stages = GrowthStageConfig[nodeType]
-	if not stages then return nil end
-	
+	if not stages then
+		return nil
+	end
+
 	for _, stage in ipairs(stages) do
 		if stage.harvestable then
 			return stage
 		end
 	end
-	
+
 	return nil
 end
 

@@ -16,6 +16,7 @@ end
 
 local GrowthStageConfig = require(RS.ConfigurationFiles.GrowthStageConfig)
 local GatherConfig = require(RS.ConfigurationFiles.GatherConfig)
+local ResourceVisualService = require(SSS.Services.ResourceVisualService)
 
 -- HarvestValidator for server-side validation (distance, rate limit, cooldown)
 local validateHarvest
@@ -44,17 +45,31 @@ end
 -- Companion extra_drop buff (Antimon): 20% chance for bonus item
 local function applyExtraDropBuff(player, baseItems)
 	local data = PlayerDataService.get(player)
-	if not data then return end
+	if not data then
+		return
+	end
 	local active = data.active_companion
-	if not active then return end
+	if not active then
+		return
+	end
 	local def = CompanionConfig.companions[active]
-	if not def or not def.buff then return end
-	if def.buff.stat ~= "extra_drop" then return end
-	if def.buff.magnitude <= 0 then return end
-	if math.random() > def.buff.magnitude then return end
+	if not def or not def.buff then
+		return
+	end
+	if def.buff.stat ~= "extra_drop" then
+		return
+	end
+	if def.buff.magnitude <= 0 then
+		return
+	end
+	if math.random() > def.buff.magnitude then
+		return
+	end
 	local char = player.Character
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
+	if not hrp then
+		return
+	end
 	local bonus = { baseItems[math.random(#baseItems)] }
 	lootMod.generateLoot(player, bonus, hrp.Position)
 	notify(player, "🍀 Antimon found a bonus " .. bonus[1] .. "!")
@@ -94,14 +109,11 @@ local function updateNodeMesh(node, stageIndex)
 	end
 
 	local stage = stages[stageIndex]
-	local meshId = GrowthStageConfig.getMeshId(stage)
-
-	if meshId ~= "" and node:IsA("MeshPart") then
-		node.MeshId = meshId
-		node.Size = Vector3.new(2, 2, 2) * stage.scale
-		node:SetAttribute("GrowthStage", stageIndex)
-		node:SetAttribute("GrowthStageName", stage.name)
-	end
+	node:SetAttribute("VisualVariant", stage.name)
+	node:SetAttribute("VisualScale", Vector3.new(stage.scale, stage.scale, stage.scale))
+	ResourceVisualService.apply(node, GrowthStageConfig.getDescriptor(stage))
+	node:SetAttribute("GrowthStage", stageIndex)
+	node:SetAttribute("GrowthStageName", stage.name)
 end
 
 -- Hide the node visually + re-enable after respawn
@@ -110,6 +122,7 @@ local function consumeNode(node, respawnSec)
 		return
 	end
 	node:SetAttribute("Available", false)
+	ResourceVisualService.setVisible(node, false)
 	local cd = node:FindFirstChildOfClass("ClickDetector")
 	if cd then
 		cd.MaxActivationDistance = 0
@@ -124,6 +137,7 @@ local function consumeNode(node, respawnSec)
 			return
 		end
 		node:SetAttribute("Available", true)
+		ResourceVisualService.setVisible(node, true)
 		node.Size = node:GetAttribute("_origSize") or node.Size
 		local back = TweenS:Create(node, TweenInfo.new(0.4), { Transparency = origTransparency })
 		back:Play()

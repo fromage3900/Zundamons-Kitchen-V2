@@ -15,9 +15,9 @@ if not configFolder then
 	configFolder = ReplicatedStorage:WaitForChild("ConfigurationFiles", 10)
 end
 local ScatterConfig = configFolder and require(configFolder:WaitForChild("ScatterConfig", 10))
-local MeshAssets = configFolder and require(configFolder:WaitForChild("MeshAssets", 10))
 local ResourceNodeRegistry = configFolder and require(configFolder:WaitForChild("ResourceNodeRegistry", 10))
-if not ScatterConfig or not MeshAssets or not ResourceNodeRegistry then
+local ResourceVisualService = require(game:GetService("ServerScriptService").Services.ResourceVisualService)
+if not ScatterConfig or not ResourceNodeRegistry then
 	warn("[ScatterService] Config assets not found — scatter disabled")
 	return {}
 end
@@ -113,15 +113,7 @@ local function spawnNode(nodeType: string, variantId: string, position: Vector3,
 		return nil
 	end
 
-	local meshId = MeshAssets.meshes[nodeType] and MeshAssets.meshes[nodeType][variantId]
-	local part: BasePart
-	if meshId then
-		local mp = Instance.new("MeshPart")
-		mp.MeshId = meshId
-		part = mp
-	else
-		part = Instance.new("Part")
-	end
+	local part = Instance.new("Part")
 
 	local RESOURCE_COLORS = {
 		ZundaFlower = Color3.fromRGB(100, 200, 100),
@@ -155,6 +147,8 @@ local function spawnNode(nodeType: string, variantId: string, position: Vector3,
 	-- Visual identity is separate from behavior; the registry supplies tags,
 	-- durability/yield, tool requirements, and interaction metadata.
 	part:SetAttribute("VariantId", variantId)
+	part:SetAttribute("VisualVariant", variantId)
+	part:SetAttribute("UseFallbackOnFailure", true)
 	part:SetAttribute("_origSize", part.Size)
 	part:SetAttribute("ScatterBiome", biomeName)
 
@@ -163,6 +157,7 @@ local function spawnNode(nodeType: string, variantId: string, position: Vector3,
 	part.Parent = Workspace:FindFirstChild("GameplayLoopArea")
 			and Workspace.GameplayLoopArea:FindFirstChild("GatheringNodes")
 		or Workspace
+	ResourceVisualService.apply(part)
 
 	activeNodes[part] = true
 	return part
