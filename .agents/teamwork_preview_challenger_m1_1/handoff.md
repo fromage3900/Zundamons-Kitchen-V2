@@ -1,137 +1,166 @@
-# Handoff Report — Milestone 1 Zunda-OS 95 CLI Launch Page Empirical Testing
+# Handoff Report — Remote & Event System Empirical Stress Test (Milestone 1)
 
-**Agent**: Challenger 1 (`teamwork_preview_challenger_m1_1`)  
-**Role**: Empirical Challenger (critic, specialist)  
-**Date**: 2026-07-22  
-**Target Files**: `site/index.html`, `site/assets/audio_engine.js`  
-**Verdict**: **FAILED**
+**Verdict**: **DEFECT_FOUND**
 
 ---
 
 ## 1. Observation
 
-Direct observations obtained by writing and executing an automated empirical JSDOM test suite (`run_empirical_tests.js`) and analyzing source code in `site/index.html` and `site/assets/audio_engine.js`:
+Direct code observations from empirical inspection and tool execution:
 
-1. **Window Drag Boundary Omission**:
-   - `site/index.html` lines 477–483:
-     ```javascript
-     function onMouseMove(e) {
-         if (!isDragging) return;
-         const dx = e.clientX - startX;
-         const dy = e.clientY - startY;
-         win.style.left = `${initialLeft + dx}px`;
-         win.style.top = `${initialTop + dy}px`;
-     }
-     ```
-   - *Test Observation*: Dragging window header with `clientX: -1000, clientY: -1000` resulted in `win.style.left = "-1100px"` and `win.style.top = "-1100px"`. Window disappears off-screen.
+### System Verifications
+1. `python scripts/preflight_audit.py` executed successfully: All checks passed.
+2. `rojo build default.project.json -o build/Zundamons-kItchen.rbxl` executed successfully: Built project to `Zundamons-kItchen.rbxl`.
+3. `selene src` executed: 0 static code errors, 332 warnings, 0 parse errors.
 
-2. **Mobile Touch Drag Omission**:
-   - `site/index.html` lines 466–494: Window header drag logic only attaches `mousedown`, `mousemove`, and `mouseup` listeners.
-   - *Test Observation*: Header contains 0 listeners for `touchstart`, `touchmove`, or `touchend`. Touch gestures on mobile viewports fail to drag windows.
+### Codebase Observations
 
-3. **Taskbar Minimized Window Button Deletion**:
-   - `site/index.html` lines 433–457 (`updateTaskbar` function):
-     ```javascript
-     windows.forEach(win => {
-         if (!win.classList.contains('hidden')) {
-             // ... create taskbar button
-         }
-     });
-     ```
-   - *Test Observation*: Clicking minimize `_` button adds `.hidden` to window and calls `updateTaskbar()`. `updateTaskbar()` excludes all `.hidden` windows. Taskbar button is destroyed, leaving user with no way to restore minimized window from taskbar.
+#### Target 1: `ShowVNDialogue` Setup & Client Listener
+- **`src/client/VNController.client.lua` (lines 633-646)**:
+  ```lua
+  task.spawn(function()
+      local showVNEv = RE:WaitForChild("ShowVNDialogue", 10) :: RemoteEvent?
+      if showVNEv then
+          showVNEv.OnClientEvent:Connect(function(speakerTag, message) ... end)
+      end
+  end)
+  ```
+- **`src/server/GuestManager.server.lua` (lines 216-221)** & **`src/server/Services/ServingService.lua` (lines 76-81)**:
+  Both server scripts create `ShowVNDialogue` *lazily* only when a guest spawns or is served:
+  ```lua
+  local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
+  if not VNEvent then
+      VNEvent = Instance.new("RemoteEvent")
+      VNEvent.Name = "ShowVNDialogue"
+      VNEvent.Parent = RS.RemoteEvents
+  end
+  ```
+- Neither `ServerMain.server.lua` nor `EndlessLoopWiring.server.lua` creates `ShowVNDialogue` on server boot.
 
-4. **Focus Fallback Omission on Close / Minimize**:
-   - `site/index.html` lines 405–419: `closeWindow()` and `minimizeWindow()` add `.hidden` to the target window and call `updateTaskbar()`, but do not update active window class or z-index for remaining visible windows.
-   - *Test Observation*: Closing the top active window leaves `Remaining active window: NONE`. Visible windows remain in `.window-inactive` state.
+#### Target 2: `GiveLoot` / `sellLoot` Boot Binding
+- **`src/server/ServerMain.server.lua` (line 9)**:
+  ```lua
+  local LootModule = require(ReplicatedStorage.ConfigurationFiles.LootModule)
+  ```
+- **`src/shared/ConfigurationFiles/LootModule.lua` (lines 15-16)**:
+  ```lua
+  local giveLoot = remoteFunctions:WaitForChild("GiveLoot") :: RemoteFunction
+  local sellLoot = remoteFunctions:WaitForChild("sellLoot") :: RemoteFunction
+  ```
+- No server script or boot initializer creates `GiveLoot` or `sellLoot` in `ReplicatedStorage.RemoteFunctions` prior to requiring `LootModule`.
 
-5. **Missing Keyboard Shortcut Listeners**:
-   - `site/index.html` lines 527–592 (Start Menu controller): Zero `keydown` listeners attached for `Ctrl+Esc` or `Escape`.
-   - *Test Observation*: `site/index.html` line 242 (`QuickStart.txt`) advertises `Open Start Menu: Click [Start Zunda 🫛] or press Ctrl+Esc`. Dispatching `KeyboardEvent('keydown', { key: 'Escape', ctrlKey: true })` does not trigger Start Menu.
+#### Target 3: `GuestServed` / `GuestTimedOut` BindableEvents
+- **`src/server/Services/ServingService.lua` (lines 19, 169)**:
+  ```lua
+  ServingService.GuestServed = Instance.new("BindableEvent")
+  ...
+  ServingService.GuestServed:Fire(player, guestType, quality)
+  ```
+- **`src/server/Services/ChallengeModeService.lua` (line 309)**:
+  ```lua
+  function ChallengeModeService.onGuestServed(player: Player, quality: string, recipe: string)
+  ```
+- **`src/server/systems/EndlessLoopWiring.server.lua` (lines 37-45)**:
+  ```lua
+  ServingService.GuestServed.Event:Connect(function(player, guestType, quality)
+      if ChallengeModeService.isInChallenge(player) then
+          ChallengeModeService.onGuestServed(player, quality, guestType)
+      end
+      DailyChallengeService.updateProgress(player, "serve", 1)
+      if quality == "perfect" then
+          DailyChallengeService.updateProgress(player, "perfect", 1)
+      end
+  end)
+  ```
+- **`src/server/systems/EndlessLoopWiring.server.lua` (lines 57-65)**:
+  ```lua
+  for _, obj in ipairs(GuestManager:GetDescendants()) do
+      if obj:IsA("RemoteEvent") and obj.Name == "GuestServed" then
+          obj.Event:Connect(function(player)
+              DailyChallengeService.updateProgress(player, "serve", 1)
+          end)
+      end
+  end
+  ```
 
-6. **LocalStorage Volume Persistence Omission**:
-   - `site/assets/audio_engine.js` lines 19–46 (`ZundaAudio.init()`):
-     ```javascript
-     const savedMute = localStorage.getItem('zunda_os_muted');
-     if (savedMute !== null) {
-       this.setMute(savedMute === 'true');
-     }
-     ```
-   - *Test Observation*: `ZundaAudio.setVolume(val)` writes `localStorage.setItem('zunda_os_volume', ...)`, but `ZundaAudio.init()` never reads `zunda_os_volume`. Volume resets to `0.7` on init.
-
-7. **Un-attenuated Square Wave Beep on Invalid SFX Variant**:
-   - `site/assets/audio_engine.js` lines 83–117 (`playClickSFX`):
-     ```javascript
-     osc.type = variant === 'start' ? 'triangle' : 'square';
-     if (variant === 'down') { ... }
-     else if (variant === 'up') { ... }
-     else if (variant === 'start') { ... }
-     osc.connect(gain);
-     gain.connect(ZundaAudio.sfxGain);
-     osc.start(now);
-     osc.stop(now + 0.03);
-     ```
-   - *Test Observation*: Passing an unrecognized variant (e.g. `'invalid'`) bypasses all `if` blocks. `gain.gain.setValueAtTime` is never scheduled. Web Audio API GainNode defaults to `1.0`, emitting a full-volume square wave beep.
-
-8. **BGM Rapid Toggle Race Condition**:
-   - `site/assets/audio_engine.js` lines 320–341 (`stopCozyBGM`):
-     ```javascript
-     setTimeout(() => {
-       if (ZundaAudio.bgmPadOscs) {
-         ZundaAudio.bgmPadOscs.forEach(osc => { try { osc.stop(); } catch(e){} });
-         ZundaAudio.bgmPadOscs = null;
-       }
-     }, 1050);
-     ```
-   - *Test Observation*: Rapidly toggling BGM (start -> stop -> start within 500ms) re-populates `ZundaAudio.bgmPadOscs`. When the 1050ms `setTimeout` from the previous stop completes, it stops the new pad Oscillators and sets `bgmPadOscs` to `null`.
+#### Target 4: `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock` Remotes
+- **`src/server/systems/EndlessLoopWiring.server.lua` (lines 145-147)**:
+  ```lua
+  ensureRemote("ChefStatsUpdate")
+  ensureRemote("StylePointsUpdate")
+  ensureRemote("OutfitUnlock")
+  ```
+- **`src/client/OutfitWardrobeGui.client.lua` (lines 273-321)**:
+  Listens to `OnClientEvent` on `ChefStatsUpdate`, `StylePointsUpdate`, and `OutfitUnlock`.
+- **Global scan across `src/`**: Zero occurrences of `ChefStatsUpdate:FireClient`, `ChefStatsUpdate:FireAllClients`, `StylePointsUpdate:FireClient`, `StylePointsUpdate:FireAllClients`, `OutfitUnlock:FireClient`, or `OutfitUnlock:FireAllClients`.
 
 ---
 
 ## 2. Logic Chain
 
-1. *From Observation 1*: In `onMouseMove`, `win.style.left` and `win.style.top` are calculated strictly as `initialLeft + dx` and `initialTop + dy` without `Math.max` or viewport boundary limits. Therefore, dragging past screen edges moves windows off-screen, breaking window recovery.
-2. *From Observation 2*: Window header drag event handlers are registered exclusively for mouse events (`mousedown`). Therefore, touch inputs on mobile screens do not trigger drag handlers, failing cross-device compatibility.
-3. *From Observation 3*: `updateTaskbar()` filters `windows` array using `if (!win.classList.contains('hidden'))`. Minimized windows have `.hidden` class applied. Therefore, minimizing a window removes its taskbar button entirely, violating Windows 95 UI specifications and preventing window un-minimization from the taskbar.
-4. *From Observation 4*: `closeWindow()` and `minimizeWindow()` hide the active window but do not calculate or set `.window-active` / `.active-window` on the highest remaining `z-index` window. Therefore, closing a top window leaves all remaining windows in inactive states.
-5. *From Observation 5*: `site/index.html` contains text advertising `Ctrl+Esc` keyboard navigation in `QuickStart.txt`, but lacks a global `keydown` event listener for keyboard navigation. Therefore, advertised keyboard shortcuts fail to work.
-6. *From Observation 6*: `ZundaAudio.init()` checks `localStorage.getItem('zunda_os_muted')` on line 42, but contains no call to `localStorage.getItem('zunda_os_volume')`. Therefore, custom volume settings are lost upon page reload.
-7. *From Observation 7*: `playClickSFX` creates an oscillator and gain node regardless of `variant`, but only sets gain ramps inside specific `if/else if` blocks. Passing an unhandled variant leaves `GainNode.gain` at its default `1.0` value, producing full-volume audio output.
-8. *From Observation 8*: `stopCozyBGM` schedules an asynchronous 1050ms timer to clean up pad oscillators without tracking or canceling previous timeout handles. Restarting BGM before the timer fires allows the stale timer to terminate active BGM pad oscillators.
+1. **Target 1 (`ShowVNDialogue` Remote Setup)**:
+   - On server startup, `ShowVNDialogue` is NOT created in `ReplicatedStorage.RemoteEvents`.
+   - When a client connects and runs `VNController.client.lua`, line 634 executes `RE:WaitForChild("ShowVNDialogue", 10)`.
+   - If no guest spawns or gets served within 10 seconds of player join, `WaitForChild` times out and returns `nil`.
+   - Line 635 `if showVNEv then ... end` evaluates to `false`, skipping `OnClientEvent:Connect(...)`.
+   - Consequently, when a guest spawns later and server fires `ShowVNDialogue`, the client listener is NOT connected and dialogue is never displayed.
+
+2. **Target 2 (`GiveLoot` / `sellLoot` Boot Binding)**:
+   - When `ServerMain.server.lua` runs on server boot, line 9 requires `LootModule`.
+   - In `LootModule.lua`, lines 15 & 16 execute `remoteFunctions:WaitForChild("GiveLoot")` and `remoteFunctions:WaitForChild("sellLoot")` without a timeout.
+   - Because no boot script creates `GiveLoot` or `sellLoot` in `ReplicatedStorage.RemoteFunctions` before `LootModule` is required, `WaitForChild("GiveLoot")` yields indefinitely.
+   - This causes `ServerMain.server.lua` to hang indefinitely at line 9, blocking Matter ECS initialization, `FishingService.attachWorld(world)`, `CookingService.attachWorld(world)`, and `loop:begin()`.
+
+3. **Target 3 (`GuestServed` / `GuestTimedOut` BindableEvents)**:
+   - `ServingService.GuestServed` is fired with parameters `(player, guestType, quality)`. `ServingService.lua` omits `recipe` from `GuestServed:Fire`.
+   - `EndlessLoopWiring.server.lua` connects to `ServingService.GuestServed.Event` with parameters `(player, guestType, quality)`.
+   - Line 39 calls `ChallengeModeService.onGuestServed(player, quality, guestType)`.
+   - `ChallengeModeService.onGuestServed` signature is `(player: Player, quality: string, recipe: string)`. It receives `guestType` (e.g., `"female"`, `"magical_girl"`) in place of `recipe` (e.g., `"Zunda Mochi"`).
+   - Furthermore, lines 57-65 of `EndlessLoopWiring.server.lua` iterate `GuestManager:GetDescendants()`, looking for `RemoteEvent` named `GuestServed` and attempting to connect to `.Event`. `GuestServed` is a `BindableEvent` (not `RemoteEvent`), `RemoteEvent` lacks `.Event` property (would crash if found), and `GuestManager` is a script without such descendants.
+
+4. **Target 4 (`ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock`)**:
+   - `EndlessLoopWiring.server.lua` creates the `RemoteEvent` instances on server boot, and `OutfitWardrobeGui.client.lua` registers `OnClientEvent` handlers to update chef attribute cards, style points, and outfit unlock states.
+   - However, no server service (`ChallengeModeService`, `DailyChallengeService`, `PlayerDataService`, etc.) EVER calls `:FireClient()` or `:FireAllClients()` on `ChefStatsUpdate`, `StylePointsUpdate`, or `OutfitUnlock`.
+   - As a result, when players earn style points, upgrade stats, or unlock outfits, the wardrobe UI receives no remote events and remains static.
 
 ---
 
 ## 3. Caveats
 
-- **CSS & Rendering Engine**: Verification was performed via DOM structure, event dispatching, and Web Audio API node state inspection. Visual rendering (such as physical CRT scanlines or exact pixel layout) was not evaluated on hardware screens.
-- **Review-Only Constraint**: In accordance with agent constraints, no source code fixes were applied to `site/index.html` or `site/assets/audio_engine.js`. Failure modes are handed off for developer remediation.
+- Static analysis and script scanning were performed locally using python automation tools (`scripts/preflight_audit.py`, `selene src`, `rojo build`, and `scripts/verify_m1_remotes.py`).
+- No live Roblox Studio runtime session was executed (network mode is CODE_ONLY), but all observations are derived from 100% deterministic Luau code paths and Roblox Engine API behavior specifications.
 
 ---
 
 ## 4. Conclusion
 
-Empirical testing of Milestone 1 (`site/index.html` and `site/assets/audio_engine.js`) resulted in **12 FAILED tests out of 25 total execution tests**.
+Verification verdict: **DEFECT_FOUND**
 
-**Final Verdict**: **FAILED**
-
-The implementation requires fixes for:
-1. Window drag boundary clamping (preventing negative and off-screen positions).
-2. Mobile touch support (`touchstart`, `touchmove`, `touchend` event handlers).
-3. Taskbar button retention for minimized windows (Win95 standard behavior).
-4. Active window fallback focus on window close / minimize.
-5. Keyboard shortcut event listener (`Ctrl+Esc` / `Escape` for Start Menu).
-6. LocalStorage volume persistence in `ZundaAudio.init()`.
-7. Guard / fallback gain setting for invalid `playClickSFX` variants.
-8. Cancellation of pending `setTimeout` handle when restarting BGM.
+Milestone 1 remote and event infrastructure contains 5 major defects:
+1. **Critical Boot Blocker**: `ServerMain.server.lua` hangs infinitely on boot due to `LootModule.lua` calling `remoteFunctions:WaitForChild("GiveLoot")` when `GiveLoot`/`sellLoot` `RemoteFunction` instances are not pre-created.
+2. **Client Dialogue Listener Timeout**: `VNController.client.lua` times out on `ShowVNDialogue` after 10s because server creates `ShowVNDialogue` lazily instead of at boot.
+3. **Parameter Mismatch**: `ServingService.GuestServed` passes `guestType` instead of `recipe` into `ChallengeModeService.onGuestServed`.
+4. **Flawed Listener**: `EndlessLoopWiring.server.lua` attempts to listen to a non-existent `RemoteEvent` with invalid `.Event` property under `GuestManager`.
+5. **Dead / Unfired Remotes**: `ChefStatsUpdate`, `StylePointsUpdate`, and `OutfitUnlock` are never fired by any server script.
 
 ---
 
 ## 5. Verification Method
 
-To independently verify these findings:
+To independently verify all findings:
 
-1. Navigate to `.agents/teamwork_preview_challenger_m1_1`
-2. Run the empirical test harness command:
-   ```bash
-   node run_empirical_tests.js
-   ```
-3. Inspect output log for test results and failure details (or read `challenge.md`).
-4. Invalidation conditions: The implementation is verified (PASS) if all 25 test assertions in `run_empirical_tests.js` pass with 0 failures.
+1. **Verify Boot Blocker (`GiveLoot`/`sellLoot`)**:
+   - Inspect `src/server/ServerMain.server.lua` line 9 and `src/shared/ConfigurationFiles/LootModule.lua` lines 15-16.
+   - Run `python scripts/verify_m1_remotes.py` to confirm no server script creates `GiveLoot` or `sellLoot` RemoteFunctions prior to `LootModule` being required.
+
+2. **Verify `ShowVNDialogue` Timeout**:
+   - Inspect `src/client/VNController.client.lua` lines 633-646 and `src/server/systems/EndlessLoopWiring.server.lua` lines 140-148.
+   - Observe that `ShowVNDialogue` is missing from `ensureRemote(...)` calls in `EndlessLoopWiring.server.lua`.
+
+3. **Verify `GuestServed` Parameter Mismatch & Flawed Listener**:
+   - Compare `ServingService.lua` line 169 (`ServingService.GuestServed:Fire(player, guestType, quality)`) with `ChallengeModeService.lua` line 309 (`ChallengeModeService.onGuestServed(player, quality, recipe)`).
+   - Inspect `EndlessLoopWiring.server.lua` lines 37-39 and lines 57-65.
+
+4. **Verify Dead Wardrobe Remotes**:
+   - Run `python scripts/verify_m1_remotes.py` or `grep_search` across `src/` for `ChefStatsUpdate`, `StylePointsUpdate`, and `OutfitUnlock`.
+   - Confirm 0 calls to `:FireClient` or `:FireAllClients` exist in `src/server`.

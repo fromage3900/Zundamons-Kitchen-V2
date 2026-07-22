@@ -42,11 +42,18 @@
 
     <!-- 2. Big Game Launch Hero Banner -->
     <section id="hero" class="game-hero">
+        <!-- Live Telemetry Ticker Banner -->
+        <div id="hero-live-ticker" class="hero-live-ticker">
+            <div class="ticker-content" id="ticker-content-text">
+                🌸 <strong>Active Event:</strong> Whims of Gourmet - Spring Festival (2.0x Style Points & Gold) &nbsp;&nbsp;|&nbsp;&nbsp; 🎯 <strong>Featured Daily Challenge:</strong> Perfect Timing &nbsp;&nbsp;|&nbsp;&nbsp; 🎁 <strong>Active Promo Code:</strong> <code>HYBRIDECS</code> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍🍳 <strong>Online Chefs:</strong> 125 CHEFS ONLINE
+            </div>
+        </div>
+
         <div class="hero-container">
             <div class="hero-content">
                 <div class="status-pill">
                     <span class="pill-dot">🟢</span>
-                    <span class="pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS</span>
+                    <span class="pill-text" id="status-pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS (125 CHEFS ONLINE)</span>
                 </div>
 
                 <h1 class="hero-title">
@@ -70,6 +77,17 @@
                         <span class="cta-icon">💻</span>
                         <span class="cta-text">Open Terminal</span>
                     </button>
+                </div>
+
+                <!-- Community Global Dishes Cooked Progress Bar -->
+                <div class="community-progress-container">
+                    <div class="progress-info">
+                        <span>👨‍🍳 <strong>Community Global Cooking Goal</strong></span>
+                        <span id="dishes-cooked-text">142,850 / 200,000 Dishes Cooked (71% Goal Completed!)</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div id="dishes-cooked-bar" class="progress-bar-fill" style="width: 71%;"></div>
+                    </div>
                 </div>
 
                 <div class="hero-pills">
@@ -144,6 +162,29 @@
                     <p>Place furniture, design your kitchen plot, serve hungry NPC guests, earn gold, and level up your chef rank!</p>
                 </div>
             </div>
+
+            <!-- Active Daily Challenges Container -->
+            <div class="telemetry-challenges-container" style="margin-top: 40px;">
+                <h3 class="section-title" style="font-size: 22px;">🎯 TODAY'S FEATURED DAILY CHALLENGES</h3>
+                <p class="section-subtitle" style="margin-bottom: 20px;">Complete these daily quests in-game to earn gold, XP, and style points!</p>
+                <div id="active-challenges-list" class="challenges-grid">
+                    <div class="challenge-item-card">
+                        <div class="challenge-title">🎯 <strong>Perfect Timing</strong> <span class="challenge-diff">Difficulty ⭐⭐</span></div>
+                        <div class="challenge-desc">Cook 3 dishes with PERFECT timing</div>
+                        <div class="challenge-reward">Reward: +120 Gold, +100 XP, +15 Style Points</div>
+                    </div>
+                    <div class="challenge-item-card">
+                        <div class="challenge-title">🍳 <strong>Cooking Spree</strong> <span class="challenge-diff">Difficulty ⭐</span></div>
+                        <div class="challenge-desc">Cook 5 dishes</div>
+                        <div class="challenge-reward">Reward: +80 Gold, +60 XP, +10 Style Points</div>
+                    </div>
+                    <div class="challenge-item-card">
+                        <div class="challenge-title">✨ <strong>Flawless Chef</strong> <span class="challenge-diff">Difficulty ⭐⭐⭐</span></div>
+                        <div class="challenge-desc">Cook 5 PERFECT dishes</div>
+                        <div class="challenge-reward">Reward: +200 Gold, +150 XP, +25 Style Points</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -199,13 +240,13 @@
             <h2 class="section-title">🎁 ACTIVE RECURRING PLAYER PROMO CODES</h2>
             <p class="section-subtitle">Copy these active codes and redeem them inside Zundamon's Kitchen on Roblox!</p>
 
-            <div class="codes-grid">
+            <div class="codes-grid" id="telemetry-promos-grid">
                 <div class="code-box">
                     <div class="code-header">
                         <span class="code-val">ZUNDAMOCHI2026</span>
                         <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">📋 Copy Code</button>
                     </div>
-                    <span class="code-reward">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
+                    <span class="code-reward">Reward: +500 Gold, +50 Gems, 10x Fresh Zunda Mochi</span>
                 </div>
 
                 <div class="code-box">
@@ -213,7 +254,23 @@
                         <span class="code-val">SOUPSEASON</span>
                         <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">📋 Copy Code</button>
                     </div>
-                    <span class="code-reward">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
+                    <span class="code-reward">Reward: +1000 Gold, +100 Gems, 5x Wild Mushroom Pack</span>
+                </div>
+
+                <div class="code-box">
+                    <div class="code-header">
+                        <span class="code-val">KAWAIIZUNDA</span>
+                        <button class="win95-btn copy-code-btn btn-candy" data-code="KAWAIIZUNDA">📋 Copy Code</button>
+                    </div>
+                    <span class="code-reward">Reward: +750 Gold, +75 Gems, Sakura Chef Apron</span>
+                </div>
+
+                <div class="code-box">
+                    <div class="code-header">
+                        <span class="code-val">NIKKIFASHION</span>
+                        <button class="win95-btn copy-code-btn btn-candy" data-code="NIKKIFASHION">📋 Copy Code</button>
+                    </div>
+                    <span class="code-reward">Reward: +1500 Gold, +150 Gems, 3x Whim Gacha Tickets</span>
                 </div>
 
                 <div class="code-box">
@@ -221,7 +278,7 @@
                         <span class="code-val">HYBRIDECS</span>
                         <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">📋 Copy Code</button>
                     </div>
-                    <span class="code-reward">Reward: +250 Gold, Matter ECS Developer Badge</span>
+                    <span class="code-reward">Reward: +2000 Gold, +200 Gems, 5x Whim Gacha Tickets</span>
                 </div>
             </div>
         </div>
@@ -440,9 +497,13 @@
                         </div>
                         <div class="window-body promos-body">
                             <h3>🎁 Active Roblox Promo Codes</h3>
-                            <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">Copy ZUNDAMOCHI2026</button>
-                            <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">Copy SOUPSEASON</button>
-                            <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">Copy HYBRIDECS</button>
+                            <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">Copy ZUNDAMOCHI2026</button>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">Copy SOUPSEASON</button>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="KAWAIIZUNDA">Copy KAWAIIZUNDA</button>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="NIKKIFASHION">Copy NIKKIFASHION</button>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">Copy HYBRIDECS</button>
+                            </div>
                         </div>
                     </div>
 

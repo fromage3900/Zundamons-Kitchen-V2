@@ -9,16 +9,22 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(RS.ConfigurationFiles.UIActionRegistry)
 local RE = RS:WaitForChild("RemoteEvents")
 local ev = RE:WaitForChild("UpdateQuests", 15)
+-- Infinity Nikki aesthetic: pastel palette
 local C = {
-	bg = UIConfig.COLORS.MochiCream,
-	border = UIConfig.COLORS.ZundaDark,
-	text = UIConfig.COLORS.TextDark,
-	sub = UIConfig.COLORS.TextDarkSec,
-	done = UIConfig.COLORS.ZundaPrimary,
-	bar = UIConfig.COLORS.PeaAccent,
-	fill = UIConfig.COLORS.Sprout,
+	bg = Color3.fromRGB(255, 248, 240),
+	border = Color3.fromRGB(160, 210, 150),
+	text = Color3.fromRGB(80, 80, 80),
+	sub = Color3.fromRGB(120, 120, 120),
+	done = Color3.fromRGB(160, 210, 150),
+	bar = Color3.fromRGB(255, 200, 80),
+	fill = Color3.fromRGB(255, 150, 200),
+	mint = Color3.fromRGB(145, 215, 195),
+	gold = Color3.fromRGB(255, 200, 80),
+	pink = Color3.fromRGB(255, 150, 200),
+	zunda = Color3.fromRGB(160, 210, 150),
 }
 
 local panel = Instance.new("Frame", gui)
@@ -272,7 +278,7 @@ spawnPopup = function(kind, text, color)
 end
 
 local open = false
-local shell = CozyModalShell.wrap(panel, {
+local shell = CozyModalShell.wrap(panel, { actionId = "quests",
 	open = function()
 		panel.Size = UDim2.new(0, 420, 0, 10)
 		Tween:Create(
@@ -325,3 +331,9 @@ UIS.InputBegan:Connect(function(i, g)
 	end
 end)
 print("[QuestPanel] Ready")
+
+-- Register with UIRouter for modal exclusivity and Escape handling
+UIRouter.register("quests", nil, function() shell.close() end)
+
+-- Register callback with ActionRegistry for Pea Wheel dispatch
+ActionRegistry.registerCallback("quests", toggle)

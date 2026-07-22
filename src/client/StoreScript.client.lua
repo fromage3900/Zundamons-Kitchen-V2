@@ -146,7 +146,7 @@ local function buildProductCard(prod, idx, cat)
         UIHelper.spawnSparkles(buyBtn.Parent, pos.X + sz.X / 2, pos.Y + sz.Y / 2, C.robux, 6)
         if promptRF then
             local toast=Instance.new("ScreenGui",player:WaitForChild("PlayerGui"))
-            toast.Name="PurchaseToast"; toast.DisplayOrder=1000
+            toast.Name="PurchaseToast"; toast.DisplayOrder=1000; toast.ResetOnSpawn=false
             local f=Instance.new("Frame",toast)
             f.Size=UDim2.new(0,360,0,80); f.AnchorPoint=Vector2.new(0.5,0)
             f.Position=UDim2.new(0.5,0,0,80); f.BackgroundColor3=Color3.fromRGB(0,162,255)
@@ -251,7 +251,7 @@ tabAcc.MouseButton1Click:Connect(function()  switchTab("accessories") end)
 if purchaseEv then
     purchaseEv.OnClientEvent:Connect(function(itemName, itemType)
         local toast=Instance.new("ScreenGui",player:WaitForChild("PlayerGui"))
-        toast.Name="SuccessToast"; toast.DisplayOrder=1001
+        toast.Name="SuccessToast"; toast.DisplayOrder=1001; toast.ResetOnSpawn=false
         local f=Instance.new("Frame",toast)
         f.Size=UDim2.new(0,320,0,70); f.AnchorPoint=Vector2.new(0.5,0)
         f.Position=UDim2.new(0.5,0,0,80); f.BackgroundColor3=Color3.fromRGB(100,200,100)

@@ -1,14 +1,14 @@
-# BRIEFING — 2026-07-21T20:49:55Z
+# BRIEFING — 2026-07-22T17:56:00Z
 
 ## Mission
-Empirically stress-test window drag and state management in `site/window_manager.js` for Milestone 2.
+Empirically test and challenge Milestone 2 Real-Time Game Telemetry & Web Hub Integration (`site/api/game_info.json`, `docs/api/game_info.json`, `site/sync_site.js`, `scripts/preflight_audit.py`, fallback handling).
 
 ## 🔒 My Identity
 - Archetype: Empirical Challenger
 - Roles: critic, specialist
 - Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_1
-- Original parent: 281d54cf-b9e8-4061-a866-77c4825337fd
-- Milestone: Milestone 2 — Zunda-OS 95 CLI Launch Page & Creative Hub
+- Original parent: a028a396-270f-4893-8048-eaf8e40a76bc
+- Milestone: Milestone 2 — Real-Time Game Telemetry & Web Hub Integration
 - Instance: 1 of 1
 
 ## 🔒 Key Constraints
@@ -16,28 +16,26 @@ Empirically stress-test window drag and state management in `site/window_manager
 - Run verification code yourself; empirical evidence required
 
 ## Current Parent
-- Conversation ID: 281d54cf-b9e8-4061-a866-77c4825337fd
-- Updated: 2026-07-21T20:49:55Z
+- Conversation ID: a028a396-270f-4893-8048-eaf8e40a76bc
+- Updated: 2026-07-22T17:56:00Z
 
 ## Review Scope
-- **Files to review**: `site/window_manager.js`, `site/index.html`
-- **Interface contracts**: window drag clamping, active focus fallback, taskbar sync, keyboard shortcuts (Ctrl+Esc, Escape)
-- **Review criteria**: correctness, robustness, stress testing mouse/touch drag, focus management, taskbar sync, keyboard shortcuts
+- **Files to review**: `site/api/game_info.json`, `docs/api/game_info.json`, `site/sync_site.js`, `scripts/preflight_audit.py`, telemetry frontend scripts (`site/app.js` or `site/index.html` or game_info integration)
+- **Interface contracts**: JSON structure validity, `sync_site.js` sync and hash comparison, `preflight_audit.py` execution, edge cases (missing files, CORS fallback `STATIC_GAME_INFO_FALLBACK`, missing DOM elements)
+- **Review criteria**: correctness, robustness, fallback behavior, preflight audit results, file synchronization accuracy
 
 ## Key Decisions Made
-- Executed 52 empirical test assertions using JSDOM in `test_suite.js`.
-- Verified all 4 core dimensions pass 100%.
+- Commencing empirical testing of telemetry integration and site sync.
 
 ## Artifact Index
 - `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_1\ORIGINAL_REQUEST.md` — Original request log
-- `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_1\test_suite.js` — Empirical test suite (52 assertions)
-- `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_1\challenge.md` — Challenge report
 - `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_1\handoff.md` — Handoff report
 
 ## Attack Surface
-- **Hypotheses tested**: Mouse/touch drag clamping, active window focus fallback on minimize/close, taskbar sync & minimize/restore toggle, Ctrl+Esc/Escape keyboard shortcuts.
-- **Vulnerabilities found**: None. All 52 test cases passed.
-- **Untested angles**: None within scope.
+- **Hypotheses tested**: TBD
+- **Vulnerabilities found**: TBD
+- **Untested angles**: TBD
 
 ## Loaded Skills
 - None loaded
+

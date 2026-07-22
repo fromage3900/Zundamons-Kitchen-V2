@@ -1,56 +1,55 @@
-# Project Plan: Zundamon's Kitchen V2 — Kawaii PC Desktop x Game Showcase Launchpad
+# Project Plan: Zundamon's Kitchen V2 — Codebase Audit, Telemetry & Web Integration
 
 ## Overview
-Decompose, design, execute, and verify the Zundamon's Kitchen V2 webfront blending a Kawaii Y2K Infinity Nikki Game Showcase Launchpad with an Interactive PC Desktop workspace. Maintained in `g:\Zundamons-kItchen-V2\site` with automated dual deployment synchronization to `g:\Zundamons-kItchen-V2\docs`.
+Decompose, execute, and verify the deep codebase audit, bug fixes, real-time game telemetry integration, and preflight verification for Zundamon's Kitchen V2 across Roblox server/client/shared scripts and the Zunda-OS 95 web portal (`docs/` and `site/`).
 
-## Aesthetic & Architecture
-- **Palette**: Sakura Pink (`#ffb7c5`, `#ff85a1`, `#ffe5ec`), Zunda Edamame Mint (`#4caf50`, `#8bc34a`, `#a5d6a7`), Magical Pearl Lavender (`#e8dff5`). Glossy rounded candy buttons, sparkling starburst canvas (`✨`), zero matrix blood cell overlays, 100% SFW anti-AI-slop copy.
-- **Dual Experience**:
-  1. **Game Showcase Launchpad**: Top Game Navbar with brand logo & `[ 🎮 PLAY ON ROBLOX NOW ]` CTA, Big Game Launch Hero Banner with live status (`🟢 LIVE ON ROBLOX · v2.4.0 HYBRID ECS`), dual CTAs, feature pills, Game Features Grid (Gathering, Rhythm Minigames, Companion Spirits, Restaurant Decorating), Active Promo Codes Box with 1-click clipboard copy (`ZUNDAMOCHI2026`, `SOUPSEASON`, `HYBRIDECS`).
-  2. **Interactive Kawaii PC Desktop Workspace**: Clickable & draggable windows (`ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`, `Zundamon.app`, `Promos.app`, `Calculator.app`, `Updates.log`) and Desktop Widgets (digital clock & weather widget ⏰, Lo-Fi jukebox with rain FX 🎵, Zundamon Desktop Sticker 🫛).
-- **Game Data Integration**: Live parsing/integration of Lua config data from `src/shared/ConfigurationFiles/` (`CompanionConfig.lua`, `CraftConfig.lua`, `ItemConfig.lua`, `DailyQuestConfig.lua`, `VNDialogueData.lua`).
-- **Automated Dual Sync**: `sync_site.js` automated script mirroring `site/` to `docs/` for GitHub Pages.
+## Architecture & Requirements Summary
+1. **R1. Deep Codebase Audit & Loose-Ends Fixes**:
+   - Verify all RemoteEvent/RemoteFunction definitions in `ReplicatedStorage`.
+   - Ensure zero `script.Parent` UI references in `StarterPlayerScripts`.
+   - Ensure all modal/dialogue panels have `Visible = false` on startup in `ClientGuiBootstrap`.
+   - Ensure top-level ScreenGuis have `ResetOnSpawn = false`.
+   - Check `ServerScriptService` imports: use `ServerScriptService.Services.X` or `ServerScriptService.systems.X` (never `.Server.`).
+   - Ensure `default.project.json` includes `"$ignoreUnknownInstances": true` under `"Workspace"`.
+2. **R2. Real-Time Game Telemetry & Web Integration**:
+   - Verify `WebInfoSyncService` in server scripts and `docs/api/game_info.json`.
+   - Structure `game_info.json` with challenges, live banners, promo codes, player counts, and global stats.
+   - Update `docs/index.html`, `docs/presskit.html`, `site/index.html` (and JS modules) to fetch `docs/api/game_info.json` dynamically with live ticker and event banners.
+   - Synchronize `site/` and `docs/` using `sync_site.js`.
+3. **R3. Preflight & Acceptance Verification**:
+   - `python scripts/preflight_audit.py` returns 0 errors.
+   - Reviewer, Challenger, and Forensic Auditor verification.
 
-## Directory Structure
-- `site/` & `docs/`
-  ├── `index.html` (Top Navbar, Hero Banner, Features Grid, Promo Codes, Embedded Desktop Workspace, Widgets, Canvas)
-  ├── `style.css` (Kawaii Y2K Infinity Nikki design tokens, candy buttons, starburst canvas, glassmorphism, responsive grid)
-  ├── `window_manager.js` (Modular Window Engine: drag, clamp, z-index focus, minimize/maximize/close, taskbar buttons, shortcuts)
-  ├── `terminal.js` (Y2K Pastel Web Terminal `ZundaCLI.exe`, command parser, history, tab autocomplete, commands & easter eggs)
-  ├── `app.js` (Interactive App Engines: `Cookbook.app`, `VNTalk.app`, `Zundamon.app`, `Promos.app`, `Calculator.app`, `Updates.log`, Widgets)
-  ├── `sync_site.js` (Automated dual sync script copying web assets from `site/` to `docs/`)
-  └── `assets/` (Icons, audio synthesizers, background music, rain FX sound synthesis)
+## Directory & Module Structure
+- Roblox Source: `src/server/`, `src/client/`, `src/shared/`
+- Workspace Config: `default.project.json`, `wally.toml`
+- Scripts & Tools: `scripts/preflight_audit.py`, `scripts/sync_site.js`
+- Web Hub: `docs/index.html`, `docs/presskit.html`, `docs/api/game_info.json`, `site/`
 
 ## Milestones
 
-### Milestone 1: Kawaii Y2K Infinity Nikki Design System, Showcase Architecture & Automated Dual Sync
-- **Objective**: Implement complete HTML5 structure (`index.html`), Y2K Infinity Nikki CSS theme (`style.css`), top game navbar, hero banner with live status & dual CTAs, features grid, promo codes section with 1-click copy toast notification, sparkling starbursts canvas backdrop (removing CRT green blood cell overlays), and create `site/sync_site.js` script to automatically replicate `site/` -> `docs/`.
-- **Target Files**: `site/index.html`, `site/style.css`, `site/sync_site.js`, `docs/*`
+### Milestone 1: Deep Codebase Audit & Luau Bug Fixes
+- **Objective**: Audit and fix all Luau scripts across `src/server`, `src/client`, `src/shared`. Ensure all RemoteEvents/RemoteFunctions exist, UI scripts follow `ClientGuiBootstrap` with modal `Visible = false` and `ResetOnSpawn = false`, import paths are consistent, and `default.project.json` has `"$ignoreUnknownInstances": true`.
+- **Target Files**: `src/client/**/*`, `src/server/**/*`, `src/shared/**/*`, `default.project.json`
 - **Dependencies**: None
 - **Status**: DONE
 
-### Milestone 2: Interactive Desktop Window Manager & Pastel Desktop Widgets Engine
-- **Objective**: Refactor `window_manager.js` and CSS window styling to support 7 draggable/focusable windows (`ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`, `Zundamon.app`, `Promos.app`, `Calculator.app`, `Updates.log`). Implement smooth drag clamping, z-index stack management, taskbar button sync, active window focus fallback, keyboard shortcuts, and 3 interactive desktop widgets: (1) Live Clock & Weather Widget ⏰, (2) Lo-Fi Jukebox with Rain FX BGM player 🎵, and (3) Interactive Zundamon Desktop Sticker with speech bubble chirps 🫛.
-- **Target Files**: `site/window_manager.js`, `site/style.css`, `site/index.html`, `site/assets/audio_engine.js`, `docs/*`
+### Milestone 2: Real-Time Game Telemetry & Web Hub Integration
+- **Objective**: Enhance/verify `WebInfoSyncService` backend to sync game state to `docs/api/game_info.json`. Connect `docs/index.html`, `docs/presskit.html`, and `site/` web hubs to render real-time telemetry tickers, active daily challenges, live gacha banners, and community milestone progress without console errors. Run `sync_site.js`.
+- **Target Files**: `src/server/Services/WebInfoSyncService.lua`, `docs/api/game_info.json`, `docs/index.html`, `docs/presskit.html`, `site/*`
 - **Dependencies**: Milestone 1
-- **Status**: DONE
-
-### Milestone 3: Pastel Web Terminal (`ZundaCLI.exe`), Promos.app, Calculator.app & Updates.log
-- **Objective**: Refactor `terminal.js` and app engines for utility apps. Implement Y2K Pastel Web Terminal `ZundaCLI.exe` with command prompt (`zunda>`), history buffer, Tab autocomplete, commands (`help`, `info`, `recipes`, `spirits`, `quests`, `promos`, `calc`, `clear`, `theme`, easter eggs). Implement `Promos.app` (1-click code redeemer preview), `Calculator.app` (dish crafter profit calculator with ingredient & gold margin calculations), and `Updates.log` (Matter ECS patch notes).
-- **Target Files**: `site/terminal.js`, `site/app.js`, `site/style.css`, `docs/*`
-- **Dependencies**: Milestones 1 & 2
 - **Status**: IN_PROGRESS
 
-### Milestone 4: Game Data Integration (`Cookbook.app`, `VNTalk.app`, `Zundamon.app`), SFW Audit & Dual Deployment Verification
-- **Objective**: Integrate real Lua game configuration data from `src/shared/ConfigurationFiles/` (`CraftConfig.lua`, `ItemConfig.lua`, `CompanionConfig.lua`, `DailyQuestConfig.lua`, `VNDialogueData.lua`) into `site/app.js`. Power `Cookbook.app` (recipe card search, ingredient requirements, rhythm minigame score targets), `VNTalk.app` (interactive visual novel dialogue preview), and `Zundamon.app` (companion spirit catalog, mood avatar `🟢 Happy`/`🍳 Cooking`/`💤 Sleeping`, vocal chirps). Execute full verification, zero external dependencies check, 100% SFW audit, and dual deployment verification in `site/` and `docs/`.
-- **Target Files**: `site/app.js`, `site/index.html`, `site/sync_site.js`, `docs/*`
-- **Dependencies**: Milestones 1, 2 & 3
+### Milestone 3: Preflight Audit & End-to-End Acceptance Verification
+- **Objective**: Execute `python scripts/preflight_audit.py` (must pass with 0 errors). Conduct independent review, adversarial testing, and Forensic Integrity Audit across all rules and requirements.
+- **Target Files**: `scripts/preflight_audit.py`, all codebase & site files
+- **Dependencies**: Milestones 1 & 2
 - **Status**: PLANNED
 
 ## Verification & Audit Strategy
 For each milestone:
-1. **Exploration**: 3 Explorers analyze structure, design compliance, code layout, and requirements.
-2. **Implementation**: 1 Worker implements target code files, executes node/browser validation tests, and reports verification output.
-3. **Review**: 2 Reviewers independently assess code quality, responsiveness, zero external dependencies, and design fidelity.
-4. **Adversarial Verification**: 2 Challengers stress-test interactions, edge cases, responsiveness, and clipboard/audio APIs.
-5. **Integrity Audit**: 1 Forensic Auditor performs integrity verification (HARD VETO on hardcoded cheating or fake logic).
+1. **Exploration**: 3 Explorers analyze codebase, check contract rules, and report defect maps / integration plans.
+2. **Implementation**: 1 Worker implements fixes, executes preflight check / node tests, and reports diffs & results.
+3. **Review**: 2 Reviewers independently assess Luau correctness, decoupled UI rules, and telemetry integrity.
+4. **Adversarial Verification**: 2 Challengers stress-test edge cases, missing remote calls, and web JSON parsing.
+5. **Integrity Audit**: 1 Forensic Auditor performs static and execution analysis (HARD VETO on hardcoded cheating or fake logic).

@@ -6,6 +6,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Matter = require(ReplicatedStorage.Packages.Matter)
 local FishingService = require(ServerScriptService.Services.FishingService)
 local CookingService = require(ServerScriptService.Services.CookingService)
+local LootModule = require(ReplicatedStorage.ConfigurationFiles.LootModule)
 
 local systemsFolder = ServerScriptService:WaitForChild("systems")
 local cookingSystems = systemsFolder:WaitForChild("cooking")

@@ -50,7 +50,7 @@ header.BackgroundTransparency = 0.5
 header.BorderSizePixel = 0
 local hdrCorner = Instance.new("UICorner", header)
 hdrCorner.CornerRadius = UDim.new(0, 24)
-Instance.new("UIClip", header)
+header.ClipsDescendants = true
 
 local titleIcon = Instance.new("TextLabel", header)
 titleIcon.Size = UDim2.new(0, 48, 0, 48)

@@ -24,6 +24,18 @@ end
 local activeGuests = {} -- {guest_instance = {guest_model, player, recipe, timeout_thread}}
 local guestIdCounter = 0
 
+local remoteEventsFolder = game.ReplicatedStorage:FindFirstChild("RemoteEvents")
+if not remoteEventsFolder then
+	remoteEventsFolder = Instance.new("Folder")
+	remoteEventsFolder.Name = "RemoteEvents"
+	remoteEventsFolder.Parent = game.ReplicatedStorage
+end
+if not remoteEventsFolder:FindFirstChild("ShowVNDialogue") then
+	local vnEv = Instance.new("RemoteEvent")
+	vnEv.Name = "ShowVNDialogue"
+	vnEv.Parent = remoteEventsFolder
+end
+
 -- Spawn points: queue slots in the GameplayLoopArea ServingArea.
 -- If GuestSpawn-tagged parts exist (preferred), they will override these.
 local CollectionService = game:GetService("CollectionService")
@@ -52,8 +64,11 @@ end
 refreshSpawnPoints()
 
 local RS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 local NPCConfig = require(RS.Shared.Config.NPCConfig)
 local InsertService = game:GetService("InsertService")
+
+local ServingService: any = nil
 
 -- Cache loaded mesh templates
 local meshTemplateCache = {}
@@ -210,10 +225,10 @@ local function createGuest(player)
 	if dialogue then
 		local text = dialogue.spawn:gsub("{recipe}", recipe)
 		-- Fire client event to show VN dialogue
-		local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialgue")
+		local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
 		if not VNEvent then
 			VNEvent = Instance.new("RemoteEvent")
-			VNEvent.Name = "ShowVNDialgue"
+			VNEvent.Name = "ShowVNDialogue"
 			VNEvent.Parent = RS.RemoteEvents
 		end
 		VNEvent:FireClient(player, "guest", text)
@@ -348,10 +363,35 @@ local function createGuest(player)
 	payLabel.TextScaled = true
 	payLabel.Font = Enum.Font.Gotham
 	payLabel.Parent = bg
+	-- Assign personality type for roaming behavior
+	local personalityTypes = {"stationary", "roamer", "patrol"}
+	local personalityWeights = {0.4, 0.35, 0.25} -- 40% stationary, 35% roamer, 25% patrol
+	local roll = math.random()
+	local cumulative = 0
+	local personality = "stationary"
+	for i, pType in ipairs(personalityTypes) do
+		cumulative = cumulative + personalityWeights[i]
+		if roll <= cumulative then
+			personality = pType
+			break
+		end
+	end
+	guest:SetAttribute("Personality", personality)
+
+	-- If roamer or patrol, start roaming behavior
+	if personality ~= "stationary" then
+		task.spawn(function()
+			local NPCPatrolSystem = require(game:GetService("ServerScriptService").NPCPatrolSystem)
+			if NPCPatrolSystem and NPCPatrolSystem.startGuestRoaming then
+				NPCPatrolSystem.startGuestRoaming(guest, personality)
+			end
+		end)
+	end
+
 	-- Parent to Guests folder
 	guest.Parent = GUEST_SPAWN_FOLDER
 
-	print("[GuestManager] Spawned guest " .. guest.Name .. " for " .. player.Name .. " wanting " .. recipe)
+	print("[GuestManager] Spawned guest " .. guest.Name .. " for " .. player.Name .. " wanting " .. recipe .. " (personality: " .. personality .. ")")
 
 	return guest
 end
@@ -383,17 +423,40 @@ local function removeGuest(guest, reason)
 
 	print("[GuestManager] Guest " .. guestName .. " removed (" .. reason .. ")")
 
-	-- Trigger VN dialogue for timeout
+	-- Trigger VN dialogue and fire GuestTimedOut event on guest timeout
 	if reason == "timeout" then
 		local meshType = guest:GetAttribute("MeshType")
 		local VNDialogueData = require(RS.ConfigurationFiles.VNDialogueData)
 		local dialogue = VNDialogueData.GUEST_BY_TYPE[meshType]
-		if dialogue then
-			local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialgue")
+		local servingPlayer = game.Players:FindFirstChild(playerName)
+		if not servingPlayer then
+			local userId = guest:GetAttribute("ServingUserId")
+			if typeof(userId) == "number" then
+				servingPlayer = game.Players:GetPlayerByUserId(userId)
+			end
+		end
+
+		if dialogue and servingPlayer then
+			local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
 			if VNEvent then
-				local servingPlayer = game.Players:FindFirstChild(playerName)
-				if servingPlayer then
-					VNEvent:FireClient(servingPlayer, "guest", dialogue.timeout)
+				VNEvent:FireClient(servingPlayer, "guest", dialogue.timeout)
+			end
+		end
+
+		if servingPlayer then
+			local guestType = guest:GetAttribute("MeshType") or guest:GetAttribute("GuestType") or "default"
+			if not ServingService then
+				local sf = SSS:FindFirstChild("Services")
+				local ssMod = sf and sf:FindFirstChild("ServingService")
+				if ssMod then
+					ServingService = require(ssMod)
+				end
+			end
+			if ServingService then
+				if ServingService.onGuestTimeout then
+					ServingService.onGuestTimeout(servingPlayer, guestType)
+				elseif ServingService.GuestTimedOut then
+					ServingService.GuestTimedOut:Fire(servingPlayer, guestType)
 				end
 			end
 		end
@@ -439,11 +502,14 @@ local function guestTimeoutLoop()
 end
 
 local Players = game:GetService("Players")
-local SSS = game:GetService("ServerScriptService")
 local servicesFolder = SSS:FindFirstChild("Services")
 local GuestService = servicesFolder and servicesFolder:FindFirstChild("GuestService")
 if GuestService then
 	GuestService = require(GuestService)
+end
+local ssModule = servicesFolder and servicesFolder:FindFirstChild("ServingService")
+if ssModule then
+	ServingService = require(ssModule)
 end
 
 -- Expose for ServingSystem to call when guest is served

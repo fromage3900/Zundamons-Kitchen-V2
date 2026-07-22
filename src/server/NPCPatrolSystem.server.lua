@@ -108,6 +108,39 @@ local function patrolLoop(model, waypoints)
 	end
 end
 
+-- Guest roaming: move a guest NPC within a radius or between waypoints
+local function guestRoamLoop(guest, personality)
+	local torso = guest:FindFirstChild("Torso")
+	if not torso then return end
+	local spawnPos = torso.Position
+	local waypoints = getWaypoints()
+	
+	while guest and guest.Parent and torso.Parent do
+		if personality == "roamer" then
+			-- Wander within a 12-stud radius of spawn
+			local angle = math.random() * 2 * math.pi
+			local radius = math.random(3, 12)
+			local target = spawnPos + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+			moveToWaypoint(guest, target, 3)
+			task.wait(math.random(4, 10))
+		elseif personality == "patrol" and #waypoints > 0 then
+			-- Follow patrol waypoints
+			local wp = waypoints[math.random(1, #waypoints)]
+			moveToWaypoint(guest, wp, 4)
+			task.wait(math.random(5, 12))
+		end
+		task.wait(1)
+	end
+end
+
+-- Expose for GuestManager
+local NPCPatrolSystem = {}
+NPCPatrolSystem.startGuestRoaming = function(guest, personality)
+	task.spawn(function()
+		guestRoamLoop(guest, personality)
+	end)
+end
+
 local function spawnPatrolNPCs()
 	local waypoints = getWaypoints()
 	if #waypoints == 0 then
@@ -134,3 +167,5 @@ task.delay(5, spawnPatrolNPCs)
 CollectionService:GetInstanceAddedSignal("PatrolPoint"):Connect(function()
 	task.delay(2, spawnPatrolNPCs)
 end)
+
+return NPCPatrolSystem

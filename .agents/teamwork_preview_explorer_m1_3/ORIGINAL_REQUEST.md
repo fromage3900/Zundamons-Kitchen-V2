@@ -1,23 +1,12 @@
-## 2026-07-21T20:41:13Z
-<USER_REQUEST>
-You are Explorer 3 for Milestone 1 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
-Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3
-Target Site Directory: g:\Zundamons-kItchen-V2\site
+## 2026-07-22T17:20:37Z
 
-Your task:
-Analyze and design the Web Audio Engine Foundation and SVG Asset Infrastructure (`site/assets/`).
-Requirements to cover:
-1. Standalone Web Audio API sound synthesizer architecture (zero external audio file dependencies required):
-   - Retro click sound generator (`playClickSFX()`)
-   - Window drag/focus chime (`playWindowSFX()`)
-   - Terminal keypress beep/click (`playKeySFX()`)
-   - Cozy background melody generator / ambient audio loop synthesizer (`playCozyBGM()`)
-   - Global sound mute/volume toggle state management
-2. SVG Asset Definitions:
-   - Pea Pod icon (`pea_pod.svg` / inline SVG code) for titlebars, start menu, and favicon
-   - Zundamon avatar / mochi graphic SVG definitions
-   - Retro CRT monitor & disc icons for start menu items
-3. Roblox UI Export Readiness mapping rules (documenting how HTML/CSS flex/grid layouts and CSS variables translate to Roblox `ScreenGui`, `Frame`, `UIListLayout`, `UICorner`, `UIStroke`).
+You are Explorer 3 for Milestone 1 of Zundamon's Kitchen V2.
+Your working directory is: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3
 
-Write your detailed specification in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\analysis.md` and deliver a soft handoff in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\handoff.md`. Send a message to orchestrator when finished.
-</USER_REQUEST>
+TASK: Rojo Config & Preflight Audit
+1. Audit `default.project.json` in g:\Zundamons-kItchen-V2: verify `"$ignoreUnknownInstances": true` is included under `"Workspace"`.
+2. Inspect `wally.toml` and `default.project.json` mappings for `"Packages"` in `ReplicatedStorage` and `"ServerPackages"` in `ServerScriptService`.
+3. Run `python scripts/preflight_audit.py` using `run_command` (Cwd: g:\Zundamons-kItchen-V2) to analyze the current preflight status and catch any Luau static errors or rule violations.
+4. Document all preflight check failures, warnings, and missing configurations.
+5. Write your complete analysis and findings to `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\handoff.md`.
+6. Send a message to caller with the summary and path to your handoff report.

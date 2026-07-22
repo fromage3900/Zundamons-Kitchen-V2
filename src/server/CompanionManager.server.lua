@@ -7,7 +7,7 @@ local InsertService = game:GetService("InsertService")
 
 -- Per-companion mesh IDs
 local COMPANION_MESHES = {
-    zundapal   = "rbxassetid://81331860128238",
+    zundapal   = "rbxassetid://71161704530283",
     dog        = "rbxassetid://123070508686616",
     parrot     = "rbxassetid://100814736457956",
     cat        = "rbxassetid://131662379743903",
@@ -49,7 +49,7 @@ local function loadCompanionModel(compType)
     end
 
     -- In-world model wins (zundapal already placed in workspace)
-    local worldModel = workspace:FindFirstChild("zundapalupdate2")
+    local worldModel = workspace:FindFirstChild("zundapalupdate2") or workspace:FindFirstChild("zundapalupdate4")
     if compType == "zundapal" and worldModel then
         print("[CompanionManager.loadCompanionModel] Using in-world zundapalupdate2")
         local clone = worldModel:Clone()

@@ -7,13 +7,71 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local remoteFunctions = ReplicatedStorage:WaitForChild("RemoteFunctions")
+local RunService = game:GetService("RunService")
+
+local remoteEvents = ReplicatedStorage:FindFirstChild("RemoteEvents")
+if not remoteEvents then
+	remoteEvents = Instance.new("Folder")
+	remoteEvents.Name = "RemoteEvents"
+	remoteEvents.Parent = ReplicatedStorage
+end
+
+local remoteFunctions = ReplicatedStorage:FindFirstChild("RemoteFunctions")
+if not remoteFunctions then
+	remoteFunctions = Instance.new("Folder")
+	remoteFunctions.Name = "RemoteFunctions"
+	remoteFunctions.Parent = ReplicatedStorage
+end
+
 local lootFolder = ReplicatedStorage:WaitForChild("Loot")
-local makeLoot = remoteEvents:WaitForChild("MakeLootEvent") :: RemoteEvent
-local removeCode = remoteEvents:WaitForChild("RemoveCode") :: RemoteEvent
-local giveLoot = remoteFunctions:WaitForChild("GiveLoot") :: RemoteFunction
-local sellLoot = remoteFunctions:WaitForChild("sellLoot") :: RemoteFunction
+
+local makeLoot = remoteEvents:FindFirstChild("MakeLootEvent") :: RemoteEvent?
+if not makeLoot then
+	if RunService:IsServer() then
+		local newEv = Instance.new("RemoteEvent")
+		newEv.Name = "MakeLootEvent"
+		newEv.Parent = remoteEvents
+		makeLoot = newEv
+	else
+		makeLoot = remoteEvents:WaitForChild("MakeLootEvent") :: RemoteEvent
+	end
+end
+
+local removeCode = remoteEvents:FindFirstChild("RemoveCode") :: RemoteEvent?
+if not removeCode then
+	if RunService:IsServer() then
+		local newEv = Instance.new("RemoteEvent")
+		newEv.Name = "RemoveCode"
+		newEv.Parent = remoteEvents
+		removeCode = newEv
+	else
+		removeCode = remoteEvents:WaitForChild("RemoveCode") :: RemoteEvent
+	end
+end
+
+local giveLoot = remoteFunctions:FindFirstChild("GiveLoot") :: RemoteFunction?
+if not giveLoot then
+	if RunService:IsServer() then
+		local newRF = Instance.new("RemoteFunction")
+		newRF.Name = "GiveLoot"
+		newRF.Parent = remoteFunctions
+		giveLoot = newRF
+	else
+		giveLoot = remoteFunctions:WaitForChild("GiveLoot") :: RemoteFunction
+	end
+end
+
+local sellLoot = remoteFunctions:FindFirstChild("sellLoot") :: RemoteFunction?
+if not sellLoot then
+	if RunService:IsServer() then
+		local newRF = Instance.new("RemoteFunction")
+		newRF.Name = "sellLoot"
+		newRF.Parent = remoteFunctions
+		sellLoot = newRF
+	else
+		sellLoot = remoteFunctions:WaitForChild("sellLoot") :: RemoteFunction
+	end
+end
 
 local MineableConfig = require(ReplicatedStorage.ConfigurationFiles.MineableConfig)
 local ChefLevelConfig = require(ReplicatedStorage.ConfigurationFiles.ChefLevelConfig)

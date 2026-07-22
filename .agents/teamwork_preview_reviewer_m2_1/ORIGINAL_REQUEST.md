@@ -1,13 +1,19 @@
-## 2026-07-21T20:48:22Z
-You are Reviewer 1 for Milestone 2 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
-Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1
-Target Site Directory: g:\Zundamons-kItchen-V2\site
+## 2026-07-22T17:55:59Z
+<USER_REQUEST>
+You are Reviewer 1 for Milestone 2 (Real-Time Game Telemetry & Web Hub Integration).
+Your working directory is `.agents/teamwork_preview_reviewer_m2_1`.
 
-Your task:
-Review code correctness and API design of `site/window_manager.js`, `site/assets/audio_engine.js`, and `site/index.html`:
-1. Verify JavaScript syntax via `node -c site/window_manager.js` and `node -c site/assets/audio_engine.js`.
-2. Inspect `WindowManager` class structure, event listener bindings, and cleanup logic.
-3. Check boundary clamping calculation in mouse and touch drag handlers (`Math.max(0, Math.min(pos, max))`).
-4. Confirm zero external script, font, or audio dependencies.
-
-Document your review in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1\review.md` and deliver `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1\handoff.md`. Send a message to orchestrator with your verdict (APPROVED / REJECTED).
+### Task:
+Perform independent code review across all Milestone 2 changes:
+1. `src/server/Services/WebInfoSyncService.lua` & `src/server/Services/PromoCodeService.lua`:
+   - Verify `exportGameStateJson()` Luau syntax and correctness.
+   - Verify `DailyChallengeConfig.dailyPool` and `weeklyBoss` indexing fix (no nil indexing).
+   - Verify `PromoCodeService.activeCodes` has `HYBRIDECS`.
+2. Telemetry JSON Schema (`site/api/game_info.json` & `docs/api/game_info.json`):
+   - Check structure: `online_players`, `active_challenges`, `gacha_banners`, `promo_codes`, `global_stats`.
+3. Web Frontend (`site/index.html`, `site/presskit.html`, `site/app.js`, `site/style.css`):
+   - Verify `TelemetryService` implementation, `STATIC_GAME_INFO_FALLBACK` resiliency, ticker banner, promo buttons, and community progress bar.
+   - Verify decoupled UI rules (no inline breaking script errors, clean DOM binding).
+4. Run verification commands (e.g. `node -c site/app.js`, `node site/sync_site.js`, `python scripts/preflight_audit.py`).
+5. Write your findings and handoff report in `.agents/teamwork_preview_reviewer_m2_1/handoff.md` with explicit APPROVED or REJECTED verdict.
+</USER_REQUEST>

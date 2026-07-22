@@ -1,108 +1,171 @@
-# Handoff Report: CSS3 Styling Architecture (Zunda-OS 95 & Zen Aesthetic)
-
-**From**: Explorer 2 (`teamwork_preview_explorer_m1_2`)  
-**To**: Orchestrator (`281d54cf-b9e8-4061-a866-77c4825337fd`) & Implementer Worker (`teamwork_preview_worker_m1`)  
-**Milestone**: Milestone 1 (Zunda-OS 95 CLI Launch Page & Creative Hub)  
-**Target Output File**: `g:\Zundamons-kItchen-V2\site\style.css`  
-**Handoff Type**: Soft Handoff (Design & Architecture Phase -> Implementation Phase)  
-
----
+# Handoff Report: Client UI Decoupling & Modal Visibility Audit
 
 ## 1. Observation
 
-Direct observations from prompt requirements, workspace state, and architecture plan:
+### System Mapping & Scope
+- **File**: `default.project.json`
+- **Lines 67-72**:
+  ```json
+  "StarterPlayer": {
+    "$className": "StarterPlayer",
+    "StarterPlayerScripts": {
+      "$path": "src/client"
+    }
+  }
+  ```
+  *Observation*: `src/client` is mapped directly to `StarterPlayer.StarterPlayerScripts` in Rojo, meaning all 61 Lua files in `src/client/` run inside `StarterPlayerScripts`.
 
-1. **Target Directory & File**:
-   - `Target Site Directory`: `g:\Zundamons-kItchen-V2\site`
-   - `Target CSS File`: `site/style.css`
-   - `Working Directory`: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_2`
+### Audit Criterion 2a: `script.Parent` for UI References
+- *Command*: Executed AST / pattern search across all 61 Lua files in `src/client`.
+- *Result*: Only 5 files contain `script.Parent`, and **all 5 instances are strictly for module requiring or script folder navigation**:
+  1. `src/client/Controllers/PeaWheelController.lua` (Line 13):
+     `local ActionRegistry = require(script.Parent.Parent.ConfigurationFiles.UIActionRegistry)`
+  2. `src/client/PeaWheelBootstrap.client.lua` (Line 6):
+     `local ActionRegistry = require(script.Parent.ConfigurationFiles.UIActionRegistry)`
+  3. `src/client/TimedCookingScript.client.lua` (Line 2):
+     `local Controllers = script.Parent:WaitForChild("Controllers")`
+  4. `src/client/ui/cooking/stories/CookingHUD.story.lua` (Line 3):
+     `local CookingHUD = require(script.Parent.Parent.components.CookingHUD)`
+  5. `src/client/ui/inventory/components/InventoryHUD.lua` (Line 2):
+     `local useInventory = require(script.Parent.Parent.hooks.useInventory)`
+- *Verbatim Finding*: Zero (0) scripts use `script.Parent` to locate or access UI instances. All UI access is performed via `PlayerGui` (`player:WaitForChild("PlayerGui")`) or generated dynamically via `ClientGuiBootstrap` / `Instance.new("ScreenGui")`.
 
-2. **Required CSS Tokens (`:root`)**:
-   - Primary Greens: `--zunda-dark: #2e7d32`, `--zunda-primary: #4caf50`, `--zunda-light: #8bc34a`, `--zunda-bg: #e8f5e9`, `--zunda-accent: #c8e6c9`, `--zunda-pastel: #f1f8e9`.
-   - Retro OS Palette: `--win-bg: #e8f5e9`, `--win-border-light: #ffffff`, `--win-border-dark: #2e7d32`, `--win-title-bg: linear-gradient(90deg, #2e7d32, #4caf50)`, `--win-title-text: #ffffff`.
-   - Terminal Phosphor Palette: `--term-bg: #0a150a`, `--term-green: #33ff66`, `--term-glow: 0 0 8px rgba(51, 255, 102, 0.6)`.
-   - Roblox UI Export Mapping variables: `--roblox-screengui-bg`, `--roblox-frame-border`, `--roblox-text-color`, `--roblox-corner-radius`.
+### Audit Criterion 2b: Modal/Dialogue Panel Startup Visibility (`panel.Visible = false`)
+- *Command*: Audited all modal, dialogue, shop, and popup interfaces in `src/client/`.
+- *Observed Initializations*:
+  - `src/client/VNController.client.lua` (Lines 52, 64, 193, 206):
+    `dimmer.Visible = false`, `panel.Visible = false`, `choiceFrame.Visible = false`, `nameBanner.Visible = false`
+  - `src/client/CompanionShopScript.client.lua` (Lines 40, 50):
+    `backdrop.Visible = false`, `panel.Visible = false`
+  - `src/client/CompendiumScript.client.lua` (Line 83):
+    `panel.Visible = false`
+  - `src/client/Controllers/CookingController.lua` (Line 107):
+    `mainPanel.Visible = false`
+  - `src/client/CraftingScript.client.lua` (Line 39):
+    `panel.Visible = false`
+  - `src/client/DailyChecklistUI.client.lua` (Line 40):
+    `panel.Visible = false`
+  - `src/client/FishingMinigameScript.client.lua` (Lines 21, 30):
+    `backdrop.Visible = false`, `panel.Visible = false`
+  - `src/client/GuestServingUI.client.lua` (Lines 14, 24, 32):
+    `gui.Enabled = false`, `backdrop.Visible = false`, `panel.Visible = false`
+  - `src/client/KeybindsScript.client.lua` (Line 38):
+    `panel.Visible = false`
+  - `src/client/MaterialsScript.client.lua` (Line 43):
+    `panel.Visible = false`
+  - `src/client/OutfitWardrobeGui.client.lua` (Line 31):
+    `mainFrame.Visible = false`
+  - `src/client/PouchScript.client.lua` (Line 40):
+    `panel.Visible = false`
+  - `src/client/PromoCodeGui.client.lua` (Line 28):
+    `mainFrame.Visible = false`
+  - `src/client/QuestScript.client.lua` (Line 36):
+    `panel.Visible = false`
+  - `src/client/SettingsScreen.client.lua` (Lines 18, 28, 37):
+    `gui.Enabled = false`, `backdrop.Visible = false`, `panel.Visible = false`
+  - `src/client/StoreScript.client.lua` (Line 8):
+    `panel.Visible = false`
+  - `src/client/TeleportPicker.client.lua` (Line 13):
+    `gui.Enabled = false`
+  - `src/client/TutorialController.client.lua` (Line 121):
+    `card.Visible = false`
+  - `src/client/WelcomeStarterPackGui.client.lua` (Line 30):
+    `mainFrame.Visible = false`
+  - `src/client/ZundaroomsController.client.lua` (Line 24):
+    `banner.Visible = false`
+- *Verbatim Finding*: All 20 modal and dialogue systems explicitly set `panel.Visible = false` or `gui.Enabled = false` during script initialization.
 
-3. **Zunda-OS 95 Window Requirements**:
-   - Retro 3D beveled borders (`box-shadow` / `border` outset and inset effects in pastel green).
-   - Retro titlebars with pea pod icon (`🫛`), title text, and square control buttons (`_`, `□`, `X`).
-   - Active vs Inactive window state styling (`.window-active`, `.window-inactive`).
-
-4. **Taskbar & Start Menu Requirements**:
-   - Vintage 90s taskbar pinned at bottom (`height: 38px`), inset system tray, active window taskbar buttons.
-   - Start Menu popup box with icon list and hover highlights.
-
-5. **CRT Overlay & Atmosphere Requirements**:
-   - CRT overlay scanlines effect (`background: linear-gradient(...)`, `pointer-events: none`, toggleable via `.crt-off`).
-   - Floating zunda mochi/pea pod animation keyframes (`@keyframes floatPea`).
-
-6. **Responsive Layout**:
-   - Mobile (<768px), Tablet (768px-1024px), Desktop (>1024px) media queries.
+### Audit Criterion 2c: Top-level ScreenGui `ResetOnSpawn = false`
+- *Central Bootstrap*: `src/shared/ConfigurationFiles/ClientGuiBootstrap.lua` (Lines 14-22):
+  ```lua
+  local screenGui = Instance.new("ScreenGui")
+  screenGui.Name = name
+  screenGui.ResetOnSpawn = false
+  screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+  if displayOrder then
+      screenGui.DisplayOrder = displayOrder
+  end
+  screenGui.Parent = playerGui
+  return screenGui
+  ```
+  `ClientGuiBootstrap` handles ScreenGui creation for 21 client modules and automatically enforces `ResetOnSpawn = false`.
+- *Manual Compliant Implementations*: 16 client scripts create `ScreenGui` directly or fetch existing ones and explicitly set `ResetOnSpawn = false` (e.g. `AdminConsole.client.lua:13`, `CompanionHUD.client.lua:14`, `HarvestController.client.lua:59`, `CookingResultCard.client.lua:11`, `FurniturePlacement.client.lua:19`, `GuestServingUI.client.lua:12`, `HudBootstrap.client.lua:14`, `HudScript.client.lua:14,19`, `InventoryController.client.lua:26`, `PlayerStateHud.client.lua:19`, `RecipeUnlockToast.client.lua:10`, `SettingsScreen.client.lua:16`, `TeleportPicker.client.lua:11`, `UpdateScript.client.lua:12`, `WeatherClient.client.lua:75`, `ZundaFrameAnim.client.lua:10`).
+- *Non-Compliant Implementations (Bugs Identified)*:
+  - **`src/client/StoreScript.client.lua` (Line 148)**:
+    `local toast=Instance.new("ScreenGui",player:WaitForChild("PlayerGui"))`
+    (`PurchaseToast`) — missing `toast.ResetOnSpawn = false`.
+  - **`src/client/StoreScript.client.lua` (Line 253)**:
+    `local toast=Instance.new("ScreenGui",player:WaitForChild("PlayerGui"))`
+    (`SuccessToast`) — missing `toast.ResetOnSpawn = false`.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Token Foundation -> Visual Consistency**:
-   - *Premise*: Defining design tokens in `:root` (Observation 2) establishes a central single source of truth for color themes, terminal phosphors, and Roblox ScreenGui variable mappings.
-   - *Deduction*: Referencing `var(--zunda-dark)`, `var(--win-bg)`, and `var(--term-green)` across window components guarantees seamless visual harmonization across windows, taskbar, start menu, and terminal components.
+1. **Premise 1**: Under Rojo, scripts mapped to `StarterPlayerScripts` execute under `PlayerScripts`. If a script uses `script.Parent` to reference a GUI, it assumes it is parented inside a ScreenGui in `StarterGui`, which breaks when moved to `StarterPlayerScripts`.
+   - **Observation Ref**: `default.project.json` maps `src/client` to `StarterPlayerScripts`. All 5 occurrences of `script.Parent` in `src/client` were verified to be script/module require paths.
+   - **Deduction**: Client UI decoupling is fully maintained across all client scripts.
 
-2. **3D Bevels & Active/Inactive States -> Retro OS Authenticity**:
-   - *Premise*: Windows 95 UI relies on light/shadow bevels and titlebar color changes (Observation 3).
-   - *Deduction*: Creating `.bevel-outset` (top/left white, bottom/right green-shadow) and `.bevel-inset` classes allows any element (window frame, button, content container, text box) to render authentic 90s relief. Changing titlebars to muted blue-gray gradient (`.window-inactive`) clearly indicates window focus.
+2. **Premise 2**: Modal/dialogue panels left visible in Studio or uninitialized in client scripts will appear on screen when a player joins, causing overlapping UI bugs.
+   - **Observation Ref**: All 20 modal, shop, and dialogue controllers explicitly assign `panel.Visible = false` or `gui.Enabled = false` during top-level execution before listening for events or user input.
+   - **Deduction**: Startup modal visibility handling fully complies with AGENTS.md Rule 2.
 
-3. **Fixed Bottom Taskbar & Start Menu -> OS Layout Hierarchy**:
-   - *Premise*: Desktop OS interactions rely on a bottom-pinned taskbar (38px height) and popup Start Menu (Observation 4).
-   - *Deduction*: Setting `#taskbar` to `position: fixed; bottom: 0; height: 38px; z-index: 9999` reserves screen real estate and ensures window content does not get occluded when maximized or scrolled. The Start Menu (`#start-menu`) sits at `bottom: 40px` with vertical sidebar branding.
-
-4. **CRT Overlay & Floating Keyframes -> Cozy Zen Aesthetics**:
-   - *Premise*: The aesthetic merges retro CRT CLI feel with cozy Infinity Nikki zen edamame theme (Observation 5).
-   - *Deduction*: Layering `#crt-overlay` with `pointer-events: none` and linear gradient scanlines creates CRT cathode immersion without blocking mouse clicks on interactive windows. Toggling `body.crt-off` hides this layer cleanly. `@keyframes floatPea` adds gentle organic movement to background decoration elements.
-
-5. **Responsive Media Queries -> Cross-Device Usability**:
-   - *Premise*: Users access the website on desktop, tablet, and mobile devices (Observation 6).
-   - *Deduction*: Under mobile viewport widths (<768px), windows automatically expand to 100vw/100vh full-screen modals, control buttons enlarge to touchable targets (24px+), and the taskbar scales to 42px height.
+3. **Premise 3**: Top-level `ScreenGui` instances that omit `ResetOnSpawn = false` will be destroyed by Roblox when the player character respawns, resetting client UI state unexpectedly.
+   - **Observation Ref**: `ClientGuiBootstrap` enforces `ResetOnSpawn = false` for 21 modules, and 16 standalone scripts set it manually. However, `StoreScript.client.lua` creates two temporary `ScreenGui` instances (`PurchaseToast` at line 148 and `SuccessToast` at line 253) using direct instantiation `Instance.new("ScreenGui", playerGui)` without setting `ResetOnSpawn = false`.
+   - **Deduction**: `StoreScript.client.lua` has a minor non-compliance bug with Rule 2c that should be fixed by setting `toast.ResetOnSpawn = false` or using `ClientGuiBootstrap`.
 
 ---
 
-## 3. Caveats & Remaining Work
+## 3. Caveats
 
-### Caveats
-- **Font Availability**: System fallback fonts (`'MS Sans Serif'`, `'Segoe UI'`, `monospace`) are specified. Web fonts (`VT323`, `Press Start 2P`) can be loaded via standard `@import` or `<link>` in `index.html`.
-- **Browser Vendors**: `writing-mode: vertical-rl` on Start Menu sidebar is widely supported across all modern browsers (Chrome, Firefox, Edge, Safari).
-
-### Remaining Work (Implementation Steps for `teamwork_preview_worker_m1`)
-1. Create `site/style.css` using the full architecture specified in `analysis.md`.
-2. Connect `style.css` in `site/index.html` (`<link rel="stylesheet" href="style.css">`).
-3. Verify window render states (`.window-active`, `.window-inactive`) with HTML window elements.
-4. Verify `#crt-overlay` rendering and test `.crt-off` toggle logic.
+- **Studio Instance Inspection**: Static code analysis was performed on all 61 Lua files in `src/client/`. Pre-built `.rbxl` binary places stored outside git were not inspected directly; however, `000_LegacyOverlayCleanup.client.lua` actively cleans up any legacy studio GUI shells or grey full-screen frames upon player launch.
+- **Roact Component State**: For Roact components (`ui/cooking/components/CookingHUD.lua` and `ui/inventory/components/InventoryHUD.lua`), visibility is managed via React/Roact state props (`Visible = false` in story/parent wrapper).
 
 ---
 
 ## 4. Conclusion
 
-The CSS3 styling architecture for Zunda-OS 95 is fully analyzed, structured, and specified in `analysis.md`. All design token variables (`:root`), 3D bevel definitions, window header/button layouts, pinned bottom taskbar, start menu popup, CRT scanline overlay toggle, floating pea animations, and mobile/tablet responsive breakpoints have been mapped out cleanly.
+- **Client UI Decoupling (Rule 2a)**: **100% PASS**. No client script uses `script.Parent` for UI references.
+- **Modal / Dialogue Visibility (Rule 2b)**: **100% PASS**. All 20 modal and dialogue panels set `panel.Visible = false` or `gui.Enabled = false` on startup.
+- **ScreenGui ResetOnSpawn (Rule 2c)**: **96.7% PASS**. 59 of 61 files are fully compliant. 1 file (`src/client/StoreScript.client.lua`) has 2 lines (148 and 253) where temporary toast `ScreenGui` instances omit `ResetOnSpawn = false`.
+
+### Proposed Fixes for Implementer:
+
+#### Proposed Change 1: `src/client/StoreScript.client.lua` (Lines 148 & 253)
+Set `toast.ResetOnSpawn = false` for both toast ScreenGuis:
+
+```lua
+-- Replace line 148:
+local toast = Instance.new("ScreenGui")
+toast.Name = "PurchaseToast"
+toast.ResetOnSpawn = false
+toast.DisplayOrder = 1000
+toast.Parent = player:WaitForChild("PlayerGui")
+
+-- Replace line 253:
+local toast = Instance.new("ScreenGui")
+toast.Name = "SuccessToast"
+toast.ResetOnSpawn = false
+toast.DisplayOrder = 1001
+toast.Parent = player:WaitForChild("PlayerGui")
+```
 
 ---
 
 ## 5. Verification Method
 
-To independently verify the implementation once `site/style.css` is written:
+### Step 1: Automated Verification Script
+Run the Python audit script in your working directory:
+```powershell
+python g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_2\audit.py
+```
+*Expected Output*:
+- 0 `script.Parent` UI reference warnings.
+- 0 `ResetOnSpawn` missing warnings (after applying proposed fix to `StoreScript.client.lua`).
 
-1. **File Existence & Integrity Check**:
-   - Verify `g:\Zundamons-kItchen-V2\site\style.css` exists.
-   - Confirm `:root` block contains all required green tokens (`#2e7d32`, `#4caf50`, `#8bc34a`, `#e8f5e9`, `#c8e6c9`, `#f1f8e9`).
+### Step 2: Code Inspection
+Inspect `src/client/StoreScript.client.lua` lines 148 & 253 to verify `ResetOnSpawn = false` is added.
 
-2. **Visual & Layout Inspection**:
-   - Open `site/index.html` in browser.
-   - Verify 3D bevel borders render on `.window` and `.bevel-outset`.
-   - Inspect `#taskbar` pinned at viewport bottom (`height: 38px`).
-   - Click CRT toggle button to verify `body.crt-off` hides `#crt-overlay`.
-
-3. **Responsive Verification**:
-   - Resize browser window below 768px width: verify `.window` switches to full-screen viewport dimensions.
-
-4. **Invalidation Conditions**:
-   - Missing required green tokens in `:root`.
-   - Window borders lack 3D bevel effect.
-   - CRT overlay blocks mouse pointer events on UI buttons (would mean `pointer-events: none` was omitted).
+### Invalidation Conditions
+- Any new `.client.lua` script added to `src/client/` that calls `Instance.new("ScreenGui")` without setting `ResetOnSpawn = false`.
+- Any modal frame instantiated without an explicit `.Visible = false` initial property assignment.

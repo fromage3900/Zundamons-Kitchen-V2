@@ -16,6 +16,7 @@ local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local UIAssets = require(RS.Shared.Config.UIAssets)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(RS.ConfigurationFiles.UIActionRegistry)
 
 -- ─── COLORS ──────────────────────────────────────────────
 local C = {
@@ -249,7 +250,7 @@ end
 
 -- ─── TOGGLE ───────────────────────────────────────────────
 local open = false
-local shell = CozyModalShell.wrap(panel, {
+local shell = CozyModalShell.wrap(panel, { actionId = "inventory",
     open = function()
         refresh()
         panel.Size = UDim2.new(0,580,0,10)
@@ -310,3 +311,9 @@ task.spawn(function()
 end)
 
 print("[ZundaPouch] Ready — press I or click bag icon")
+
+-- Register with UIRouter for modal exclusivity and Escape handling
+UIRouter.register("inventory", nil, function() shell.close() end)
+
+-- Register callback with ActionRegistry for Pea Wheel dispatch
+ActionRegistry.registerCallback("inventory", toggle)

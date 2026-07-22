@@ -1,33 +1,41 @@
-## 2026-07-21T20:47:01Z
-You are Worker 2 for Milestone 2 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
-Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2_1
-Target Site Directory: g:\Zundamons-kItchen-V2\site
+## 2026-07-22T17:55:23Z
+You are Worker 5 (Milestone 2 Telemetry & Web Hub Implementer).
+Your metadata working directory is `.agents/teamwork_preview_worker_m2_1`.
 
-MANDATORY INTEGRITY WARNING:
+### Mandatory Integrity Warning
 DO NOT CHEAT. All implementations must be genuine. DO NOT hardcode test results, create dummy/facade implementations, or circumvent the intended task. A Forensic Auditor will independently verify your work. Integrity violations WILL be detected and your work WILL be rejected.
 
-Your objective:
-Implement `site/window_manager.js` and apply audio engine remediation in `site/assets/audio_engine.js` and `site/index.html`:
+### Objectives:
+1. Update `src/server/Services/PromoCodeService.lua`:
+   - Register `HYBRIDECS` code: `{ gold = 2000, gems = 200, item = "5x Whim Gacha Tickets" }` in `PromoCodeService.activeCodes`.
 
-1. `site/window_manager.js`:
-   - Create ES6 modular `WindowManager` class managing windows: `ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`, `QuickStart.txt`.
-   - Dual Mouse (`mousedown`, `mousemove`, `mouseup`) and Touch (`touchstart`, `touchmove`, `touchend`) drag engine with viewport boundary clamping (`Math.max(0, Math.min(pos, max))`).
-   - Dynamic z-index depth stack (100 to 8999) with `.window-active` and `.window-inactive` state synchronization.
-   - Active Focus Fallback (`transferFocusToTopVisibleWindow()`): Automatically focus the top-most remaining visible window when a window is closed or minimized.
-   - Minimize, Maximize, and Restore state engine with geometry memory (`dataset.prevLeft`, `dataset.prevTop`, `dataset.prevWidth`, `dataset.prevHeight`).
-   - Taskbar Sync: Taskbar buttons MUST retain minimized windows (`#taskbar-windows`). Clicking taskbar buttons: active window -> minimizes; inactive or minimized window -> restores & focuses.
-   - Keyboard Shortcuts: Global `Ctrl+Esc` and `Escape` keydown listeners toggling Start Menu (`#start-menu`).
-   - Roblox UI Export Hook: Expose `WindowManager.exportScreenGuiLayout()` returning JSON layout structure mapping windows directly to Roblox ScreenGui frame hierarchies.
+2. Update `src/server/Services/WebInfoSyncService.lua`:
+   - Fix runtime bug indexing `DailyChallengeConfig.challenges` (it should use `DailyChallengeConfig.dailyPool` and `DailyChallengeConfig.weeklyBoss`).
+   - Implement complete, schema-compliant `exportGameStateJson()` returning valid JSON string matching the structure:
+     - `last_updated`: UTC timestamp (e.g., `os.date("!%Y-%m-%dT%H:%M:%SZ")`)
+     - `online_players`: `{ count = activeCount, status = "online", version = "2.4.0 HYBRID ECS" }` (where `activeCount` falls back to baseline `125` if `#Players:GetPlayers() == 0`).
+     - `active_challenges`: `{ daily = [...], weekly = [...] }` (mapped from `DailyChallengeConfig.dailyPool` and `weeklyBoss`).
+     - `gacha_banners`: array of banners from `GachaConfig.banners` with `rates` (`legendary`: "5%", `epic`: "20%", `rare`: "75%").
+     - `promo_codes`: array of active codes from `PromoCodeService.activeCodes` or fallback list including `ZUNDAMOCHI2026`, `SOUPSEASON`, `KAWAIIZUNDA`, `NIKKIFASHION`, and `HYBRIDECS` with reward summaries.
+     - `global_stats`: `{ total_dishes_cooked = 142850, edamame_harvested = 89420, total_gacha_pulls = 38920, active_event = { name = "🌸 Whims of Gourmet - Spring Festival", active = true, multiplier = "2.0x Style Points & Gold" } }`.
 
-2. `site/assets/audio_engine.js`:
-   - In `ZundaAudio.init()`, read `localStorage.getItem('zunda_os_volume')` and set `this.volume = parseFloat(savedVol)`.
-   - In `playClickSFX()`, add fallback gain ramp down (0.15 -> 0.001 over 0.03s) for invalid/unknown variants.
-   - In `startCozyBGM()` and `stopCozyBGM()`, handle `bgmStopTimeout` with `clearTimeout()` to prevent rapid toggle race conditions.
+3. Create `site/api/game_info.json` and update `docs/api/game_info.json`:
+   - Provide clean, formatted, valid telemetry JSON adhering to the schema above.
 
-3. `site/index.html`:
-   - Update script tags to load `<script src="assets/audio_engine.js"></script>` and `<script src="window_manager.js"></script>`, ensuring clean modular initialization of `WindowManager`.
+4. Create `site/presskit.html`:
+   - Create `site/presskit.html` mirroring `docs/presskit.html` (or with updated dynamic ticker script and telemetry bindings) so it stays in sync.
 
-Verification requirements:
-- Run `node -c site/window_manager.js` and `node -c site/assets/audio_engine.js` (exit code 0).
-- Confirm zero external script or style dependencies.
-- Document implementation details in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2_1\changes.md` and `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2_1\handoff.md`. Send a message when completed.
+5. Update `site/index.html`, `site/app.js`, and `site/style.css`:
+   - In `site/app.js`, implement `TelemetryService` fetching `api/game_info.json`.
+   - Provide `STATIC_GAME_INFO_FALLBACK` object so if fetch fails or runs under `file://` protocol, telemetry renders seamlessly without console errors.
+   - Dynamic rendering: status pill text (`LIVE ON ROBLOX · v2.4.0 HYBRID ECS (125 CHEFS ONLINE)`), live ticker banner (`hero-live-ticker`), active daily challenges list, dynamic promo codes copy buttons, and community dishes cooked progress bar.
+   - Add styles in `site/style.css` for ticker banner and telemetry cards if needed.
+
+6. Synchronize and Verify:
+   - Run `node site/sync_site.js` to mirror `site/` to `docs/`.
+   - Run `python scripts/preflight_audit.py` to ensure 0 errors.
+
+7. Write `handoff.md` in `.agents/teamwork_preview_worker_m2_1/handoff.md` detailing:
+   - Modifications made per file.
+   - Command outputs for `sync_site.js` and `preflight_audit.py`.
+   - Verification status.

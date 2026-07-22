@@ -1,96 +1,102 @@
-# Handoff Report — Challenger 2 (Milestone 1)
+# Handoff Report — Client UI Decoupling & Workspace Rules Stress Test
 
-**Target Project**: Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub  
-**Target Directory**: `g:\Zundamons-kItchen-V2\site`  
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2`  
-**Verdict**: **FAILED** (Defects identified in Mobile Modal Layout & CSS Cascade Theme Switcher)  
-
----
+**Verdict**: **VERIFIED**
 
 ## 1. Observation
 
-Direct observations from source code inspection and empirical test execution (`run_empirical_tests.py`):
+- **`script.Parent` Usage Audit**:
+  - `grep_search` for `script.Parent` across `src/client/` yielded 5 total occurrences:
+    1. `src/client/Controllers/PeaWheelController.lua:13`: `local ActionRegistry = require(script.Parent.Parent.ConfigurationFiles.UIActionRegistry)`
+    2. `src/client/PeaWheelBootstrap.client.lua:6`: `local ActionRegistry = require(script.Parent.ConfigurationFiles.UIActionRegistry)`
+    3. `src/client/TimedCookingScript.client.lua:2`: `local Controllers = script.Parent:WaitForChild("Controllers")`
+    4. `src/client/ui/cooking/stories/CookingHUD.story.lua:3`: `local CookingHUD = require(script.Parent.Parent.components.CookingHUD)`
+    5. `src/client/ui/inventory/components/InventoryHUD.lua:2`: `local useInventory = require(script.Parent.Parent.hooks.useInventory)`
+  - Direct inspection confirms **ZERO** UI instance references using `script.Parent` in client scripts synced to `StarterPlayerScripts`. All UI construction and lookup queries use `PlayerGui` or `ClientGuiBootstrap`.
 
-1. **CSS Variable Definition vs Element Height Override**:
-   - `style.css:52`: `:root { --taskbar-height: 38px; }`
-   - `style.css:1000-1002`: `@media screen and (max-width: 768px) { #taskbar { height: 42px; } }`
-   - `style.css:979-987`: `@media screen and (max-width: 768px) { .window { width: 100vw !important; height: calc(100vh - var(--taskbar-height)) !important; top: 0 !important; left: 0 !important; } }`
-   - Observation: `--taskbar-height` is **not** updated in `@media screen and (max-width: 768px)`.
+- **Startup Modal/Dialogue Visibility**:
+  - `VNController.client.lua`: `panel.Visible = false` (line 64), `dimmer.Visible = false` (line 52).
+  - `CompendiumScript.client.lua`: `panel.Visible = false` (line 84).
+  - `CraftingScript.client.lua`: `panel.Visible = false` (line 39).
+  - `DailyChecklistUI.client.lua`: `panel.Visible = false` (line 40).
+  - `CookingResultCard.client.lua`: `gui.Enabled = false` (line 13), `backdrop.Visible = false` (line 23), `card.Visible = false` (line 31).
+  - `GuestServingUI.client.lua`: `gui.Enabled = false` (line 14), `backdrop.Visible = false` (line 24), `panel.Visible = false` (line 32).
+  - `FurniturePlacement.client.lua`: `gui.Enabled = false` (line 21), `manageFrame.Visible = false` (line 341).
+  - `SettingsScreen.client.lua`: `gui.Enabled = false` (line 18).
+  - `TeleportPicker.client.lua`: `gui.Enabled = false` (line 13).
+  - `CompanionShopScript.client.lua`: `panel.Visible = false` (line 50), `backdrop.Visible = false` (line 40).
 
-2. **Start Menu Theme Switcher**:
-   - `index.html:574-582`:
-     ```javascript
-     const menuThemeBtn = document.getElementById('menu-toggle-theme');
-     if (menuThemeBtn) {
-         menuThemeBtn.addEventListener('click', () => {
-             playClick('down');
-             const currentTheme = document.documentElement.getAttribute('data-theme');
-             const nextTheme = currentTheme === 'zunda-classic' ? 'zunda-dark' : 'zunda-classic';
-             document.documentElement.setAttribute('data-theme', nextTheme);
-         });
-     }
-     ```
-   - `style.css`: Contains 0 occurrences of `[data-theme` or `data-theme="zunda-dark"`.
+- **ScreenGui `ResetOnSpawn` Compliance**:
+  - `ClientGuiBootstrap.lua` line 16 explicitly assigns `screenGui.ResetOnSpawn = false` for all GUs generated through `ClientGuiBootstrap.createScreenGui`.
+  - Direct `Instance.new("ScreenGui")` initializations all set `ResetOnSpawn = false`:
+    - `AdminConsole.client.lua:13`: `screenGui.ResetOnSpawn = false`
+    - `CompanionHUD.client.lua:14`: `gui.ResetOnSpawn = false`
+    - `Controllers/HarvestController.client.lua:59`: `screenGui.ResetOnSpawn = false`
+    - `CookingResultCard.client.lua:11`: `gui.ResetOnSpawn = false`
+    - `FurniturePlacement.client.lua:19`: `gui.ResetOnSpawn = false`
+    - `GuestServingUI.client.lua:12`: `gui.ResetOnSpawn = false`
+    - `HudBootstrap.client.lua:14`: `hud.ResetOnSpawn = false`
+    - `HudScript.client.lua:14,19`: `sg.ResetOnSpawn = false`
+    - `RecipeUnlockToast.client.lua:10`: `gui.ResetOnSpawn = false`
+    - `SettingsScreen.client.lua:16`: `gui.ResetOnSpawn = false`
+    - `StoreScript.client.lua:149`: `toast.ResetOnSpawn = false` (Purchase Toast)
+    - `StoreScript.client.lua:254`: `toast.ResetOnSpawn = false` (Success Toast)
+    - `TeleportPicker.client.lua:11`: `gui.ResetOnSpawn = false`
+    - `WeatherClient.client.lua:75`: `auroraGui.ResetOnSpawn = false`
 
-3. **SVG Assets (`site/assets/`)**:
-   - `pea_pod.svg` (21 lines, 1031 bytes): XML Valid, `viewBox="0 0 32 32"`, 0 `<image>`, 0 `xlink:href`, 0 `<script>`, 0 external URLs.
-   - `zundamon_mochi.svg` (33 lines, 1506 bytes): XML Valid, `viewBox="0 0 64 64"`, 0 `<image>`, 0 `xlink:href`, 0 `<script>`, 0 external URLs.
-   - `crt_monitor.svg` (21 lines, 1085 bytes): XML Valid, `viewBox="0 0 32 32"`, 0 `<image>`, 0 `xlink:href`, 0 `<script>`, 0 external URLs.
-   - `disc_icon.svg` (16 lines, 804 bytes): XML Valid, `viewBox="0 0 32 32"`, 0 `<image>`, 0 `xlink:href`, 0 `<script>`, 0 external URLs.
+- **Rojo `$ignoreUnknownInstances` Configuration**:
+  - `default.project.json` lines 73-77:
+    ```json
+    "Workspace": {
+      "$className": "Workspace",
+      "$path": "src/Workspace",
+      "$ignoreUnknownInstances": true
+    }
+    ```
 
-4. **Zero-Dependency Compliance**:
-   - Audit across `index.html`, `style.css`, `assets/audio_engine.js`, and all 4 SVG files: 0 network API calls (`fetch`, `XMLHttpRequest`, `WebSocket`, `sendBeacon`, `EventSource`, `importScripts`), 0 `@import` font calls, 0 `@font-face` remote URLs. Audio synthesizes procedurally via native browser `AudioContext`.
+- **Audit Tool Runs**:
+  - `python scripts/preflight_audit.py` output:
+    ```
+    ==================================================
+    🌸 ZUNDAMON'S KITCHEN V2 - PREFLIGHT AUDIT RUNNER 🌸
+    ==================================================
+    ✅ Rojo Level Preservation Check Passed: $ignoreUnknownInstances = true
+    🔍 Auditing 61 client Luau scripts...
+    ✅ Client UI Decoupling Audit Passed cleanly!
+    ✅ MarketplaceConfig detected and present.
 
----
+    ✨ ALL PREFLIGHT AUDITS PASSED! READY FOR STUDIO & PUBLIC LAUNCH! ✨
+    ```
+    Exit code: 0.
+
+  - `selene src` output:
+    ```
+    Results:
+    0 errors
+    332 warnings
+    0 parse errors
+    ```
 
 ## 2. Logic Chain
 
-1. **Mobile Layout Overlap Logic**:
-   - On mobile screens (width <= 768px, including 320px and 768px), `#taskbar` height is set to `42px`.
-   - The modal window height is calculated as `calc(100vh - var(--taskbar-height))`.
-   - Because `--taskbar-height` remains at its `:root` value of `38px`, the window height evaluates to `100vh - 38px`.
-   - The window spans from `y = 0` to `y = 100vh - 38px`.
-   - The fixed taskbar spans from `y = 100vh - 42px` to `y = 100vh`.
-   - Therefore, the taskbar covers the bottom `4px` (`42px - 38px`) of mobile modal windows, obscuring window content and body borders.
-
-2. **Inert Theme Switcher Logic**:
-   - The JavaScript click handler for `#menu-toggle-theme` successfully toggles the `data-theme` attribute on `<html>` from `zunda-classic` to `zunda-dark`.
-   - However, CSS variable definitions and styles exist exclusively under `:root` without any conditional selector overrides for `[data-theme="zunda-dark"]`.
-   - Therefore, toggling the attribute does not trigger any CSS cascade change, rendering the theme toggle feature completely non-functional.
-
-3. **SVG & Zero-Dependency Logic**:
-   - XML parser (`xml.etree.ElementTree`) confirms all 4 SVG assets are structurally valid XML with clean vector elements (`path`, `rect`, `ellipse`, `circle`).
-   - String scanning confirms no remote asset tags (`<image>`, `xlink:href`, `<script>`, external fonts, or network requests) exist anywhere in `site/`.
-
----
+1. **Rojo Level Preservation**: Setting `"$ignoreUnknownInstances": true` under `"Workspace"` in `default.project.json` ensures Rojo code syncs do not delete terrain, models, or manual 3D level geometry placed in Studio. Inspection confirmed it is set to `true`.
+2. **Client UI Decoupling**: Scripts synced to `StarterPlayerScripts` execute under `PlayerScripts`. If client scripts accessed UI elements via `script.Parent`, they would fail because their parent is `PlayerScripts` rather than a GUI element. Verifying zero UI `script.Parent` references and confirming all UI elements anchor to `PlayerGui` via `ClientGuiBootstrap` or direct `PlayerGui` queries guarantees decoupling.
+3. **Panel Visibility at Startup**: Setting `Visible = false` on frames/panels or `Enabled = false` on ScreenGuis during initialization prevents overlapping UI artifacts when the game loads. Verifying all modals/dialogues comply ensures clean initial UI state.
+4. **Respawn Safety (`ResetOnSpawn = false`)**: Setting `ResetOnSpawn = false` on top-level ScreenGui instances (including dynamically created toasts) prevents UI deletion/resetting when the player respawns. Verifying 100% compliance across all 61 client scripts ensures UI state survives respawns.
+5. **Linting & Audit Compliance**: Both `preflight_audit.py` and `selene src` were executed directly. `preflight_audit.py` returned exit code 0, and `selene src` returned 0 errors.
 
 ## 3. Caveats
 
-- **No Code Modifications Made**: Per agent role constraints (Review-only EMPIRICAL CHALLENGER), no source files under `site/` were altered. Findings are documented for implementers/orchestrator.
-- **Outbound Links**: `index.html` contains standard outbound hyperlink anchors (`<a href="https://www.roblox.com/">` and `<a href="https://github.com/">`). These are user-facing navigation links opened via `target="_blank"`, not background asset loading or network dependencies.
-
----
+- `selene src` flags 332 warnings regarding `Instance.new(className, parent)` being deprecated in Luau/Roblox guidelines. These are non-fatal linter warnings and do not constitute errors or UI decoupling defects.
 
 ## 4. Conclusion
 
-**Verdict: FAILED**
-
-While the application achieves **100% Zero-Dependency compliance** and **100% SVG Vector XML validity**, it fails review due to two functional defects:
-1. **Layout Integrity Defect**: Taskbar height variable mismatch causing 4px visual overlap on mobile viewports (<=768px).
-2. **CSS Cascade Defect**: Missing `[data-theme="zunda-dark"]` CSS rules causing an inert, non-functional theme toggle button.
-
----
+- **Verification Verdict**: **VERIFIED**
+- All client UI scripts in `src/client/` fully comply with Workspace Rules and Client UI Decoupling requirements. `default.project.json` correctly protects Studio level geometry with `"$ignoreUnknownInstances": true`. `preflight_audit.py` passed cleanly, and `selene src` reported 0 errors.
 
 ## 5. Verification Method
 
-To independently verify these findings, run the empirical python test script from the agent directory:
-
-```powershell
-python g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2\run_empirical_tests.py
-```
-
-Expected Output Highlights:
-- `Mobile (<=768px) Taskbar Height Overlap Discrepancy` reported under `[1/4] AUDITING VIEWPORT RENDERING`.
-- `Inert Theme Toggle Feature` reported under `[2/4] AUDITING CSS VARIABLE CASCADE`.
-- `Clean Vector: True` for all 4 SVGs under `[3/4] VALIDATING SVG VECTOR FILES`.
-- `Net APIs: 0 | Ext Fonts: 0 | Compliant: True` for all files under `[4/4] AUDITING FOR HIDDEN NETWORK CALLS`.
+To independently verify:
+1. `python scripts/preflight_audit.py` from repository root `g:\Zundamons-kItchen-V2`.
+2. `selene src` from repository root `g:\Zundamons-kItchen-V2`.
+3. Inspect `default.project.json` line 76 for `"$ignoreUnknownInstances": true`.
+4. Run `rg "script\.Parent" src/client` to verify only module requires use `script.Parent`.

@@ -48,6 +48,11 @@ function CozyModalShell.wrap(panel, options)
 	applyCozyTokens(panel)
 
 	local function openShell()
+		-- Play panel open sound
+		local zsc = _G.ZundaSoundController
+		if zsc and zsc.play then
+			zsc.play("PanelOpen")
+		end
 		if options.open then
 			options.open()
 		end
@@ -55,18 +60,24 @@ function CozyModalShell.wrap(panel, options)
 	end
 
 	local function closeShell()
+		-- Play panel close sound
+		local zsc = _G.ZundaSoundController
+		if zsc and zsc.play then
+			zsc.play("PanelClose")
+		end
 		if options.close then
 			options.close()
 		end
 	end
 
-	-- Escape key closes the topmost modal
-	if _G.ZundaUIRouter then
+	-- Escape key closes the topmost modal if this panel is the current one
+	-- Uses options.actionId (the UIRouter action ID) for comparison, not panel.Name
+	if _G.ZundaUIRouter and options.actionId then
 		local escConn
 		escConn = UserInputService.InputBegan:Connect(function(input, processed)
 			if processed then return end
 			if input.KeyCode == Enum.KeyCode.Escape then
-				if _G.ZundaUIRouter.getCurrent() == panel.Name then
+				if _G.ZundaUIRouter.getCurrent() == options.actionId then
 					closeShell()
 				end
 			end
@@ -88,10 +99,8 @@ function CozyModalShell.wrap(panel, options)
 end
 
 function CozyModalShell.applyReducedMotion(panel)
-	if not panel then return end
-	if UserInputService.ReducedMotionEnabled then
-		-- Caller should avoid creating tweens when reduced motion is enabled
-	end
+	if not panel then return false end
+	return UserInputService.ReducedMotionEnabled
 end
 
 return CozyModalShell

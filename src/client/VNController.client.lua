@@ -629,6 +629,22 @@ if qcRE then
     end)
 end
 
+-- Server-triggered guest dialogues (ShowVNDialogue)
+task.spawn(function()
+    local showVNEv = RE:WaitForChild("ShowVNDialogue", 10) :: RemoteEvent?
+    if showVNEv then
+        showVNEv.OnClientEvent:Connect(function(speakerTag, message)
+            if type(message) == "string" and message ~= "" then
+                local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
+                _G.ZundaVN.show(speaker, { message })
+            elseif type(message) == "table" then
+                local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
+                _G.ZundaVN.show(speaker, message)
+            end
+        end)
+    end
+end)
+
 -- Zone entry lore (BindableEvent fired by client zone ClickDetector handler)
 local showZoneVNBindable = playerGui:FindFirstChild("ShowZoneVN")
 if not showZoneVNBindable then

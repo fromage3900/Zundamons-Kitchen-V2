@@ -1,54 +1,55 @@
-# BRIEFING — 2026-07-21T20:48:46Z
+# BRIEFING — 2026-07-22T17:56:00Z
 
 ## Mission
-Review code correctness and API design of site/window_manager.js, site/assets/audio_engine.js, and site/index.html for Milestone 2.
+Perform independent code review and adversarial critic analysis across all Milestone 2 changes (Real-Time Game Telemetry & Web Hub Integration).
 
 ## 🔒 My Identity
 - Archetype: reviewer / critic
 - Roles: reviewer, critic
 - Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1
-- Original parent: 281d54cf-b9e8-4061-a866-77c4825337fd
-- Milestone: Milestone 2 — Zunda-OS 95 CLI Launch Page & Creative Hub
+- Original parent: a028a396-270f-4893-8048-eaf8e40a76bc
+- Milestone: Milestone 2
 - Instance: 1 of 1
 
 ## 🔒 Key Constraints
 - Review-only — do NOT modify implementation code.
-- Write outputs to g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m2_1.
-- Document review in review.md and handoff in handoff.md.
-- Send message to parent (281d54cf-b9e8-4061-a866-77c4825337fd) with verdict.
+- Write findings and handoff report in `.agents/teamwork_preview_reviewer_m2_1/handoff.md`.
+- Issue explicit APPROVED or REJECTED verdict.
+- Actively check for integrity violations (hardcoded test results, facade implementations, bypasses, self-certifying artifacts).
 
 ## Current Parent
-- Conversation ID: 281d54cf-b9e8-4061-a866-77c4825337fd
-- Updated: 2026-07-21T20:48:46Z
+- Conversation ID: a028a396-270f-4893-8048-eaf8e40a76bc
+- Updated: 2026-07-22T17:56:00Z
 
 ## Review Scope
-- **Files to review**: `site/window_manager.js`, `site/assets/audio_engine.js`, `site/index.html`
-- **Review criteria**:
-  1. JS Syntax verification (`node -c site/window_manager.js`, `node -c site/assets/audio_engine.js`)
-  2. WindowManager class structure, event listener bindings, cleanup logic
-  3. Boundary clamping calculation in mouse and touch drag handlers (`Math.max(0, Math.min(pos, max))`)
-  4. Confirm zero external script, font, or audio dependencies
-
-## Key Decisions Made
-- Checked syntax via `node -c` (both passed).
-- Inspected event listener cleanup in `setupDragEngine` (`document.removeEventListener`).
-- Verified boundary clamping math `Math.max(0, Math.min(raw, max))`.
-- Confirmed zero external CDNs, scripts, fonts, or audio assets.
-- Issued verdict: APPROVED.
-
-## Artifact Index
-- ORIGINAL_REQUEST.md
-- BRIEFING.md
-- progress.md
-- review.md
-- handoff.md
+- **Files to review**:
+  - `src/server/Services/WebInfoSyncService.lua`
+  - `src/server/Services/PromoCodeService.lua`
+  - `site/api/game_info.json`
+  - `docs/api/game_info.json`
+  - `site/index.html`
+  - `site/presskit.html`
+  - `site/app.js`
+  - `site/style.css`
+  - `site/sync_site.js`
+  - `scripts/preflight_audit.py`
+- **Interface contracts**: PROJECT.md, AGENTS.md
+- **Review criteria**: Luau/JS correctness, nil-safety, integrity, schema compliance, UI decoupling, execution of verification scripts.
 
 ## Review Checklist
-- **Items reviewed**: `site/window_manager.js`, `site/assets/audio_engine.js`, `site/index.html`
-- **Verdict**: APPROVED
-- **Unverified claims**: none
+- **Items reviewed**: [TBD]
+- **Verdict**: PENDING
+- **Unverified claims**: [TBD]
 
 ## Attack Surface
-- **Hypotheses tested**: drag overflow, unhandled touch start, missing initial geometries, AudioContext autoplay block. All passed.
-- **Vulnerabilities found**: none.
-- **Untested angles**: none.
+- **Hypotheses tested**: [TBD]
+- **Vulnerabilities found**: [TBD]
+- **Untested angles**: [TBD]
+
+## Key Decisions Made
+- Initiated independent review of M2 work items.
+
+## Artifact Index
+- `.agents/teamwork_preview_reviewer_m2_1/ORIGINAL_REQUEST.md` — Original prompt payload
+- `.agents/teamwork_preview_reviewer_m2_1/BRIEFING.md` — State tracker
+- `.agents/teamwork_preview_reviewer_m2_1/progress.md` — Liveness heartbeat tracker

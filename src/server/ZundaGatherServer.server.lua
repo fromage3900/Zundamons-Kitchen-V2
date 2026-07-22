@@ -29,6 +29,18 @@ local RE_SideDlg = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFir
 local PlayerDataService = require(SSS.Services.PlayerDataService)
 local CompanionConfig = require(RS.ConfigurationFiles.CompanionConfig)
 
+-- Pop notification
+local function notify(player, message)
+	if RE_notify then
+		RE_notify:FireClient(player, "gather_success", message)
+	else
+		local notifEvent = RS:FindFirstChild("RemoteEvents") and RS.RemoteEvents:FindFirstChild("NotificationEvent")
+		if notifEvent and notifEvent:IsA("RemoteEvent") then
+			notifEvent:FireClient(player, message)
+		end
+	end
+end
+
 -- Companion extra_drop buff (Antimon): 20% chance for bonus item
 local function applyExtraDropBuff(player, baseItems)
 	local data = PlayerDataService.get(player)
@@ -67,13 +79,6 @@ local function grantItems(player, items)
 	pcall(function()
 		lootMod.generateLoot(player, items, hrp.Position)
 	end)
-end
-
--- Pop notification
-local function notify(player, message)
-	if RE_notify then
-		RE_notify:FireClient(player, "gather_success", message)
-	end
 end
 
 -- Update node mesh based on growth stage

@@ -1,109 +1,258 @@
-# Handoff Report: Zunda-OS 95 Window Manager Architecture & Design Specification
+# Handoff Report — Web Frontend Telemetry & Dual Sync Audit
 
-**Agent**: Explorer 2  
-**Milestone**: Milestone 2 — Modular Desktop & Window Manager Engine  
-**Target File**: `site/window_manager.js`  
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_2\`  
+**Agent Identity**: Explorer 5 (Milestone 2)  
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_2`  
+**Date**: 2026-07-22  
+**Target Scope**: `docs/index.html`, `docs/presskit.html`, `site/index.html`, `site/press.html`, `site/app.js`, `docs/app.js`, `site/sync_site.js`, `docs/sync_site.js`, `docs/api/game_info.json`
 
 ---
 
 ## 1. Observation
 
-### 1.1 Existing Layout & Code Structure
-* **`site/index.html`**:
-  * Lines 71–261 define `#window-container` holding four core Zunda-OS 95 application windows:
-    1. `#window-zundacli` (`ZundaCLI.exe`) — line 74
-    2. `#window-cookbook` (`Cookbook.app`) — line 108
-    3. `#window-vntalk` (`VNTalk.app`) — line 182
-    4. `#window-quickstart` (`QuickStart.txt`) — line 219
-  * Lines 318–322 define `#taskbar-windows` container for active taskbar window items.
-  * Lines 265–315 define `#taskbar` and `#start-menu` popover.
-  * Lines 340–550 contain an inline JavaScript prototype for basic window dragging and event handling.
-* **`site/style.css`**:
-  * Lines 286–332 define `.window`, `.window.active-window`, `.window.window-active`, `.window.inactive-window`, `.window.window-inactive`, and `.window.maximized`.
-  * Lines 711–871 define `#taskbar`, `#start-menu`, `.taskbar-item`, `.taskbar-item.active`.
-
-### 1.2 Identified Gaps & Deficiencies in Prototype Inline Code
-1. **Focus Depth Stack Unbounded Increment**:
-   * Inline script line 382 uses `zIndexCount++` naively. Clicking windows repeatedly causes `z-index` to grow without bound, risking z-index overflow past the taskbar (`z-index: 9000`).
-2. **Missing Active Focus Fallback**:
-   * Inline script lines 405–418 (`closeWindow` and `minimizeWindow`) hide the target window, but **fail to transfer focus** to the top-most remaining visible window. When the active window is closed/minimized, no window remains focused (`.window-active`).
-3. **Taskbar Button Retention Bug on Minimize**:
-   * Inline script line 434 (`if (!win.classList.contains('hidden'))`) filtered out hidden windows when rebuilding `#taskbar-windows`. When a window was minimized, its taskbar button disappeared completely from `#taskbar-windows`, breaking the Win95 requirement that taskbar buttons MUST retain minimized windows so users can restore them.
-4. **Missing Keyboard Shortcuts**:
-   * Prototype inline script had no listeners for `Ctrl+Esc` or `Escape` keypresses to toggle `#start-menu`.
-5. **No Roblox ScreenGui Layout Exporter**:
-   * Prototype inline script lacked layout export hooks for Roblox ScreenGui conversion.
+### Exact File & Path Survey
+- `docs/api/game_info.json`: Present (35 lines, 883 bytes). Contains structured telemetry:
+  ```json
+  {
+    "last_updated": "2026-07-22T13:17:30Z",
+    "game_version": "v2.4.1-hybrid",
+    "live_event": {
+      "name": "🌸 Whims of Gourmet - Spring Festival",
+      "active": true,
+      "multiplier": "2.0x Style Points & Gold"
+    },
+    "active_daily_challenges": [
+      "⚡ Speed Chef Rush: Serve 5 Guests in Under 60s",
+      "🎯 Perfect Timing Master: Cook 3 Perfect Dishes in a Row",
+      "🌿 Gourmet Harvester: Gather 10 Fresh Zunda Peas"
+    ],
+    "featured_gacha_banner": {
+      "name": "🌸 Whims of Spring Gourmet",
+      "cost": 100,
+      "featured_items": ["Zundamon_MagicalGirlForm", "Royal_Gourmet_Crown", "Ankomon_GoldTrim"]
+    },
+    "active_promo_codes": ["ZUNDAMOCHI2026", "SOUPSEASON", "KAWAIIZUNDA", "NIKKIFASHION"],
+    "global_stats": {
+      "total_dishes_cooked": 142850,
+      "total_gacha_pulls": 38920,
+      "active_chefs_online": 125
+    }
+  }
+  ```
+- `site/api/game_info.json`: **MISSING** in `site/` directory (only exists in `docs/api/`).
+- `docs/presskit.html`: Lines 101–114 contain inline fetch logic:
+  ```html
+  <script>
+    fetch('api/game_info.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('liveStatus').innerHTML = `
+          <strong>Active Event:</strong> ${data.live_event.name} (${data.live_event.multiplier})<br>
+          <strong>Featured Banner:</strong> ${data.featured_gacha_banner.name}<br>
+          <strong>Total Dishes Cooked Globally:</strong> ${data.global_stats.total_dishes_cooked.toLocaleString()}
+        `;
+      })
+      .catch(() => {
+        document.getElementById('liveStatus').innerText = "Live status server active!";
+      });
+  </script>
+  ```
+- `site/presskit.html`: **MISSING** in `site/` directory (`site/press.html` exists instead).
+- `site/app.js` & `docs/app.js`: 1,544 lines. Zero references to `game_info` or `fetch('api/game_info.json')`.
+- `site/index.html` & `docs/index.html`: 562 lines.
+  - Server status pill (lines 47–50): Hardcoded HTML string `<span class="pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS</span>`.
+  - Live Ticker: Not present in HTML markup.
+  - Active Daily Challenges Card: Not present in HTML markup.
+  - Promo Code Copy Buttons (lines 197–228, 429–447): Present and backed by `app.js` clipboard handling (`navigator.clipboard.writeText` with `execCommand('copy')` fallback and toast alert). Codes are hardcoded (`ZUNDAMOCHI2026`, `SOUPSEASON`, `HYBRIDECS`).
+  - Community Progress Bar: Not present in HTML markup.
+- `site/sync_site.js` & `docs/sync_site.js`: 176 lines. Command test executed via `node site/sync_site.js --dry-run`:
+  ```
+  ==================================================
+   Zundamon's Kitchen V2 - Dual Deployment Sync
+   Mode: [DRY RUN - PREVIEW ONLY]
+   Source: G:\Zundamons-kItchen-V2\site
+   Target: G:\Zundamons-kItchen-V2\docs
+  ==================================================
+  Total site assets scanned: 13
+  New files to copy:         0
+  Updated files:             0
+  Unchanged files skipped:   13
+  Preserved docs files:      14
+  Errors:                    0
+  ```
 
 ---
 
 ## 2. Logic Chain
 
-1. **Depth Stack Management**:
-   * Maintaining a `focusStack` array of window DOM elements ordered by focus recency allows deterministic `z-index` re-assignment (`100 + i`). This guarantees windows stay within range `100–8999`, safely below `#taskbar` (`z-index: 9000`) and `#start-menu` (`z-index: 9500`).
-   * Applying both `.window-active` / `.active-window` and `.window-inactive` / `.window-inactive` ensures complete CSS compatibility across all existing style declarations in `style.css`.
-
-2. **Active Focus Fallback**:
-   * When closing or minimizing the currently focused window, filtering `focusStack` for remaining visible windows (`!hidden` and `!window-minimized`) and focusing the top-most remaining element guarantees a seamless desktop experience without orphaned focus states.
-
-3. **Minimize / Maximize / Restore State Engine & Taskbar Sync**:
-   * Adding `.window-minimized` to minimized windows while keeping taskbar buttons visible in `#taskbar-windows` fulfills the retro Windows 95 taskbar behavior requirement.
-   * Storing original cascaded coordinates in HTML5 dataset properties (`dataset.prevTop`, `dataset.prevLeft`, `dataset.prevWidth`, `dataset.prevHeight`) allows flawless Maximize (`.maximized`) and Restore transitions.
-   * Updating taskbar button click behavior:
-     * Active window taskbar button click -> Minimize.
-     * Inactive visible window taskbar button click -> Focus & bring to front.
-     * Minimized window taskbar button click -> Restore & focus.
-
-4. **Keyboard Shortcuts Interceptor**:
-   * Listening to global `keydown` for `Ctrl + Esc` toggles `#start-menu` and updates `#start-btn` active class (`.start-btn-active`).
-   * Listening for `Escape` closes `#start-menu` when open.
-
-5. **Roblox ScreenGui Export Hook**:
-   * Providing `exportRobloxScreenGuiLayout()` formats all open/minimized window dimensions into Luau `UDim2` dictionary format, satisfying AGENTS.md Rule 4 and Milestone 2 requirements.
+1. **Telemetry Source Location**: `docs/api/game_info.json` exists as the ground-truth JSON data file, but `site/api/game_info.json` is missing. Since `site/sync_site.js` synchronizes files unidirectional from `site/` to `docs/`, any file missing in `site/` will fail to fetch when running `site/index.html` locally and won't be mirrored by `sync_site.js`.
+2. **Current Telemetry Consumption**: `docs/presskit.html` is currently the only page fetching `api/game_info.json`. Its error handling uses a minimal text fallback (`"Live status server active!"`) rather than structured fallback telemetry data.
+3. **Index Page Telemetry Gap**: `site/index.html` and `site/app.js` do not currently perform fetch or dynamic DOM binding for telemetry data (`live_event`, `active_daily_challenges`, `active_chefs_online`, `total_dishes_cooked`).
+4. **Clipboard & Copy Mechanics**: `app.js` (`QuickStartApp` & `initPromosApp`) already implements robust clipboard copy logic with toast popups and fallback `execCommand('copy')`, running cleanly without console errors. However, the promo codes list in `index.html` is hardcoded rather than dynamically rendered from `game_info.json`.
+5. **Dual Sync Behavior**: `site/sync_site.js` uses SHA-256 hashing to copy modified web files from `site/` to `docs/` while preserving `.md` documentation files in `docs/`. Creating `site/api/game_info.json` and `site/presskit.html` in `site/` ensures both web root folders stay perfectly mirrored upon sync execution.
 
 ---
 
 ## 3. Caveats
 
-* **Read-Only Explorer Investigation**: Code implementation in `site/window_manager.js` is delegated to the Worker agent. This report provides the complete architecture and verification specification.
-* **Audio Synthesizer Dependency**: Audio trigger calls (`playWindowSFX`, `playClickSFX`) check `typeof window.playWindowSFX === 'function'` before invoking to ensure graceful operation even if `assets/audio_engine.js` is omitted or delayed.
-* **Touch Drag Clamping**: Touch event handlers (`touchstart`, `touchmove`, `touchend`) must mirror mouse dragging logic and clamp coordinates within `#desktop` bounds.
+- **Network Mode**: Investigation was conducted under `CODE_ONLY` network mode. No external HTTP requests were made.
+- **Client Protocol Context**: Browser `fetch('api/game_info.json')` over local `file://` URIs may trigger CORS/origin restrictions in certain strict browsers (e.g. Chrome local file policies). The telemetry system MUST provide a robust inline JS fallback object (`STATIC_GAME_INFO_FALLBACK`) so the page renders flawlessly under all protocol conditions (`http://`, `https://`, and `file://`).
 
 ---
 
 ## 4. Conclusion
 
-The architecture for `site/window_manager.js` has been fully designed and specified in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_2\analysis.md`. 
-
-Key deliverables provided in specification:
-1. `WindowManager` class structure with clean API methods (`init`, `focusWindow`, `minimizeWindow`, `maximizeWindow`, `restoreWindow`, `closeWindow`, `openWindow`, `syncTaskbar`, `toggleStartMenu`, `handleKeyDown`, `exportRobloxScreenGuiLayout`).
-2. Data structures (`focusStack` array, window geometry datasets).
-3. Active Focus Fallback algorithm.
-4. Taskbar retention & toggle logic for minimized windows.
-5. Keyboard shortcuts (`Ctrl+Esc`, `Escape`).
-6. Roblox ScreenGui UDim2 export mapping.
+The web frontend telemetry infrastructure in Zundamon's Kitchen V2 has a solid data model (`docs/api/game_info.json`) and a reliable sync tool (`site/sync_site.js`), but requires a unified client-side `TelemetryService` inside `site/app.js` to dynamically bind telemetry components on `index.html` and `presskit.html` with graceful static fallback data.
 
 ---
 
-## 5. Verification Method
+## 5. Frontend Integration Plan
 
-To verify the implementation of `site/window_manager.js`:
+### Component Architecture & Implementation Steps
 
-1. **Inspect Analysis File**:
-   * Confirm `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m2_2\analysis.md` exists and contains complete design specs.
+#### Step 1: Create `site/api/game_info.json` & Mirror `site/presskit.html`
+- Create `site/api/game_info.json` matching `docs/api/game_info.json`.
+- Copy `docs/presskit.html` into `site/presskit.html` so `site/sync_site.js` maintains dual deployment synchronization.
 
-2. **Verify Focus Depth Stack & Fallback**:
-   * In browser preview, open multiple windows (`ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`). Click each window to confirm `z-index` updates and active header styling toggles.
-   * Close or minimize the top active window. Verify focus automatically transfers to the next visible top window and its taskbar button becomes highlighted (`.active`).
+#### Step 2: Implement `TelemetryService` in `site/app.js`
+Add a dedicated `TelemetryService` class to `site/app.js`:
+```javascript
+const STATIC_GAME_INFO_FALLBACK = {
+  last_updated: "2026-07-22T13:17:30Z",
+  game_version: "v2.4.1-hybrid",
+  live_event: {
+    name: "🌸 Whims of Gourmet - Spring Festival",
+    active: true,
+    multiplier: "2.0x Style Points & Gold"
+  },
+  active_daily_challenges: [
+    "⚡ Speed Chef Rush: Serve 5 Guests in Under 60s",
+    "🎯 Perfect Timing Master: Cook 3 Perfect Dishes in a Row",
+    "🌿 Gourmet Harvester: Gather 10 Fresh Zunda Peas"
+  ],
+  featured_gacha_banner: {
+    name: "🌸 Whims of Spring Gourmet",
+    cost: 100,
+    featured_items: ["Zundamon_MagicalGirlForm", "Royal_Gourmet_Crown", "Ankomon_GoldTrim"]
+  },
+  active_promo_codes: ["ZUNDAMOCHI2026", "SOUPSEASON", "KAWAIIZUNDA", "NIKKIFASHION"],
+  global_stats: {
+    total_dishes_cooked: 142850,
+    total_gacha_pulls: 38920,
+    active_chefs_online: 125
+  }
+};
 
-3. **Verify Taskbar Sync & Minimized Retention**:
-   * Click minimize button (`_`) on a window. Verify window content hides but taskbar button remains in `#taskbar-windows`.
-   * Click the taskbar button for the minimized window. Verify window un-minimizes and receives active focus.
-   * Click the taskbar button for an active window. Verify window minimizes.
+class TelemetryService {
+  async fetchGameInfo() {
+    try {
+      const res = await fetch('api/game_info.json', { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn('[TelemetryService] Fetch failed, applying static fallback:', err.message);
+      return STATIC_GAME_INFO_FALLBACK;
+    }
+  }
 
-4. **Verify Maximize / Restore**:
-   * Click maximize button (`🗖`). Verify window resizes to full viewport and icon changes to restore (`🗗`). Click again to verify window returns to original size and position.
+  async init() {
+    const data = await this.fetchGameInfo();
+    this.renderStatusPill(data);
+    this.renderLiveTicker(data);
+    this.renderActiveChallenges(data);
+    this.renderPromoCodes(data);
+    this.renderCommunityProgress(data);
+  }
 
-5. **Verify Keyboard Shortcuts**:
-   * Press `Ctrl+Esc`. Verify Start Menu opens/toggles.
-   * Press `Escape` while Start Menu is open. Verify Start Menu closes.
+  renderStatusPill(data) {
+    const pillText = document.querySelector('.status-pill .pill-text');
+    if (pillText) {
+      pillText.textContent = `LIVE ON ROBLOX · ${data.game_version} (${data.global_stats.active_chefs_online} CHEFS ONLINE)`;
+    }
+  }
+
+  renderLiveTicker(data) {
+    const tickerEl = document.getElementById('hero-live-ticker');
+    if (tickerEl) {
+      tickerEl.innerHTML = `
+        <span>🌸 Event: <strong>${data.live_event.name}</strong> (${data.live_event.multiplier})</span> · 
+        <span>⚡ Daily Challenge: <strong>${data.active_daily_challenges[0]}</strong></span> · 
+        <span>🍡 Global Dishes Cooked: <strong>${data.global_stats.total_dishes_cooked.toLocaleString()}</strong></span>
+      `;
+    }
+  }
+
+  renderActiveChallenges(data) {
+    const cardEl = document.getElementById('active-challenges-list');
+    if (cardEl) {
+      cardEl.innerHTML = data.active_daily_challenges.map(ch => `<li class="challenge-item">${ch}</li>`).join('');
+    }
+  }
+
+  renderPromoCodes(data) {
+    const codesGrid = document.getElementById('dynamic-promo-codes-grid');
+    if (codesGrid && data.active_promo_codes) {
+      codesGrid.innerHTML = data.active_promo_codes.map(code => `
+        <div class="code-box">
+          <div class="code-header">
+            <span class="code-val">${code}</span>
+            <button class="win95-btn copy-code-btn btn-candy" data-code="${code}">📋 Copy Code</button>
+          </div>
+        </div>
+      `).join('');
+      // Re-bind copy listeners
+      if (window.mainApp && window.mainApp.initPromosApp) {
+        window.mainApp.initPromosApp();
+      }
+    }
+  }
+
+  renderCommunityProgress(data) {
+    const targetDishes = 200000;
+    const current = data.global_stats.total_dishes_cooked;
+    const percent = Math.min(100, Math.round((current / targetDishes) * 100));
+
+    const barEl = document.getElementById('community-progress-bar');
+    const labelEl = document.getElementById('community-progress-text');
+    if (barEl) barEl.style.width = `${percent}%`;
+    if (labelEl) labelEl.textContent = `${current.toLocaleString()} / ${targetDishes.toLocaleString()} Dishes Cooked (${percent}%)`;
+  }
+}
+```
+
+#### Step 3: UI Markup Enhancements in `site/index.html`
+1. Add Ticker Container under `.status-pill` in `#hero`:
+   ```html
+   <div id="hero-live-ticker" class="hero-live-ticker-banner">
+     Loading live community telemetry...
+   </div>
+   ```
+2. Add Active Challenges & Community Goal Widget to `#features` / `#promos`:
+   ```html
+   <div class="community-telemetry-card feature-card">
+     <h3>🎯 Active Daily Challenges & Community Target</h3>
+     <ul id="active-challenges-list" class="challenges-list"></ul>
+     <div class="progress-container" style="margin-top:12px;">
+       <div class="progress-bar-bg"><div id="community-progress-bar" class="progress-bar-fill" style="width: 0%;"></div></div>
+       <span id="community-progress-text" class="progress-label">0 / 200,000 Dishes</span>
+     </div>
+   </div>
+   ```
+
+#### Step 4: Run Dual Sync Execution
+Run `node site/sync_site.js` to verify all updated web assets mirror from `site/` to `docs/`.
+
+---
+
+## 6. Verification Method
+
+1. **Dual Sync Verification**:
+   ```powershell
+   node site/sync_site.js --dry-run
+   ```
+   *Expected Output*: 0 errors, full scan of `site/` files mirroring cleanly to `docs/`.
+
+2. **JSON Telemetry Verification**:
+   Verify existence of `site/api/game_info.json` and `docs/api/game_info.json` using `view_file`.
+
+3. **Fallback Resiliency Test**:
+   Test page rendering when `api/game_info.json` fetch fails (or under `file://` protocol). The telemetry components must seamlessly populate using `STATIC_GAME_INFO_FALLBACK` without console errors.

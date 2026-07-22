@@ -1,13 +1,14 @@
-## 2026-07-21T20:43:18Z
-You are Challenger 2 for Milestone 1 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
-Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2
-Target Site Directory: g:\Zundamons-kItchen-V2\site
+## 2026-07-22T17:38:36Z
+You are Challenger 2 for Milestone 1 of Zundamon's Kitchen V2.
+Your working directory is: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2
 
-Your task:
-Challenging cross-browser compatibility, layout integrity, and zero-dependency compliance of `g:\Zundamons-kItchen-V2\site`:
-1. Verify viewport rendering at 320px (mobile), 768px (tablet), 1024px (laptop), and 1920px (desktop). Ensure mobile modal window fallback works properly.
-2. Verify CSS variable cascade across `:root` and elements.
-3. Validate SVG vector files in `site/assets/` (`pea_pod.svg`, `zundamon_mochi.svg`, `crt_monitor.svg`, `disc_icon.svg`) for clean XML rendering without external image references.
-4. Perform an explicit audit for hidden network calls, external fonts, or remote assets.
-
-Document your findings in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2\challenge.md` and deliver `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2\handoff.md`. Send a message to orchestrator with your verdict (VERIFIED / FAILED).
+TASK: Client UI Decoupling & Workspace Rules Stress Test for Milestone 1
+1. Perform empirical stress testing of all client UI scripts in `src/client/`:
+   - Confirm ZERO `script.Parent` references in client scripts synced to `StarterPlayerScripts`.
+   - Confirm all modal/dialogue panels set `panel.Visible = false` or `gui.Enabled = false` on startup.
+   - Confirm top-level ScreenGui instances and temporary toasts (`StoreScript.client.lua`) set `ResetOnSpawn = false`.
+   - Confirm `default.project.json` has `"$ignoreUnknownInstances": true` under `"Workspace"`.
+2. Run `python scripts/preflight_audit.py` (Cwd: g:\Zundamons-kItchen-V2).
+3. Run `selene src` to confirm 0 errors.
+4. Write your findings and verification verdict (VERIFIED / DEFECT_FOUND) to `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2\handoff.md`.
+5. Send a message to caller with your verdict and report path.

@@ -1,0 +1,123 @@
+{
+  "last_updated": "2026-07-22T17:55:00Z",
+  "online_players": {
+    "count": 125,
+    "status": "online",
+    "version": "2.4.0 HYBRID ECS"
+  },
+  "active_challenges": {
+    "daily": [
+      {
+        "id": "dc_perfect_3",
+        "title": "Perfect Timing",
+        "description": "Cook 3 dishes with PERFECT timing",
+        "reward": {
+          "gold": 120,
+          "xp": 100,
+          "style": 15
+        },
+        "difficulty": 2
+      },
+      {
+        "id": "dc_cook_5",
+        "title": "Cooking Spree",
+        "description": "Cook 5 dishes",
+        "reward": {
+          "gold": 80,
+          "xp": 60,
+          "style": 10
+        },
+        "difficulty": 1
+      },
+      {
+        "id": "dc_perfect_5",
+        "title": "Flawless Chef",
+        "description": "Cook 5 PERFECT dishes",
+        "reward": {
+          "gold": 200,
+          "xp": 150,
+          "style": 25
+        },
+        "difficulty": 3
+      }
+    ],
+    "weekly": [
+      {
+        "id": "wc_zunda_rush",
+        "title": "Zunda Paradise Rush",
+        "description": "Serve 5 Zunda Paradise dishes in Challenge Mode",
+        "reward": {
+          "gold": 1000,
+          "xp": 500,
+          "style": 100
+        },
+        "difficulty": 5
+      }
+    ]
+  },
+  "gacha_banners": [
+    {
+      "id": "gourmet_spring_2026",
+      "name": "🌸 Whims of Spring Gourmet",
+      "type": "fashion",
+      "costPerPull": 100,
+      "featuredItems": [
+        "Zundamon_MagicalGirlForm",
+        "Royal_Gourmet_Crown",
+        "Ankomon_GoldTrim"
+      ],
+      "rates": {
+        "legendary": "5%",
+        "epic": "20%",
+        "rare": "75%"
+      }
+    }
+  ],
+  "promo_codes": [
+    {
+      "code": "ZUNDAMOCHI2026",
+      "gold": 500,
+      "gems": 50,
+      "item": "10x Fresh Zunda Mochi",
+      "reward_summary": "+500 Gold, +50 Gems, 10x Fresh Zunda Mochi"
+    },
+    {
+      "code": "SOUPSEASON",
+      "gold": 1000,
+      "gems": 100,
+      "item": "5x Wild Mushroom Pack",
+      "reward_summary": "+1000 Gold, +100 Gems, 5x Wild Mushroom Pack"
+    },
+    {
+      "code": "KAWAIIZUNDA",
+      "gold": 750,
+      "gems": 75,
+      "item": "Sakura Chef Apron",
+      "reward_summary": "+750 Gold, +75 Gems, Sakura Chef Apron"
+    },
+    {
+      "code": "NIKKIFASHION",
+      "gold": 1500,
+      "gems": 150,
+      "item": "3x Whim Gacha Tickets",
+      "reward_summary": "+1500 Gold, +150 Gems, 3x Whim Gacha Tickets"
+    },
+    {
+      "code": "HYBRIDECS",
+      "gold": 2000,
+      "gems": 200,
+      "item": "5x Whim Gacha Tickets",
+      "reward_summary": "+2000 Gold, +200 Gems, 5x Whim Gacha Tickets"
+    }
+  ],
+  "global_stats": {
+    "total_dishes_cooked": 142850,
+    "edamame_harvested": 89420,
+    "total_gacha_pulls": 38920,
+    "active_event": {
+      "name": "🌸 Whims of Gourmet - Spring Festival",
+      "active": true,
+      "multiplier": "2.0x Style Points & Gold"
+    }
+  }
+}

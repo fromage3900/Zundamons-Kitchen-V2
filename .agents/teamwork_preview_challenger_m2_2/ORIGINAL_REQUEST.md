@@ -1,13 +1,13 @@
-## 2026-07-21T20:48:22Z
-You are Challenger 2 for Milestone 2 of Zundamon's Kitchen V2 — Zunda-OS 95 CLI Launch Page & Creative Hub.
-Working Directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_2
-Target Site Directory: g:\Zundamons-kItchen-V2\site
+## 2026-07-22T17:56:01Z
+<USER_REQUEST>
+You are Challenger 2 for Milestone 2 (Real-Time Game Telemetry & Web Hub Integration).
+Your working directory is `.agents/teamwork_preview_challenger_m2_2`.
 
-Your task:
-Challenging audio engine fixes, zero-dependency rules, and export metadata in `site/assets/audio_engine.js` and `site/window_manager.js`:
-1. Verify `ZundaAudio.init()` volume persistence loads `zunda_os_volume` from LocalStorage.
-2. Verify `playClickSFX('invalid')` applies smooth gain attenuation ramp down (no full volume 1.0 blips).
-3. Test BGM rapid toggle race condition: call `startCozyBGM()` and `stopCozyBGM()` rapidly and verify zero oscillator leaks or unhandled errors.
-4. Run `WindowManager.exportScreenGuiLayout()` and verify returned object contains valid JSON schema mapping windows to Roblox `ScreenGui` frames.
-
-Document your findings in `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_2\challenge.md` and deliver `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_2\handoff.md`. Send a message to orchestrator with your verdict (VERIFIED / FAILED).
+### Task:
+Empirically test and challenge the Milestone 2 implementation:
+1. Validate JSON schema completeness for `game_info.json`.
+2. Test `WebInfoSyncService.lua` logic via mock/static analysis script.
+3. Test `site/sync_site.js` execution to confirm target `docs/` folder is perfectly synced with `site/`.
+4. Test preflight audit script (`python scripts/preflight_audit.py`).
+5. Write your findings and handoff report in `.agents/teamwork_preview_challenger_m2_2/handoff.md` with explicit VERIFIED or FAILED verdict.
+</USER_REQUEST>

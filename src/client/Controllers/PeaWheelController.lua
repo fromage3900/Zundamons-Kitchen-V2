@@ -84,6 +84,19 @@ local function buildWheelGui()
 	hubStroke.Thickness = 2
 	hubStroke.Transparency = 0.2
 
+	-- Hub button click handler (connected when hub is created)
+	hubButton.MouseButton1Click:Connect(function()
+		if RunService:IsStudio() and RunService:IsEdit() then return end
+		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
+		PeaWheelController.toggle()
+		if not reducedMotion then
+			local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
+			if UIHelper and UIHelper.spawnSparkles then
+				UIHelper.spawnSparkles(hubButton, hubButton.AbsoluteSize.X/2, hubButton.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 8)
+			end
+		end
+	end)
+
 	-- Tooltip
 	tooltipLabel = Instance.new("TextLabel")
 	tooltipLabel.Name = "Tooltip"
@@ -199,6 +212,12 @@ function PeaWheelController.open()
 	if isOpen then return end
 	if RunService:IsStudio() and RunService:IsEdit() then return end
 
+	-- Play wheel open sound
+	local zsc = _G.ZundaSoundController
+	if zsc and zsc.play then
+		zsc.play("WheelOpen")
+	end
+
 	local gui = buildWheelGui()
 	if not gui then return end
 
@@ -238,6 +257,12 @@ function PeaWheelController.close()
 	if not isOpen then return end
 	isOpen = false
 
+	-- Play wheel close sound
+	local zsc = _G.ZundaSoundController
+	if zsc and zsc.play then
+		zsc.play("WheelClose")
+	end
+
 	if not hubButton or not tooltipLabel then return end
 
 	-- Hide slices
@@ -269,6 +294,11 @@ end
 -- ── Selection & Dispatch ─────────────────────────────────────
 function PeaWheelController.select(actionId)
 	if not isOpen then return end
+	-- Play wheel select sound
+	local zsc = _G.ZundaSoundController
+	if zsc and zsc.play then
+		zsc.play("WheelSelect")
+	end
 	local ok = ActionRegistry.dispatch(actionId)
 	if ok then
 		PeaWheelController.close()
@@ -332,34 +362,6 @@ end
 -- ── Initialization ───────────────────────────────────────────
 UserInputService.InputBegan:Connect(onInputBegan)
 UserInputService.InputEnded:Connect(onInputEnded)
-
--- Hub button
-if hubButton then
-	hubButton.MouseButton1Click:Connect(function()
-		if RunService:IsStudio() and RunService:IsEdit() then return end
-		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
-		PeaWheelController.toggle()
-		-- Cute sparkle frill on hub click
-		if not reducedMotion then
-			local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
-			if UIHelper and UIHelper.spawnSparkles then
-				UIHelper.spawnSparkles(hubButton, hubButton.AbsoluteSize.X/2, hubButton.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 8)
-			end
-		end
-	end)
-else
-	-- Build on first require
-	task.spawn(function()
-		local gui = buildWheelGui()
-		if gui and hubButton then
-			hubButton.MouseButton1Click:Connect(function()
-				if RunService:IsStudio() and RunService:IsEdit() then return end
-				if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
-				PeaWheelController.toggle()
-			end)
-		end
-	end)
-end
 
 -- Expose Globals
 _G.PeaWheelController = PeaWheelController

@@ -1,14 +1,17 @@
-## 2026-07-21T18:04:19Z
-You are Worker 4 (Milestone 2 Refinement & Fixes).
-Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2_fix
-Project root: g:\Zundamons-kItchen-V2
-Workspace rules: g:\Zundamons-kItchen-V2\AGENTS.md
+## 2026-07-22T13:56:40Z
+<USER_REQUEST>
+You are Worker 6 (Milestone 2 Audio Engine Remediation Worker).
+Your metadata working directory is `.agents/teamwork_preview_worker_m2_fix`.
 
-MANDATORY INTEGRITY WARNING:
+### Mandatory Integrity Warning
 DO NOT CHEAT. All implementations must be genuine. DO NOT hardcode test results, create dummy/facade implementations, or circumvent the intended task. A Forensic Auditor will independently verify your work. Integrity violations WILL be detected and your work WILL be rejected.
 
-Tasks:
-1. **Client Quality Score Array Unrolling**: In `src/client/Controllers/CookingController.lua`, update lines 373-377 where `craftConfig.calculateQuality` is called. Unroll `currentScore` counts into an array of hit objects matching `craftConfig.calculateQuality` expectations (where `#score >= totalNotes`), ensuring local client completion returns the accurate grade (3-star, 2-star, 1-star) instead of defaulting to "ok".
-2. **Server Cooking Session Duration Extension**: In `src/server/Services/CookingValidationSystem.lua`, update `session.duration` calculation (line 63) to `math.max(craftConfig.cookingTimes[item] or 15, (noteCount * 1.0) + 2.0 + 3.0)` so server session entities stay alive for the entire note sequence duration and do not expire prematurely while notes are falling.
-3. Verify compilation with `rojo build`.
-4. Write handoff report to g:\Zundamons-kItchen-V2\.agents\teamwork_preview_worker_m2_fix\handoff.md.
+### Objective:
+Fix the BGM rapid toggle oscillator race condition in `site/assets/audio_engine.js`:
+1. In `startCozyBGM()` (in `site/assets/audio_engine.js`), when clearing `ZundaAudio.bgmStopTimeout`, also iterate over any existing `ZundaAudio.bgmPadOscs` and `ZundaAudio.bgmMelodyOscs` and call `osc.stop()` (inside a try-catch block) before clearing or overwriting the arrays.
+2. Ensure `stopCozyBGM()` and `startCozyBGM()` maintain zero unstopped oscillator leaks under rapid toggle conditions.
+3. Run `node g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m2_2\verify.js` to verify all 4 tests pass (100% pass, 0 failures).
+4. Run `node site/sync_site.js` to synchronize `site/` -> `docs/`.
+5. Run `python scripts/preflight_audit.py` to confirm 0 errors.
+6. Write your handoff report in `.agents/teamwork_preview_worker_m2_fix/handoff.md`.
+</USER_REQUEST>

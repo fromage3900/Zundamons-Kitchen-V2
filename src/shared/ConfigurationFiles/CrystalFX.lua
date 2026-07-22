@@ -31,9 +31,6 @@ local function enhanceCrystal(part)
 	-- SurfaceAppearance with emission
 	local sa = Instance.new("SurfaceAppearance")
 	sa.Name = "CrystalGlow"
-	sa.ColorMap = Instance.new("NumberSequence")
-	sa.RoughnessMap = Instance.new("NumberSequence")
-	sa.MetalnessMap = Instance.new("NumberSequence")
 	sa.EmissiveMap = "rbxassetid://121883683025787"
 	sa.EmissiveScale = 0.8
 	sa.Parent = fx

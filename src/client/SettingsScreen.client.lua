@@ -1,8 +1,15 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RS = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
+
+local UIHelper = require(RS.Shared.Modules.UIHelper)
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
+local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
+local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(RS.ConfigurationFiles.UIActionRegistry)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "SettingsScreenGui"
@@ -102,13 +109,13 @@ Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
 local function setVolume(val)
 	local clamped = math.clamp(val, 0, 1)
 	local soundService = game:GetService("SoundService")
-    for _, sound in ipairs(soundService:GetDescendants()) do
-        if sound:IsA("Sound") then
-            local baseVolume = sound:GetAttribute("SettingsBaseVolume") or sound.Volume
-            sound:SetAttribute("SettingsBaseVolume", baseVolume)
-            sound.Volume = baseVolume * clamped
-        end
-    end
+	for _, sound in ipairs(soundService:GetDescendants()) do
+		if sound:IsA("Sound") then
+			local baseVolume = sound:GetAttribute("SettingsBaseVolume") or sound.Volume
+			sound:SetAttribute("SettingsBaseVolume", baseVolume)
+			sound.Volume = baseVolume * clamped
+		end
+	end
 	volVal.Text = math.floor(clamped * 100) .. "%"
 	sliderFill.Size = UDim2.new(clamped, 0, 1, 0)
 	sliderBtn.Position = UDim2.new(clamped, -9, 0.5, -9)
@@ -116,11 +123,6 @@ local function setVolume(val)
 	player:SetAttribute("VolumeLevel", attrVal)
 end
 
-local RS = game:GetService("ReplicatedStorage")
-local UIHelper = require(RS.Shared.Modules.UIHelper)
-local UIConfig = require(RS.ConfigurationFiles.UIConfig)
-local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
-local UIRouter = require(RS.ConfigurationFiles.UIRouter)
 local function loadVolume()
 	local attr = player:GetAttribute("VolumeLevel")
 	if attr then
@@ -151,24 +153,32 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 local shell = CozyModalShell.wrap(panel, {
+	actionId = "settings",
 	open = function()
 		gui.Enabled = true
-		backdrop.Visible = true; panel.Visible = true
-		panel.BackgroundTransparency = 1; pStroke.Transparency = 1
-		closeBtn.BackgroundTransparency = 1; closeBtn.TextTransparency = 1
+		backdrop.Visible = true
+		panel.Visible = true
+		panel.BackgroundTransparency = 1
+		pStroke.Transparency = 1
+		closeBtn.BackgroundTransparency = 1
+		closeBtn.TextTransparency = 1
 		panel.Size = UDim2.new(0, 0, 0, 0)
 		panel.Position = UDim2.new(0.5, 0, 0.5, 0)
 		TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 320, 0, 200), Position = UDim2.new(0.5, -160, 0.5, -100)
+			Size = UDim2.new(0, 320, 0, 200),
+			Position = UDim2.new(0.5, -160, 0.5, -100),
 		}):Play()
 		task.wait(0.15)
-		panel.BackgroundTransparency = 0; pStroke.Transparency = 0
-		closeBtn.BackgroundTransparency = 0; closeBtn.TextTransparency = 0
+		panel.BackgroundTransparency = 0
+		pStroke.Transparency = 0
+		closeBtn.BackgroundTransparency = 0
+		closeBtn.TextTransparency = 0
 		loadVolume()
 	end,
 	close = function()
 		gui.Enabled = false
-		backdrop.Visible = false; panel.Visible = false
+		backdrop.Visible = false
+		panel.Visible = false
 	end,
 })
 
@@ -182,27 +192,58 @@ local function hide()
 	shell.close()
 end
 
+local function toggle()
+	if gui.Enabled then
+		hide()
+	else
+		show()
+	end
+end
+
+-- Register with UIRouter for modal exclusivity and Escape handling
+UIRouter.register("settings", show, hide)
+
+-- Register callback with ActionRegistry for Pea Wheel dispatch
+ActionRegistry.registerCallback("settings", toggle)
+
 closeBtn.MouseButton1Click:Connect(function()
 	hide()
 	local pos = closeBtn.AbsolutePosition
-	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
+	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255, 255, 255), 5)
 end)
 backdrop.MouseButton1Click:Connect(function()
 	hide()
 	local pos = backdrop.AbsolutePosition
-	UIHelper.spawnSparkles(panel, pos.X + 10, pos.Y + 10, Color3.fromRGB(255,255,255), 4)
+	UIHelper.spawnSparkles(panel, pos.X + 10, pos.Y + 10, Color3.fromRGB(255, 255, 255), 4)
 end)
 
 local RS_gui = RS:WaitForChild("RemoteEvents")
 local toggleEv = RS_gui:WaitForChild("ToggleSettingsUI")
 toggleEv.OnClientEvent:Connect(function()
-	if gui.Enabled then hide() else show() end
+	toggle()
 end)
 
+-- Wire HUD button
+task.spawn(function()
+	local pg = player:WaitForChild("PlayerGui")
+	local hudGui = pg:WaitForChild("ZundaHUD", 15)
+	if hudGui then
+		local hudButtons = hudGui:WaitForChild("HudButtons", 8)
+		if hudButtons then
+			local btn = hudButtons:FindFirstChild("HudBtn_settings")
+			if btn then
+				btn.MouseButton1Click:Connect(toggle)
+			end
+		end
+	end
+end)
+
+-- Keyboard shortcut (will be replaced by central input handler)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.L then
-		if gui.Enabled then hide() else show() end
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.F1 then
+		toggle()
 	end
 end)
 
 loadVolume()
+print("[SettingsScreen] Ready — press F1 or click gear icon")

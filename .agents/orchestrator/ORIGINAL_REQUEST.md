@@ -58,3 +58,30 @@ Ensure all web assets (`index.html`, `style.css`, `app.js`, `terminal.js`, `wind
 
 ### GitHub Pages Packaging
 - [ ] Clean code in `site/` and `docs/` ready for immediate live deployment on GitHub Pages.
+
+## 2026-07-22T17:19:17Z
+
+Deeply audit Zundamon's Kitchen V2 codebase for loose ends, fix any lingering bugs or edge cases, and complete the real-time Roblox game data telemetry sync on the Zunda-OS 95 website hub.
+
+Working directory: g:\Zundamons-kItchen-V2
+Integrity mode: development
+
+## Requirements
+
+### R1. Deep Codebase Audit & Loose-Ends Fixes
+Conduct a comprehensive review across all server, client, shared, and script modules to catch and fix any missing remote definitions, decoupled UI visibility bugs, unhandled errors, or broken contracts.
+
+### R2. Real-Time Game Telemetry & Web Integration
+Enhance and verify the live connection between the Roblox game backend (WebInfoSyncService) and the Zunda-OS 95 web portal (docs/index.html, docs/presskit.html, docs/api/game_info.json) so website visitors can view real-time player counts, active daily challenges, live gacha banners, and community milestone progress.
+
+### R3. Preflight & Acceptance Verification
+Ensure all preflight automated audits pass cleanly with zero Luau static errors, full Rojo level preservation ($ignoreUnknownInstances: true), and decoupled UI rules.
+
+## Acceptance Criteria
+
+### Comprehensive Quality Bar
+- [ ] Preflight audit script (python scripts/preflight_audit.py) passes cleanly with 0 errors.
+- [ ] Real-time game JSON telemetry (docs/api/game_info.json) contains valid, structured live data for challenges, banners, codes, and global stats.
+- [ ] Web pages (docs/index.html and docs/presskit.html) render live ticker data and dynamic event banners cleanly without browser console errors.
+- [ ] All client UI scripts follow ClientGuiBootstrap and explicitly hide modals (Visible = false) on startup.
+

@@ -36,3 +36,7 @@ Saved/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Ollama content workers output
+scripts/ollama_output/
+scripts/__pycache__/

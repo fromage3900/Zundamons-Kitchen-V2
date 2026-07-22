@@ -9,6 +9,7 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(RS.ConfigurationFiles.UIActionRegistry)
 local craftConfig = require(RS.ConfigurationFiles.CraftConfig)
 
 local C = {
@@ -392,7 +393,7 @@ tabZones.MouseButton1Click:Connect(function()
 end)
 
 local open = false
-local shell = CozyModalShell.wrap(panel, {
+local shell = CozyModalShell.wrap(panel, { actionId = "compendium",
 	open = function()
 		render("recipes")
 		panel.Size = UDim2.new(0, 600, 0, 10)
@@ -438,3 +439,9 @@ UIS.InputBegan:Connect(function(inp, gpe)
 end)
 
 print("[Compendium v2] AC style, search bar, owned tracking, dynamic data")
+
+-- Register with UIRouter for modal exclusivity and Escape handling
+UIRouter.register("compendium", nil, function() shell.close() end)
+
+-- Register callback with ActionRegistry for Pea Wheel dispatch
+ActionRegistry.registerCallback("compendium", toggle)

@@ -41,7 +41,7 @@ Lighting.ExposureCompensation     = L.exposure_compensation
 -- LightingStyle: Soft for diffused painted shadows (July 2025+ Unified Lighting)
 pcall(function() Lighting.LightingStyle = Enum.LightingStyle.Soft end)
 -- Extend light range to 120 studs for better global illumination reach
-pcall(function() Lighting.ExtendLightRangeTo120 = Enum.RolloutState.On end)
+pcall(function() Lighting.ExtendLightRangeTo120 = true end)
 
 -- ── ATMOSPHERE + SKY ──────────────────────────────────────
 for _, c in ipairs(Lighting:GetChildren()) do

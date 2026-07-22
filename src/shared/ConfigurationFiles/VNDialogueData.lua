@@ -218,10 +218,126 @@ GUEST_BY_TYPE.male2 = {
 -- Add guest speaker to SPEAKERS table
 SPEAKERS.guest = { name = "Guest", emoji = "🍽️", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) }
 
+-- New side dialogue for Infinity Nikki themed recipes
+SIDE_DIALOGUES.zunda_paradise = {
+	speaker = "zundapal",
+	text = "ZUNDA PARADISE!!! 🫛✨",
+	lore = "15 Zunda Peas + 10 Edamame + 5 Sweet Peas + 3 Pea Flowers = CULINARY TRANSCENDENCE!!!",
+	tip = "This dish doesn't just feed the body — it feeds the SOUL!!!",
+}
+SIDE_DIALOGUES.protein_punch = {
+	speaker = "ankomon",
+	text = "PROTEIN PUNCH!!! 💪🫘",
+	lore = "5 Edamame Pods + 3 Zunda Peas + 1 Gold = BEAN POWER!!!",
+	tip = "Each sip grants +10% cooking speed for 30 seconds!",
+}
+SIDE_DIALOGUES.golden_harvest = {
+	speaker = "sakuradamon",
+	text = "Golden Harvest Platter... 🌟",
+	lore = "5 Apples + 8 Wheat + 2 Gold + 3 Sweet Peas = A FEAST FOR THE EYES!!!",
+	tip = "The gold flakes make it sparkle like morning dew!",
+}
+SIDE_DIALOGUES.winter_stew = {
+	speaker = "cardamon",
+	text = "Warm Winter Stew... so comforting. 🧘",
+	lore = "3 Zunda Roots + 2 Zunda Mushrooms + 1 Gold = PATIENCE IN A BOWL.",
+	tip = "Slow cooking reveals the deepest flavors.",
+}
+
+-- New guest types (Infinity Nikki aesthetic)
+GUEST_BY_TYPE.magical_girl = {
+    spawn = "By the power of sparkling cuisine! I need {recipe}! ✨💖",
+    served = "My transformation is complete! Thank you, chef-san! 🌸✨",
+    timeout = "My magic is fading... hurry! 🫧💔",
+    wrong_dish = "This isn't the right ingredient for my transformation! 😱",
+}
+GUEST_BY_TYPE.fashionista = {
+    spawn = "Darling, I require {recipe} — it MUST be Instagram-worthy! 📸💄",
+    served = "FABULOUS! This dish is a work of ART! 💋✨",
+    timeout = "This is SO last season... I'm out! 👋",
+    wrong_dish = "This has ZERO aesthetic value! 😤",
+}
+GUEST_BY_TYPE.stylist = {
+    spawn = "I need {recipe} to complete my look today! 💇‍♀️🎨",
+    served = "PERFECTION! This pairs beautifully with my pastel aura! 🌈",
+    timeout = "I have other appointments! This is UNACCEPTABLE! ⏰",
+    wrong_dish = "This clashes with my color palette! 🎨❌",
+}
+GUEST_BY_TYPE.challenge_fighter = {
+    spawn = "I've trained for this moment! Give me {recipe}! 💪🔥",
+    served = "THAT'S WHAT I'M TALKING ABOUT!!! 🔥🔥🔥",
+    timeout = "I... I can't believe I lost... 😭",
+    wrong_dish = "This dish has no POWER! 💀",
+}
+
+-- Challenge mode dialogue
+local CHALLENGE_DIALOGUE = {}
+CHALLENGE_DIALOGUE.wave_start = {
+	speaker = "zundamon",
+	lines = {
+		"WAVE {wave}!!! THE STOVE AWAITETH!!! 🔥🔥🔥",
+		"GUESTS ARE COMING!!! COOK COOK COOK!!! GO GO GO!!!",
+		"THE KITCHEN ITSELF WILL JUDGE YOU!!! 🫛✨",
+	},
+}
+CHALLENGE_DIALOGUE.wave_complete = {
+	speaker = "zundapal",
+	lines = {
+		"WAVE {wave} COMPLETE!!! 🎉🎉🎉",
+		"Your score is {score}!!! ABSOLUTELY STUNNING!!! 💫",
+		"Keep going! The LEGENDARY tier awaits!!! 👑",
+	},
+}
+CHALLENGE_DIALOGUE.perfect_cook = {
+	speaker = "zundapal",
+	lines = {
+		"PERFECT!!! 🫛✨",
+		"That timing was CRYSTAL CLEAR!!! 💖",
+		"Style points +10!!! You're a NATURAL!!!",
+	},
+}
+CHALLENGE_DIALOGUE.combo = {
+	speaker = "zundamon",
+	lines = {
+		"COMBO x{combo}!!! THE KITCHEN SINGS!!! 🔥",
+		"KEEP THAT STREAK ALIVE!!! GO GO GO!!!",
+		"NOBODY HAS EVER COOKED THIS WELL!!! 🏆",
+	},
+}
+CHALLENGE_DIALOGUE.tier_up = {
+	speaker = "zundapal",
+	lines = {
+		"TIER UP!!! You are now {tier}!!! 💖",
+		"Your style shines brighter than the morning sun!!! ✨",
+		"Unlock new outfits and recipes!!! The fashion show awaits!!! 👗",
+	},
+}
+
+-- Daily challenge dialogue
+local DAILY_DIALOGUE = {}
+DAILY_DIALOGUE.challenge_start = {
+	speaker = "zundapal",
+	lines = {
+		"Three challenges await, {player}~ 🌟",
+		"Complete all three for a STREAK BONUS!!! 💖",
+		"Let's make today MAGICAL!!! ✨",
+	},
+}
+DAILY_DIALOGUE.visitor_arrival = {
+	speaker = "narrator",
+	lines = {
+		"[ A mysterious traveler approaches the kitchen... ]",
+		"[ Their eyes gleam with the promise of adventure... ]",
+		"[ 'I've heard your cooking can grant wishes,' they say. ]",
+	},
+}
+
 return {
     SPEAKERS = SPEAKERS,
     COMPANION_DIALOGUE = COMPANION_DIALOGUE,
     SIDE_DIALOGUES = SIDE_DIALOGUES,
     GUEST_DIALOGUE = GUEST_DIALOGUE,
     GUEST_BY_TYPE = GUEST_BY_TYPE,
+    CHALLENGE_DIALOGUE = CHALLENGE_DIALOGUE,
+    DAILY_DIALOGUE = DAILY_DIALOGUE,
 }

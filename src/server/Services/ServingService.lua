@@ -16,6 +16,8 @@ local MAX_SERVE_DISTANCE = 20
 local RATE_LIMIT = 0.25
 local lastServeAt: { [number]: number } = {}
 local ServingService = {}
+ServingService.GuestServed = Instance.new("BindableEvent")
+ServingService.GuestTimedOut = Instance.new("BindableEvent")
 
 local function validGuest(player: Player, guest: any): (boolean, string?)
 	if typeof(guest) ~= "Instance" or not guest:IsA("Model") or not guest.Parent then
@@ -71,7 +73,12 @@ local function showDialogue(player: Player, guest: Instance, key: string, gold: 
 	local dialogueData = require(ReplicatedStorage.ConfigurationFiles.VNDialogueData)
 	local dialogue = dialogueData.GUEST_BY_TYPE[meshType]
 	local text = dialogue and dialogue[key]
-	local event = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialgue")
+	local event = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialogue")
+	if not event then
+		event = Instance.new("RemoteEvent")
+		event.Name = "ShowVNDialogue"
+		event.Parent = ReplicatedStorage.RemoteEvents
+	end
 	if type(text) == "string" and event and event:IsA("RemoteEvent") then
 		if gold then
 			text = text:gsub("{gold}", tostring(gold))
@@ -157,8 +164,14 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	guest:SetAttribute("ServingState", "settled")
 	showDialogue(player, guest, "served", result.gold)
 	PlayerDataService.checkAndUnlockTiers(player)
+	local guestType = guest:GetAttribute("MeshType") or guest:GetAttribute("GuestType") or "normal"
 	GuestService.removeGuestByInstance(guest, "served")
+	ServingService.GuestServed:Fire(player, guestType, recipe, quality)
 	return true, "served", { recipe = recipe, quality = quality, gold = result.gold, xp = result.xp }
+end
+
+function ServingService.onGuestTimeout(player: Player, guestType: string?)
+	ServingService.GuestTimedOut:Fire(player, guestType or "default")
 end
 
 Players.PlayerRemoving:Connect(function(player)
