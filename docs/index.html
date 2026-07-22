@@ -35,6 +35,11 @@
 
         <!-- Desktop Shortcuts Grid -->
         <div id="desktop-icons" role="region" aria-label="Desktop Shortcuts">
+            <button class="desktop-shortcut" data-open-window="window-zundamon" tabindex="0">
+                <div class="shortcut-icon character-icon">🫛✨</div>
+                <span class="shortcut-label">Zundamon.app</span>
+            </button>
+
             <button class="desktop-shortcut" data-open-window="window-zundacli" tabindex="0">
                 <div class="shortcut-icon cli-icon">
                     <img src="assets/crt_monitor.svg" alt="CLI Icon">
@@ -124,6 +129,105 @@
                         <button type="button" class="cli-vkey" data-key="ArrowDown">▼ HIST</button>
                         <button type="button" class="cli-vkey" data-cmd="help">HELP</button>
                         <button type="button" class="cli-vkey" data-cmd="clear">CLEAR</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 0. Zundamon.app Window (Character Showcase & Real Game Companion Stats) -->
+            <section id="window-zundamon" class="window active-window" data-window-id="zundamon" style="top: 30px; left: 50px; width: 700px; height: 500px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🫛✨</span>
+                        <span class="window-title-text">Zundamon.app — Companion Hub & Real Game Stats</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize" aria-label="Minimize Window">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize" aria-label="Maximize Window">🗖</button>
+                        <button class="win-btn win-close" data-action="close" title="Close" aria-label="Close Window">✕</button>
+                    </div>
+                </div>
+
+                <div class="window-body zundamon-body">
+                    <div class="zunda-hero-panel">
+                        <div class="zunda-avatar-card">
+                            <div class="zunda-avatar-frame">
+                                <svg class="zunda-svg-avatar" viewBox="0 0 200 200" width="140" height="140">
+                                    <!-- Green Pea Ears -->
+                                    <ellipse cx="60" cy="45" rx="22" ry="40" fill="#8bc34a" transform="rotate(-25 60 45)"/>
+                                    <ellipse cx="140" cy="45" rx="22" ry="40" fill="#8bc34a" transform="rotate(25 140 45)"/>
+                                    <ellipse cx="60" cy="45" rx="14" ry="28" fill="#a5d6a7" transform="rotate(-25 60 45)"/>
+                                    <ellipse cx="140" cy="45" rx="14" ry="28" fill="#a5d6a7" transform="rotate(25 140 45)"/>
+                                    <!-- Body & Head -->
+                                    <circle cx="100" cy="115" r="55" fill="#4caf50"/>
+                                    <!-- Cute Chef Hat -->
+                                    <path d="M 75 65 C 75 45, 125 45, 125 65 Z" fill="#ffffff"/>
+                                    <rect x="75" y="62" width="50" height="10" rx="3" fill="#ffe5ec"/>
+                                    <!-- Face Features -->
+                                    <circle cx="80" cy="108" r="7" fill="#1b5e20"/>
+                                    <circle cx="120" cy="108" r="7" fill="#1b5e20"/>
+                                    <circle cx="82" cy="105" r="2.5" fill="#ffffff"/>
+                                    <circle cx="122" cy="105" r="2.5" fill="#ffffff"/>
+                                    <!-- Blush Cheeks -->
+                                    <ellipse cx="70" cy="118" rx="8" ry="4" fill="#ff85a1" opacity="0.75"/>
+                                    <ellipse cx="130" cy="118" rx="8" ry="4" fill="#ff85a1" opacity="0.75"/>
+                                    <!-- Smile -->
+                                    <path d="M 92 118 Q 100 126 108 118" fill="none" stroke="#1b5e20" stroke-width="3" stroke-linecap="round"/>
+                                    <!-- Zunda Mochi Stick -->
+                                    <line x1="140" y1="130" x2="165" y2="155" stroke="#d7ccc8" stroke-width="4"/>
+                                    <circle cx="142" cy="132" r="10" fill="#ffffff"/>
+                                    <circle cx="142" cy="132" r="8" fill="#8bc34a" opacity="0.8"/>
+                                </svg>
+                            </div>
+                            <div class="zunda-name-badge">
+                                <span class="zunda-name">Zundamon (ずんだもん)</span>
+                                <span class="zunda-title">Pea Spirit Companion 🫛</span>
+                            </div>
+                            <div class="zunda-mood-bar">
+                                <span class="mood-label">Mood:</span>
+                                <button class="win95-btn mood-btn active" data-mood="happy">🟢 Happy</button>
+                                <button class="win95-btn mood-btn" data-mood="cooking">🍳 Cooking</button>
+                                <button class="win95-btn mood-btn" data-mood="sleeping">💤 Sleeping</button>
+                            </div>
+                        </div>
+
+                        <div class="zunda-stats-panel">
+                            <h3 class="panel-header">📊 REAL IN-GAME COMPANION STATS</h3>
+                            <div class="stat-grid">
+                                <div class="stat-box">
+                                    <span class="stat-lbl">Chef Level</span>
+                                    <span class="stat-val">Lv. 24 Master</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-lbl">Affinity</span>
+                                    <span class="stat-val">⭐⭐⭐⭐⭐ Max</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-lbl">Active Buff</span>
+                                    <span class="stat-val">+25% Chef XP</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-lbl">Fav Dish</span>
+                                    <span class="stat-val">Zunda Mochi 🍡</span>
+                                </div>
+                            </div>
+
+                            <div class="vn-dialogue-card">
+                                <div class="vn-speaker-bar">
+                                    <span class="vn-speaker">🫛 Zundamon:</span>
+                                    <button id="zunda-voice-btn" class="win95-btn mini-btn">🔊 Chirp</button>
+                                </div>
+                                <p id="zunda-dialogue-text" class="vn-quote">"Morning, {player}! The garden is sparkling nanoda! Let us make one dish we are proud of today!"</p>
+                            </div>
+
+                            <div class="companion-catalog-strip">
+                                <span class="strip-label">Companions:</span>
+                                <button class="comp-chip active" data-comp="zundamon">🫛 Zundamon</button>
+                                <button class="comp-chip" data-comp="sakuradamon">🌸 Sakuradamon (+25% XP)</button>
+                                <button class="comp-chip" data-comp="ankomon">🫘 Ankomon (+15% Gold)</button>
+                                <button class="comp-chip" data-comp="cardamon">🍋 Cardamon (+30% Perfect)</button>
+                                <button class="comp-chip" data-comp="antimon">🌿 Antimon (+20% Gather)</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

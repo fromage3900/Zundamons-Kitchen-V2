@@ -1152,6 +1152,7 @@ class MainApp {
 
     this.initPromosApp();
     this.initCalculatorApp();
+    this.initZundamonApp();
   }
 
   initClock() {
@@ -1313,6 +1314,59 @@ class MainApp {
     if (dishSelect) dishSelect.addEventListener('change', () => { playClick('down'); updateCalc(); });
     if (qtyInput) qtyInput.addEventListener('input', updateCalc);
     updateCalc();
+  }
+
+  initZundamonApp() {
+    const moodBtns = document.querySelectorAll('.mood-btn');
+    const dialogueText = document.getElementById('zunda-dialogue-text');
+    const voiceBtn = document.getElementById('zunda-voice-btn');
+    const compChips = document.querySelectorAll('.comp-chip');
+
+    const moodQuotes = {
+      happy: '"Morning, {player}! The garden is sparkling nanoda! Let us make one dish we are proud of today!"',
+      cooking: '"Rhythm cooking time! Tap along to the beat to score S-Rank PERFECT dishes nanoda! 🍳"',
+      sleeping: '"Zzz... fresh edamame mochi... so delicious nanoda... 💤"'
+    };
+
+    moodBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClick('down');
+        moodBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mood = btn.dataset.mood || 'happy';
+        if (dialogueText && moodQuotes[mood]) {
+          dialogueText.textContent = moodQuotes[mood];
+        }
+        if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('chirp');
+      });
+    });
+
+    if (voiceBtn) {
+      voiceBtn.addEventListener('click', () => {
+        if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('nanoda_arpeggio');
+      });
+    }
+
+    const compQuotes = {
+      zundamon: '"I will stay close while you gather and cook nanoda! 🫛"',
+      sakuradamon: '"Blossom petals drift on the breeze... Carries +25% bonus XP lessons for you! 🌸"',
+      ankomon: '"Sweet red beans sweeten every payday! Serving guests grants +15% Gold! 🫘"',
+      cardamon: '"A steady hand makes the finest dishes. +30% wider cooking windows! 🍋"',
+      antimon: '"The forest whispers where rare ingredients slumber. +20% extra gather drops! 🌿"'
+    };
+
+    compChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        playClick('down');
+        compChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const comp = chip.dataset.comp || 'zundamon';
+        if (dialogueText && compQuotes[comp]) {
+          dialogueText.textContent = compQuotes[comp];
+        }
+        if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('chirp');
+      });
+    });
   }
 
   initSystemTray() {

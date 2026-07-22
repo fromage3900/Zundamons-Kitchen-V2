@@ -3,30 +3,34 @@
    ========================================================================== */
 
 :root {
-  /* --- Primary Zunda Greens (Cozy Zen Edamame Palette) --- */
+  /* --- Primary Zunda Greens & Cozy Infinity Nikki Y2K Palette --- */
   --zunda-dark: #2e7d32;         /* Deep forest edamame green */
   --zunda-primary: #4caf50;      /* Fresh zunda green */
   --zunda-light: #8bc34a;        /* Bright sprout green */
-  --zunda-bg: #e8f5e9;           /* Soft zen mint desktop background */
-  --zunda-accent: #c8e6c9;       /* Pastel pea pod highlight */
-  --zunda-pastel: #f1f8e9;       /* Warm mochi cream green */
-  --zunda-hover: #3d8b40;        /* Hover state dark green */
-  --zunda-shadow: rgba(46, 125, 50, 0.25); /* Ambient green drop shadow */
+  --zunda-bg: #fff5f8;           /* Cozy Nikki Dreamy Pastel Pink background */
+  --zunda-accent: #ffb7c5;       /* Soft Sakura Pink accent */
+  --zunda-pastel: #ffe5ec;       /* Warm Nikki Cream Pink */
+  --zunda-pink-hot: #ff477e;     /* Y2K Sparkle Pink accent */
+  --zunda-pink-pastel: #ff85a1;  /* Soft Dreamy Rose */
+  --zunda-lavender: #e8dff5;     /* Y2K Magical Pearl Lavender */
+  --zunda-mint-light: #d4edda;   /* Fresh Edamame Mint Cream */
+  --zunda-hover: #ff7096;        /* Hover state pink */
+  --zunda-shadow: rgba(255, 133, 161, 0.25); /* Ambient pink drop shadow */
 
-  /* --- Retro OS Palette (Zunda-OS 95 Windows & Bevels) --- */
-  --win-bg: #e8f5e9;             /* Window surface background */
+  /* --- Retro OS Palette (Zunda-OS 95 Infinity Nikki Y2K Bevels) --- */
+  --win-bg: #ffe5ec;             /* Window surface background */
   --win-content-bg: #ffffff;     /* Window inner content panel background */
   --win-border-light: #ffffff;   /* 3D top/left bevel highlight */
-  --win-border-mid: #a5d6a7;     /* 3D intermediate pastel bevel border */
-  --win-border-dark: #2e7d32;    /* 3D bottom/right dark bevel shadow */
-  --win-border-shadow: #1b5e20;  /* 3D deep edge shadow */
-  --win-title-bg: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%); /* Active titlebar gradient */
-  --win-title-bg-inactive: linear-gradient(90deg, #78909c 0%, #b0bec5 100%); /* Inactive titlebar */
+  --win-border-mid: #ffb7c5;     /* 3D intermediate pastel pink bevel border */
+  --win-border-dark: #ff477e;    /* 3D bottom/right dark bevel shadow */
+  --win-border-shadow: #c9184a;  /* 3D deep edge shadow */
+  --win-title-bg: linear-gradient(90deg, #ff7096 0%, #ffb7c5 40%, #8bc34a 100%); /* Infinity Nikki Y2K active titlebar */
+  --win-title-bg-inactive: linear-gradient(90deg, #e8dff5 0%, #f3e5f5 100%); /* Inactive titlebar */
   --win-title-text: #ffffff;     /* Active titlebar text */
-  --win-title-text-inactive: #eceff1; /* Inactive titlebar text */
-  --win-btn-bg: #c8e6c9;         /* Retro control button background */
-  --win-btn-hover: #a5d6a7;       /* Control button hover color */
-  --win-btn-active: #8bc34a;      /* Control button active/pressed color */
+  --win-title-text-inactive: #8e7dbe; /* Inactive titlebar text */
+  --win-btn-bg: #ffc6ff;         /* Y2K control button background */
+  --win-btn-hover: #ff85a1;      /* Control button hover color */
+  --win-btn-active: #ff477e;     /* Control button active/pressed color */
 
   /* --- Terminal Phosphor Palette (ZundaCLI.exe CRT Console) --- */
   --term-bg: #0a150a;            /* Dark obsidian phosphor background */
@@ -1389,9 +1393,195 @@ body.crt-off #crt-overlay,
   font-size: 13px;
 }
 
-.profit-good {
-  color: #2e7d32;
-  font-weight: bold;
-  font-size: 15px;
+/* Zundamon.app Character Showcase & Real Companion Stats Styles */
+.zundamon-body {
+  padding: 14px;
+  background: var(--win-bg);
+  color: var(--text-dark);
+  font-family: var(--font-os);
+  overflow-y: auto;
 }
+
+.zunda-hero-panel {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 14px;
+}
+
+@media screen and (max-width: 640px) {
+  .zunda-hero-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.zunda-avatar-card {
+  background: #ffffff;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.zunda-avatar-frame {
+  background: radial-gradient(circle, #fff0f5 0%, #ffe5ec 100%);
+  border: 2px solid #ffb7c5;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(255, 133, 161, 0.3);
+}
+
+.zunda-name-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.zunda-name {
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 14px;
+}
+
+.zunda-title {
+  font-size: 11px;
+  color: #ff477e;
+  font-weight: bold;
+}
+
+.zunda-mood-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mood-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.mood-btn.active {
+  background: #ff85a1;
+  color: #ffffff;
+  border-color: #ff477e;
+}
+
+.zunda-stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-header {
+  margin: 0;
+  font-size: 13px;
+  color: #1b5e20;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-box {
+  background: #ffffff;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: #777;
+  text-transform: uppercase;
+}
+
+.stat-val {
+  font-weight: bold;
+  color: #ff477e;
+  font-size: 13px;
+}
+
+.vn-dialogue-card {
+  background: #ffffff;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vn-speaker-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vn-speaker {
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 13px;
+}
+
+.vn-quote {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #333;
+  line-height: 1.4;
+}
+
+.companion-catalog-strip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  background: #ffffff;
+  padding: 6px;
+  border-top: 2px solid var(--win-border-shadow);
+  border-left: 2px solid var(--win-border-shadow);
+  border-right: 2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+.strip-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #555;
+}
+
+.comp-chip {
+  padding: 2px 6px;
+  font-size: 10px;
+  border: 1px solid #ffb7c5;
+  background: #fff0f5;
+  cursor: pointer;
+  border-radius: 3px;
+  font-family: var(--font-os);
+}
+
+.comp-chip.active {
+  background: #ff85a1;
+  color: #ffffff;
+  font-weight: bold;
+}
+
 
