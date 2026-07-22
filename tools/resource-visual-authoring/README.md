@@ -7,12 +7,14 @@ models, and writes only the canonical resource attributes.
 
 ## Install
 
-1. From this folder run:
-   `rojo build plugin.project.json -o ZundaResourceVisualAuthoring.rbxm`
-2. In Studio, insert the `.rbxm`, right-click its root Model, and choose
+1. From the repository root run:
+   `.\\node_modules\\.bin\\rojo.cmd build tools/resource-visual-authoring/plugin.project.json -o build/ZundaResourceVisualAuthoring.rbxm`
+2. In Studio, drag `build/ZundaResourceVisualAuthoring.rbxm` into the place,
+   right-click its root Model in Explorer, and choose
    **Save as Local Plugin**.
 3. Restart Studio and open **Plugins > Zunda Kitchen > Resource Visuals**.
-3. Keep Rojo connected. The plugin edits Studio-owned level data only; Rojo
+4. Delete the temporary inserted Model from the place after saving the plugin.
+5. Keep Rojo connected. The plugin edits Studio-owned level data only; Rojo
    preserves it through `$ignoreUnknownInstances`.
 
 ## Everyday workflow
