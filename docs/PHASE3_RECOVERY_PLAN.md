@@ -19,6 +19,7 @@ Restore one server-authoritative implementation for fishing and the Harvest -> C
 - 3.1 is committed as `668e88d`: versioned player projections, serialized rollback-safe mutations, inventory helpers, and RewardCore ownership are active.
 - `FishingServer` is the sole remote owner; `FishingService` owns one Matter session per player, server simulation, lifecycle cleanup, and atomic settlement.
 - A real Studio catch granted one `Fish: Trout`, advanced the data revision once, and rejected replay. Duplicate begin, forged session, legacy client-result, and repeated cancellation requests were rejected.
+- Final parity retest used the actual `Driftwood Rod` (`Type = FishingRod`), caught one Carp through bounded reel input, and retained its inventory item, species count, and total across a ProfileService mock release/reload.
 - Product decision: a catch becomes a visible raw inventory item named `Fish: <species>` plus chef XP. It does not grant immediate gold, preserving fish for later recipe or selling design without double-paying the economy.
 - The local Blender and `crucialassets/` sources remain owner-controlled and untracked.
 - 3.2 was committed as `3a304c5`. A real catch granted one fish and one revision, while duplicate/forged/replayed requests awarded nothing.

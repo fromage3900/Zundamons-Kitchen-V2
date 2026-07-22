@@ -34,7 +34,7 @@ local function equippedRod(player: Player): Tool?
 		return nil
 	end
 	for _, child in ipairs(character:GetChildren()) do
-		if child:IsA("Tool") and child.Name == "FishingRod" and child:GetAttribute("Type") == "FishingRod" then
+		if child:IsA("Tool") and child:GetAttribute("Type") == "FishingRod" then
 			return child
 		end
 	end
