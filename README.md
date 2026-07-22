@@ -1,164 +1,150 @@
-# Zundamon's kItchen V2
+# 🫛 Zundamon’s Kitchen V2
 
-A cooperative, massively persistent kitchen life-sim Roblox experience — gather ingredients, cook dishes with rhythm minigames, serve guests, and build your restaurant empire with your Zundamon companion.
+> Gather slowly. Cook carefully. Feed somebody well.
 
-> **Status:** Active recovery and hybrid ECS migration. Phase 2 restores deterministic boot; end-to-end gameplay parity is not yet certified. See [Phase 2 Boot Recovery](docs/PHASE2_BOOT_RECOVERY.md). · [MIT License](LICENSE) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
+**Zundamon’s Kitchen** is a cozy Roblox cooking adventure about harvesting ingredients, learning rhythm-based recipes, serving village guests, and travelling with a pea-spirit companion.
 
----
-
-## 🎮 What Is This?
-
-Zundamon's kItchen is a cozy Roblox experience featuring:
-- **Gathering** — Harvest ingredients from world resource nodes (berries, mushrooms, wheat, etc.)
-- **Cooking** — Rhythm-game minigames to craft recipes with combo scoring
-- **Serving** — NPC guests arrive and order dishes; serve to earn gold
-- **Companions** — Zundamon companions follow you, provide buffs, and have VN dialogues
-- **Quests** — 68+ quests across gathering, cooking, serving, and exploration
-- **Building** — Place furniture, decorate your kitchen plot
-- **AI Mentor** — Optional LLM-powered Zundapal chat (requires Studio secrets)
-- **Day/Night + Weather** — Dynamic sky, clouds, rain, aurora effects
+[Getting started](GETTING_STARTED.md) · [Contributing](CONTRIBUTING.md) · [Production handoff](docs/PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md) · [UI roadmap](docs/UI_UX_OVERHAUL_PLAN.md) · [Credits](CREDITS.md)
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## The game today
+
+The production baseline has a verified **Harvest → Collect → Cook → Serve → Reward** loop, persistence recovery, fishing, quests, companion following and dialogue, respawn-safe interfaces, and Rojo-authored resource behavior.
+
+The codebase is undergoing a careful hybrid ECS migration:
+
+- Matter ECS owns world simulation and transient entities.
+- Services own persistence, rewards, economy, and domain transactions.
+- Server adapters own remotes and request validation.
+- Controllers and React-Lua own player interface state.
+
+This is a working foundation, not a finished release. Build success is not treated as runtime proof.
+
+## 🌱 Experience pillars
+
+- **Gather:** trees, rocks, flowers, crops, and fishing spots provide useful ingredients.
+- **Cook:** timing and recipe knowledge turn ingredients into dishes.
+- **Serve:** guests exchange requested dishes for gold and chef XP.
+- **Grow:** chef ranks, collections, quests, decorating, and village improvements provide long goals.
+- **Befriend:** companions have distinct appearances, dialogue, and server-authoritative gifts.
+
+The visual language combines mochi cream, edamame green, blush accents, friendly type, and the clear pressed/active states developed for the repository’s **Zunda-OS** website in [`site/`](site/).
+
+## Five-minute setup
+
+Requirements: Git, Roblox Studio, the Rojo Studio plugin, and the pinned command-line tools.
 
 ```powershell
-# 1. Clone
-git clone https://github.com/fromage3900/Zundamons-kItchen-V2.git
-cd Zundamons-kItchen-V2
-
-# 2. Install tools (pick one)
-mise install           # Option A: Mise (recommended — manages all tools)
-npm install            # Option B: Node.js only (Rojo + StyLua via npm)
-
-# 3. Install Wally packages (ECS, React, ProfileService)
+git clone https://github.com/fromage3900/Zundamons-Kitchen-V2.git
+cd Zundamons-Kitchen-V2
+git switch codex/core-production-baseline
+rokit install
 wally install
-
-# 4. Start syncing
-rojo serve
-
-# 5. Open the place file in Studio → Connect Rojo plugin → Press Play
+rojo serve default.project.json --port 34872
 ```
 
-> **New to all this?** See the full [Getting Started Guide](GETTING_STARTED.md) — it walks through every install step from scratch.
+Then:
 
----
+1. Open the correct Zundamon’s Kitchen V2 place in Roblox Studio.
+2. Connect the Rojo plugin to `localhost:34872`.
+3. Confirm the place name before syncing or testing.
+4. Press Play and check Studio Output for server/client bootstrap errors.
+5. Run the smoke loop: harvest, collect, cook, serve, reward, respawn, and rejoin.
 
-## 📁 Project Structure
+If `rokit` is unavailable, follow the alternative setup in [Getting Started](GETTING_STARTED.md).
 
-```
-Zundamons-kItchen-V2/
-├── src/
-│   ├── client/                 # StarterPlayerScripts (43 files)
-│   │   ├── Controllers/        #   HarvestController
-│   │   ├── systems/            #   Matter ECS client systems (new)
-│   │   └── ui/                 #   React-Lua components (new)
-│   ├── server/                 # ServerScriptService (41 files)
-│   │   ├── DevTools/           #   Studio command-bar dev utilities
-│   │   ├── Plugins/            #   Runtime effect plugins
-│   │   ├── Services/           #   Core services (PlayerData, Admin, LLM, etc.)
-│   │   ├── Validation/         #   Server-side harvest validation
-│   │   └── systems/            #   Matter ECS server systems (new)
-│   ├── shared/                 # ReplicatedStorage
-│   │   ├── ConfigurationFiles/ #   41 game config modules (recipes, items, quests, etc.)
-│   │   ├── Shared/Config/      #   Pipeline configs (architecture, landscape, VN)
-│   │   ├── Shared/Modules/     #   Shared utility modules (MeshProvider, ModifierStack)
-│   │   ├── RemoteEvents/       #   Remote event declarations (init.meta.json)
-│   │   ├── RemoteFunctions/    #   Remote function declarations
-│   │   ├── components/         #   Matter ECS component definitions (new)
-│   │   └── ...                 #   Loot, Meshes, Models, ToolRemotes, RewardEvents
-│   └── Workspace/              # Game world folder structure (.gitkeep hierarchy)
-├── default.project.json        # Rojo project config
-├── mise.toml                   # Toolchain versions (Rojo 7.7, Wally 0.3.2, etc.)
-├── wally.toml                  # Wally package dependencies
-├── selene.toml                 # Linter rules (print/warn = error)
-├── stylua.toml                 # Formatter settings (tabs, 120-col)
-├── package.json                # NPM scripts (lint, build, serve)
-└── docs/                       # Architecture, design system, security docs
+## 🧺 Choose the right branch
+
+| Branch | Purpose | Rule |
+| --- | --- | --- |
+| `codex/core-production-baseline` | Stable demo and level-design baseline | Protect it; use reviewed commits only |
+| `codex/expanded-gameplay-experiments` | Pea Wheel, HUD V2, and bounded gameplay prototypes | Never publish directly |
+| `main` | Historical/default integration branch | Do not assume it contains the newest recovery work |
+
+Experimental work returns to production as small reviewed commits. Do not merge the experiment branch wholesale.
+
+## 🛠 Everyday workflow
+
+```powershell
+git status --short --branch
+git pull --ff-only
+wally install
+rojo serve default.project.json --port 34872
 ```
 
-### Rojo Mapping (How Disk → Studio)
+Before committing, run every gate independently:
 
-| Disk Path | Studio Location | What's There |
-|-----------|-----------------|--------------|
-| `src/server/` | `ServerScriptService` | All server scripts (flat) |
-| `src/client/` | `StarterPlayer.StarterPlayerScripts` | All client scripts (flat) |
-| `src/shared/ConfigurationFiles/` | `ReplicatedStorage.ConfigurationFiles` | 41 config modules |
-| `src/shared/RemoteEvents/` | `ReplicatedStorage.RemoteEvents` | Event declarations |
-| `src/shared/Shared/Config/` | `ReplicatedStorage.Shared.Config` | Pipeline configs |
-| `src/shared/Shared/Modules/` | `ReplicatedStorage.Shared.Modules` | Utility modules |
-| `src/Workspace/` | `Workspace` | World folder hierarchy |
+```powershell
+stylua --check <files-you-changed>
+selene <files-you-changed>
+rojo build default.project.json --output build/ZundamonsKitchenV2.rbxlx
+git diff --check -- <files-you-changed>
+git status --short
+```
 
-> **Why this mapping?** All scripts use `game.ReplicatedStorage.ConfigurationFiles.X` — the Rojo config maps each subdirectory individually to preserve these paths.
+Full-source formatting still contains inherited debt. Do not bulk-format unrelated files to make a focused change pass.
 
----
+## 🏡 Level designers
 
-## 🛠️ Tech Stack
+The authored world is Studio-owned. Code and reusable configuration are Rojo-owned.
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| [Mise](https://mise.jdx.dev/) | — | Universal toolchain manager (one `mise install` gets everything) |
-| [Rojo](https://rojo.space/) | 7.7.0 | File sync between VS Code and Roblox Studio (preserves Studio level design via `$ignoreUnknownInstances`) |
-| [Wally](https://wally.run/) | 0.3.2 | Roblox package manager (Matter, React, ProfileService) |
-| [StyLua](https://github.com/JohnnyMorganz/StyLua) | 2.5.2 | Lua code formatter |
-| [Selene](https://kampfkarren.github.io/selene/) | 0.27.1 | Lua linter |
-| [Blink](https://github.com/1axen/blink) | latest | Network event compiler |
-| [Matter](https://matter-ecs.github.io/matter/) | 0.8.4 | Entity-Component-System framework |
-| [React-Lua](https://github.com/jsdotlua/react-lua) | 17.1.0 | Declarative UI rendering |
-| [ProfileService](https://madstudioroblox.github.io/ProfileService/) | 1.0.4 | Player data persistence |
-| [ReplicaService](https://madstudioroblox.github.io/ReplicaService/) | 1.0.1 | State replication |
+- Keep `"$ignoreUnknownInstances": true` under `Workspace` in `default.project.json`.
+- Save the Studio place before stopping Rojo or changing branches.
+- Never place gameplay scripts inside imported meshes.
+- Use tags and attributes from [Resource Node Authoring](docs/RESOURCE_NODE_AUTHORING.md).
+- Use [Zundarooms Authoring](docs/ZUNDAROOMS_AUTHORING.md) for mystery spaces.
+- Use the [Chef Master import contract](docs/ZUNDAMON_CHEF_MASTER_IMPORT.md) for the progression NPC and companion variants.
 
----
+## ⚠ Must know before editing
 
-## 📋 NPM Scripts
+- `PlayerDataService` is the persistence boundary.
+- `RewardCore` is the reward and companion-buff boundary.
+- `MarketplaceService` is the sole `ProcessReceipt` owner.
+- Monetization fails closed and contains placeholder IDs. Do not enable it casually.
+- External LLM chat has been removed from the production baseline.
+- Remotes are owned by explicit server adapters; clients never decide rewards.
+- UI scripts create or locate interfaces through `ClientGuiBootstrap`; top-level ScreenGuis survive respawn and modal panels start hidden.
+- Matter systems use the explicit ordered registry. Do not restore recursive system loading.
 
-| Command | What It Does |
-|---------|--------------|
-| `npm run rojo:serve` | Start Rojo file sync (connect Studio plugin) |
-| `npm run rojo:build` | Build `.rbxl` from project config |
-| `npm run lint` | Run StyLua format check + Selene lint |
-| `npm run lint:stylua` | StyLua format check only |
-| `npm run lint:selene` | Selene lint only |
+Never stage owner source assets accidentally. In particular, do not use `git add -A` in a mixed workspace containing `.blend`, `.blend1`, `crucialassets/`, generated builds, or another agent’s work.
 
----
+## Project map
 
-## 🔐 The Iron Gate (Code Quality)
+```text
+src/client/                         controllers, HUD, VN, and player input
+src/server/                         adapters, services, systems, and validation
+src/shared/ConfigurationFiles/      canonical gameplay and UI configuration
+src/shared/components/              Matter component definitions
+src/shared/Models/                  repository-authored reusable models
+src/Workspace/                      Rojo-owned world scaffolding only
+docs/                               recovery, authoring, production, and UX plans
+site/                               Zunda-OS creative hub and design reference
+default.project.json                Rojo DataModel mapping
+wally.toml                          Roblox dependencies
+aftman.toml / mise.toml             pinned toolchains
+```
 
-Before any code reaches `main`:
+## Packages
 
-1. **`stylua src/`** — Auto-format all Lua files
-2. **`selene src/`** — Lint check (⚠️ `print()`/`warn()` are **errors**, not warnings)
-3. **`rojo build`** — Verify the project compiles
-4. **PR Review** — Fill out the template, get approval
-5. **CI Pipeline** — GitHub Actions runs all checks automatically
+Matter, React-Lua, ReactRoblox, ProfileService, ReplicaService, Promise, and Signal are managed through Wally. Generated `Packages/` and `ServerPackages/` directories are not committed.
 
----
+## For collaborators and coding agents
 
-## 🤝 Contributing
+Read these in order:
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide covering:
-- Branch naming conventions
-- Code style rules (naming, formatting, architecture)
-- PR checklist
-- How to report issues
+1. [`AGENTS.md`](AGENTS.md)
+2. [Getting Started](GETTING_STARTED.md)
+3. [Production and Level Design Handoff](docs/PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md)
+4. [Phase 3 Acceptance Status](docs/PHASE3_ACCEPTANCE_STATUS.md)
+5. [Collaborator Prompts](docs/COLLABORATOR_PROMPTS.md)
 
----
+One task, one concern, one reviewable commit. Report static checks separately from Studio evidence. Stop and ask before changing schemas, production remotes, paid-product configuration, receipt ownership, terrain preservation, or publishing.
 
-## 📖 Documentation
+## Licensing and safety
 
-| Document | What It Covers |
-|----------|---------------|
-| [AGENT_HANDOFF.md](docs/AGENT_HANDOFF.md) | Multi-agent coordination guide for Antigravity, Cline, DeepSeek, & Ollama |
-| [GETTING_STARTED.md](GETTING_STARTED.md) | Step-by-step setup for first-timers |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Branch workflow, code style, PR process |
-| [CREDITS.md](CREDITS.md) | Asset licenses and attributions |
-| [PRIVACY.md](PRIVACY.md) | Player data handling and AI chat policy |
-| [SECURITY.md](SECURITY.md) | Vulnerability reporting and secure dev practices |
+Code is provided under the [MIT License](LICENSE). Asset and character rights may have different terms; consult [CREDITS.md](CREDITS.md) before commercial use. Keep all player-facing text age-appropriate, filter user-generated text through Roblox services, and never commit credentials or API keys.
 
 ---
 
-## ⚖️ License
-
-[MIT License](LICENSE) — see [CREDITS.md](CREDITS.md) for third-party asset licenses.
-
-*This is a fan project. Zundamon is a character from the ZUNKO PJ project. No commercial use is intended.*
+<p align="center"><strong>🫛 Make something warm, leave the kitchen kinder. 🌸</strong></p>

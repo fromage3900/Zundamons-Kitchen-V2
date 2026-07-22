@@ -1,104 +1,135 @@
-# Getting Started (Zundamon's kItchen V2)
+# Getting Started
 
-Welcome to the team! We use a strict **domain-driven structure**, meaning our code lives in VS Code and our map lives in Roblox Studio. Follow these steps exactly to set up your environment.
+This guide gets a new collaborator from a clean clone to a safe Studio playtest. Read `AGENTS.md` before editing.
 
----
+## 1. Install
 
-## Step 1: Install the Toolchain
+Install:
 
-We use **Mise** as a universal package manager to guarantee everyone uses the exact same versions of Rojo, Wally, StyLua, and Selene.
+- Git
+- Roblox Studio
+- Rojo Studio plugin
+- Rokit, or Mise as the fallback tool manager
 
-1. Install **Mise**: [Getting Started Guide](https://mise.jdx.dev/getting-started.html)
-2. Open your terminal in the root of the cloned repository.
-3. Run the following commands:
-```bash
+Clone and install pinned tools:
+
+```powershell
+git clone https://github.com/fromage3900/Zundamons-Kitchen-V2.git
+cd Zundamons-Kitchen-V2
+git switch codex/core-production-baseline
+rokit install
+wally install
+```
+
+Mise fallback:
+
+```powershell
 mise install
 wally install
 ```
-*This installs Rojo, Linters, Formatters, and our Roblox package dependencies (Matter, React, ProfileService).*
 
-> **No Mise?** If you are on an OS that struggles with Mise, you can alternatively use `npm install` to get `rojo` and `stylua` from npm. However, you will still need to manually install `wally` and `selene`.
+Do not rely on the npm Rojo package for gameplay work; the repository’s Roblox toolchain is pinned separately.
 
----
-
-## Step 2: Git and recovery branch
-
-The active recovery branch is `codex/phase1-recovery`. Before editing, run:
+## 2. Verify Git before opening Studio
 
 ```powershell
 git status --short --branch
 git log -5 --oneline
+git remote -v
 ```
 
-Do not stage generated builds, place files, Blender working files, `crucialassets/`, `Packages/`, or `ServerPackages/`. Existing untracked files belong to their author unless a task explicitly places them in scope. Phase commits are intentionally small and reversible; do not push or publish unless the owner requests it.
+Expected production branch: `codex/core-production-baseline`.
 
-## Step 3: The Studio Workflow
+Do not stage local Blender files, `crucialassets/`, generated place files, packages, `.agents` activity, or another collaborator’s work. Use explicit paths with `git add`.
 
-**Do not edit code in Studio!** All scripts and configuration files must be edited in VS Code.
+## 3. Connect Rojo
 
-1. Open the **Zundamon's kItchen V2** place in Roblox Studio (Team Create).
-2. Open the repository in VS Code.
-3. In your VS Code terminal, start Rojo:
-```bash
-rojo serve --port 34872
-```
-4. In Roblox Studio, open the **Plugins** tab, click **Rojo**, and hit **Connect**.
-
-Your scripts will now automatically sync to the game when you save them in VS Code. Keep `$ignoreUnknownInstances: true` under `Workspace` in `default.project.json`; the authored world is Studio-owned and must not be erased by Rojo.
-
-For Studio automation, use `@chrrxs/robloxstudio-mcp@latest` on `http://localhost:58741`. Confirm the active Studio instance before edits. Port `28821` belongs to the quarantined legacy plugin and must have no listener or connection.
-
----
-
-## Step 4: Generating the Workspace (If starting from scratch)
-
-If you are opening an empty baseplate instead of the live Team Create place, you need to populate the world.
-
-1. With Rojo connected, open the Studio **View > Command Bar**.
-2. Run this command to generate the terrain and placement nodes:
-```lua
-require(game.ServerScriptService.DevTools["PopulateWorld.dev"]).populate()
+```powershell
+rojo serve default.project.json --port 34872
 ```
 
----
+In Studio:
 
-## Step 5: UI Development with Hoarcekat
+1. Open the intended V2 place.
+2. Save a recoverable local or published version.
+3. Open Plugins → Rojo.
+4. Connect to `localhost:34872`.
+5. Confirm scripts appear in the expected services.
 
-If you are working on React-Lua UI, you don't need to press Play in Studio.
+`Workspace.$ignoreUnknownInstances` must remain `true`. It protects manually authored terrain, meshes, and level geometry.
 
-1. Install the [Hoarcekat plugin](https://github.com/Roblox/hoarcekat) in Roblox Studio.
-2. Ensure your component has a corresponding `.story.lua` file.
-3. Open the Hoarcekat plugin window to preview your UI live as you edit the code in VS Code.
+Studio automation uses `@chrrxs/robloxstudio-mcp@latest` when available. Verify the connected instance before executing anything. Do not run a competing port-28821 MCP server.
 
----
+## 4. Understand ownership
 
-## Step 6: Before You Commit (Independent Gates)
+| Work | Source of truth |
+| --- | --- |
+| Luau scripts and configuration | Git under `src/` |
+| Terrain and hand-authored level geometry | Roblox Studio place |
+| Reusable repository models | `src/shared/Models/` |
+| Wally packages | `wally.toml`; generated folders stay ignored |
+| Recovery and design decisions | `docs/` |
 
-Our CI pipeline will reject bad code. Before making a Pull Request:
+Avoid editing Rojo-owned scripts in Studio because the next sync can replace them.
 
-Run each gate separately so a later success cannot mask an earlier failure:
+## 5. First smoke test
 
-1. **Check formatting without rewriting unrelated files:**
-```bash
-npm run lint:stylua
-```
-2. **Lint your code:**
-```bash
-npm run lint:selene
-```
-3. **Verify the build:**
-```bash
-rojo build default.project.json -o build/test.rbxl
-```
-4. **Verify Git whitespace and scope:**
-```bash
-git diff --check
+Start a fresh server and verify:
+
+1. Server and client boot without red errors.
+2. Equip the correct tool and harvest a node.
+3. Collect its loot and confirm inventory changes.
+4. Cook one available recipe.
+5. Serve the correct dish to one guest.
+6. Confirm gold, XP, and HUD update exactly once.
+7. Complete one fishing attempt.
+8. Respawn; top-level UI remains and modals stay hidden.
+9. Rejoin; inventory, currency, progression, and companion state return.
+
+Rojo build success alone does not certify this runtime loop.
+
+## 6. Make a focused change
+
+- Create or switch to the correct feature/experiment branch.
+- Inspect before editing.
+- Keep transactions in services and simulation in ECS systems.
+- Keep UI state in controllers/React, not gameplay ECS.
+- Preserve existing user changes in a dirty worktree.
+- Add an acceptance scenario and rollback note for behavioral work.
+
+For experimental UI such as the Pea Wheel, use `codex/expanded-gameplay-experiments` and follow [the UI plan](docs/UI_UX_OVERHAUL_PLAN.md).
+
+## 7. Check and commit
+
+Run checks independently against the files you changed:
+
+```powershell
+stylua --check <changed-luau-files>
+selene <changed-luau-files>
+rojo build default.project.json --output build/ZundamonsKitchenV2.rbxlx
+git diff --check -- <changed-files>
 git status --short
 ```
 
-The inherited full-source StyLua baseline and Selene warnings are tracked debt. A phase commit must not hide them or bulk-format unrelated code. Report each gate as pass/fail independently.
+Then stage explicit paths:
 
----
+```powershell
+git add path/to/file1 path/to/file2
+git diff --cached --check
+git diff --cached --stat
+git commit -m "type(scope): concise change"
+```
 
-## 🎉 You're ready!
-Check out the [README.md](README.md) for an overview of our tech stack, and [CONTRIBUTING.md](CONTRIBUTING.md) for our code style and architecture rules.
+Do not commit or publish merely because a build passed. Record the Studio playtest result in the PR.
+
+## 8. Before publishing
+
+- Use `codex/core-production-baseline`, never the experimental branch.
+- Stop play mode and save the place.
+- Take a recoverable Studio version.
+- Repeat the fresh-server and rejoin smoke tests.
+- Confirm monetization and external-cost integrations remain disabled unless deliberately released.
+- Review experience maturity, asset rights, thumbnails, descriptions, and Roblox policy settings.
+- Publish only with owner approval.
+
+Welcome to the kitchen. Start small and leave it safer than you found it. 🫛
