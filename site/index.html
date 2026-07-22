@@ -87,6 +87,80 @@
             </button>
         </div>
 
+        <!-- Y2K Cozy Desktop Widgets Panel -->
+        <div id="desktop-widgets" role="region" aria-label="Desktop Widgets">
+
+            <!-- 1. Clock & Weather Y2K Widget -->
+            <div class="y2k-widget clock-widget">
+                <div class="widget-header">
+                    <span class="widget-title">⏰ Zunda Time & Weather</span>
+                    <span class="widget-sparkle">✨</span>
+                </div>
+                <div class="widget-body">
+                    <div id="widget-clock" class="widget-big-time">12:00:00 PM</div>
+                    <div class="widget-sub-info">
+                        <span class="weather-badge">🌤️ Cozy Sunny (22°C)</span>
+                        <span class="players-online-badge">🟢 120 Chefs Playing</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Interactive Zundamon Sticker Widget -->
+            <div id="zunda-sticker-widget" class="y2k-widget zunda-sticker-card" title="Click me for a chirp, nanoda!">
+                <div class="zunda-bubble-talk" id="widget-speech-bubble">"Welcome to Zunda-OS 95, nanoda! 🫛✨"</div>
+                <div class="sticker-avatar-wrap">
+                    <svg viewBox="0 0 100 100" width="70" height="70">
+                        <circle cx="50" cy="55" r="32" fill="#4caf50"/>
+                        <ellipse cx="28" cy="25" rx="12" ry="22" fill="#8bc34a" transform="rotate(-20 28 25)"/>
+                        <ellipse cx="72" cy="25" rx="12" ry="22" fill="#8bc34a" transform="rotate(20 72 25)"/>
+                        <circle cx="40" cy="50" r="4" fill="#1b5e20"/>
+                        <circle cx="60" cy="50" r="4" fill="#1b5e20"/>
+                        <ellipse cx="34" cy="56" rx="5" ry="2.5" fill="#ff85a1" opacity="0.8"/>
+                        <ellipse cx="66" cy="56" rx="5" ry="2.5" fill="#ff85a1" opacity="0.8"/>
+                        <path d="M 45 56 Q 50 61 55 56" stroke="#1b5e20" stroke-width="2" fill="none"/>
+                    </svg>
+                </div>
+                <span class="sticker-label">Tap Zundamon! 🫛</span>
+            </div>
+
+            <!-- 3. Cozy Jukebox Lo-Fi Player Widget -->
+            <div class="y2k-widget jukebox-widget">
+                <div class="widget-header">
+                    <span class="widget-title">🎵 Kitchen Lo-Fi Beats</span>
+                    <span class="widget-sparkle">💖</span>
+                </div>
+                <div class="widget-body">
+                    <div class="song-title-row">
+                        <span class="disc-spin">💿</span>
+                        <span class="song-name" id="jukebox-song-name">Zunda Village Afternoon BGM</span>
+                    </div>
+                    <div class="jukebox-controls">
+                        <button id="widget-play-bgm" class="win95-btn primary-btn">▶ Play BGM</button>
+                        <button id="widget-toggle-rain" class="win95-btn">🌧️ Rain FX</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Quick Promo Code Scratch Widget -->
+            <div class="y2k-widget promo-scratch-widget">
+                <div class="widget-header">
+                    <span class="widget-title">🎁 Quick Promo Codes</span>
+                    <span class="widget-sparkle">🎀</span>
+                </div>
+                <div class="widget-body">
+                    <div class="quick-code-row">
+                        <span class="q-code">ZUNDAMOCHI2026</span>
+                        <button class="win95-btn copy-code-btn mini-copy" data-code="ZUNDAMOCHI2026">Copy</button>
+                    </div>
+                    <div class="quick-code-row">
+                        <span class="q-code">SOUPSEASON</span>
+                        <button class="win95-btn copy-code-btn mini-copy" data-code="SOUPSEASON">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <!-- Window Manager Floating Window Stack -->
         <div id="window-container">
 

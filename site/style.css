@@ -32,13 +32,22 @@
   --win-btn-hover: #ff85a1;      /* Control button hover color */
   --win-btn-active: #ff477e;     /* Control button active/pressed color */
 
-  /* --- Terminal Phosphor Palette (ZundaCLI.exe CRT Console) --- */
-  --term-bg: #0a150a;            /* Dark obsidian phosphor background */
-  --term-green: #33ff66;         /* Classic CRT phosphor green text */
-  --term-green-dim: #1eb844;     /* Secondary dim console text */
-  --term-glow: 0 0 8px rgba(51, 255, 102, 0.6); /* CRT text glow shadow */
-  --term-cursor: #33ff66;        /* Blinking block cursor color */
-  --term-selection: rgba(51, 255, 102, 0.25); /* Console text highlight */
+  /* --- Cute Vaporwave Y2K & Pastel Terminal Palette (Bye Harsh Green!) --- */
+  --term-bg: #231b2e;            /* Deep Dreamy Violet Obsidian */
+  --term-green: #f472b6;         /* Soft Pastel Rose Pink */
+  --term-cyan: #38bdf8;          /* Soft Vaporwave Sky Cyan */
+  --term-yellow: #fef08a;        /* Warm Pastel Gold */
+  --term-green-dim: #d8b4fe;     /* Dreamy Lilac Secondary Text */
+  --term-glow: 0 0 10px rgba(244, 114, 182, 0.45); /* Soft Rose Glow */
+  --term-cursor: #f472b6;        /* Soft Pastel Rose Cursor */
+  --term-selection: rgba(244, 114, 182, 0.3); /* Selection highlight */
+
+  /* --- Y2K Glassmorphism Desktop Widget Tokens --- */
+  --widget-bg: rgba(255, 255, 255, 0.85);
+  --widget-border: 2px solid #ffb7c5;
+  --widget-shadow: 0 8px 24px rgba(255, 133, 161, 0.22);
+  --widget-radius: 12px;
+  --y2k-gradient-title: linear-gradient(90deg, #ff7096 0%, #e8dff5 50%, #a5d6a7 100%);
 
   /* --- Roblox UI Export Mapping Variables --- */
   --roblox-screengui-bg: var(--zunda-bg);
@@ -1578,10 +1587,168 @@ body.crt-off #crt-overlay,
   font-family: var(--font-os);
 }
 
-.comp-chip.active {
-  background: #ff85a1;
-  color: #ffffff;
-  font-weight: bold;
+/* Y2K Cozy Desktop Widgets Panel & Layout */
+#desktop-widgets {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 260px;
+  z-index: 10;
+  pointer-events: auto;
 }
+
+@media screen and (max-width: 900px) {
+  #desktop-widgets {
+    display: none; /* Hide floating desktop widgets on small mobile screens */
+  }
+}
+
+.y2k-widget {
+  background: var(--widget-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--widget-border);
+  box-shadow: var(--widget-shadow);
+  border-radius: var(--widget-radius);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-os);
+  user-select: none;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed #ffb7c5;
+  padding-bottom: 4px;
+}
+
+.widget-title {
+  font-weight: bold;
+  font-size: 12px;
+  color: #ff477e;
+  letter-spacing: 0.3px;
+}
+
+.widget-sparkle {
+  font-size: 12px;
+}
+
+.widget-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.widget-big-time {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: bold;
+  color: #1b5e20;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.widget-sub-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: #555;
+}
+
+.zunda-sticker-card {
+  align-items: center;
+  cursor: pointer;
+  background: radial-gradient(circle, #ffffff 0%, #fff0f5 100%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.zunda-sticker-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(255, 133, 161, 0.35);
+}
+
+.zunda-bubble-talk {
+  background: #ffffff;
+  border: 1px solid #ff85a1;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #1b5e20;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.sticker-avatar-wrap {
+  padding: 4px 0;
+}
+
+.sticker-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #ff477e;
+}
+
+.song-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+}
+
+.disc-spin {
+  animation: discSpin 4s linear infinite;
+  display: inline-block;
+}
+
+@keyframes discSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.jukebox-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.jukebox-controls button {
+  flex: 1;
+  font-size: 11px;
+  padding: 4px;
+}
+
+.quick-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 4px 8px;
+  border: 1px solid #ffb7c5;
+  border-radius: 4px;
+}
+
+.q-code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: bold;
+  color: #1b5e20;
+}
+
+.mini-copy {
+  padding: 2px 6px !important;
+  font-size: 10px !important;
+}
+
 
 

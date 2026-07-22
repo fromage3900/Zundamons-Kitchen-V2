@@ -1153,6 +1153,7 @@ class MainApp {
     this.initPromosApp();
     this.initCalculatorApp();
     this.initZundamonApp();
+    this.initDesktopWidgets();
   }
 
   initClock() {
@@ -1367,6 +1368,53 @@ class MainApp {
         if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('chirp');
       });
     });
+  }
+
+  initDesktopWidgets() {
+    // 1. Clock Widget
+    const widgetClock = document.getElementById('widget-clock');
+    if (widgetClock) {
+      const updateWidgetClock = () => {
+        const now = new Date();
+        widgetClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      };
+      setInterval(updateWidgetClock, 1000);
+      updateWidgetClock();
+    }
+
+    // 2. Interactive Zundamon Desktop Sticker Widget
+    const stickerWidget = document.getElementById('zunda-sticker-widget');
+    const bubbleTalk = document.getElementById('widget-speech-bubble');
+    if (stickerWidget) {
+      const quotes = [
+        '"Welcome to Zunda-OS 95, nanoda! 🫛✨"',
+        '"Have you cooked fresh Zunda Mochi today, nanoda? 🍡"',
+        '"Tap ZundaCLI.exe to type commands, nanoda! 💻"',
+        '"Sakura petals are drifting through the kitchen! 🌸"',
+        '"Zundamon loves warm mochi draped in edamame paste! 💚"'
+      ];
+      let quoteIdx = 0;
+      stickerWidget.addEventListener('click', () => {
+        playClick('down');
+        quoteIdx = (quoteIdx + 1) % quotes.length;
+        if (bubbleTalk) bubbleTalk.textContent = quotes[quoteIdx];
+        if (typeof playZundaVoiceLine === 'function') playZundaVoiceLine('chirp');
+      });
+    }
+
+    // 3. Jukebox BGM Widget
+    const widgetPlayBgm = document.getElementById('widget-play-bgm');
+    if (widgetPlayBgm) {
+      widgetPlayBgm.addEventListener('click', () => {
+        playClick('down');
+        if (typeof window.toggleCozyBGM === 'function') {
+          const isPlaying = window.toggleCozyBGM();
+          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ Play BGM';
+          widgetPlayBgm.style.backgroundColor = isPlaying ? '#ff477e' : '';
+          widgetPlayBgm.style.color = isPlaying ? '#ffffff' : '';
+        }
+      });
+    }
   }
 
   initSystemTray() {
