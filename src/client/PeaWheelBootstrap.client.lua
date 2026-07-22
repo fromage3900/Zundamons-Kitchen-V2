@@ -3,7 +3,9 @@
 -- Panel scripts now register their own callbacks with ActionRegistry directly,
 -- so this bootstrap no longer attempts to require() LocalScripts (which return nil).
 
-local ActionRegistry = require(script.Parent.ConfigurationFiles.UIActionRegistry)
+local Players = game:GetService("Players")
+local playerScripts = Players.LocalPlayer:WaitForChild("PlayerScripts")
+local ActionRegistry = require(playerScripts:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 local EXPECTED_ACTIONS = {
 	"inventory",

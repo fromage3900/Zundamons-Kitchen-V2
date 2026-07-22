@@ -10,7 +10,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local ClientGuiBootstrap = require(ReplicatedStorage.ConfigurationFiles.ClientGuiBootstrap)
-local ActionRegistry = require(script.Parent.Parent.ConfigurationFiles.UIActionRegistry)
+local playerScripts = player:WaitForChild("PlayerScripts")
+local ActionRegistry = require(playerScripts:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 local UIConfig = require(ReplicatedStorage.ConfigurationFiles.UIConfig)
 
 local PeaWheelController = {}
@@ -60,7 +61,7 @@ local function buildWheelGui()
 
 	wheelGui = ClientGuiBootstrap.createScreenGui(player, "PeaWheelGui", 80)
 	wheelGui.ResetOnSpawn = false
-	
+
 	-- Respect reduced motion preference
 	if reducedMotion then
 		wheelGui.DisplayOrder = 80
@@ -86,13 +87,23 @@ local function buildWheelGui()
 
 	-- Hub button click handler (connected when hub is created)
 	hubButton.MouseButton1Click:Connect(function()
-		if RunService:IsStudio() and RunService:IsEdit() then return end
-		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
+		if RunService:IsStudio() and RunService:IsEdit() then
+			return
+		end
+		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then
+			return
+		end
 		PeaWheelController.toggle()
 		if not reducedMotion then
 			local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
 			if UIHelper and UIHelper.spawnSparkles then
-				UIHelper.spawnSparkles(hubButton, hubButton.AbsoluteSize.X/2, hubButton.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 8)
+				UIHelper.spawnSparkles(
+					hubButton,
+					hubButton.AbsoluteSize.X / 2,
+					hubButton.AbsoluteSize.Y / 2,
+					Color3.fromRGB(255, 255, 255),
+					8
+				)
 			end
 		end
 	end)
@@ -117,7 +128,9 @@ local function buildWheelGui()
 	local sliceList = ActionRegistry.getOrderedSliceList()
 	for i, actionId in ipairs(sliceList) do
 		local def = ActionRegistry.getAction(actionId)
-		if not def then continue end
+		if not def then
+			continue
+		end
 
 		local btn = Instance.new("TextButton")
 		btn.Name = "Slice_" .. actionId
@@ -166,7 +179,9 @@ end
 
 -- ── Visual Updates ───────────────────────────────────────────
 function PeaWheelController.updateSelectionVisual()
-	if not hubButton or not tooltipLabel then return end
+	if not hubButton or not tooltipLabel then
+		return
+	end
 	local sliceList = ActionRegistry.getOrderedSliceList()
 	local actionId = sliceList[selectedIndex]
 	local def = ActionRegistry.getAction(actionId)
@@ -196,7 +211,13 @@ function PeaWheelController.updateSelectionVisual()
 		-- Cute sparkle frill on selection
 		local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
 		if UIHelper and UIHelper.spawnSparkles then
-			UIHelper.spawnSparkles(selectedBtn, selectedBtn.AbsoluteSize.X / 2, selectedBtn.AbsoluteSize.Y / 2, Color3.fromRGB(255, 255, 255), 6)
+			UIHelper.spawnSparkles(
+				selectedBtn,
+				selectedBtn.AbsoluteSize.X / 2,
+				selectedBtn.AbsoluteSize.Y / 2,
+				Color3.fromRGB(255, 255, 255),
+				6
+			)
 		end
 	end
 
@@ -209,8 +230,12 @@ end
 
 -- ── Open / Close / Toggle ────────────────────────────────────
 function PeaWheelController.open()
-	if isOpen then return end
-	if RunService:IsStudio() and RunService:IsEdit() then return end
+	if isOpen then
+		return
+	end
+	if RunService:IsStudio() and RunService:IsEdit() then
+		return
+	end
 
 	-- Play wheel open sound
 	local zsc = _G.ZundaSoundController
@@ -219,14 +244,18 @@ function PeaWheelController.open()
 	end
 
 	local gui = buildWheelGui()
-	if not gui then return end
+	if not gui then
+		return
+	end
 
 	-- Check cooking conflict
 	local canOpen = true
 	if _G.TimedCooking and _G.TimedCooking.isCooking then
 		canOpen = not _G.TimedCooking.isCooking()
 	end
-	if not canOpen then return end
+	if not canOpen then
+		return
+	end
 
 	isOpen = true
 	selectedIndex = 1
@@ -254,7 +283,9 @@ function PeaWheelController.open()
 end
 
 function PeaWheelController.close()
-	if not isOpen then return end
+	if not isOpen then
+		return
+	end
 	isOpen = false
 
 	-- Play wheel close sound
@@ -263,7 +294,9 @@ function PeaWheelController.close()
 		zsc.play("WheelClose")
 	end
 
-	if not hubButton or not tooltipLabel then return end
+	if not hubButton or not tooltipLabel then
+		return
+	end
 
 	-- Hide slices
 	for _, btn in ipairs(sliceButtons) do
@@ -293,7 +326,9 @@ end
 
 -- ── Selection & Dispatch ─────────────────────────────────────
 function PeaWheelController.select(actionId)
-	if not isOpen then return end
+	if not isOpen then
+		return
+	end
 	-- Play wheel select sound
 	local zsc = _G.ZundaSoundController
 	if zsc and zsc.play then
@@ -308,7 +343,9 @@ end
 
 -- ── Keyboard Input ───────────────────────────────────────────
 local function onInputBegan(input, processed)
-	if processed then return end
+	if processed then
+		return
+	end
 
 	-- Cooking conflict guard
 	if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then

@@ -9,7 +9,8 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
-local ActionRegistry = require(RS.ConfigurationFiles.UIActionRegistry)
+local ActionRegistry =
+	require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "SettingsScreenGui"

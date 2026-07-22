@@ -9,7 +9,8 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
-local ActionRegistry = require(RS.ConfigurationFiles.UIActionRegistry)
+local ActionRegistry =
+	require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 local RE = RS:WaitForChild("RemoteEvents")
 local ev = RE:WaitForChild("UpdateQuests", 15)
 -- Infinity Nikki aesthetic: pastel palette
@@ -278,7 +279,8 @@ spawnPopup = function(kind, text, color)
 end
 
 local open = false
-local shell = CozyModalShell.wrap(panel, { actionId = "quests",
+local shell = CozyModalShell.wrap(panel, {
+	actionId = "quests",
 	open = function()
 		panel.Size = UDim2.new(0, 420, 0, 10)
 		Tween:Create(
@@ -307,7 +309,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	open = true
 	toggle()
 	local pos = closeBtn.AbsolutePosition
-	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, Color3.fromRGB(255,255,255), 6)
+	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, Color3.fromRGB(255, 255, 255), 6)
 end)
 task.spawn(function()
 	local pg = player:WaitForChild("PlayerGui")
@@ -333,7 +335,9 @@ end)
 print("[QuestPanel] Ready")
 
 -- Register with UIRouter for modal exclusivity and Escape handling
-UIRouter.register("quests", nil, function() shell.close() end)
+UIRouter.register("quests", nil, function()
+	shell.close()
+end)
 
 -- Register callback with ActionRegistry for Pea Wheel dispatch
 ActionRegistry.registerCallback("quests", toggle)
