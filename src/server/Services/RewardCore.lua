@@ -13,6 +13,7 @@ local RequestRewardSync = rewardEvents:WaitForChild("RequestRewardSync")
 local NotifyAction = rewardEvents:WaitForChild("NotifyAction")
 
 local ChefLevelConfig = require(RS.ConfigurationFiles.ChefLevelConfig)
+local CompanionConfig = require(RS.ConfigurationFiles.CompanionConfig)
 local PlayerDataService = require(SSS.Services.PlayerDataService)
 
 local function ensureProfile(player)
@@ -65,11 +66,7 @@ local function companionBuff(player, stat)
 	if not active then
 		return 0
 	end
-	local cat = _G.ZundaCompanionCatalog
-	if not cat then
-		return 0
-	end
-	local def = cat[active]
+	local def = CompanionConfig.companions[active]
 	if not def or not def.buff then
 		return 0
 	end

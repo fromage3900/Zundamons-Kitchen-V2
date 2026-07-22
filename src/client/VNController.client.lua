@@ -504,19 +504,21 @@ end)
 local RE = RS:WaitForChild("RemoteEvents")
 
 -- ── BRANCHING ZUNDAPAL DIALOGUE TREE ─────────────────────────────
-local function buildCompanionTree()
+local function buildCompanionTree(compType)
+    local speakerKey = SPEAKERS[compType] and compType or "zundamon"
+    local companionDialogue = COMPANION_DIALOGUE[speakerKey] or COMPANION_DIALOGUE.zundamon
     local hour = tonumber(Lighting:GetAttribute("CurrentHour")) or 12
     local slot = hour>=5 and hour<12 and "morning"
               or hour>=12 and hour<18 and "afternoon"
               or hour>=18 and hour<21 and "evening"
               or "night"
-    local greeting = COMPANION_DIALOGUE[slot]
+    local greeting = companionDialogue[slot] or companionDialogue.afternoon or companionDialogue.morning or {}
 
     -- LEAVES
     local leafEnd = {
-        speaker = "zundapal",
+        speaker = speakerKey,
         lines = {
-            {speaker="zundapal", text="Talk to me anytime, "..player.Name.."~ \u{1F49B}"},
+            {speaker=speakerKey, text="Talk to me anytime, "..player.Name.."~ \u{1F49B}"},
         },
     }
 
@@ -583,14 +585,14 @@ local function buildCompanionTree()
     -- ROOT
     local greetingLines = {}
     if math.random() < 0.5 then
-        table.insert(greetingLines, {speaker="narrator", text="[ Zundapal looks up with sparkling eyes. ]"})
+        table.insert(greetingLines, {speaker="narrator", text="[ Your companion looks up with sparkling eyes. ]"})
     end
     for _, l in ipairs(greeting) do
-        table.insert(greetingLines, {speaker="zundapal", text=l})
+        table.insert(greetingLines, {speaker=speakerKey, text=l})
     end
 
     return {
-        speaker = "zundapal",
+        speaker = speakerKey,
         lines   = greetingLines,
         prompt  = "What would you like to talk about?",
         choices = {
@@ -611,7 +613,7 @@ end
 -- Companion click → branching tree
 RE:WaitForChild("OpenCompanionVN").OnClientEvent:Connect(function(compType, emoji)
     if isOpen then closePanel(true); return end
-    _G.ZundaVN.showBranching(buildCompanionTree())
+    _G.ZundaVN.showBranching(buildCompanionTree(compType))
 end)
 
 -- Quest completed

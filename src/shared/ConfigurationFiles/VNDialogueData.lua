@@ -10,19 +10,46 @@ local RGB = Color3.fromRGB
 local SPEAKERS = {}
 SPEAKERS.zundamon = { name = "Zundamon", emoji = "🍙", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }
 SPEAKERS.zundapal = { name = "Zundapal", emoji = "🍡", accent = RGB(200, 230, 180), portrait = RGB(210, 235, 195) }
+SPEAKERS.zundacat = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) }
+SPEAKERS.zundabunny = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) }
+SPEAKERS.tantanmon = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) }
 SPEAKERS.narrator = { name = "", emoji = "✨", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) }
 SPEAKERS.elder = { name = "Village Elder", emoji = "🏮", accent = RGB(220, 180, 130), portrait = RGB(230, 200, 160) }
 SPEAKERS.ruins = { name = "Ancient Voice", emoji = "👁", accent = RGB(190, 170, 210), portrait = RGB(210, 195, 220) }
 SPEAKERS.chef = { name = "Head Chef", emoji = "🍳", accent = RGB(230, 185, 130), portrait = RGB(240, 210, 170) }
 SPEAKERS.system = { name = "", emoji = "⭐", accent = RGB(210, 195, 235), portrait = RGB(225, 215, 240) }
-SPEAKERS.ankomon = { name = "Ankomon", emoji = "🦴", accent = RGB(180, 180, 190), portrait = RGB(200, 200, 210) }
-SPEAKERS.cardamon = { name = "Cardamon", emoji = "🌿", accent = RGB(180, 210, 180), portrait = RGB(200, 230, 200) }
-SPEAKERS.antimon = { name = "Antimon", emoji = "⚡", accent = RGB(210, 220, 150), portrait = RGB(230, 240, 180) }
+SPEAKERS.ankomon = { name = "Ankomon", emoji = "🫘", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) }
+SPEAKERS.cardamon = { name = "Cardamon", emoji = "🍋", accent = RGB(235, 205, 125), portrait = RGB(248, 230, 175) }
+SPEAKERS.antimon = { name = "Antimon", emoji = "🌿", accent = RGB(145, 215, 195), portrait = RGB(195, 235, 220) }
 SPEAKERS.sakuradamon =
 	{ name = "Sakuradamon", emoji = "🌸", accent = RGB(255, 180, 200), portrait = RGB(255, 220, 230) }
 
 -- Companion-specific branching dialogue (time + level based)
 local COMPANION_DIALOGUE = {}
+COMPANION_DIALOGUE.zundamon = {
+	morning = { "Morning, {player}! The garden is sparkling.", "Let us make one dish we are proud of today." },
+	afternoon = { "You are finding your rhythm, {player}!", "I will stay close while you gather and cook." },
+	evening = { "The kitchen feels warm after a day of good work.", "What was your favorite little moment today?" },
+	night = { "Quiet kitchens keep the sweetest memories.", "Rest when you are ready; tomorrow can wait." },
+}
+COMPANION_DIALOGUE.zundacat = {
+	morning = { "Mrrp! I found the sunniest gathering path.", "Race you to the next shiny ingredient!" },
+	afternoon = { "I inspected every basket. Very professional.", "There may be something curious near the garden wall." },
+	evening = { "Serving guests is better with a cat supervisor.", "You cook; I will accept the compliments." },
+	night = { "The village is full of tiny night sounds.", "I will keep watch from the comfiest spot." },
+}
+COMPANION_DIALOGUE.zundabunny = {
+	morning = { "Hop, hop—good morning!", "Let us gather something colorful today." },
+	afternoon = { "You make hard work look gentle.", "A tiny break can be part of the adventure too." },
+	evening = { "The sunset makes the whole village blush.", "Can we visit a pretty place before supper?" },
+	night = { "The moon looks like a flour-dusted mochi.", "I saved you the softest patch of starlight." },
+}
+COMPANION_DIALOGUE.tantanmon = {
+	morning = { "Up and sizzling, chef!", "Let us turn breakfast into a tiny festival." },
+	afternoon = { "That cooking streak has some spice!", "One more guest—let us make it spectacular." },
+	evening = { "A warm kitchen is the heart of the village.", "You brought the spark today, {player}." },
+	night = { "Even little flames need time to glow low.", "I will save the fireworks for tomorrow." },
+}
 COMPANION_DIALOGUE.zundapal = {
 	morning = {
 		"Good morning, {player}~ ☀️",

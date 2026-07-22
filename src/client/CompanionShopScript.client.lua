@@ -8,6 +8,7 @@ local RS = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local ClientGuiBootstrap = require(RS.ConfigurationFiles.ClientGuiBootstrap)
+local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
 
 local gui = ClientGuiBootstrap.createScreenGui(player, "CompanionShopGui", 28)
 
@@ -41,7 +42,7 @@ local panel = Instance.new("Frame", gui)
 panel.Name = "Panel"
 panel.Size = UDim2.new(0, 820, 0, 540)
 panel.Position = UDim2.new(0.5, -410, 0.5, -270)
-panel.BackgroundColor3 = Color3.fromRGB(36, 26, 52)
+panel.BackgroundColor3 = Color3.fromRGB(255, 248, 238)
 panel.BorderSizePixel = 0
 panel.Visible = false
 panel.ZIndex = 2
@@ -56,7 +57,7 @@ title.BackgroundTransparency = 1
 title.Text = "✨  Companion Shop  ✨"
 title.Font = Enum.Font.FredokaOne
 title.TextSize = 32
-title.TextColor3 = Color3.fromRGB(255, 220, 245)
+title.TextColor3 = Color3.fromRGB(91, 67, 86)
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.ZIndex = 3
 
@@ -89,7 +90,7 @@ local detail = Instance.new("Frame", panel)
 detail.Name = "Detail"
 detail.Size = UDim2.new(1, -40, 1, -170)
 detail.Position = UDim2.new(0, 20, 0, 150)
-detail.BackgroundColor3 = Color3.fromRGB(50, 36, 70)
+detail.BackgroundColor3 = Color3.fromRGB(246, 231, 225)
 detail.BorderSizePixel = 0
 detail.ZIndex = 3
 Instance.new("UICorner", detail).CornerRadius = UDim.new(0, 16)
@@ -122,7 +123,7 @@ nameLbl.BackgroundTransparency = 1
 nameLbl.Text = "Zundamon"
 nameLbl.Font = Enum.Font.FredokaOne
 nameLbl.TextSize = 36
-nameLbl.TextColor3 = Color3.fromRGB(255, 240, 255)
+nameLbl.TextColor3 = Color3.fromRGB(82, 61, 79)
 nameLbl.TextXAlignment = Enum.TextXAlignment.Left
 nameLbl.ZIndex = 5
 
@@ -133,7 +134,7 @@ flavor.BackgroundTransparency = 1
 flavor.Text = ""
 flavor.Font = Enum.Font.Gotham
 flavor.TextSize = 16
-flavor.TextColor3 = Color3.fromRGB(220, 200, 240)
+flavor.TextColor3 = Color3.fromRGB(111, 86, 103)
 flavor.TextXAlignment = Enum.TextXAlignment.Left
 flavor.TextWrapped = true
 flavor.ZIndex = 5
@@ -220,8 +221,13 @@ local function refreshDetail()
             actionBtn.BackgroundColor3 = Color3.fromRGB(120, 90, 200)
         end
     else
-        actionBtn.Text = ("Buy %d Robux"):format(def.price or 500)
-        actionBtn.BackgroundColor3 = Color3.fromRGB(80, 150, 100)
+        if MarketplaceConfig.enabled then
+            actionBtn.Text = ("Welcome %s home • %d Robux"):format(def.displayName or currentKey, def.price or 500)
+            actionBtn.BackgroundColor3 = Color3.fromRGB(108, 164, 125)
+        else
+            actionBtn.Text = "Coming Soon • Preview Companion"
+            actionBtn.BackgroundColor3 = Color3.fromRGB(177, 151, 177)
+        end
     end
 end
 
@@ -268,7 +274,7 @@ local function buildTabs()
                 price.Size = UDim2.new(1, 0, 0, 14)
                 price.Position = UDim2.new(0, 0, 1, -14)
                 price.BackgroundTransparency = 1
-                price.Text = "500 R$"
+                price.Text = MarketplaceConfig.enabled and ((def.price or 500) .. " R$") or "Preview"
                 price.Font = Enum.Font.GothamBold
                 price.TextSize = 10
                 price.TextColor3 = Color3.fromRGB(255, 220, 130)
@@ -297,7 +303,7 @@ actionBtn.MouseButton1Click:Connect(function()
         owned.__active = currentKey
         refreshDetail()
         refreshTabs()
-    else
+    elseif MarketplaceConfig.enabled then
         -- Purchase
         PurchaseCompanion:FireServer(currentKey)
     end

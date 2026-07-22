@@ -28,6 +28,22 @@ local function loadCompanionModel(compType)
         return companionModelCache[compType]:Clone()
     end
 
+    -- Repository-authored variants win over asset IDs. Add a Model named for
+    -- the companion key under src/shared/Models/Companions.
+    local models = RS:FindFirstChild("Models")
+    local variants = models and models:FindFirstChild("Companions")
+    local authored = variants and variants:FindFirstChild(compType)
+    if authored and authored:IsA("Model") then
+        local clone = authored:Clone()
+        clone.PrimaryPart = clone.PrimaryPart or clone:FindFirstChildWhichIsA("BasePart")
+        if clone.PrimaryPart then
+            companionModelCache[compType] = clone
+            return clone:Clone()
+        end
+        clone:Destroy()
+        warn("[CompanionManager] Authored companion has no BasePart:", compType)
+    end
+
     local meshId = COMPANION_MESHES[compType] or DEFAULT_COMPANION_MESH
     print("[CompanionManager.loadCompanionModel] Loading model for", compType, "meshId:", meshId)
 
