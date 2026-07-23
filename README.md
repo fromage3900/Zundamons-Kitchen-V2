@@ -6,6 +6,10 @@
 
 [Getting started](GETTING_STARTED.md) · [Contributing](CONTRIBUTING.md) · [Production handoff](docs/PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md) · [UI roadmap](docs/UI_UX_OVERHAUL_PLAN.md) · [Credits](CREDITS.md)
 
+> **Current status:** finishing Phase 3. Active work and the remaining task streams live in
+> [docs/PHASE3_HANDOFF.md](docs/PHASE3_HANDOFF.md); live playtest findings in
+> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md). Superseded phase docs are in [docs/archive/](docs/archive/).
+
 ---
 
 ## The game today

@@ -9,13 +9,21 @@ models, and writes only the canonical resource attributes.
 
 1. From the repository root run:
    `.\\node_modules\\.bin\\rojo.cmd build tools/resource-visual-authoring/plugin.project.json -o build/ZundaResourceVisualAuthoring.rbxm`
-2. In Studio, drag `build/ZundaResourceVisualAuthoring.rbxm` into the place,
-   right-click its root Model in Explorer, and choose
-   **Save as Local Plugin**.
-3. Restart Studio and open **Plugins > Zunda Kitchen > Resource Visuals**.
-4. Delete the temporary inserted Model from the place after saving the plugin.
-5. Keep Rojo connected. The plugin edits Studio-owned level data only; Rojo
+2. **Preferred (never touches the place):** open the Studio **Plugins** tab →
+   **Plugins Folder**, and drop `build/ZundaResourceVisualAuthoring.rbxm` in there
+   directly. Restart Studio.
+3. Open **Plugins > Zunda Kitchen > Resource Visuals**.
+4. Keep Rojo connected. The plugin edits Studio-owned level data only; Rojo
    preserves it through `$ignoreUnknownInstances`.
+
+> ⚠️ **Do not leave the plugin Model in the place.** If you use the older
+> "drag into place → right-click → Save as Local Plugin" flow instead of step 2,
+> you **must** delete the temporary `ZundaResourceVisualAuthoring` Model from
+> Workspace immediately afterward. If it is saved into the `.rbxl`, its server
+> Script runs at play time and throws
+> `attempt to index nil with 'CreateToolbar'` on every load (the `plugin` global
+> only exists in the Studio plugin context). The script now bails out safely in
+> that case, but the stray Model should still be deleted and the place re-saved.
 
 ## Everyday workflow
 

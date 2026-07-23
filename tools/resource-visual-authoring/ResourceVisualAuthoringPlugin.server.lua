@@ -10,6 +10,14 @@ local InsertService = game:GetService("InsertService")
 local Selection = game:GetService("Selection")
 local ServerStorage = game:GetService("ServerStorage")
 
+-- Fail-safe: this script must only run in a Studio plugin context (where the
+-- `plugin` global exists). If a copy of this Model is ever left inside Workspace
+-- and saved into the place, it would otherwise throw on `plugin:CreateToolbar`
+-- every load at runtime. Bail out cleanly instead.
+if not plugin then
+	return
+end
+
 local toolbar = plugin:CreateToolbar("Zunda Kitchen")
 local toolbarButton = toolbar:CreateButton("Resource Visuals", "Replace harvest visuals safely", "")
 local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, false, false, 360, 620, 300, 420)

@@ -5,7 +5,9 @@ Entry point for any agent picking up work. Pairs with [PLAYTEST_NOTES.md](PLAYTE
 
 ## Session close-out (2026-07-23)
 - **Committed:** `7d2127b` on `codex/core-production-baseline` — the 12 verified files (companion, PeaWheel, keybinds, lag, Rojo project fix, docs). Rojo build passes.
-- **NOT committed (Stream D):** ~124 other tracked changes from a prior batch remain staged/modified, plus untracked noise: `docs/assets/*` and a full `site/` mirror (docs + assets + marketing — confirm if this is the GitHub Pages source or accidental duplication), `ZUNDAMONS_KITCHEN_MASTER_BLUEPRINT.md`, `.env.example`, `mcp_req.json`, and several **gif files with corrupted/mojibake names** (`docs/assets/é╕...gif`, `site/assets/é╕...gif`) that should be renamed or removed.
+- **NOT committed (Stream D):** ~124 other tracked changes from a prior batch remain staged/modified (the user's — leave them), plus untracked `ZUNDAMONS_KITCHEN_MASTER_BLUEPRINT.md` and `docs/assets/*` / `site/assets/*` binaries.
+- **Scaffolding cleanup done (2026-07-23):** `.agents/` untracked + gitignored (kept on disk); junk untracked (`mcp_req.json`, `test_terminal_sim.js`, `*.blend`); superseded phase docs moved to `docs/archive/`; the 15 mojibake gifs renamed to `zundamon_emote_<group><variant>.gif` in both `site/assets/` and `docs/assets/`; authoring-plugin fail-safe guard added.
+- **Known maintenance smell:** `site/` (GitHub Pages source) and `docs/` are kept in sync by `site/sync_site.js` (copies by filename, never deletes). They have diverged in git. Recommend picking one canonical dir and treating the other as generated; when renaming/adding assets, always mirror both or re-run `sync_site.js`.
 - A fresh Sonnet session should branch from `7d2127b` and start with **Stream A** (load-time errors) — biggest playtest-smoothness win.
 
 ## How to work here (read first)

@@ -75,17 +75,32 @@ portrait.BorderSizePixel = 0
 portrait.ZIndex = 11
 Instance.new("UICorner", portrait).CornerRadius = UDim.new(0, 18)
 
--- Portrait emoji
+-- Portrait emoji (fallback when no uploaded character image is configured)
 local pEmoji = Instance.new("TextLabel", portrait)
 pEmoji.Name = "Emoji"
 pEmoji.Size = UDim2.new(0.9, 0, 0.7, 0)
 pEmoji.AnchorPoint = Vector2.new(0.5, 0.5)
 pEmoji.Position = UDim2.new(0.5, 0, 0.5, 0)
 pEmoji.BackgroundTransparency = 1
-pEmoji.Text = "🫛"
+pEmoji.Text = "🌱"
 pEmoji.Font = Enum.Font.GothamBold
 pEmoji.TextSize = 52
 pEmoji.ZIndex = 13
+
+-- Portrait character sprite. Shown (over the emoji) only when a Zundamon image
+-- asset is configured in VNPortraitConfig. Since `portrait` lives inside `panel`,
+-- it is only ever visible while the dialogue textbox is on screen.
+local VNPortraitConfig = require(RS.ConfigurationFiles.VNPortraitConfig)
+local pImage = Instance.new("ImageLabel", portrait)
+pImage.Name = "CharacterSprite"
+pImage.Size = UDim2.new(1, -6, 1, -6)
+pImage.AnchorPoint = Vector2.new(0.5, 1)
+pImage.Position = UDim2.new(0.5, 0, 1, -2)
+pImage.BackgroundTransparency = 1
+pImage.ScaleType = Enum.ScaleType.Fit
+pImage.Image = ""
+pImage.Visible = false
+pImage.ZIndex = 14
 
 -- Text area
 local textArea = Instance.new("Frame", panel)
@@ -202,6 +217,19 @@ local function setSpeaker(key)
     portrait.BackgroundColor3 = sp.portrait
     nameBanner.BackgroundColor3 = sp.accent
     pStroke.Color = C_border
+
+    -- Prefer an uploaded Zundamon character image when one is configured;
+    -- otherwise fall back to the emoji portrait. (Roblox can't play the source
+    -- GIFs directly — upload frames as image assets into VNPortraitConfig.)
+    local img = VNPortraitConfig.getSpeakerImage(key)
+    if img ~= "" then
+        pImage.Image = img
+        pImage.Visible = true
+        pEmoji.Visible = false
+    else
+        pImage.Visible = false
+        pEmoji.Visible = true
+    end
     if sp.name == "" then
         nameBanner.Visible = false
     else

@@ -123,6 +123,22 @@ Instance.new("UICorner", card).CornerRadius = UDim.new(0, 22)
 local cStroke = Instance.new("UIStroke", card)
 cStroke.Thickness = 3; cStroke.Color = C.border; cStroke.ZIndex = 1000
 
+-- Optional Zundamon mascot peeking from the card's top-left. Only appears when a
+-- character image is configured (Roblox can't play the source GIFs; upload a frame
+-- into VNPortraitConfig.tutorialMascot). It lives inside `card`, so it only shows
+-- while the tutorial card is visible.
+local VNPortraitConfig = require(RS.ConfigurationFiles.VNPortraitConfig)
+local mascot = Instance.new("ImageLabel", card)
+mascot.Name = "Mascot"
+mascot.Size = UDim2.new(0, 84, 0, 84)
+mascot.AnchorPoint = Vector2.new(0.5, 1)
+mascot.Position = UDim2.new(0, 46, 0, 12)
+mascot.BackgroundTransparency = 1
+mascot.ScaleType = Enum.ScaleType.Fit
+mascot.ZIndex = 1001
+mascot.Image = VNPortraitConfig.tutorialMascot
+mascot.Visible = VNPortraitConfig.tutorialMascot ~= ""
+
 local titleLbl = Instance.new("TextLabel", card)
 titleLbl.Name = "Title"
 titleLbl.Size = UDim2.new(1, -40, 0, 48); titleLbl.Position = UDim2.new(0, 20, 0, 16)
