@@ -54,3 +54,16 @@ already carries the dreamy Nikki look. Remaining polish, in order of impact:
    2026-07-23); sweep all UI text for unsupported emoji like the fixed 🫛.
 7. **VN portrait assets** — upload zundamon emote frames, fill
    `VNPortraitConfig.speakerImages/tutorialMascot` to replace emoji portraits.
+8. **Tool section modernization** — the old custom hotbar (`Custom Inventory`) is
+   deprecated/destroyed; the default Roblox backpack is the functional tool bar.
+   Next: a themed replacement hotbar (pastel slots, keybind chips 1–7) registered
+   at HUD layer (~50), replacing the default backpack via
+   `StarterGui:SetCoreGuiEnabled(Backpack, false)` only once feature-complete.
+9. **Chef level pill + minimap refresh** — `ZundaHUD.ChefPill` and
+   `MinimapGui.MinimapOuter` work but predate the Nikki pass: restyle with
+   `UIConfig` pastels/CORNER_RADIUS/FONTS tokens, add level-up glow tween, and
+   give the minimap a rounded mint frame + zone-name banner.
+10. **Starter gift rewards are display-only** — `WelcomeStarterPackGui`'s claim
+    button just hides the panel; no server grant exists. Wire a server-validated
+    one-time grant (tickets/gold/apron) + persistence flag before monetization
+    review, or label the popup as cosmetic preview.
