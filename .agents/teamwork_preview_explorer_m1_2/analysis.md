@@ -1,592 +1,155 @@
-# CSS3 Styling Architecture Specification: Zunda-OS 95 & Cozy Infinity Nikki Zen Edamame-Pea Aesthetic
-
-**Author**: Explorer 2 (`teamwork_preview_explorer_m1_2`)  
-**Target Path**: `site/style.css` (Target Root Directory: `g:\Zundamons-kItchen-V2\site`)  
-**Milestone**: Milestone 1 (Zunda-OS 95 CLI Launch Page & Creative Hub)  
-**Status**: Specification Complete  
-
----
+# Comprehensive Analysis: Companion Purchasing & Marketplace Synchronization
 
 ## Executive Summary
+This report presents an in-depth investigation of `MarketplaceConfig.lua`, `CompanionConfig.lua`, and the server/client companion purchasing infrastructure (`CompanionShopServer.server.lua`, `MarketplaceService.lua`, `CompanionShopScript.client.lua`).
 
-This document specifies the complete CSS3 styling architecture (`site/style.css`) for the Zunda-OS 95 CLI Launch Page and Creative Hub. The visual aesthetic fuses vintage 1990s desktop operating systems (Windows 95/98) with a cozy Infinity Nikki zen edamame-pea palette (`#2e7d32`, `#4caf50`, `#8bc34a`, `#e8f5e9`), CRT phosphor terminal luminescence, floating ambient zunda mochi animations, and modular Roblox ScreenGui UI token mappings.
+We identified critical ID collisions and cross-table inconsistencies between `MarketplaceConfig.products`, `MarketplaceConfig.companionDevProductIds`, and `MarketplaceConfig.storeDisplay.companions`. Furthermore, `tantanmon` is currently hardcoded as owned by default in `CompanionShopServer.server.lua`, which bypasses premium Robux purchase checks.
 
----
-
-## 1. CSS Design Tokens (`:root`)
-
-The token system is structured into five functional groups: Primary Zunda Greens, Retro OS Window Palette, Terminal Phosphor Palette, Roblox UI Export Mapping Variables, and Typography/Geometry Tokens.
-
-```css
-/* ==========================================================================
-   ZUNDA-OS 95 DESIGN TOKENS & CSS VARIABLES
-   ========================================================================== */
-
-:root {
-  /* --- Primary Zunda Greens (Cozy Zen Edamame Palette) --- */
-  --zunda-dark: #2e7d32;         /* Deep forest edamame green */
-  --zunda-primary: #4caf50;      /* Fresh zunda green */
-  --zunda-light: #8bc34a;        /* Bright sprout green */
-  --zunda-bg: #e8f5e9;           /* Soft zen mint desktop background */
-  --zunda-accent: #c8e6c9;       /* Pastel pea pod highlight */
-  --zunda-pastel: #f1f8e9;       /* Warm mochi cream green */
-  --zunda-hover: #3d8b40;        /* Hover state dark green */
-  --zunda-shadow: rgba(46, 125, 50, 0.25); /* Ambient green drop shadow */
-
-  /* --- Retro OS Palette (Zunda-OS 95 Windows & Bevels) --- */
-  --win-bg: #e8f5e9;             /* Window surface background */
-  --win-content-bg: #ffffff;     /* Window inner content panel background */
-  --win-border-light: #ffffff;   /* 3D top/left bevel highlight */
-  --win-border-mid: #a5d6a7;     /* 3D intermediate pastel bevel border */
-  --win-border-dark: #2e7d32;    /* 3D bottom/right dark bevel shadow */
-  --win-border-shadow: #1b5e20;  /* 3D deep edge shadow */
-  --win-title-bg: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%); /* Active titlebar gradient */
-  --win-title-bg-inactive: linear-gradient(90deg, #78909c 0%, #b0bec5 100%); /* Inactive titlebar */
-  --win-title-text: #ffffff;     /* Active titlebar text */
-  --win-title-text-inactive: #eceff1; /* Inactive titlebar text */
-  --win-btn-bg: #c8e6c9;         /* Retro control button background */
-  --win-btn-hover: #a5d6a7;       /* Control button hover color */
-  --win-btn-active: #8bc34a;      /* Control button active/pressed color */
-
-  /* --- Terminal Phosphor Palette (ZundaCLI.exe CRT Console) --- */
-  --term-bg: #0a150a;            /* Dark obsidian phosphor background */
-  --term-green: #33ff66;         /* Classic CRT phosphor green text */
-  --term-green-dim: #1eb844;     /* Secondary dim console text */
-  --term-glow: 0 0 8px rgba(51, 255, 102, 0.6); /* CRT text glow shadow */
-  --term-cursor: #33ff66;        /* Blinking block cursor color */
-  --term-selection: rgba(51, 255, 102, 0.25); /* Console text highlight */
-
-  /* --- Roblox UI Export Mapping Variables --- */
-  /* Direct map to Roblox Studio ScreenGui, Frame, TextLabel, TextButton properties */
-  --roblox-screengui-bg: var(--zunda-bg);
-  --roblox-frame-border: var(--win-border-dark);
-  --roblox-text-color: #1b5e20;
-  --roblox-corner-radius: 0px;
-  --roblox-titlebar-bg: var(--zunda-dark);
-  --roblox-btn-bg: var(--zunda-accent);
-  --roblox-font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, monospace, sans-serif;
-
-  /* --- Typography & Spacing Tokens --- */
-  --font-os: 'MS Sans Serif', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: 'VT323', 'Courier New', Consolas, monospace;
-  --font-pixel: 'Press Start 2P', monospace;
-  --taskbar-height: 38px;
-  --start-menu-width: 250px;
-  --border-width-3d: 2px;
-}
-```
+Precise code modification recommendations are provided to align product IDs, structure 1,000 Robux pricing for all 4 premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`), and fix server-side ownership defaults.
 
 ---
 
-## 2. Zunda-OS 95 Window Styling Architecture
+## 1. Direct Observations & Evidence Chain
 
-### 2.1 3D Bevel Border Mechanics
-Zunda-OS 95 utilizes realistic 90s dual-layer outset and inset 3D bevels via layered `box-shadow` and `border` definitions:
-- **Outset Bevel (`.bevel-outset`)**: Applied to window containers, popups, and unpressed buttons. Top-left edges are crisp white (`#ffffff`), while bottom-right edges are dark green (`#2e7d32` / `#1b5e20`).
-- **Inset Bevel (`.bevel-inset`)**: Applied to terminal screens, text inputs, status bars, content viewports, and pressed buttons. Reverse light direction gives an engraved look.
+### Observation 1.1: Product ID Collision in `MarketplaceConfig.lua`
+In `src/shared/ConfigurationFiles/MarketplaceConfig.lua`:
+- **Receipt Catalog (`products`)**:
+  - `[1111111101]` = `{ type = "companion", key = "zundacat", name = "ZundaCat Companion" }`
+  - `[1111111102]` = `{ type = "companion", key = "zundabunny", name = "ZundaBunny Companion" }`
+  - `[1111111103]` = `{ type = "companion", key = "tantanmon", name = "TantanMon Companion" }`
+  - `[1111111104]` = `{ type = "recipe", key = "Premium Ramen", name = "Premium Ramen Recipe" }`
+- **Product ID Mapping (`companionDevProductIds`)**:
+  - `cardamon = 0`, `antimon = 0`, `sakuradamon = 0` (unassigned)
+  - `zundacat = 1111111101`, `zundabunny = 1111111102`, `tantanmon = 1111111103`
+- **Store Display (`storeDisplay.companions`)**:
+  - `{ id = 1111111101, name = "Cardamon", key = "cardamon", robux = 1000 }`
+  - `{ id = 1111111102, name = "Antimon", key = "antimon", robux = 1000 }`
+  - `{ id = 1111111103, name = "Sakuradamon", key = "sakuradamon", robux = 1000 }`
+  - `{ id = 1111111104, name = "Tantanmon", key = "tantanmon", robux = 1000 }`
 
-```css
-/* --- 3D Bevel Classes --- */
-.bevel-outset {
-  border-top: 2px solid var(--win-border-light);
-  border-left: 2px solid var(--win-border-light);
-  border-right: 2px solid var(--win-border-shadow);
-  border-bottom: 2px solid var(--win-border-shadow);
-  box-shadow: 
-    inset 1px 1px 0px var(--zunda-pastel),
-    inset -1px -1px 0px var(--win-border-dark);
-}
+**Logic Chain**:
+- Product ID `1111111101` represents `zundacat` in `products`, but `cardamon` in `storeDisplay`.
+- Product ID `1111111104` represents `Premium Ramen Recipe` in `products`, but `Tantanmon` in `storeDisplay`.
+- If a client purchases ID `1111111104` via `storeDisplay`, `MarketplaceService.processReceipt` checks `products[1111111104]`, which executes `prod.type == "recipe"` and unlocks `Premium Ramen` instead of `tantanmon`.
+- `cardamon`, `antimon`, and `sakuradamon` do not exist in `MarketplaceConfig.products`.
 
-.bevel-inset {
-  border-top: 2px solid var(--win-border-shadow);
-  border-left: 2px solid var(--win-border-shadow);
-  border-right: 2px solid var(--win-border-light);
-  border-bottom: 2px solid var(--win-border-light);
-  box-shadow: 
-    inset 1px 1px 0px var(--win-border-dark),
-    inset -1px -1px 0px var(--zunda-pastel);
-}
+### Observation 1.2: Premium Companion Configuration in `CompanionConfig.lua`
+In `src/shared/ConfigurationFiles/CompanionConfig.lua`:
+- Premium companions:
+  - `cardamon`: `free = false`, `price = 1000`, `robux = 1000`, buff: `perfect_window` (0.30)
+  - `antimon`: `free = false`, `price = 1000`, `robux = 1000`, buff: `extra_drop` (0.20)
+  - `sakuradamon`: `free = false`, `price = 1000`, `robux = 1000`, buff: `xp` (0.25)
+  - `tantanmon`: `free = false`, `price = 1000`, `robux = 1000`, buff: `speed` (0.20)
+- Free companions: `zundapal`, `dog`, `parrot`, `cat`, `ankomon` (all `free = true`, `price = 0`).
+
+### Observation 1.3: Server Ownership Hardcoding in `CompanionShopServer.server.lua`
+In `src/server/CompanionShopServer.server.lua` line 68:
+```lua
+local owned = { zundapal = true, zundamon = true, zundacat = true, zundabunny = true, tantanmon = true, dog = true, parrot = true, cat = true }
 ```
+**Logic Chain**:
+- `tantanmon` is explicitly marked as owned by default in `GetOwnedCompanions`.
+- Because `GetOwnedCompanions` returns `tantanmon = true`, players are treated as owning `tantanmon` automatically, disabling the purchase prompt and enabling equipment without payment.
 
-### 2.2 Window Component Hierarchy
-- `.window`: Base class for interactive floating app windows (`position: absolute`, `display: flex`, `flex-direction: column`, `background: var(--win-bg)`).
-- `.window-header` / `.window-titlebar`: Active gradient bar holding pea pod icon (`🫛`), window title, and retro window action buttons (`_`, `□`, `X`).
-- `.window-body` / `.window-content`: Main content container (`flex: 1`, `overflow: auto`, `background: var(--win-content-bg)`).
+---
 
-```css
-/* --- Window Component Base --- */
-.window {
-  position: absolute;
-  min-width: 280px;
-  min-height: 180px;
-  background-color: var(--win-bg);
-  padding: 3px;
-  box-sizing: border-box;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
+## 2. Recommended Structure for `MarketplaceConfig.lua`
+
+To eliminate ID collisions and properly configure 1,000 Robux pricing for all premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`), assign unique product IDs in `MarketplaceConfig.lua`:
+
+### 2.1 Dedicated ID Scheme
+- Companion Product IDs: `1111111110` – `1111111113`
+  - `1111111110`: Cardamon Companion (1,000 Robux)
+  - `1111111111`: Antimon Companion (1,000 Robux)
+  - `1111111112`: Sakuradamon Companion (1,000 Robux)
+  - `1111111113`: Tantanmon Companion (1,000 Robux)
+- Recipe Product IDs: `1111111104` – `1111111106`
+- Accessory Product IDs: `1111111107` – `1111111109`
+
+### 2.2 Precise Modification Proposal for `MarketplaceConfig.lua`
+
+```lua
+-- MarketplaceConfig.lua
+
+MarketplaceConfig.products = {
+	-- Premium Companions (1,000 Robux)
+	[1111111110] = { type = "companion", key = "cardamon", name = "Cardamon Companion" },
+	[1111111111] = { type = "companion", key = "antimon", name = "Antimon Companion" },
+	[1111111112] = { type = "companion", key = "sakuradamon", name = "Sakuradamon Companion" },
+	[1111111113] = { type = "companion", key = "tantanmon", name = "TantanMon Companion" },
+
+	-- Recipes
+	[1111111104] = { type = "recipe", key = "Premium Ramen", name = "Premium Ramen Recipe" },
+	[1111111105] = { type = "recipe", key = "Party Cake", name = "Party Cake Recipe" },
+	[1111111106] = { type = "recipe", key = "Truffle Soup", name = "Truffle Soup Recipe" },
+
+	-- Accessories
+	[1111111107] = { type = "accessory", key = "crown", name = "Gold Crown" },
+	[1111111108] = { type = "accessory", key = "bow", name = "Pink Bow" },
+	[1111111109] = { type = "accessory", key = "chefhat", name = "Chef Hat" },
 }
 
-/* Active Window State */
-.window.window-active {
-  z-index: 100;
-  box-shadow: 
-    4px 4px 16px var(--zunda-shadow),
-    inset 1px 1px 0px var(--win-border-light),
-    inset -1px -1px 0px var(--win-border-dark);
+MarketplaceConfig.companionDevProductIds = {
+	cardamon = 1111111110,
+	antimon = 1111111111,
+	sakuradamon = 1111111112,
+	tantanmon = 1111111113,
+	ankomon = 0,
+	zundacat = 0,
+	zundabunny = 0,
 }
 
-.window.window-active .window-titlebar {
-  background: var(--win-title-bg);
-  color: var(--win-title-text);
-}
-
-/* Inactive Window State */
-.window.window-inactive {
-  z-index: 1;
-  opacity: 0.95;
-}
-
-.window.window-inactive .window-titlebar {
-  background: var(--win-title-bg-inactive);
-  color: var(--win-title-text-inactive);
-}
-
-/* Titlebar & Controls */
-.window-titlebar {
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 4px;
-  font-family: var(--font-os);
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-
-.window-titlebar-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.window-icon {
-  width: 16px;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-}
-
-.window-controls {
-  display: flex;
-  gap: 3px;
-}
-
-.win-btn {
-  width: 18px;
-  height: 16px;
-  background: var(--win-btn-bg);
-  border-top: 1px solid var(--win-border-light);
-  border-left: 1px solid var(--win-border-light);
-  border-right: 1px solid var(--win-border-dark);
-  border-bottom: 1px solid var(--win-border-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-os);
-  font-size: 10px;
-  font-weight: bold;
-  color: #1b5e20;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
-.win-btn:hover {
-  background: var(--win-btn-hover);
-}
-
-.win-btn:active {
-  border-top: 1px solid var(--win-border-dark);
-  border-left: 1px solid var(--win-border-dark);
-  border-right: 1px solid var(--win-border-light);
-  border-bottom: 1px solid var(--win-border-light);
-  padding: 1px 0 0 1px;
-}
-
-.win-btn-close:hover {
-  background: #e57373;
-  color: #ffffff;
+MarketplaceConfig.storeDisplay = {
+	companions = {
+		{ id = 1111111110, name = "Cardamon", emoji = "🍋", desc = "+30% wider perfect cooking window", robux = 1000, key = "cardamon" },
+		{ id = 1111111111, name = "Antimon", emoji = "🌿", desc = "+20% extra gather drop chance", robux = 1000, key = "antimon" },
+		{ id = 1111111112, name = "Sakuradamon", emoji = "🌸", desc = "+25% XP bonus from cooking & serving", robux = 1000, key = "sakuradamon" },
+		{ id = 1111111113, name = "Tantanmon", emoji = "🌶️", desc = "+20% speed & spicy burst", robux = 1000, key = "tantanmon" },
+	},
+	recipes = {
+		{ id = 1111111104, name = "Premium Ramen", emoji = "🍜", desc = "Exclusive ramen recipe", robux = 60 },
+		{ id = 1111111105, name = "Party Cake", emoji = "🎂", desc = "Fancy celebration cake", robux = 60 },
+		{ id = 1111111106, name = "Truffle Soup", emoji = "🍲", desc = "Ultra-rare truffle recipe", robux = 80 },
+	},
+	accessories = {
+		{ id = 1111111107, name = "Gold Crown", emoji = "👑", desc = "Wear royalty on your head", robux = 40 },
+		{ id = 1111111108, name = "Pink Bow", emoji = "🎀", desc = "Cute bow accessory", robux = 40 },
+		{ id = 1111111109, name = "Chef Hat", emoji = "🍽️", desc = "Professional chef headwear", robux = 50 },
+	},
 }
 ```
 
 ---
 
-## 3. Taskbar & Start Menu Styling Architecture
+## 3. Recommended Modifications for Server & Companion Config Files
 
-### 3.1 Pinned Vintage Taskbar (`#taskbar`)
-The taskbar is permanently fixed to the viewport bottom (`height: 38px`), matching authentic Windows 95 spatial metrics while adopting Zunda green glass/pastel tones.
-
-```css
-/* --- Taskbar Architecture --- */
-#taskbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--taskbar-height);
-  background-color: var(--win-bg);
-  border-top: 2px solid var(--win-border-light);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 4px;
-  z-index: 9999;
-  box-sizing: border-box;
-  user-select: none;
-}
-
-/* Start Button */
-#start-btn {
-  height: 30px;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-os);
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--win-border-shadow);
-  background: var(--win-btn-bg);
-  cursor: pointer;
-}
-
-#start-btn.start-btn-active {
-  border-top: 2px solid var(--win-border-shadow);
-  border-left: 2px solid var(--win-border-shadow);
-  border-right: 2px solid var(--win-border-light);
-  border-bottom: 2px solid var(--win-border-light);
-  background: var(--zunda-accent);
-}
-
-/* Taskbar Windows Bar */
-#taskbar-windows {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-  margin: 0 8px;
-  overflow-x: auto;
-}
-
-.taskbar-btn {
-  height: 28px;
-  min-width: 120px;
-  max-width: 180px;
-  padding: 0 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-os);
-  font-size: 12px;
-  color: #1b5e20;
-  background: var(--win-btn-bg);
-  cursor: pointer;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.taskbar-btn.active {
-  font-weight: bold;
-  background: var(--zunda-pastel);
-  border-top: 2px solid var(--win-border-dark);
-  border-left: 2px solid var(--win-border-dark);
-  border-right: 2px solid var(--win-border-light);
-  border-bottom: 2px solid var(--win-border-light);
-}
-
-/* System Tray */
-#system-tray {
-  height: 28px;
-  padding: 0 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-os);
-  font-size: 12px;
-  color: var(--win-border-shadow);
-  background: var(--win-bg);
-}
-
-.tray-icon {
-  cursor: pointer;
-  font-size: 14px;
-  opacity: 0.85;
-  transition: opacity 0.15s ease;
-}
-
-.tray-icon:hover {
-  opacity: 1;
-}
-
-#tray-clock {
-  font-weight: bold;
-  font-size: 11px;
-}
+### 3.1 Fix Server Default Ownership in `CompanionShopServer.server.lua`
+In `src/server/CompanionShopServer.server.lua`:
+Change line 68 from:
+```lua
+local owned = { zundapal = true, zundamon = true, zundacat = true, zundabunny = true, tantanmon = true, dog = true, parrot = true, cat = true }
 ```
-
-### 3.2 Retro Start Menu Popup (`#start-menu`)
-The start menu renders a side banner with vertical "Zunda-OS 95" branding alongside a list of launcher items.
-
-```css
-/* --- Start Menu Popup --- */
-#start-menu {
-  position: fixed;
-  bottom: calc(var(--taskbar-height) + 2px);
-  left: 2px;
-  width: var(--start-menu-width);
-  background: var(--win-bg);
-  display: flex;
-  z-index: 10000;
-  padding: 3px;
-  box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
-}
-
-#start-menu.hidden {
-  display: none !important;
-}
-
-.start-menu-banner {
-  width: 32px;
-  background: linear-gradient(180deg, #1b5e20 0%, #4caf50 100%);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 12px;
-}
-
-.start-menu-banner-text {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-family: var(--font-os);
-  font-size: 16px;
-  font-weight: bold;
-  color: #ffffff;
-  letter-spacing: 2px;
-}
-
-.start-menu-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 4px 0;
-}
-
-.start-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  font-family: var(--font-os);
-  font-size: 13px;
-  color: #1b5e20;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.start-menu-item:hover {
-  background-color: var(--zunda-dark);
-  color: #ffffff;
-}
-
-.start-menu-divider {
-  height: 1px;
-  border-top: 1px solid var(--win-border-dark);
-  border-bottom: 1px solid var(--win-border-light);
-  margin: 4px 2px;
-}
+To:
+```lua
+local owned = { zundapal = true, zundamon = true, dog = true, parrot = true, cat = true, ankomon = true }
 ```
+*(Removes `tantanmon` from default owned so that it requires purchase or unlocking, consistent with `CompanionConfig.lua`)*
+
+### 3.2 Ensure Price and Robux Fields in `CompanionConfig.lua`
+`CompanionConfig.lua` already defines:
+- `cardamon`: `free = false, price = 1000, robux = 1000`
+- `antimon`: `free = false, price = 1000, robux = 1000`
+- `sakuradamon`: `free = false, price = 1000, robux = 1000`
+- `tantanmon`: `free = false, price = 1000, robux = 1000`
+No structural change is needed in `CompanionConfig.lua`, as prices are already set to 1000.
 
 ---
 
-## 4. CRT Scanlines Overlay & Cozy Atmosphere Keyframe Animations
+## 4. Verification Method
 
-### 4.1 CRT Scanlines Layer (`#crt-overlay`)
-A non-interactive overlay screen simulating nostalgic CRT TV/Monitor raster lines and RGB subpixel tinting. Toggleable via `.crt-off`.
-
-```css
-/* --- CRT Scanlines Effect --- */
-#crt-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 9000;
-  background: 
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-  background-size: 100% 3px, 6px 100%;
-  box-shadow: inset 0 0 80px rgba(10, 21, 10, 0.35);
-  transition: opacity 0.3s ease;
-}
-
-/* CRT Toggle Off State */
-body.crt-off #crt-overlay,
-#crt-overlay.crt-off {
-  display: none !important;
-  opacity: 0 !important;
-}
-
-/* Terminal Viewport Phosphor Styling */
-.terminal-viewport {
-  background-color: var(--term-bg);
-  color: var(--term-green);
-  font-family: var(--font-mono);
-  font-size: 15px;
-  line-height: 1.4;
-  padding: 12px;
-  text-shadow: var(--term-glow);
-  overflow-y: auto;
-  flex: 1;
-}
-```
-
-### 4.2 Keyframe Animations
-Floating pea pods and zunda mochi floating keyframes for cozy atmosphere, terminal pulse, and blinking block cursor.
-
-```css
-/* --- Keyframe Animations --- */
-
-/* Floating Pea Pod / Mochi Animation */
-@keyframes floatPea {
-  0% {
-    transform: translateY(0px) rotate(0deg) scale(1);
-  }
-  50% {
-    transform: translateY(-12px) rotate(4deg) scale(1.04);
-  }
-  100% {
-    transform: translateY(0px) rotate(0deg) scale(1);
-  }
-}
-
-.floating-pea-asset {
-  animation: floatPea 4s ease-in-out infinite;
-}
-
-/* CRT Terminal Text Glow Pulse */
-@keyframes terminalPulse {
-  0%, 100% {
-    text-shadow: 0 0 8px rgba(51, 255, 102, 0.6);
-  }
-  50% {
-    text-shadow: 0 0 14px rgba(51, 255, 102, 0.9), 0 0 3px rgba(255, 255, 255, 0.4);
-  }
-}
-
-/* Classic Block Cursor Blink */
-@keyframes cursorBlink {
-  0%, 49% {
-    opacity: 1;
-  }
-  50%, 100% {
-    opacity: 0;
-  }
-}
-
-.terminal-cursor {
-  display: inline-block;
-  width: 8px;
-  height: 15px;
-  background-color: var(--term-cursor);
-  animation: cursorBlink 1s infinite;
-  vertical-align: middle;
-  margin-left: 2px;
-}
-```
-
----
-
-## 5. Responsive Layout Architecture
-
-Adaptive media queries ensuring functional UI presentation across Desktop (>1024px), Tablet (768px - 1024px), and Mobile (<768px).
-
-```css
-/* --- Responsive Breakpoints --- */
-
-/* Desktop (>1024px): Default multi-window floating workspace */
-
-/* Tablet Display (768px to 1024px) */
-@media screen and (max-width: 1024px) {
-  .window {
-    max-width: 92vw;
-    max-height: 80vh;
-  }
-  
-  .taskbar-btn {
-    min-width: 90px;
-    max-width: 130px;
-  }
-}
-
-/* Mobile Display (<768px) */
-@media screen and (max-width: 768px) {
-  /* Force active window into full-screen modal mode */
-  .window {
-    width: 100vw !important;
-    height: calc(100vh - var(--taskbar-height)) !important;
-    top: 0 !important;
-    left: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    min-width: 100vw;
-  }
-
-  #start-menu {
-    width: calc(100vw - 4px);
-    left: 2px;
-  }
-
-  .win-btn {
-    width: 24px;
-    height: 22px;
-    font-size: 12px;
-  }
-
-  #taskbar {
-    height: 42px;
-  }
-
-  #start-btn {
-    height: 34px;
-    padding: 0 12px;
-  }
-
-  .terminal-viewport {
-    font-size: 13px;
-    padding: 8px;
-  }
-}
-```
-
----
-
-## 6. Implementation Checklist for Worker (`teamwork_preview_worker_m1`)
-
-1. Create `site/style.css` in `g:\Zundamons-kItchen-V2\site\style.css`.
-2. Insert `:root` design token block with exact color codes (`#2e7d32`, `#4caf50`, `#8bc34a`, `#e8f5e9`, `#c8e6c9`, `#f1f8e9`, `#0a150a`, `#33ff66`).
-3. Ensure `.bevel-outset` and `.bevel-inset` 3D border shadows render accurately.
-4. Wire up `.window`, `.window-active`, `.window-inactive`, `.window-titlebar`, and `.win-btn` control buttons.
-5. Setup `#taskbar` (38px bottom pin), `#start-btn`, `#taskbar-windows`, `#system-tray`.
-6. Setup `#start-menu` with vertical sidebar branding.
-7. Implement `#crt-overlay` scanline gradient overlay with `.crt-off` toggle support.
-8. Define `@keyframes floatPea` floating mochi animation.
-9. Include tablet (1024px) and mobile (768px) media query overrides.
+To verify these fixes:
+1. Validate syntax of modified Lua modules (`MarketplaceConfig.lua`, `CompanionShopServer.server.lua`).
+2. Verify reverse lookup mapping in `CompanionShopServer.server.lua`:
+   `productToComp[pid]` correctly resolves `1111111110` -> `cardamon`, `1111111111` -> `antimon`, `1111111112` -> `sakuradamon`, `1111111113` -> `tantanmon`.
+3. Verify receipt processing in `MarketplaceService.lua`:
+   Calling `MarketplaceService.processReceipt({ PlayerId = userId, ProductId = 1111111110 })` sets `companion_owned_cardamon = true` in player data and fires `CompanionOwnedSync`.

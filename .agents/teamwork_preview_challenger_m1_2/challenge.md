@@ -1,93 +1,63 @@
-# Adversarial Challenge Report — Zunda-OS 95 CLI Launch Page & Creative Hub (Milestone 1)
-
-**Target Directory**: `g:\Zundamons-kItchen-V2\site`  
-**Reviewer**: Challenger 2 (Empirical Challenger)  
-**Date**: 2026-07-21  
-
----
+# Milestone 1 Gate Verification Report — Challenger 2
 
 ## Challenge Summary
 
-**Overall risk assessment**: **MEDIUM**  
+**Overall risk assessment**: LOW
 
-While zero-dependency compliance and SVG vector XML validity are 100% compliant, empirical stress testing surfaced **two significant layout and CSS cascade failure modes**:
-1. **Mobile Viewport Taskbar Overlap**: `--taskbar-height` is not updated inside `@media screen and (max-width: 768px)` despite `#taskbar` height increasing from 38px to 42px. This causes fixed taskbars to overlap the bottom 4px of modal windows and miscalculates start menu positioning.
-2. **Inert Theme Toggle Feature**: `index.html` contains JavaScript logic to toggle `data-theme` between `zunda-classic` and `zunda-dark`, but `style.css` contains zero CSS selectors or overrides for `[data-theme="zunda-dark"]`. Clicking the button changes the HTML attribute but produces zero visual change.
+Empirical testing confirms that Milestone 1 companion shop catalog synchronization, DevProduct mapping, client tab sorting, and server ownership sync logic meet all requirements. Legacy key contamination (`zundacat`, `zundabunny`) has been completely eliminated from runtime shop and companion scripts, and `MarketplaceConfig.lua`, `CompanionShopScript.client.lua`, and `StoreScript.client.lua` are fully consistent with `CompanionConfig.lua`.
+
+**Gate Decision**: **VERIFIED**
 
 ---
 
 ## Challenges
 
-### [Medium] Challenge 1: Mobile Taskbar Height Variable Cascade Mismatch (Layout Integrity)
+### [Low] Challenge 1: Backward Compatibility for Legacy Player Save Data
 
-- **Assumption challenged**: `--taskbar-height` in `:root` accurately reflects `#taskbar` element height across all viewports.
-- **Attack scenario**: Viewing the application on mobile viewports (<=768px) such as 320px (iPhone SE) or 768px (iPad portrait).
-- **Blast radius**: 
-  - `:root` declares `--taskbar-height: 38px;`.
-  - `@media screen and (max-width: 768px)` increases `#taskbar` height to `42px`.
-  - `--taskbar-height` variable is NOT updated inside `@media screen and (max-width: 768px)`.
-  - Mobile modal windows use `height: calc(100vh - var(--taskbar-height)) !important;` -> evaluates to `100vh - 38px`.
-  - The fixed taskbar sits from `y = 100vh - 42px` to `100vh`.
-  - **Result**: The taskbar overlaps the bottom 4px of mobile modal window bodies. Additionally, `#start-menu` positioning (`bottom: calc(var(--taskbar-height) + 2px);` = 40px) overlaps 2px with the top edge of the 42px taskbar.
-- **Mitigation**: Update `--taskbar-height` inside the mobile media query:
-  ```css
-  @media screen and (max-width: 768px) {
-    :root {
-      --taskbar-height: 42px;
-    }
-    ...
-  }
-  ```
+- **Assumption challenged**: Players who previously played older builds may have `companion_owned_zundacat = true` or `companion_owned_zundabunny = true` stored in `PlayerDataService`.
+- **Attack scenario**: When `GetOwnedCompanions.OnServerInvoke` executes, it parses all keys matching `companion_owned_(.+)` from player data and adds `owned["zundacat"] = true` to the returned dictionary. If the client code iterated blindly over `owned` to create shop tabs, obsolete tabs would be rendered.
+- **Blast radius**: UI rendering of empty/glitched tabs for obsolete companions if client UI doesn't filter against active catalog.
+- **Mitigation & Verification**: In `CompanionShopScript.client.lua`, `buildTabs()` iterates exclusively over `TAB_ORDER` and checks `catalog[key]`. Obsolete keys in `owned` data are safely ignored during tab rendering.
+- **Status**: PASSED / MITIGATED.
 
----
+### [Low] Challenge 2: Disabling MarketplaceConfig in Unverified Environments
 
-### [Medium] Challenge 2: Inert Theme Switcher Cascade Gap (CSS Cascade)
-
-- **Assumption challenged**: Clicking "Toggle Theme Mode" in the Start Menu changes the application theme.
-- **Attack scenario**: User clicks "Toggle Theme Mode" in the Start Menu (`#menu-toggle-theme`).
-- **Blast radius**: 
-  - `index.html` lines 574-582 toggle the `data-theme` attribute on `document.documentElement` between `zunda-classic` and `zunda-dark`.
-  - `style.css` has zero rules for `[data-theme="zunda-dark"]` or `:root[data-theme="zunda-dark"]`.
-  - **Result**: The HTML attribute changes, but zero visual color or theme changes occur.
-- **Mitigation**: Add theme override rules in `style.css`:
-  ```css
-  [data-theme="zunda-dark"] {
-    --zunda-bg: #1b381e;
-    --win-bg: #223824;
-    --win-content-bg: #142416;
-    --win-border-light: #3e6341;
-    --win-border-shadow: #0b170c;
-    /* Dark theme palette overrides */
-  }
-  ```
-
----
-
-### [Low] Challenge 3: Lack of Touch Event Listeners for Mobile Window Dragging
-
-- **Assumption challenged**: Window dragging works identically on desktop and mobile devices.
-- **Attack scenario**: User attempts to drag a window titlebar on a touch device.
-- **Blast radius**: 
-  - Window manager script binds `mousedown`, `mousemove`, `mouseup` to header, but omits `touchstart`, `touchmove`, `touchend`.
-  - On mobile (<=768px), CSS `width: 100vw !important`, `top: 0 !important`, `left: 0 !important` prevents windows from being dragged offscreen, masking the issue. On tablets (769px-1024px) where CSS full-screen fallback does not apply, touch dragging fails.
-- **Mitigation**: Add touch event listeners or pointer events (`pointerdown`, `pointermove`, `pointerup`) to window header dragging logic.
+- **Assumption challenged**: DevProduct purchases could fail or error if MarketplaceConfig is disabled or product IDs are placeholders.
+- **Attack scenario**: A player clicks a premium companion purchase button while `MarketplaceConfig.enabled == false`.
+- **Blast radius**: Potential UI freeze or unhandled error if client/server do not handle `enabled == false`.
+- **Mitigation & Verification**: `MarketplaceConfig.enabled` defaults to `false` (fail-closed). Client displays `"Coming Soon • Preview Companion"` on action buttons when disabled, preventing invalid Robux purchase prompts. `CompanionShopServer.server.lua` line 47 checks `MarketplaceConfig.enabled` and warns gracefully if purchase is invoked while disabled.
+- **Status**: PASSED.
 
 ---
 
 ## Stress Test Results
 
-| Scenario | Tested Viewport / State | Expected Behavior | Actual Behavior | Pass / Fail |
-|---|---|---|---|---|
-| Viewport 1920px Desktop | 1920x1080 | Floating windows, full desktop layout | Renders cleanly, icons float, windows stack properly | **PASS** |
-| Viewport 1024px Laptop | 1024x768 | Window constraints max 92vw / 80vh | Renders cleanly, taskbar buttons constrain to 90px-130px | **PASS** |
-| Viewport 768px Mobile/Tablet | 768x1024 | Mobile modal fallback window covers viewport above taskbar | Window height equals `100vh - 38px`, taskbar height is 42px. 4px overlap occurs at window bottom | **FAIL** |
-| Viewport 320px Mobile | 320x568 | Mobile modal window fits screen, taskbar fits | Taskbar items scroll horizontally, window bottom 4px covered by taskbar | **FAIL** |
-| Theme Toggle Button Click | User clicks "Toggle Theme Mode" | UI theme updates to dark edamame theme | `data-theme="zunda-dark"` set on `<html>`, zero visual change in CSS | **FAIL** |
-| SVG Vector Rendering | 4 SVG assets in `site/assets/` | Clean XML vector without external references | Clean XML, valid viewBox, 0 `<image>`, 0 `xlink:href`, 0 remote calls | **PASS** |
-| Zero-Dependency Network Audit | All 7 files in `site/` | 0 external network requests, 0 external font imports | 0 fetch/xhr/ws, 0 external font imports, 100% local Web Audio synthesis | **PASS** |
+1. **MarketplaceConfig Product ID Uniqueness & Mapping**
+   - *Scenario*: Scan `MarketplaceConfig.products` for duplicate product IDs and verify mapping against `companionDevProductIds`.
+   - *Expected Behavior*: All product IDs (1111111101..1111111110) are unique; `cardamon`=1111111101, `antimon`=1111111102, `sakuradamon`=1111111103, `tantanmon`=1111111104.
+   - *Actual Behavior*: 10 unique product IDs found, 0 duplicates, 100% alignment between `products`, `companionDevProductIds`, and `storeDisplay`.
+   - *Result*: **PASS**
+
+2. **Client Tab Order & Active Companion Inclusion**
+   - *Scenario*: Extract `TAB_ORDER` from `CompanionShopScript.client.lua` and compare against `CompanionConfig.companions` keys.
+   - *Expected Behavior*: `TAB_ORDER` contains 9 active companions (`zundapal`, `parrot`, `dog`, `cat`, `ankomon`, `cardamon`, `antimon`, `sakuradamon`, `tantanmon`), 0 duplicates, 0 legacy keys.
+   - *Actual Behavior*: Exact match (9 active companions), clean sorting (free first, premium second), 0 duplicates, 0 legacy keys.
+   - *Result*: **PASS**
+
+3. **StoreScript Free Companion Consistency**
+   - *Scenario*: Compare `FREE_COMPANIONS` in `StoreScript.client.lua` against `def.free == true` in `CompanionConfig.lua`.
+   - *Expected Behavior*: `FREE_COMPANIONS` contains exactly `zundapal`, `dog`, `parrot`, `cat`, `ankomon`.
+   - *Actual Behavior*: Exact 1-to-1 match (5 free companions), 0 missing, 0 extra.
+   - *Result*: **PASS**
+
+4. **Runtime Legacy Keys Audit (`zundacat`, `zundabunny`)**
+   - *Scenario*: Grep scan all runtime shop/companion scripts (`CompanionShopScript.client.lua`, `StoreScript.client.lua`, `CompanionShopServer.server.lua`, `CompanionConfig.lua`, `MarketplaceConfig.lua`) for legacy keys (`zundacat`, `zundabunny`).
+   - *Expected Behavior*: 0 occurrences of `zundacat` or `zundabunny` in shop/companion runtime files.
+   - *Actual Behavior*: 0 occurrences found across all 5 runtime files.
+   - *Result*: **PASS**
 
 ---
 
 ## Unchallenged Areas
 
-- **Web Audio Synthesis**: `assets/audio_engine.js` synthesis algorithms (oscillators, gains, audio nodes) were audited for zero network calls, but audio frequency harmonics and sound quality were not subjected to acoustic analysis.
+- **Roblox Studio In-Game Prompt Purchase Execution**: Cannot execute actual Roblox Marketplace DevProduct purchases without active Studio playtest session connected via Roblox Studio MCP or live Roblox client. Verified via offline static analysis and Python empirical harness.

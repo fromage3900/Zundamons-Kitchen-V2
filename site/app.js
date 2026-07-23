@@ -921,7 +921,7 @@ class VNTalkApp {
     } else if (action === 'open_quickstart' && typeof window !== 'undefined' && window.windowManager) {
       window.windowManager.openWindow('window-updates');
     } else if (action === 'launch_roblox' && typeof window !== 'undefined') {
-      window.open('https://www.roblox.com/', '_blank');
+      window.open('https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo', '_blank');
     }
   }
 }
@@ -990,7 +990,7 @@ class QuickStartApp {
     if (launchRobloxBtn) {
       launchRobloxBtn.addEventListener('click', () => {
         playClick('down');
-        window.open('https://www.roblox.com/', '_blank');
+        window.open('https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo', '_blank');
       });
     }
 
@@ -1045,147 +1045,6 @@ class QuickStartApp {
 }
 
 // ============================================================================
-// 5.5 TelemetryService & Game Info API Client
-// ============================================================================
-
-const STATIC_GAME_INFO_FALLBACK = {
-  last_updated: "2026-07-22T17:55:00Z",
-  online_players: {
-    count: 125,
-    status: "online",
-    version: "2.4.0 HYBRID ECS"
-  },
-  active_challenges: {
-    daily: [
-      { id: "dc_perfect_3", title: "Perfect Timing", description: "Cook 3 dishes with PERFECT timing", reward: { gold: 120, xp: 100, style: 15 }, difficulty: 2 },
-      { id: "dc_cook_5", title: "Cooking Spree", description: "Cook 5 dishes", reward: { gold: 80, xp: 60, style: 10 }, difficulty: 1 },
-      { id: "dc_perfect_5", title: "Flawless Chef", description: "Cook 5 PERFECT dishes", reward: { gold: 200, xp: 150, style: 25 }, difficulty: 3 }
-    ],
-    weekly: [
-      { id: "wc_zunda_rush", title: "Zunda Paradise Rush", description: "Serve 5 Zunda Paradise dishes in Challenge Mode", reward: { gold: 1000, xp: 500, style: 100 }, difficulty: 5 }
-    ]
-  },
-  gacha_banners: [
-    {
-      id: "gourmet_spring_2026",
-      name: "🌸 Whims of Spring Gourmet",
-      type: "fashion",
-      costPerPull: 100,
-      featuredItems: ["Zundamon_MagicalGirlForm", "Royal_Gourmet_Crown", "Ankomon_GoldTrim"],
-      rates: { legendary: "5%", epic: "20%", rare: "75%" }
-    }
-  ],
-  promo_codes: [
-    { code: "ZUNDAMOCHI2026", gold: 500, gems: 50, item: "10x Fresh Zunda Mochi", reward_summary: "+500 Gold, +50 Gems, 10x Fresh Zunda Mochi" },
-    { code: "SOUPSEASON", gold: 1000, gems: 100, item: "5x Wild Mushroom Pack", reward_summary: "+1000 Gold, +100 Gems, 5x Wild Mushroom Pack" },
-    { code: "KAWAIIZUNDA", gold: 750, gems: 75, item: "Sakura Chef Apron", reward_summary: "+750 Gold, +75 Gems, Sakura Chef Apron" },
-    { code: "NIKKIFASHION", gold: 1500, gems: 150, item: "3x Whim Gacha Tickets", reward_summary: "+1500 Gold, +150 Gems, 3x Whim Gacha Tickets" },
-    { code: "HYBRIDECS", gold: 2000, gems: 200, item: "5x Whim Gacha Tickets", reward_summary: "+2000 Gold, +200 Gems, 5x Whim Gacha Tickets" }
-  ],
-  global_stats: {
-    total_dishes_cooked: 142850,
-    edamame_harvested: 89420,
-    total_gacha_pulls: 38920,
-    active_event: {
-      name: "🌸 Whims of Gourmet - Spring Festival",
-      active: true,
-      multiplier: "2.0x Style Points & Gold"
-    }
-  }
-};
-
-class TelemetryService {
-  constructor() {
-    this.data = STATIC_GAME_INFO_FALLBACK;
-  }
-
-  async fetchTelemetry() {
-    try {
-      const response = await fetch('api/game_info.json');
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const json = await response.json();
-      if (json && typeof json === 'object') {
-        this.data = json;
-      }
-    } catch (err) {
-      console.warn('[TelemetryService] Telemetry fetch failed or running under file:// protocol. Using STATIC_GAME_INFO_FALLBACK.', err);
-      this.data = STATIC_GAME_INFO_FALLBACK;
-    }
-    this.render();
-  }
-
-  render() {
-    const data = this.data || STATIC_GAME_INFO_FALLBACK;
-
-    // 1. Status Pill Text
-    const pillText = document.getElementById('status-pill-text') || document.querySelector('.pill-text');
-    if (pillText && data.online_players) {
-      const count = data.online_players.count || 125;
-      const version = data.online_players.version || '2.4.0 HYBRID ECS';
-      const cleanVer = version.replace(/^v/, '');
-      pillText.textContent = `LIVE ON ROBLOX · v${cleanVer} (${count} CHEFS ONLINE)`;
-    }
-
-    // 2. Hero Live Ticker
-    const tickerEl = document.getElementById('ticker-content-text');
-    if (tickerEl) {
-      const activeEvt = data.global_stats?.active_event || data.live_event || {};
-      const evtName = activeEvt.name || '🌸 Whims of Gourmet - Spring Festival';
-      const evtMult = activeEvt.multiplier || '2.0x Style Points & Gold';
-      const dailyChall = data.active_challenges?.daily?.[0]?.title || 'Perfect Timing';
-      const lastCode = data.promo_codes?.[data.promo_codes.length - 1]?.code || 'HYBRIDECS';
-      const onlineCount = data.online_players?.count || 125;
-
-      tickerEl.innerHTML = `🌸 <strong>Active Event:</strong> ${evtName} (${evtMult}) &nbsp;&nbsp;|&nbsp;&nbsp; 🎯 <strong>Featured Daily Challenge:</strong> ${dailyChall} &nbsp;&nbsp;|&nbsp;&nbsp; 🎁 <strong>Active Promo Code:</strong> <code>${lastCode}</code> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍🍳 <strong>Online Chefs:</strong> ${onlineCount} CHEFS ONLINE`;
-    }
-
-    // 3. Active Daily Challenges List
-    const challengesList = document.getElementById('active-challenges-list');
-    if (challengesList && data.active_challenges?.daily) {
-      challengesList.innerHTML = data.active_challenges.daily.map(c => `
-        <div class="challenge-item-card">
-          <div class="challenge-title">🎯 <strong>${c.title}</strong> <span class="challenge-diff">Difficulty ${'⭐'.repeat(c.difficulty || 1)}</span></div>
-          <div class="challenge-desc">${c.description}</div>
-          <div class="challenge-reward">Reward: +${c.reward?.gold || 0} Gold, +${c.reward?.xp || 0} XP, +${c.reward?.style || 0} Style Points</div>
-        </div>
-      `).join('');
-    }
-
-    // 4. Dynamic Promo Codes Copy Buttons
-    const promosGrid = document.getElementById('telemetry-promos-grid');
-    if (promosGrid && data.promo_codes) {
-      promosGrid.innerHTML = data.promo_codes.map(p => `
-        <div class="code-box">
-          <div class="code-header">
-            <span class="code-val">${p.code}</span>
-            <button class="win95-btn copy-code-btn btn-candy" data-code="${p.code}">📋 Copy Code</button>
-          </div>
-          <span class="code-reward">Reward: ${p.reward_summary || `+${p.gold} Gold, +${p.gems} Gems, ${p.item}`}</span>
-        </div>
-      `).join('');
-
-      if (window.mainApp && typeof window.mainApp.initPromoCodeButtons === 'function') {
-        window.mainApp.initPromoCodeButtons();
-      }
-    }
-
-    // 5. Community Dishes Cooked Progress Bar
-    const progressFill = document.getElementById('dishes-cooked-bar');
-    const progressText = document.getElementById('dishes-cooked-text');
-    if (data.global_stats) {
-      const cooked = data.global_stats.total_dishes_cooked || 142850;
-      const target = 200000;
-      const pct = Math.min(100, Math.round((cooked / target) * 100));
-
-      if (progressFill) progressFill.style.width = `${pct}%`;
-      if (progressText) progressText.textContent = `${cooked.toLocaleString()} / ${target.toLocaleString()} Dishes Cooked (${pct}% Goal Completed!)`;
-    }
-  }
-}
-
-// ============================================================================
 // 6. MainApp — Desktop Integration, Start Menu, System Tray & Particles
 // ============================================================================
 
@@ -1209,9 +1068,6 @@ class MainApp {
 
     this.quickstart = new QuickStartApp();
     this.quickstart.init();
-
-    this.telemetryService = new TelemetryService();
-    this.telemetryService.fetchTelemetry();
 
     this.initPromosApp();
     this.initCalculatorApp();
@@ -1493,12 +1349,29 @@ class MainApp {
     if (widgetPlayBgm) {
       widgetPlayBgm.addEventListener('click', () => {
         if (typeof playClick === 'function') playClick('down');
-        if (typeof window.toggleCozyBGM === 'function') {
-          const isPlaying = window.toggleCozyBGM();
-          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ BGM';
-          if (discIconEl) {
-            discIconEl.classList.toggle('spinning', isPlaying);
+        const audioEl = document.getElementById('zunda-mp3-player');
+        if (audioEl) {
+          if (audioEl.paused) {
+            audioEl.play().then(() => {
+              widgetPlayBgm.textContent = '⏸ Pause zunda.mp3';
+              if (discIconEl) discIconEl.classList.add('spinning');
+            }).catch(() => {
+              // Fallback to Web Audio synthesis engine if MP3 file fails to play
+              if (typeof window.toggleCozyBGM === 'function') {
+                const isPlaying = window.toggleCozyBGM();
+                widgetPlayBgm.textContent = isPlaying ? '⏸ Pause Synth BGM' : '▶ zunda.mp3';
+                if (discIconEl) discIconEl.classList.toggle('spinning', isPlaying);
+              }
+            });
+          } else {
+            audioEl.pause();
+            widgetPlayBgm.textContent = '▶ zunda.mp3';
+            if (discIconEl) discIconEl.classList.remove('spinning');
           }
+        } else if (typeof window.toggleCozyBGM === 'function') {
+          const isPlaying = window.toggleCozyBGM();
+          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ zunda.mp3';
+          if (discIconEl) discIconEl.classList.toggle('spinning', isPlaying);
         }
       });
     }
@@ -1640,6 +1513,25 @@ class MainApp {
     for (let i = 0; i < 40; i++) {
       particles.push(new SparkleStar());
     }
+
+    // Y2K Interactive Mouse & Scroll Parallax Controller
+    const heroCard = document.querySelector('.hero-card-preview');
+    const heroTitle = document.querySelector('.hero-title');
+    const heroAvatar = document.querySelector('.hero-zunda-svg');
+
+    window.addEventListener('mousemove', (e) => {
+      const mouseX = (e.clientX / window.innerWidth - 0.5) * 30;
+      const mouseY = (e.clientY / window.innerHeight - 0.5) * 30;
+
+      if (heroCard) heroCard.style.transform = `translate3d(${mouseX * 0.8}px, ${mouseY * 0.8}px, 0) rotate3d(1, 1, 0, ${(mouseX - mouseY) * 0.15}deg)`;
+      if (heroTitle) heroTitle.style.transform = `translate3d(${mouseX * 0.3}px, ${mouseY * 0.3}px, 0)`;
+      if (heroAvatar) heroAvatar.style.transform = `translate3d(${-mouseX * 0.5}px, ${-mouseY * 0.5}px, 0) scale(1.05)`;
+    });
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (heroCard) heroCard.style.transform = `translate3d(0, ${scrollY * 0.15}px, 0)`;
+    });
 
     const animateParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);

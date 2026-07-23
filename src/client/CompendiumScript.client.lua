@@ -576,8 +576,9 @@ local function toggle()
 	end
 end
 closeBtn.MouseButton1Click:Connect(function()
-	open = true
-	toggle()
+	open = false
+	shell.close()
+	UIRouter.close("compendium")
 	local pos = closeBtn.AbsolutePosition
 	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255, 255, 255), 6)
 end)
@@ -593,15 +594,6 @@ task.spawn(function()
 				btn.MouseButton1Click:Connect(toggle)
 			end
 		end
-	end
-end)
-
-UIS.InputBegan:Connect(function(inp, gpe)
-	if gpe then
-		return
-	end
-	if inp.KeyCode == Enum.KeyCode.C then
-		toggle()
 	end
 end)
 

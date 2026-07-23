@@ -1,313 +1,176 @@
-# Analysis & Specification: Automated Dual Deployment Sync (`site/sync_site.js`)
+# Technical Analysis: ClientGuiBootstrap, UI Decoupling Rules & Startup Visibility for Pea Wheel System
 
-**Author**: Explorer 3 (Milestone 1)  
-**Target Requirement**: R4 - Automated Dual Deployment Sync  
-**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\explorer_m1_3`  
-**Date**: 2026-07-22  
-
----
-
-## 1. Executive Summary
-
-Zundamon's Kitchen V2 uses a dual-folder structure for web assets:
-- `g:\Zundamons-kItchen-V2\site`: The active development source directory for the HTML5/Y2K Infinity Nikki web front.
-- `g:\Zundamons-kItchen-V2\docs`: The target deployment directory for GitHub Pages hosting, which also contains project architectural & process documentation (Markdown files).
-
-Requirement R4 dictates creating an automated Node.js synchronization runner (`site/sync_site.js`) that replicates all web assets from `site/` to `docs/` while strictly preserving all existing Markdown documentation files in `docs/`.
-
-This specification provides the architectural design, file mapping rules, comparison algorithms, CLI interface, and complete zero-dependency Node.js reference implementation for `site/sync_site.js`.
+**Target Scope**: Milestone 1 — UI System Overhaul  
+**Target Files Analyzed**:
+- `src/client/Controllers/PeaWheelController.lua`
+- `src/shared/ConfigurationFiles/ClientGuiBootstrap.lua`
+- `src/client/000_LegacyOverlayCleanup.client.lua`
+- `src/client/PeaWheelStarter.client.lua`
+- `src/client/PeaWheelBootstrap.client.lua`
+- `src/shared/ConfigurationFiles/LegacyGuiConfig.lua`
 
 ---
 
-## 2. Directory Structure & File Inventory Analysis
+## Executive Summary
 
-### 2.1 Source Directory (`site/`)
-Current contents of `g:\Zundamons-kItchen-V2\site`:
-- `.nojekyll` (Bypasses Jekyll processing on GitHub Pages)
-- `index.html` (Main web showcase & desktop container)
-- `style.css` (Y2K Infinity Nikki design tokens & layout rules)
-- `app.js` (Interactive desktop application engines)
-- `terminal.js` (Y2K Pastel Web Terminal `ZundaCLI.exe`)
-- `window_manager.js` (Modular window management engine)
-- `sync_site.js` (Dual deployment sync runner — to be added in M1)
-- `assets/` (Directory)
-  - `audio_engine.js` (Web Audio API synthesizer & sound effects)
-  - `crt_monitor.svg` (SVG icon asset)
-  - `disc_icon.svg` (SVG icon asset)
-  - `pea_pod.svg` (SVG icon asset)
-  - `zundamon_mochi.svg` (SVG icon asset)
+An investigation was conducted on `PeaWheelController.lua`, `ClientGuiBootstrap.lua`, and `000_LegacyOverlayCleanup.client.lua` to evaluate compliance with Roblox Studio & Rojo UI Decoupling rules, startup visibility controls, and lifetime persistence across player respawns (`ResetOnSpawn = false`).
 
-### 2.2 Target Directory (`docs/`)
-Current contents of `g:\Zundamons-kItchen-V2\docs`:
-- Web Assets (mirror of `site/`): `.nojekyll`, `index.html`, `style.css`, `app.js`, `terminal.js`, `window_manager.js`, `assets/*`
-- Repository Markdown Documentation (MUST BE PRESERVED):
-  - `AGENT_HANDOFF.md`
-  - `ASSET_MANAGEMENT.md`
-  - `COLLABORATOR_PROMPTS.md`
-  - `MCP_WORKFLOW.md`
-  - `PHASE1_INVENTORY.md`
-  - `PHASE1_RECOVERY.md`
-  - `PHASE2_BOOT_RECOVERY.md`
-  - `PHASE3_ACCEPTANCE_STATUS.md`
-  - `PHASE3_RECOVERY_PLAN.md`
-  - `PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md`
-  - `RESOURCE_NODE_AUTHORING.md`
-  - `UI_UX_OVERHAUL_PLAN.md`
-  - `ZUNDAMON_CHEF_MASTER_IMPORT.md`
-  - `ZUNDAROOMS_AUTHORING.md`
+### Key Findings:
+1. **`ResetOnSpawn = false` Compliance**: **VERIFIED**. Both `ClientGuiBootstrap.createScreenGui` (line 16) and `PeaWheelController.lua` (line 65) explicitly assign `screenGui.ResetOnSpawn = false`. The top-level `PeaWheelGui` persists under `PlayerGui` across player character respawns without losing UI bindings or dropping instance references.
+2. **Startup Visibility Control**: **VERIFIED**. In `PeaWheelController.lua`, the modal backdrop frame (`backdropFrame.Visible = false`, line 73), the radial menu container (`wheelFrame.Visible = false`, line 83), and the action label (`tooltipLabel.Visible = false`, line 143) are explicitly set to `Visible = false` upon initial creation. The overlay does not display, block raycasts, or overlap other HUD elements on game startup before explicit user activation (via Tab/Q keypress or `HubButton` click).
+3. **Decoupled UI & Bootstrap Interaction**: **VERIFIED**. `PeaWheelController.lua` consumes `ClientGuiBootstrap` to construct its `ScreenGui` dynamically in `PlayerGui` without referencing `script.Parent`. When `PeaWheelGui` is added to `PlayerGui`, `000_LegacyOverlayCleanup.client.lua` evaluates it via its `ChildAdded` listener (`cleanupScreenGui`); `PeaWheelGui` passes cleanup safely without being destroyed or stripped because it is not listed in `LegacyGuiConfig.destroyScreenGuis` or `destroyLegacyStarterShells`, and contains no legacy grey fullscreen frames or embedded LocalScripts.
 
 ---
 
-## 3. Specification & Architectural Requirements
+## Detailed Code & Evidence Analysis
 
-### R4.1 Native Node.js & Zero External Dependencies
-- **Constraint**: Must use only Node.js standard built-in modules (`fs`, `path`, `crypto`, `process`).
-- **Rationale**: Ensures instant execution without requiring `npm install` or third-party packages, avoiding build-step failures in CI/CD or local environments.
+### 1. `ResetOnSpawn = false` Verification
 
-### R4.2 Robust Path Resolution
-- **Constraint**: Must calculate absolute paths using `__dirname`.
-- **Source Path**: `path.resolve(__dirname)` -> resolves to absolute path of `site/`.
-- **Target Path**: `path.resolve(__dirname, '..', 'docs')` -> resolves to absolute path of `docs/`.
-- **Rationale**: Allows running `node site/sync_site.js` from the repository root, from inside `site/`, or from any current working directory.
-
-### R4.3 Recursive Web Asset Copying
-- **Constraint**: Recursively list all files in `site/` (including nested folders like `assets/` and hidden files like `.nojekyll`).
-- **Target Directory Auto-Creation**: Ensure parent directories (e.g., `docs/assets/`) exist using `fs.mkdirSync(destDir, { recursive: true })` prior to copying.
-
-### R4.4 Documentation Preservation
-- **Constraint**: Documentation Markdown files (`*.md`) located in `docs/` must NEVER be deleted, overwritten, or modified by `sync_site.js`.
-- **Mechanism**: The sync script only reads files present in `site/`. Since Markdown documentation files reside solely in `docs/` and not in `site/`, standard unidirectional copy (`site/` -> `docs/`) naturally preserves `docs/*.md`. Furthermore, an explicit audit log will list preserved `.md` files during execution.
-
-### R4.5 Content Hashing & Smart Differential Sync
-- **Constraint**: Use SHA-256 hashing via `crypto.createHash('sha256')` to compare source and destination file contents.
-- **Rules**:
-  - Destination file missing -> `[NEW]` (Copy file).
-  - Destination file exists & SHA-256 matches -> `[UNCHANGED]` (Skip write to preserve file mtime & prevent unnecessary git diffs).
-  - Destination file exists & SHA-256 differs -> `[UPDATE]` (Overwrite destination file).
-
-### R4.6 CLI Flags & Execution Modes
-- `--dry-run` / `-d`: Preview operations without making file system modifications.
-- `--verbose` / `-v`: Output detailed file-by-file logs, including unchanged files and preserved markdown documentation files.
-- `--help` / `-h`: Display CLI help documentation and exit.
-- Default Mode: Executes actual synchronization and prints a clean summary table.
-
----
-
-## 4. Complete Reference Implementation Specification (`site/sync_site.js`)
-
-Below is the complete, production-ready code specification for `site/sync_site.js`:
-
-```javascript
-/**
- * site/sync_site.js
- * Zundamon's Kitchen V2 - Automated Dual Deployment Sync Runner
- * 
- * Synchronizes web assets from `site/` to `docs/` for GitHub Pages deployment.
- * Preserves existing markdown documentation files in `docs/`.
- * Native Node.js script — Zero external npm dependencies.
- * 
- * Usage:
- *   node site/sync_site.js [--dry-run|-d] [--verbose|-v] [--help|-h]
- */
-
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-
-// Configuration
-const SITE_DIR = path.resolve(__dirname);
-const REPO_ROOT = path.resolve(__dirname, '..');
-const DOCS_DIR = path.resolve(REPO_ROOT, 'docs');
-
-// Parse CLI arguments
-const args = process.argv.slice(2);
-const isDryRun = args.includes('--dry-run') || args.includes('-d');
-const isVerbose = args.includes('--verbose') || args.includes('-v');
-const isHelp = args.includes('--help') || args.includes('-h');
-
-if (isHelp) {
-  console.log(`
-Zundamon's Kitchen V2 - Dual Deployment Sync Utility
-===================================================
-Usage: node site/sync_site.js [options]
-
-Options:
-  --dry-run, -d   Preview files to copy/update without making disk changes
-  --verbose, -v   Show detailed file-by-file status including skipped files
-  --help, -h      Show this help message
-  `);
-  process.exit(0);
-}
-
-// Compute SHA-256 hash of a file buffer
-function getFileHash(filePath) {
-  try {
-    const fileBuffer = fs.readFileSync(filePath);
-    return crypto.createHash('sha256').update(fileBuffer).digest('hex');
-  } catch (err) {
-    return null;
-  }
-}
-
-// Recursively list all files relative to base directory
-function listFilesRecursively(dir, relativeTo = dir) {
-  let results = [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    const relPath = path.relative(relativeTo, fullPath);
-
-    if (entry.isDirectory()) {
-      results = results.concat(listFilesRecursively(fullPath, relativeTo));
-    } else if (entry.isFile()) {
-      results.push(relPath);
-    }
-  }
-
-  return results;
-}
-
-function sync() {
-  console.log(`\n==================================================`);
-  console.log(` Zundamon's Kitchen V2 - Dual Deployment Sync`);
-  console.log(` Mode: ${isDryRun ? '[DRY RUN - PREVIEW ONLY]' : '[LIVE SYNC]'}`);
-  console.log(` Source: ${SITE_DIR}`);
-  console.log(` Target: ${DOCS_DIR}`);
-  console.log(`==================================================\n`);
-
-  if (!fs.existsSync(SITE_DIR)) {
-    console.error(`Error: Source directory does not exist: ${SITE_DIR}`);
-    process.exit(1);
-  }
-
-  if (!fs.existsSync(DOCS_DIR)) {
-    if (isDryRun) {
-      console.log(`[DRY RUN] Would create target directory: ${DOCS_DIR}`);
-    } else {
-      fs.mkdirSync(DOCS_DIR, { recursive: true });
-      console.log(`Created target directory: ${DOCS_DIR}`);
-    }
-  }
-
-  // Get list of web assets from site/
-  const siteFiles = listFilesRecursively(SITE_DIR);
-
-  // Statistics
-  const stats = {
-    totalScanned: siteFiles.length,
-    copiedNew: 0,
-    updated: 0,
-    unchanged: 0,
-    preservedDocs: 0,
-    errors: 0
-  };
-
-  for (const relPath of siteFiles) {
-    const srcPath = path.join(SITE_DIR, relPath);
-    const destPath = path.join(DOCS_DIR, relPath);
-    const destDir = path.dirname(destPath);
-
-    try {
-      const srcHash = getFileHash(srcPath);
-      const destExists = fs.existsSync(destPath);
-      const destHash = destExists ? getFileHash(destPath) : null;
-
-      if (!destExists) {
-        stats.copiedNew++;
-        console.log(`  [NEW]      ${relPath}`);
-        if (!isDryRun) {
-          if (!fs.existsSync(destDir)) {
-            fs.mkdirSync(destDir, { recursive: true });
-          }
-          fs.copyFileSync(srcPath, destPath);
-        }
-      } else if (srcHash !== destHash) {
-        stats.updated++;
-        console.log(`  [UPDATE]   ${relPath}`);
-        if (!isDryRun) {
-          fs.copyFileSync(srcPath, destPath);
-        }
-      } else {
-        stats.unchanged++;
-        if (isVerbose) {
-          console.log(`  [UNCHANGED] ${relPath}`);
-        }
-      }
-    } catch (err) {
-      stats.errors++;
-      console.error(`  [ERROR]    ${relPath}: ${err.message}`);
-    }
-  }
-
-  // Audit preserved markdown files in docs/
-  if (fs.existsSync(DOCS_DIR)) {
-    const docsEntries = fs.readdirSync(DOCS_DIR, { withFileTypes: true });
-    const markdownDocs = docsEntries
-      .filter(e => e.isFile() && e.name.endsWith('.md'))
-      .map(e => e.name);
-    
-    stats.preservedDocs = markdownDocs.length;
-    if (isVerbose && markdownDocs.length > 0) {
-      console.log(`\nPreserved Markdown Documentation Files in docs/:`);
-      for (const mdFile of markdownDocs) {
-        console.log(`  [PRESERVED] ${mdFile}`);
-      }
-    }
-  }
-
-  console.log(`\n--------------------------------------------------`);
-  console.log(` Sync Summary (${isDryRun ? 'DRY RUN' : 'COMPLETED'})`);
-  console.log(`--------------------------------------------------`);
-  console.log(` Total site assets scanned: ${stats.totalScanned}`);
-  console.log(` New files to copy:         ${stats.copiedNew}`);
-  console.log(` Updated files:             ${stats.updated}`);
-  console.log(` Unchanged files skipped:   ${stats.unchanged}`);
-  console.log(` Preserved docs files:      ${stats.preservedDocs}`);
-  console.log(` Errors:                    ${stats.errors}`);
-  console.log(`==================================================\n`);
-  
-  if (stats.errors > 0) {
-    process.exit(1);
-  }
-}
-
-sync();
+#### Observations:
+- **`src/shared/ConfigurationFiles/ClientGuiBootstrap.lua`**:
+```lua
+14: 	local screenGui = Instance.new("ScreenGui")
+15: 	screenGui.Name = name
+16: 	screenGui.ResetOnSpawn = false
+17: 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+```
+- **`src/client/Controllers/PeaWheelController.lua`**:
+```lua
+64: 	wheelGui = ClientGuiBootstrap.createScreenGui(player, "PeaWheelGui", 80)
+65: 	wheelGui.ResetOnSpawn = false
 ```
 
----
-
-## 5. Verification & Testing Procedures
-
-To verify the dual sync runner once implemented:
-
-1. **Dry-Run Mode Test**:
-   ```powershell
-   node site/sync_site.js --dry-run
-   ```
-   *Expected result*: Displays file scan status and summary without writing or modifying files in `docs/`.
-
-2. **Live Sync Execution Test**:
-   ```powershell
-   node site/sync_site.js
-   ```
-   *Expected result*: Synchronizes modified/new assets to `docs/`. Unchanged files show skipped.
-
-3. **Verbose Inspection Test**:
-   ```powershell
-   node site/sync_site.js --verbose
-   ```
-   *Expected result*: Lists all `[UNCHANGED]` assets and all `[PRESERVED]` markdown files (`AGENT_HANDOFF.md`, etc.).
-
-4. **Documentation Preservation Audit**:
-   Verify that all 14+ `.md` files in `docs/` retain their exact content, size, and modifications after running `sync_site.js`.
+#### Technical Reasoning & Safety:
+- When a Roblox player resets or respawns, `ScreenGui` instances with `ResetOnSpawn = true` (Roblox's default) are automatically destroyed by the Roblox engine and recreated from `StarterGui`.
+- Because `PeaWheelController` builds its GUI dynamically via `ClientGuiBootstrap` (decoupled from `StarterGui`), destroying `PeaWheelGui` on respawn would leave stale, dangling Lua references (`wheelGui`, `wheelFrame`, `backdropFrame`) pointing to destroyed instances.
+- Double-setting `ResetOnSpawn = false` in `ClientGuiBootstrap` and `PeaWheelController.lua` guarantees that `PeaWheelGui` remains under `PlayerGui` across player respawns, preserving event connections (`MouseButton1Click`, `InputBegan`, `MouseEnter`) and preventing null reference exceptions post-respawn.
 
 ---
 
-## 6. Conclusion & Recommendations
+### 2. Startup Visibility (`Visible = false`) Verification
 
-- The specification for `site/sync_site.js` satisfies all requirement criteria for R4.
-- Zero npm package dependency ensures high portability and zero installation overhead.
-- SHA-256 hash checking prevents unnecessary disk writes and keeps git working tree clean.
-- Explicit path calculation via `__dirname` makes script execution resilient regardless of current working directory.
-- Implementation can proceed immediately under Worker agent during Milestone 1 phase.
+#### Observations:
+- **`src/client/Controllers/PeaWheelController.lua`**:
+```lua
+68: 	backdropFrame = Instance.new("Frame")
+69: 	backdropFrame.Name = "Backdrop"
+70: 	backdropFrame.Size = UDim2.fromScale(1, 1)
+71: 	backdropFrame.BackgroundColor3 = Color3.fromRGB(10, 8, 16)
+72: 	backdropFrame.BackgroundTransparency = 0.55
+73: 	backdropFrame.Visible = false
+...
+77: 	wheelFrame = Instance.new("Frame")
+78: 	wheelFrame.Name = "WheelFrame"
+79: 	wheelFrame.Size = UDim2.fromOffset(340, 340)
+80: 	wheelFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+81: 	wheelFrame.Position = UDim2.fromScale(0.5, 0.5)
+82: 	wheelFrame.BackgroundTransparency = 1
+83: 	wheelFrame.Visible = false
+...
+132: 	tooltipLabel = Instance.new("TextLabel")
+...
+143: 	tooltipLabel.Visible = false
+...
+331: 	buildWheelGui()
+```
+
+#### Technical Reasoning & Safety:
+- `buildWheelGui()` is invoked immediately when `PeaWheelController` module is required (line 331).
+- Upon invocation, `backdropFrame`, `wheelFrame`, and `tooltipLabel` are initialized with `Visible = false`.
+- Controller state starts at `isOpen = false` (line 28).
+- The quick trigger launcher button (`HubButton`, lines 109-124) remains visible at the bottom-right corner (`Position = UDim2.fromScale(1, 1) - UDim2.fromOffset(24, 24)`), which is the intended HUD quick-access trigger.
+- The 360° radial menu panel (`wheelFrame`) and screen-dimming backdrop (`backdropFrame`) do not display or block inputs until `PeaWheelController.open()` or `.toggle()` is invoked.
+- When `PeaWheelController.close()` is called, `wheelFrame` scales down via `TweenService` and after a 0.16s delay both `wheelFrame.Visible` and `backdropFrame.Visible` are set back to `false` (lines 255-256).
+
+---
+
+### 3. Cleanup & Decoupling Interaction (`000_LegacyOverlayCleanup.client.lua`)
+
+#### Observations:
+- **`src/client/000_LegacyOverlayCleanup.client.lua`**:
+```lua
+131: local function cleanupScreenGui(gui: ScreenGui)
+132: 	if destroyOverlayGui(gui) then
+133: 		return
+134: 	end
+135: 	if destroyLegacyStarterShell(gui) then
+136: 		return
+137: 	end
+138: 	-- Single-pass descendant cleanup to maximize startup performance
+139: 	for _, inst in ipairs(gui:GetDescendants()) do
+140: 		if isStudioGreyFullscreen(inst) then
+141: 			inst:Destroy()
+142: 			logRemoved("grey fullscreen " .. inst:GetFullName())
+143: 		elseif inst:IsA("LocalScript") then
+144: 			inst.Enabled = false
+145: 			inst:Destroy()
+146: 			logRemoved("Embedded LocalScript " .. inst:GetFullName())
+147: 		elseif isLegacyVignetteFrame(inst) then
+148: 			inst:Destroy()
+149: 			logRemoved("Vignette " .. inst:GetFullName())
+150: 		end
+151: 	end
+152: end
+...
+164: playerGui.ChildAdded:Connect(function(child)
+165: 	task.defer(function()
+166: 		if child:IsA("ScreenGui") then
+167: 			cleanupScreenGui(child)
+168: 		end
+169: 	end)
+170: end)
+```
+
+- **`src/shared/ConfigurationFiles/LegacyGuiConfig.lua`**:
+```lua
+8: LegacyGuiConfig.destroyScreenGuis = {
+9: 	"ZundaFX",
+10: 	"PostProcessOverlay",
+11: }
+...
+23: LegacyGuiConfig.destroyLegacyStarterShells = {
+24: 	"ZundaVN",
+25: 	"ZundaPouch",
+26: 	"QuestPanel",
+27: 	"CompanionShop",
+28: 	"ZundaShop",
+29: }
+```
+
+#### Technical Reasoning & Safety:
+- `000_LegacyOverlayCleanup.client.lua` operates on `PlayerGui.ChildAdded`.
+- When `ClientGuiBootstrap.createScreenGui` parents `PeaWheelGui` to `PlayerGui`, `cleanupScreenGui` checks:
+  1. `destroyOverlayGui`: `PeaWheelGui` is not in `destroyScreenGuis` -> Retained.
+  2. `destroyLegacyStarterShell`: `PeaWheelGui` is not in `destroyLegacyStarterShells` -> Retained.
+  3. Single-pass descendant inspection:
+     - `Backdrop`: `BackgroundTransparency = 0.55` (> 0.05 limit in `isStudioGreyFullscreen`), `BackgroundColor3 = RGB(10,8,16)` -> Retained.
+     - `WheelFrame`: `BackgroundTransparency = 1` -> Retained.
+     - UIStrokes, UICorners, TextButtons: Not LocalScripts or Vignettes -> Retained.
+- Result: `PeaWheelGui` cleanly coexists with `000_LegacyOverlayCleanup.client.lua` without race conditions or accidental destruction.
+
+---
+
+## Non-Critical Discoveries & Recommendations
+
+1. **`PeaWheelStarter.client.lua` Print Message Consistency**:
+   - `PeaWheelStarter.client.lua` line 8 contains `print("[PeaWheelStarter] PeaWheelController loaded — wheel ready on Tab/G key")`.
+   - `PeaWheelController.lua` listens to `Tab` and `Q` keys (line 285).
+   - *Recommendation*: Update print statement in `PeaWheelStarter.client.lua` line 8 to reference `Tab/Q key`.
+
+2. **`PeaWheelStarter.client.lua` Comment Accuracy**:
+   - `PeaWheelStarter.client.lua` line 6 comment states `-- The PeaWheelController builds its GUI lazily on first open/toggle.`.
+   - `PeaWheelController.lua` actually calls `buildWheelGui()` at module load (line 331).
+   - *Recommendation*: Update comment in `PeaWheelStarter.client.lua` line 6 for clarity.
+
+3. **Dead Code in `000_LegacyOverlayCleanup.client.lua`**:
+   - Lines 49-129 contain legacy helper functions (`destroyNamedDescendants`, `destroyHeuristicVignettes`, `destroyStudioGreyFullscreen`, `stripEmbeddedScripts`) which are unused because `cleanupScreenGui` (lines 131-152) inline-handles single-pass descendant inspection.
+   - *Recommendation*: Flag for dead-code cleanup during Milestone 3 (Performance Traversal Overhaul).
+
+---
+
+## Conclusion
+
+The architecture of `PeaWheelController.lua`, `ClientGuiBootstrap.lua`, and `000_LegacyOverlayCleanup.client.lua` fully satisfies all client UI decoupling guidelines and startup visibility requirements:
+- `ResetOnSpawn = false` is active on `PeaWheelGui`.
+- Modal frames are hidden on game start (`Visible = false`).
+- Startup cleanup in `000_LegacyOverlayCleanup.client.lua` safely passes `PeaWheelGui`.

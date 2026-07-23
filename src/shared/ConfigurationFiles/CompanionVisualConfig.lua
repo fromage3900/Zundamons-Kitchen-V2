@@ -4,13 +4,13 @@
 
 local CompanionVisualConfig = {}
 
-CompanionVisualConfig.defaultAssetId = "rbxassetid://103182526409237"
+CompanionVisualConfig.defaultAssetId = "rbxassetid://84382956251208"
 CompanionVisualConfig.defaultPrefab = "zundapalupdate4"
 
 CompanionVisualConfig.visuals = {
-	zundapal    = { modelAssetId = "rbxassetid://71161704530283",  basePrefab = "zundapalupdate4" },
+	zundapal    = { modelAssetId = "rbxassetid://84382956251208",  basePrefab = "zundapalupdate4" },
 	dog         = { modelAssetId = "rbxassetid://123070508686616", basePrefab = "dog" },
-	parrot      = { modelAssetId = "rbxassetid://100814736457956", basePrefab = "parrot" },
+	parrot      = { modelAssetId = "rbxassetid://84382956251208",  basePrefab = "parrot" },
 	cat         = { modelAssetId = "rbxassetid://131662379743903", basePrefab = "cat" },
 	zundamon    = { modelAssetId = "rbxassetid://121481310719137", basePrefab = "zundapalupdate4" },
 	zundacat    = { modelAssetId = "rbxassetid://101663144452966", basePrefab = "zundapalupdate4" },

@@ -306,8 +306,9 @@ local function toggle()
 	end
 end
 closeBtn.MouseButton1Click:Connect(function()
-	open = true
-	toggle()
+	UIRouter.close("quests")
+	open = false
+	shell.close()
 	local pos = closeBtn.AbsolutePosition
 	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, Color3.fromRGB(255, 255, 255), 6)
 end)
@@ -322,14 +323,6 @@ task.spawn(function()
 				btn.MouseButton1Click:Connect(toggle)
 			end
 		end
-	end
-end)
-UIS.InputBegan:Connect(function(i, g)
-	if g then
-		return
-	end
-	if i.KeyCode == Enum.KeyCode.J then
-		toggle()
 	end
 end)
 print("[QuestPanel] Ready")

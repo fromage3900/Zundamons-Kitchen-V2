@@ -1,17 +1,14 @@
-## 2026-07-22T04:22:27Z
-<USER_REQUEST>
-You are Explorer 3 for Zundamon's Kitchen V2 - Milestone 1.
-Your working directory is `g:\Zundamons-kItchen-V2\.agents\explorer_m1_3`.
+## 2026-07-23T03:25:46Z
+You are Explorer 3 for Milestone 1 of the UI System Overhaul in Zundamon's Kitchen V2.
+
+Working directory: g:\Zundamons-kItchen-V2\.agents\explorer_m1_3\
 
 Task:
-Analyze the Automated Dual Deployment sync requirement (R4) to synchronize `g:\Zundamons-kItchen-V2\site` with `g:\Zundamons-kItchen-V2\docs`.
-Review `g:\Zundamons-kItchen-V2\.agents\orchestrator\plan.md`, `site/`, and `docs/`.
+Analyze ClientGuiBootstrap, UI decoupling rules, and startup visibility for `PeaWheelController.lua` and top-level ScreenGui instances.
 
-Formulate a detailed specification for `site/sync_site.js` (or node sync runner) that:
-1. Copies web assets (`index.html`, `style.css`, `app.js`, `terminal.js`, `window_manager.js`, `.nojekyll`, `sync_site.js`, `assets/`) recursively from `g:\Zundamons-kItchen-V2\site` to `g:\Zundamons-kItchen-V2\docs`.
-2. Preserves existing markdown documentation files in `docs/` (`AGENT_HANDOFF.md`, `ASSET_MANAGEMENT.md`, `UI_UX_OVERHAUL_PLAN.md`, etc.).
-3. Provides dry-run and sync modes, logging copied/updated files.
-4. Can be executed via `node site/sync_site.js` cleanly without third-party npm packages (using Node native `fs` and `path`).
-
-Write your findings and recommendations to `g:\Zundamons-kItchen-V2\.agents\explorer_m1_3\analysis.md` and send a message back.
-</USER_REQUEST>
+Specifically:
+1. Verify `ResetOnSpawn = false` on top-level ScreenGui containing the Pea Wheel overlay.
+2. Verify startup panel visibility (`Visible = false`) so the Pea Wheel overlay does not overlap or display on game start before explicit open.
+3. Check interactions with `ClientGuiBootstrap` and `000_LegacyOverlayCleanup.client.lua` to ensure clean startup initialization without breaking UI decoupling rules.
+4. Write your analysis report to `g:\Zundamons-kItchen-V2\.agents\explorer_m1_3\analysis.md` and handoff report to `g:\Zundamons-kItchen-V2\.agents\explorer_m1_3\handoff.md`.
+5. Send a message to the orchestrator with the link to your handoff report when done.

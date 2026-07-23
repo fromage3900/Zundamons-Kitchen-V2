@@ -1,56 +1,49 @@
-# BRIEFING — 2026-07-22T17:41:40Z
+# BRIEFING — 2026-07-22T21:36:52Z
 
 ## Mission
-Empirical stress test and verification of all RemoteEvents, RemoteFunctions, and BindableEvents for Milestone 1.
+Empirically test and stress-test configuration and logic changes implemented in Milestone 1 (Companion System & Companion Shop Synchronization).
 
 ## 🔒 My Identity
 - Archetype: EMPIRICAL CHALLENGER
 - Roles: critic, specialist
 - Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1
-- Original parent: 0c8ea642-0389-4403-bc3c-eafb5b552e57
-- Milestone: Milestone 1
+- Original parent: c873e613-5eb4-4470-8789-0eba61b841bc
+- Milestone: Milestone 1 Gate Verification
 - Instance: 1 of 1
 
 ## 🔒 Key Constraints
-- Review-only — do NOT modify implementation code (if bugs are found, report as findings)
-- Run empirical verification and tests
-- Check all 4 target areas specified in request
-- Execute preflight_audit, rojo build, and selene src
+- Must write and execute empirical test/verification code yourself.
+- Do NOT trust unverified claims.
+- Write challenge report to `challenge.md` and `handoff.md`.
+- Send summary via `send_message` to parent (`c873e613-5eb4-4470-8789-0eba61b841bc`).
 
 ## Current Parent
-- Conversation ID: 0c8ea642-0389-4403-bc3c-eafb5b552e57
-- Updated: 2026-07-22T17:41:40Z
+- Conversation ID: c873e613-5eb4-4470-8789-0eba61b841bc
+- Updated: 2026-07-22T21:36:52Z
 
 ## Review Scope
-- **Files reviewed**:
-  - `VNController.client.lua` (`ShowVNDialogue` remote setup & client listener)
-  - `ServerMain.server.lua` & `LootModule.lua` (`GiveLoot` / `sellLoot` boot binding)
-  - `ServingService.lua` & `EndlessLoopWiring.server.lua` (`GuestServed` / `GuestTimedOut` BindableEvents)
-  - `OutfitWardrobeGui.client.lua` (`ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock`)
-- **Verdict**: DEFECT_FOUND
+- **Files to review**: `CompanionConfig.lua`, `MarketplaceConfig.lua`, `CompanionManager.server.lua`, `CompanionHUD.client.lua`, `CompanionShopServer.server.lua`
+- **Review criteria**: Table entries for 8 companions, preflight audit script, edge cases (invalid keys, missing player data), ID alignment across MarketplaceConfig tables.
 
 ## Key Decisions Made
-- Executed `preflight_audit.py` (PASSED).
-- Executed `rojo build` (PASSED).
-- Executed `selene src` (PASSED: 0 static errors, 332 warnings).
-- Executed empirical remote verification script `scripts/verify_m1_remotes.py`.
-- Identified 5 major defects across all 4 milestone targets.
-
-## Attack Surface
-- **Hypotheses tested**:
-  - `ShowVNDialogue` remote registration on server boot -> UNHANDLED / LATE CREATION DEFECT.
-  - `GiveLoot` / `sellLoot` RemoteFunction creation on server boot -> CRITICAL BOOT BLOCKING DEFECT.
-  - `GuestServed` BindableEvent signature & payload mapping -> PARAMETER MISMATCH & INVALID PROPERTY DEFECT.
-  - `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock` RemoteEvent firing -> UNFIRED / DEAD REMOTES DEFECT.
-- **Vulnerabilities found**: 5 critical architectural/runtime flaws in remote and event infrastructure.
-- **Untested angles**: Network lag latency simulation (moot given fundamental code wiring defects).
-
-## Loaded Skills
-- None specified in dispatch.
+- Wrote and executed empirical test harness `verify_m1.py`.
+- Determined status: **REJECTED** due to critical fallback key bug (`zundamon` vs `zundapal`) in `CompanionManager.server.lua` and `CompanionHUD.client.lua`.
 
 ## Artifact Index
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\ORIGINAL_REQUEST.md — Original request instructions
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\BRIEFING.md — Persistent memory briefing
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\progress.md — Liveness heartbeat log
-- g:\Zundamons-kItchen-V2\scripts\verify_m1_remotes.py — Empirical remote scanner script
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\handoff.md — Handoff report with DEFECT_FOUND verdict
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\ORIGINAL_REQUEST.md — Original request copy
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\verify_m1.py — Empirical test verification script
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\challenge.md — Detailed stress-test challenge report
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\handoff.md — 5-Component Handoff Report
+
+## Attack Surface
+- **Hypotheses tested**: 
+  1. `CompanionConfig.lua` schema completeness for 8 companions + `zundapal` (PASS).
+  2. Preflight audit execution (PASS).
+  3. Invalid key fallback handling in companion scripts (FAIL - `COMPANIONS.zundamon` is nil).
+  4. Missing/nil player data handling in `GetOwnedCompanions` (PASS with minor note).
+  5. Marketplace ID 1-to-1 alignment (PASS).
+- **Vulnerabilities found**: Critical fallback mismatch in `CompanionManager.server.lua:173` and `CompanionHUD.client.lua:63` (`zundamon` instead of `zundapal`).
+- **Untested angles**: Live Roblox server purchase prompt flow (offline test mode).
+
+## Loaded Skills
+- None loaded currently

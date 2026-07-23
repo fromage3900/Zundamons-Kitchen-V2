@@ -34,12 +34,12 @@ SkyConfig.sky = {
     sun_angular_size   = 24,
     moon_angular_size  = 16,
     star_count         = 5500,
-    skybox_bk = "rbxassetid://80738444881201",
-    skybox_dn = "rbxassetid://110993843013989",
-    skybox_ft = "rbxassetid://80738444881201",
-    skybox_lf = "rbxassetid://122925638895073",
-    skybox_rt = "rbxassetid://78822905803072",
-    skybox_up = "rbxassetid://80738444881201",
+    skybox_bk = "rbxassetid://129075140128878", -- PurpleNebula_01
+    skybox_dn = "rbxassetid://119372168213953", -- BlueNebula_01
+    skybox_ft = "rbxassetid://129075140128878", -- PurpleNebula_01
+    skybox_lf = "rbxassetid://129075140128878", -- PurpleNebula_01
+    skybox_rt = "rbxassetid://129075140128878", -- PurpleNebula_01
+    skybox_up = "rbxassetid://133511173179472", -- Starfield_05
     sun_texture  = "rbxassetid://123736711329002",
     moon_texture = "rbxassetid://85079237605725",
 }
@@ -48,8 +48,8 @@ SkyConfig.sky = {
 -- ATMOSPHERE BASE
 -- ============================================================
 SkyConfig.atmosphere = {
-    decay   = Color3.fromRGB(95, 70, 155),
-    glare   = 0.15,
+    decay   = Color3.fromRGB(55, 120, 210),
+    glare   = 0.28,
     haze    = 4.0,
 }
 
@@ -189,17 +189,17 @@ SkyConfig.weather_types = {
     clear = {
         display_name="Clear Skies", emoji="☀️",
         particle_enabled=false,
-        atmosphere_haze=1.8, atmosphere_density_mult=1.0, fog_mult=1.0,
+        atmosphere_haze=1.6, atmosphere_density_mult=0.90, fog_mult=1.0,
         wind=Vector3.new(0,0,0),
-        color_correction={brightness=0.04, contrast=0.02, saturation=0.30, tint=Color3.fromRGB(238,230,250)},
+        color_correction={brightness=0.03, contrast=0.02, saturation=0.16, tint=Color3.fromRGB(232,225,245)},
     },
     cloudy = {
         display_name="Cloudy", emoji="☁️",
         particle_enabled=false,
-        atmosphere_haze=3.0, atmosphere_density_mult=1.5, fog_mult=0.75,
+        atmosphere_haze=2.6, atmosphere_density_mult=1.3, fog_mult=0.80,
         wind=Vector3.new(0.3,0,0.15),
-        fog_tint=Color3.fromRGB(195, 198, 230),
-        color_correction={brightness=0.02, contrast=0.04, saturation=0.26, tint=Color3.fromRGB(228,226,248)},
+        fog_tint=Color3.fromRGB(190, 195, 225),
+        color_correction={brightness=0.01, contrast=0.03, saturation=0.15, tint=Color3.fromRGB(222,220,242)},
     },
     cherry_blossom = {
         display_name="Sakura Petals", emoji="🌸",
@@ -208,10 +208,10 @@ SkyConfig.weather_types = {
         particle_color=Color3.fromRGB(255,182,200),
         particle_color2=Color3.fromRGB(255,220,230),
         particle_size=1.2, particle_rate=35, particle_lifetime=5, particle_speed=8,
-        atmosphere_haze=2.0, atmosphere_density_mult=1.0, fog_mult=1.0,
+        atmosphere_haze=1.8, atmosphere_density_mult=0.90, fog_mult=1.0,
         wind=Vector3.new(2,0,0.5),
-        fog_tint=Color3.fromRGB(255, 200, 218),
-        color_correction={brightness=0.06, contrast=0.01, saturation=0.32, tint=Color3.fromRGB(245,228,240)},
+        fog_tint=Color3.fromRGB(250, 198, 215),
+        color_correction={brightness=0.04, contrast=0.01, saturation=0.18, tint=Color3.fromRGB(240,224,238)},
     },
     rain = {
         display_name="Rain", emoji="🌧️",
@@ -220,10 +220,10 @@ SkyConfig.weather_types = {
         particle_color=Color3.fromRGB(175,195,235),
         particle_color2=Color3.fromRGB(135,165,225),
         particle_size=0.5, particle_rate=220, particle_lifetime=1.4, particle_speed=80,
-        atmosphere_haze=2.8, atmosphere_density_mult=1.8, fog_mult=0.55,
+        atmosphere_haze=2.4, atmosphere_density_mult=1.6, fog_mult=0.60,
         wind=Vector3.new(3,0,1),
-        fog_tint=Color3.fromRGB(155, 168, 210),
-        color_correction={brightness=0.00, contrast=0.06, saturation=0.22, tint=Color3.fromRGB(215,218,242)},
+        fog_tint=Color3.fromRGB(152, 165, 205),
+        color_correction={brightness=-0.01, contrast=0.04, saturation=0.14, tint=Color3.fromRGB(210,214,238)},
     },
     snow = {
         display_name="Snow", emoji="❄️",
@@ -232,19 +232,18 @@ SkyConfig.weather_types = {
         particle_color=Color3.fromRGB(245,245,255),
         particle_color2=Color3.fromRGB(215,225,245),
         particle_size=0.8, particle_rate=80, particle_lifetime=6, particle_speed=12,
-        atmosphere_haze=2.4, atmosphere_density_mult=1.4, fog_mult=0.60,
+        atmosphere_haze=2.0, atmosphere_density_mult=1.2, fog_mult=0.65,
         wind=Vector3.new(1.5,0,0.8),
-        fog_tint=Color3.fromRGB(195, 205, 238),
-        color_correction={brightness=0.08, contrast=0.03, saturation=0.28, tint=Color3.fromRGB(235,238,250)},
+        fog_tint=Color3.fromRGB(190, 202, 234),
+        color_correction={brightness=0.06, contrast=0.02, saturation=0.16, tint=Color3.fromRGB(230,234,246)},
     },
     aurora = {
         display_name="Aurora", emoji="🌌",
         particle_enabled=false,
-        atmosphere_haze=1.6, atmosphere_density_mult=0.80, fog_mult=1.0,
+        atmosphere_haze=1.4, atmosphere_density_mult=0.75, fog_mult=1.0,
         wind=Vector3.new(0.2,0,0.1),
-        aurora_glow=true,
-        fog_tint=Color3.fromRGB(125, 145, 200),
-        color_correction={brightness=0.03, contrast=0.05, saturation=0.25, tint=Color3.fromRGB(215,210,250)},
+        fog_tint=Color3.fromRGB(120, 140, 195),
+        color_correction={brightness=0.02, contrast=0.04, saturation=0.15, tint=Color3.fromRGB(210,206,245)},
     },
     storm = {
         display_name="Thunderstorm", emoji="⛈️",
@@ -253,10 +252,10 @@ SkyConfig.weather_types = {
         particle_color=Color3.fromRGB(135,155,205),
         particle_color2=Color3.fromRGB(95,125,185),
         particle_size=0.55, particle_rate=320, particle_lifetime=1.2, particle_speed=110,
-        atmosphere_haze=3.2, atmosphere_density_mult=2.0, fog_mult=0.40,
+        atmosphere_haze=2.8, atmosphere_density_mult=1.8, fog_mult=0.45,
         wind=Vector3.new(5,0,2),
-        fog_tint=Color3.fromRGB(85, 95, 140),
-        color_correction={brightness=-0.02, contrast=0.10, saturation=0.18, tint=Color3.fromRGB(182,188,222)},
+        fog_tint=Color3.fromRGB(82, 92, 135),
+        color_correction={brightness=-0.03, contrast=0.08, saturation=0.13, tint=Color3.fromRGB(178,184,218)},
     },
     fog = {
         display_name="Mist", emoji="🌫️",
@@ -265,10 +264,10 @@ SkyConfig.weather_types = {
         particle_color=Color3.fromRGB(215,218,235),
         particle_color2=Color3.fromRGB(195,200,225),
         particle_size=8, particle_rate=15, particle_lifetime=12, particle_speed=2,
-        atmosphere_haze=4.0, atmosphere_density_mult=2.8, fog_mult=0.35,
+        atmosphere_haze=3.6, atmosphere_density_mult=2.5, fog_mult=0.40,
         wind=Vector3.new(0.5,0,0.2),
-        fog_tint=Color3.fromRGB(172, 180, 215),
-        color_correction={brightness=0.01, contrast=0.02, saturation=0.18, tint=Color3.fromRGB(226,224,242)},
+        fog_tint=Color3.fromRGB(168, 176, 210),
+        color_correction={brightness=0.00, contrast=0.02, saturation=0.14, tint=Color3.fromRGB(220,218,238)},
     },
 }
 

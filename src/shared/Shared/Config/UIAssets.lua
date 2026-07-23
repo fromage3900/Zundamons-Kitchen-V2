@@ -19,27 +19,31 @@ local UIAssets = {
 	},
 
 	sounds = {
-		harvest_start = "rbxassetid://14133663945",
-		harvest_complete = "rbxassetid://9114369623",
-		craft_start = "rbxassetid://9114369767",
+		-- Harvesting
+		harvest_start = "rbxassetid://9113837269",
+		harvest_complete = "rbxassetid://4612374495",
+		craft_start = "rbxassetid://9114542867",
 		craft_perfect = "rbxassetid://125367748123159",
 		serve_success = "rbxassetid://81614326929268",
 		level_up = "rbxassetid://9038472644",
 		gather_fail = "rbxassetid://14133663945",
 		ui_click = "rbxassetid://87437544236708",
-		-- ASMR-Kawaii weather ambience v2 (placeholder IDs, volume tuned low on client)
-		rain = "rbxassetid://9114369623",
-		storm = "rbxassetid://9114369623",
-		snow = "rbxassetid://9114369767",
-		cherry_blossom = "rbxassetid://9114369767",
-		aurora = "rbxassetid://9114369767",
-		fog = "rbxassetid://9114369767",
-		-- Kawaii interactions (soft bubbly UI clicks)
+		-- Weather ambience (ProSoundEffects + free assets)
+		rain = "rbxassetid://9112852739",
+		storm = "rbxassetid://9112794090",
+		snow = "rbxassetid://9112855667",
+		wind = "rbxassetid://5799870105",
+		cherry_blossom = "rbxassetid://9038469951",
+		aurora = "rbxassetid://9125602882",
+		fog = "rbxassetid://5799870105",
+		-- Kawaii interactions
 		ui_hover = "rbxassetid://87437544236708",
 		ui_confirm = "rbxassetid://87437544236708",
 		ui_cancel = "rbxassetid://14133663945",
 		craft_note_hit = "rbxassetid://125367748123159",
-		companion_pet = "rbxassetid://9114369623",
+		companion_pet = "rbxassetid://4612374495",
+		-- Thunder
+		thunder = "rbxassetid://4961088919",
 	},
 
 	particles = {

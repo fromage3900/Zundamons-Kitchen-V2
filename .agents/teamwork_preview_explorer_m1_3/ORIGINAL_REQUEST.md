@@ -1,12 +1,15 @@
-## 2026-07-22T17:20:37Z
+## 2026-07-22T21:33:45Z
+You are Explorer 3 for Milestone 1 of Zundamon's Kitchen V2 - Companion System & Companion Shop Synchronization.
 
-You are Explorer 3 for Milestone 1 of Zundamon's Kitchen V2.
-Your working directory is: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3
+Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3
 
-TASK: Rojo Config & Preflight Audit
-1. Audit `default.project.json` in g:\Zundamons-kItchen-V2: verify `"$ignoreUnknownInstances": true` is included under `"Workspace"`.
-2. Inspect `wally.toml` and `default.project.json` mappings for `"Packages"` in `ReplicatedStorage` and `"ServerPackages"` in `ServerScriptService`.
-3. Run `python scripts/preflight_audit.py` using `run_command` (Cwd: g:\Zundamons-kItchen-V2) to analyze the current preflight status and catch any Luau static errors or rule violations.
-4. Document all preflight check failures, warnings, and missing configurations.
-5. Write your complete analysis and findings to `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\handoff.md`.
-6. Send a message to caller with the summary and path to your handoff report.
+Objective:
+Audit default unlocked companions in player data & initial state across server/client scripts.
+
+Tasks:
+1. Examine `src/shared/ConfigurationFiles/CompanionConfig.lua` for default unlocked companion list (`ankomon`, `parrot`, `dog`, `cat`).
+2. Search server player data initialization (e.g. `PlayerDataService.lua` or `CompanionShopServer.server.lua`) to see how initial owned companions are granted to new or existing players.
+3. Ensure that all 4 free companions (`parrot`, `dog`, `cat`, `ankomon`) are automatically owned/unlocked by all players on join.
+4. Verify that premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`) require purchase (1,000 Robux each) and are NOT unlocked by default.
+
+Write your analysis report into `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\analysis.md` and send a summary back via send_message.

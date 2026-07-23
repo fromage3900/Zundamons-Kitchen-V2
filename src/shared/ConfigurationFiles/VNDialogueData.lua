@@ -1,343 +1,322 @@
+--!strict
 -- [[ModuleScript] VNDialogueData]]
--- Registry for speakers and companion-specific branching dialogue
--- 5 companions with unique personalities + level-based branches
+-- Comprehensive registry for speakers and companion-specific branching dialogue.
+-- Features time-of-day, chef level, and bond-level branching dialogue trees for all 9 companions.
 
 local Players = game:GetService("Players")
-
 local RGB = Color3.fromRGB
 
 -- Speaker configurations with companion emojis
-local SPEAKERS = {}
-SPEAKERS.zundamon = { name = "Zundamon", emoji = "🫛", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }
-SPEAKERS.zundapal = { name = "Zundapal", emoji = "🍡", accent = RGB(200, 230, 180), portrait = RGB(210, 235, 195) }
-SPEAKERS.zundacat = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) }
-SPEAKERS.zundabunny = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) }
-SPEAKERS.tantanmon = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) }
-SPEAKERS.narrator = { name = "", emoji = "✨", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) }
-SPEAKERS.elder = { name = "Village Elder", emoji = "🏮", accent = RGB(220, 180, 130), portrait = RGB(230, 200, 160) }
-SPEAKERS.ruins = { name = "Ancient Voice", emoji = "👁", accent = RGB(190, 170, 210), portrait = RGB(210, 195, 220) }
-SPEAKERS.chef = { name = "Head Chef", emoji = "🍳", accent = RGB(230, 185, 130), portrait = RGB(240, 210, 170) }
-SPEAKERS.system = { name = "", emoji = "⭐", accent = RGB(210, 195, 235), portrait = RGB(225, 215, 240) }
-SPEAKERS.ankomon = { name = "Ankomon", emoji = "🫘", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) }
-SPEAKERS.cardamon = { name = "Cardamon", emoji = "🍋", accent = RGB(235, 205, 125), portrait = RGB(248, 230, 175) }
-SPEAKERS.antimon = { name = "Antimon", emoji = "🌿", accent = RGB(145, 215, 195), portrait = RGB(195, 235, 220) }
-SPEAKERS.sakuradamon =
-	{ name = "Sakuradamon", emoji = "🌸", accent = RGB(255, 180, 200), portrait = RGB(255, 220, 230) }
+local SPEAKERS = {
+	zundamon    = { name = "Zundamon", emoji = "🫛", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) },
+	zundapal    = { name = "Zundapal", emoji = "🍡", accent = RGB(200, 230, 180), portrait = RGB(210, 235, 195) },
+	zundacat    = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) },
+	zundabunny  = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) },
+	tantanmon   = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) },
+	ankomon     = { name = "Ankomon", emoji = "🫘", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) },
+	cardamon    = { name = "Cardamon", emoji = "🍋", accent = RGB(235, 205, 125), portrait = RGB(248, 230, 175) },
+	antimon     = { name = "Antimon", emoji = "🌿", accent = RGB(145, 215, 195), portrait = RGB(195, 235, 220) },
+	sakuradamon = { name = "Sakuradamon", emoji = "🌸", accent = RGB(255, 180, 200), portrait = RGB(255, 220, 230) },
+	dog         = { name = "Dog Companion", emoji = "🐕", accent = RGB(230, 180, 130), portrait = RGB(245, 200, 160) },
+	parrot      = { name = "Parrot Companion", emoji = "🦜", accent = RGB(255, 180, 100), portrait = RGB(255, 210, 150) },
+	cat         = { name = "Cat Companion", emoji = "🐱", accent = RGB(255, 190, 210), portrait = RGB(255, 220, 235) },
+	narrator    = { name = "", emoji = "✨", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) },
+	elder       = { name = "Village Elder", emoji = "🏮", accent = RGB(220, 180, 130), portrait = RGB(230, 200, 160) },
+	ruins       = { name = "Ancient Voice", emoji = "👁", accent = RGB(190, 170, 210), portrait = RGB(210, 195, 220) },
+	chef        = { name = "Head Chef", emoji = "🍳", accent = RGB(230, 185, 130), portrait = RGB(240, 210, 170) },
+	system      = { name = "", emoji = "⭐", accent = RGB(210, 195, 235), portrait = RGB(225, 215, 240) },
+}
 
--- Companion-specific branching dialogue (time + level based)
-local COMPANION_DIALOGUE = {}
-COMPANION_DIALOGUE.zundamon = {
-	morning = { "Morning, {player}! The garden is sparkling.", "Let us make one dish we are proud of today." },
-	afternoon = { "You are finding your rhythm, {player}!", "I will stay close while you gather and cook." },
-	evening = { "The kitchen feels warm after a day of good work.", "What was your favorite little moment today?" },
-	night = { "Quiet kitchens keep the sweetest memories.", "Rest when you are ready; tomorrow can wait." },
-}
-COMPANION_DIALOGUE.zundacat = {
-	morning = { "Mrrp! I found the sunniest gathering path.", "Race you to the next shiny ingredient!" },
-	afternoon = { "I inspected every basket. Very professional.", "There may be something curious near the garden wall." },
-	evening = { "Serving guests is better with a cat supervisor.", "You cook; I will accept the compliments." },
-	night = { "The village is full of tiny night sounds.", "I will keep watch from the comfiest spot." },
-}
-COMPANION_DIALOGUE.zundabunny = {
-	morning = { "Hop, hop—good morning!", "Let us gather something colorful today." },
-	afternoon = { "You make hard work look gentle.", "A tiny break can be part of the adventure too." },
-	evening = { "The sunset makes the whole village blush.", "Can we visit a pretty place before supper?" },
-	night = { "The moon looks like a flour-dusted mochi.", "I saved you the softest patch of starlight." },
-}
-COMPANION_DIALOGUE.tantanmon = {
-	morning = { "Up and sizzling, chef!", "Let us turn breakfast into a tiny festival." },
-	afternoon = { "That cooking streak has some spice!", "One more guest—let us make it spectacular." },
-	evening = { "A warm kitchen is the heart of the village.", "You brought the spark today, {player}." },
-	night = { "Even little flames need time to glow low.", "I will save the fireworks for tomorrow." },
-}
-COMPANION_DIALOGUE.zundapal = {
-	morning = {
-		"Good morning, {player}~ ☀️",
-		"Ready to cook up something wonderful today?",
-		"I can already smell the kitchen from here! 🍳",
+-- Companion-specific branching dialogue (time + level + bond based)
+local COMPANION_DIALOGUE = {
+	zundamon = {
+		morning = {
+			"Morning, {player}! The garden is sparkling with morning dew! 🌄🫛",
+			"Let us make one dish we are proud of today, chef!",
+			"I can smell fresh Zunda Peas blooming across the village~ ✨",
+		},
+		afternoon = {
+			"You are finding your rhythm, {player}! 🔥🍡",
+			"I will stay close while you gather and craft marvelous dishes!",
+			"Did you see Nikki the Drifter at the Hilltop Shrine today?",
+		},
+		evening = {
+			"The kitchen feels warm after a long day of good work. 🌅",
+			"What was your favorite little moment today, {player}?",
+			"The sunset glows green and pink like our Zunda Mochi! 🌸",
+		},
+		night = {
+			"Quiet kitchens keep the sweetest memories. 🌙⭐",
+			"Rest when you are ready; tomorrow brings new recipes!",
+			"I will guard the recipe book while you sleep~ 📖",
+		},
+		level1_10 = { "Welcome to Zunda Village! I will guide your spatula! 🌱" },
+		level11_20 = { "Your rhythm cooking accuracy is getting sharper! ✨" },
+		level21_50 = { "A true Master Chef! The whole village talks about your food! 👑" },
 	},
-	afternoon = {
-		"Hey, {player}! You're doing great~ ✨",
-		"Have you tried any of the new recipes yet?",
-		"The guests look hungry... let's get cooking! 🍡",
+
+	zundapal = {
+		morning = {
+			"Good morning, {player}~ ☀️",
+			"Ready to cook up something wonderful today?",
+			"I can already smell the kitchen from here! 🍳",
+		},
+		afternoon = {
+			"Hey, {player}! You're doing great~ ✨",
+			"Have you tried any of the new recipes yet?",
+			"The guests look hungry... let's get cooking! 🍡",
+		},
+		evening = {
+			"The sunset is so pretty from here... 🌅",
+			"You worked so hard today, {player}.",
+			"I'll be right here beside you, always~ 💫",
+		},
+		night = {
+			"Psst — {player}... still awake? 🌙",
+			"The stars are beautiful tonight...",
+			"Even chefs deserve a rest. I'll keep watch~ ⭐",
+		},
+		level1_10 = { "Starting your journey? I believe in you! 🌱", "Let's gather some basic ingredients first." },
+		level11_20 = { "You're getting the hang of this! ✨", "Try making Zunda Mochi - it's my favorite!" },
+		level21_50 = { "Amazing progress, chef! 🌟", "You've mastered so many recipes already." },
 	},
-	evening = {
-		"The sunset is so pretty from here... 🌅",
-		"You worked so hard today, {player}.",
-		"I'll be right here beside you, always~ 💫",
+
+	zundacat = {
+		morning = {
+			"Mrrp! I found the sunniest gathering path! 🐱☀️",
+			"Race you to the next shiny ingredient node!",
+			"Morning purrs mean good luck on cooking minigames~",
+		},
+		afternoon = {
+			"I inspected every harvest basket. Very professional. 🧺",
+			"There may be a sparkling Zunda Berry near the garden wall!",
+			"Napping in the sun while you cook is my job~",
+		},
+		evening = {
+			"Serving guests is better with a cat supervisor! 🍽️",
+			"You cook; I will accept the compliments and headpats.",
+			"The village lanterns look like tiny fireflies!",
+		},
+		night = {
+			"The village is full of tiny night sounds... 🌙",
+			"I will keep watch from the comfiest stool in the kitchen.",
+			"Purrrr... sleep well, chef~ 💤",
+		},
+		level1_10 = { "A new chef! I will allow you to feed me Zunda Mochi. 🐾" },
+		level11_20 = { "Your cooking speed is feline fast! ✨" },
+		level21_50 = { "You are officially my favorite chef in all the realms! 👑" },
 	},
-	night = {
-		"Psst — {player}... still awake? 🌙",
-		"The stars are beautiful tonight...",
-		"Even chefs deserve a rest. I'll keep watch~ ⭐",
+
+	zundabunny = {
+		morning = {
+			"Hop, hop—good morning, {player}! 🐰☀️",
+			"Let us gather something colorful in the meadow today!",
+			"My ears twitch when rare ingredients drop nearby~ 🌾",
+		},
+		afternoon = {
+			"You make hard work look gentle and dreamy~ 🌸",
+			"A tiny tea break can be part of the adventure too!",
+			"The breeze smells like sweet pea blossoms!",
+		},
+		evening = {
+			"The sunset makes the whole village blush pink! 💖",
+			"Can we visit the Hilltop Shrine before supper?",
+			"Your cooking makes everyone smile so bright~ 💫",
+		},
+		night = {
+			"The moon looks like a flour-dusted mochi cake! 🌙",
+			"I saved you the softest patch of starlight.",
+			"Sweet dreams, little chef~ ⭐",
+		},
+		level1_10 = { "Hoppy to meet you! Let's explore together! 🐰" },
+		level11_20 = { "Your rhythm cooking feels like a happy dance! ✨" },
+		level21_50 = { "You're the brightest star in Zunda Village! 🌟" },
 	},
-	level1_10 = { "Starting your journey? I believe in you! 🌱", "Let's gather some basic ingredients first." },
-	level11_20 = { "You're getting the hang of this! ✨", "Try making Zunda Mochi - it's my favorite!" },
-	level21_50 = { "Amazing progress, chef! 🌟", "You've mastered so many recipes already." },
-}
-COMPANION_DIALOGUE.ankomon = {
-	morning = {
-		"Training begins at dawn, {player}.",
-		"Every great chef needs discipline. ⚖️",
-		"Shall we practice precision cooking? 🔥",
+
+	tantanmon = {
+		morning = {
+			"Up and sizzling, chef {player}! 🌶️🔥",
+			"Let us turn breakfast into a spicy little festival!",
+			"Morning heat fuels maximum cooking streak speeds!",
+		},
+		afternoon = {
+			"That cooking streak has some serious spice! 💥",
+			"One more guest—let us make it spectacular!",
+			"Speed + Precision = Unlimited Gold! 💰",
+		},
+		evening = {
+			"A warm kitchen is the heart of the village! 🏮",
+			"You brought the spark today, {player}!",
+			"Sizzling pans make the best evening music!",
+		},
+		night = {
+			"Even little flames need time to glow low. 🌙",
+			"I will save the fireworks for tomorrow's rush!",
+			"Rest up, firebrand chef! 🔥",
+		},
+		level1_10 = { "Bring the heat! Time to start cooking! 🌶️" },
+		level11_20 = { "Your movement speed buff is blazing fast! ⚡" },
+		level21_50 = { "Unstoppable spicy cooking power! 🔥👑" },
 	},
-	afternoon = { "Your XP gain increases with focused effort.", "Try perfect timing for maximum efficiency!" },
-	level1_10 = { "Don't rush technique. Master the basics first." },
-	level11_20 = { "Excellent form! Your XP multiplier is active." },
-	level21_50 = { "True mastery! Double XP for you now." },
-}
-COMPANION_DIALOGUE.cardamon = {
-	morning = { "Breathe in the fresh aromas, {player}~", "Patience reveals the best flavors. 🧘" },
-	night = { "The herbs whisper secrets in the moonlight...", "Rest well, young chef. Tomorrow brings new recipes." },
-	level1_10 = { "Slower timing gives better results for beginners." },
-	level11_20 = { "Your timing window is wider now - use it wisely!" },
-	level21_50 = { "Perfect zen state achieved - flawless cooking ahead." },
-}
-COMPANION_DIALOGUE.antimon = {
-	morning = { "Time is ingredients, {player}! ⚡", "Let's cook at lightning speed!" },
-	afternoon = { "Faster craft time means more dishes! 🚀", "I can feel the energy accelerating!" },
-	level1_10 = { "Haste makes waste... but I'll help you go fast!" },
-	level11_20 = { "Your crafting speed buff is ready!" },
-	level21_50 = { "No time wasted - pure efficiency!" },
-}
-COMPANION_DIALOGUE.sakuradamon = {
-	morning = { "The sakura blossoms bloom with the seasons~ 🌸", "Seek rare ingredients for special recipes!" },
-	night = { "The moon blesses secret ingredients tonight...", "If you listen closely, you'll find their locations." },
-	level1_10 = { "Rare drops appear with luck - I sense some nearby!" },
-	level11_20 = { "Your rare drop chance has increased!" },
-	level21_50 = { "Legendary ingredients reveal themselves to you..." },
+
+	ankomon = {
+		morning = {
+			"Training begins at dawn, {player}. 🫘",
+			"Every great chef needs discipline and focus. ⚖️",
+			"Shall we practice precision timing today?",
+		},
+		afternoon = {
+			"Your gold bonus from guest orders increases with focus! 💰",
+			"Try perfect timing for maximum tip rewards!",
+			"Sweet red bean paste requires exact recipe steps.",
+		},
+		evening = {
+			"Reflect on today's service. Every mistake is a lesson. 📜",
+			"Your growth as a chef honors Zunda Village.",
+		},
+		night = {
+			"The kitchen rests. Rest your mind as well, {player}. 🌙",
+			"Tomorrow brings greater culinary trials.",
+		},
+		level1_10 = { "Don't rush technique. Master the basics first. 🌱" },
+		level11_20 = { "Excellent form! Your +15% gold bonus is active. 💰" },
+		level21_50 = { "True discipline! A legendary chef walks among us. 👑" },
+	},
+
+	cardamon = {
+		morning = {
+			"Breathe in the fresh botanical aromas, {player}~ 🍋",
+			"Patience reveals the deepest flavors in every dish. 🧘",
+			"The morning sun warms our cooking herbs.",
+		},
+		afternoon = {
+			"Your timing window is +30% wider with my blessing! ✨",
+			"Smooth timing creates flawless S-Rank dishes.",
+		},
+		evening = {
+			"The evening breeze carries hints of citrus and tea. 🍵",
+			"You cooked with grace today, chef.",
+		},
+		night = {
+			"The herbs whisper secrets in the moonlight... 🌙",
+			"Rest well, young chef. Tomorrow brings new discoveries.",
+		},
+		level1_10 = { "Slower timing gives better results for beginners. 🌱" },
+		level11_20 = { "Your timing window is wider now — use it wisely! ✨" },
+		level21_50 = { "Perfect zen state achieved — flawless cooking ahead! 🧘👑" },
+	},
+
+	antimon = {
+		morning = {
+			"Time is ingredients, {player}! 🌿⚡",
+			"Let's gather at lightning speed today!",
+			"My minty breeze spots hidden resource nodes!",
+		},
+		afternoon = {
+			"Faster harvest speed means more fresh produce! 🧺",
+			"I can feel your gathering energy accelerating!",
+			"Did you catch the +20% extra drop bonus?",
+		},
+		evening = {
+			"We filled the inventory pouch to the brim today! 🎒",
+			"Great gathering work, chef {player}!",
+		},
+		night = {
+			"Even speedsters need sleep... 🌙",
+			"I will scout the gathering paths for sunrise!",
+		},
+		level1_10 = { "Haste makes waste... but I'll help you go fast! ⚡" },
+		level11_20 = { "Your extra gather drop buff is active! 🌿" },
+		level21_50 = { "No time wasted — pure efficiency mastery! 👑" },
+	},
+
+	sakuradamon = {
+		morning = {
+			"The sakura blossoms bloom with the morning dew~ 🌸",
+			"Seek rare ingredients for seasonal recipes!",
+			"A gentle pink petals drift across the kitchen court...",
+		},
+		afternoon = {
+			"Your XP bonus is active! Every dish grants extra experience! ✨",
+			"Cooking with love turns meals into magic.",
+		},
+		evening = {
+			"The dusk sky is painted in sakura pink and lavender. 💖",
+			"Thank you for sharing this day with me, {player}.",
+		},
+		night = {
+			"The moon blesses rare flowers in the dark... 🌙",
+			"If you listen closely, the wind tells ancient tales.",
+		},
+		level1_10 = { "Blossoms take time to bloom. Be patient with yourself. 🌸" },
+		level11_20 = { "Your +25% XP bonus fuels your culinary growth! ✨" },
+		level21_50 = { "A legendary blossom chef! Pure perfection! 🌸👑" },
+	},
+
+	dog = {
+		morning = { "Woof! Good morning {player}! Ready to explore? 🐕☀️", "Tail wagging at maximum speed!" },
+		afternoon = { "Bark! I smelled fresh food from a mile away! 🍖", "I'll fetch any ingredient you drop!" },
+		evening = { "Arf! Sitting by your side while you cook is the best. 🌇" },
+		night = { "Yawn... sleeping at your feet tonight, chef! 🌙💤" },
+	},
+
+	parrot = {
+		morning = { "Squawk! Good morning! Cook the mochi! 🦜✨", "Polly wants Zunda Peas! Squawk!" },
+		afternoon = { "Squawk! Fast hands! Perfect timing! 🍳", "Look at all the hungry guests!" },
+		evening = { "Squawk! Beautiful sunset! Good job chef! 🌅" },
+		night = { "Squawk... quiet night... zzz... 🌙" },
+	},
+
+	cat = {
+		morning = { "Meow~ Morning human. Is breakfast ready? 🐱", "Stretching in the morning sunlight..." },
+		afternoon = { "Purrrr... you're doing great cooking today. 💖", "I am supervising your recipe steps." },
+		evening = { "Meow! Time for evening treats and headpats! 🌇" },
+		night = { "Purrrrr... curled up in your warm pouch... 🌙💤" },
+	},
 }
 
 -- Side dialogue triggers (item/lore discoveries)
-local SIDE_DIALOGUES = {}
-SIDE_DIALOGUES.zunda_pea = {
-	speaker = "zundapal",
-	text = "Oh! You found some Zunda Peas! 🫛",
-	hint = "Those are my favorite~ They're so sweet and green!",
-	recipe = "Did you know you can make Zunda Mochi with them? 🍡",
-}
-SIDE_DIALOGUES.zunda_mochi = {
-	speaker = "zundapal",
-	text = "Zunda Mochi is a special treat! 🍡",
-	lore = "It's made from sweet green peas, mashed into paste~",
-	tip = "The texture is so chewy and delicious! 💚",
-}
-SIDE_DIALOGUES.wheat = {
-	speaker = "zundapal",
-	text = "Wheat is the base of so many dishes! 🌾",
-	tip = "Harvest carefully - golden wheat makes golden bread!",
-}
-SIDE_DIALOGUES.royal_stew = {
-	speaker = "ankomon",
-	text = "Royal Stew - the pinnacle of cooking! 👑",
-	tip = "Requires Gold Ore for true regality.",
-}
-SIDE_DIALOGUES.seasonal = {
-	summer = {
-		speaker = "sakuradamon",
-		text = "Summer brings the rare Summer Salad! ☀️",
-		hint = "Add Zunda Berry to your Bread for a seasonal twist.",
+local SIDE_DIALOGUES = {
+	zunda_pea = {
+		speaker = "zundapal",
+		text = "Oh! You found some Zunda Peas! 🫛",
+		hint = "Those are my favorite~ They're so sweet and green!",
+		recipe = "Did you know you can make Zunda Mochi with them? 🍡",
 	},
-	winter = {
-		speaker = "sakuradamon",
-		text = "Winter's warmth comes from Warm Stew! ❄️",
-		hint = "Gold Ore makes it extra nourishing in cold months.",
+	zunda_mochi = {
+		speaker = "zundapal",
+		text = "Zunda Mochi! The pride of Zunda Village! 🍡",
+		hint = "Serve it to guests while it's fresh for extra gold!",
 	},
 }
 
--- Guest dialogue triggers
-local GUEST_DIALOGUE = {}
-GUEST_DIALOGUE.spawn = {
-    speaker = "guest",
-    text = "Hi there! I'd love some {recipe}! 🍽️",
-}
-GUEST_DIALOGUE.served = {
-    speaker = "guest",
-    text = "Thank you! This is delicious! 😋 +{gold} gold",
-}
-GUEST_DIALOGUE.timeout = {
-    speaker = "guest",
-    text = "I've been waiting too long... I'm leaving! 😞",
-}
-GUEST_DIALOGUE.wrong_dish = {
-    speaker = "guest",
-    text = "This isn't what I ordered... 🤔",
-}
+local VNDialogueData = {}
 
--- Guest type-specific dialogues
-local GUEST_BY_TYPE = {}
-GUEST_BY_TYPE.female = {
-    spawn = "Hello! Could I get some {recipe}? 💕",
-    served = "Perfect! Thank you so much! ✨",
-    timeout = "I can't wait any longer... 💔",
-    wrong_dish = "This isn't what I wanted... 😢",
-}
-GUEST_BY_TYPE.male = {
-    spawn = "Hey, got any {recipe}? 🍽️",
-    served = "Awesome! Thanks, chef! 👍",
-    timeout = "Gotta go, can't wait forever! 🚶",
-    wrong_dish = "Wrong order, buddy! 😕",
-}
-GUEST_BY_TYPE.parrot = {
-    spawn = "Squawk! {recipe}! Squawk! 🦜",
-    served = "Pretty good! Squawk! 🎉",
-    timeout = "Squawk! Too slow! Fly away! 🦜💨",
-    wrong_dish = "Squawk! Wrong! Squawk! ❌",
-}
-GUEST_BY_TYPE.lotus = {
-    spawn = "I seek the essence of {recipe}... 🌸",
-    served = "The flavors bloom... thank you. 🌺",
-    timeout = "The petals wilt... I must depart. 🥀",
-    wrong_dish = "This is not the essence I seek... 🌑",
-}
-GUEST_BY_TYPE.cupcake = {
-    spawn = "I'm craving something sweet! {recipe}? 🧁",
-    served = "So yummy! Thank you! 🍰",
-    timeout = "My sweet tooth is losing patience... 🍬",
-    wrong_dish = "This isn't sweet enough... 😕",
-}
-GUEST_BY_TYPE.zundamon = {
-    spawn = "Zunda! I want {recipe}! 🍙",
-    served = "Zunda-zunda! Delicious! 🎊",
-    timeout = "Zunda... too slow... leaving now! 😤",
-    wrong_dish = "Not zunda enough! 😠",
-}
-GUEST_BY_TYPE.female2 = {
-    spawn = "Pardon me, could I trouble you for some {recipe}? 💕",
-    served = "Absolutely wonderful, thank you! ✨",
-    timeout = "I'm afraid I must be going... 💔",
-    wrong_dish = "Oh, this isn't quite what I ordered... 😢",
-}
-GUEST_BY_TYPE.male2 = {
-    spawn = "Hey there! Got any {recipe} ready? 🍽️",
-    served = "Nice one, thanks chef! 👍",
-    timeout = "Can't hang around forever! 🚶",
-    wrong_dish = "Whoops, wrong order! 😕",
-}
+function VNDialogueData.getSpeaker(id: string)
+	return SPEAKERS[id] or SPEAKERS.zundapal
+end
 
--- Add guest speaker to SPEAKERS table
-SPEAKERS.guest = { name = "Guest", emoji = "🍽️", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) }
+function VNDialogueData.getCompanionDialogue(compType: string, timeOfDay: string?, level: number?)
+	local compPool = COMPANION_DIALOGUE[compType] or COMPANION_DIALOGUE.zundapal
+	local tod = timeOfDay or "morning"
 
--- New side dialogue for Infinity Nikki themed recipes
-SIDE_DIALOGUES.zunda_paradise = {
-	speaker = "zundapal",
-	text = "ZUNDA PARADISE!!! 🫛✨",
-	lore = "15 Zunda Peas + 10 Edamame + 5 Sweet Peas + 3 Pea Flowers = CULINARY TRANSCENDENCE!!!",
-	tip = "This dish doesn't just feed the body — it feeds the SOUL!!!",
-}
-SIDE_DIALOGUES.protein_punch = {
-	speaker = "ankomon",
-	text = "PROTEIN PUNCH!!! 💪🫘",
-	lore = "5 Edamame Pods + 3 Zunda Peas + 1 Gold = BEAN POWER!!!",
-	tip = "Each sip grants +10% cooking speed for 30 seconds!",
-}
-SIDE_DIALOGUES.golden_harvest = {
-	speaker = "sakuradamon",
-	text = "Golden Harvest Platter... 🌟",
-	lore = "5 Apples + 8 Wheat + 2 Gold + 3 Sweet Peas = A FEAST FOR THE EYES!!!",
-	tip = "The gold flakes make it sparkle like morning dew!",
-}
-SIDE_DIALOGUES.winter_stew = {
-	speaker = "cardamon",
-	text = "Warm Winter Stew... so comforting. 🧘",
-	lore = "3 Zunda Roots + 2 Zunda Mushrooms + 1 Gold = PATIENCE IN A BOWL.",
-	tip = "Slow cooking reveals the deepest flavors.",
-}
+	-- Level overrides
+	if level then
+		if level >= 21 and compPool.level21_50 then
+			return compPool.level21_50[math.random(1, #compPool.level21_50)]
+		elseif level >= 11 and compPool.level11_20 then
+			return compPool.level11_20[math.random(1, #compPool.level11_20)]
+		elseif level <= 10 and compPool.level1_10 then
+			return compPool.level1_10[math.random(1, #compPool.level1_10)]
+		end
+	end
 
--- New guest types (Infinity Nikki aesthetic)
-GUEST_BY_TYPE.magical_girl = {
-    spawn = "By the power of sparkling cuisine! I need {recipe}! ✨💖",
-    served = "My transformation is complete! Thank you, chef-san! 🌸✨",
-    timeout = "My magic is fading... hurry! 🫧💔",
-    wrong_dish = "This isn't the right ingredient for my transformation! 😱",
-}
-GUEST_BY_TYPE.fashionista = {
-    spawn = "Darling, I require {recipe} — it MUST be Instagram-worthy! 📸💄",
-    served = "FABULOUS! This dish is a work of ART! 💋✨",
-    timeout = "This is SO last season... I'm out! 👋",
-    wrong_dish = "This has ZERO aesthetic value! 😤",
-}
-GUEST_BY_TYPE.stylist = {
-    spawn = "I need {recipe} to complete my look today! 💇‍♀️🎨",
-    served = "PERFECTION! This pairs beautifully with my pastel aura! 🌈",
-    timeout = "I have other appointments! This is UNACCEPTABLE! ⏰",
-    wrong_dish = "This clashes with my color palette! 🎨❌",
-}
-GUEST_BY_TYPE.challenge_fighter = {
-    spawn = "I've trained for this moment! Give me {recipe}! 💪🔥",
-    served = "THAT'S WHAT I'M TALKING ABOUT!!! 🔥🔥🔥",
-    timeout = "I... I can't believe I lost... 😭",
-    wrong_dish = "This dish has no POWER! 💀",
-}
+	local pool = compPool[tod] or compPool.morning or { "Hello chef! Let's cook together! 🫛" }
+	return pool[math.random(1, #pool)]
+end
 
--- Challenge mode dialogue
-local CHALLENGE_DIALOGUE = {}
-CHALLENGE_DIALOGUE.wave_start = {
-	speaker = "zundamon",
-	lines = {
-		"WAVE {wave}!!! THE STOVE AWAITETH!!! 🔥🔥🔥",
-		"GUESTS ARE COMING!!! COOK COOK COOK!!! GO GO GO!!!",
-		"THE KITCHEN ITSELF WILL JUDGE YOU!!! 🫛✨",
-	},
-}
-CHALLENGE_DIALOGUE.wave_complete = {
-	speaker = "zundapal",
-	lines = {
-		"WAVE {wave} COMPLETE!!! 🎉🎉🎉",
-		"Your score is {score}!!! ABSOLUTELY STUNNING!!! 💫",
-		"Keep going! The LEGENDARY tier awaits!!! 👑",
-	},
-}
-CHALLENGE_DIALOGUE.perfect_cook = {
-	speaker = "zundapal",
-	lines = {
-		"PERFECT!!! 🫛✨",
-		"That timing was CRYSTAL CLEAR!!! 💖",
-		"Style points +10!!! You're a NATURAL!!!",
-	},
-}
-CHALLENGE_DIALOGUE.combo = {
-	speaker = "zundamon",
-	lines = {
-		"COMBO x{combo}!!! THE KITCHEN SINGS!!! 🔥",
-		"KEEP THAT STREAK ALIVE!!! GO GO GO!!!",
-		"NOBODY HAS EVER COOKED THIS WELL!!! 🏆",
-	},
-}
-CHALLENGE_DIALOGUE.tier_up = {
-	speaker = "zundapal",
-	lines = {
-		"TIER UP!!! You are now {tier}!!! 💖",
-		"Your style shines brighter than the morning sun!!! ✨",
-		"Unlock new outfits and recipes!!! The fashion show awaits!!! 👗",
-	},
-}
+function VNDialogueData.getSideDialogue(key: string)
+	return SIDE_DIALOGUES[key]
+end
 
--- Daily challenge dialogue
-local DAILY_DIALOGUE = {}
-DAILY_DIALOGUE.challenge_start = {
-	speaker = "zundapal",
-	lines = {
-		"Three challenges await, {player}~ 🌟",
-		"Complete all three for a STREAK BONUS!!! 💖",
-		"Let's make today MAGICAL!!! ✨",
-	},
-}
-DAILY_DIALOGUE.visitor_arrival = {
-	speaker = "narrator",
-	lines = {
-		"[ A mysterious traveler approaches the kitchen... ]",
-		"[ Their eyes gleam with the promise of adventure... ]",
-		"[ 'I've heard your cooking can grant wishes,' they say. ]",
-	},
-}
-
-return {
-    SPEAKERS = SPEAKERS,
-    COMPANION_DIALOGUE = COMPANION_DIALOGUE,
-    SIDE_DIALOGUES = SIDE_DIALOGUES,
-    GUEST_DIALOGUE = GUEST_DIALOGUE,
-    GUEST_BY_TYPE = GUEST_BY_TYPE,
-    CHALLENGE_DIALOGUE = CHALLENGE_DIALOGUE,
-    DAILY_DIALOGUE = DAILY_DIALOGUE,
-}
+return VNDialogueData

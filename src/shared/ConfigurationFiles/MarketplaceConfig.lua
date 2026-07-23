@@ -10,26 +10,24 @@ MarketplaceConfig.enabled = false
 
 -- Server receipt catalog: [productId] = { type, key, name }
 MarketplaceConfig.products = {
-	[1111111101] = { type = "companion", key = "zundacat", name = "ZundaCat Companion" },
-	[1111111102] = { type = "companion", key = "zundabunny", name = "ZundaBunny Companion" },
-	[1111111103] = { type = "companion", key = "tantanmon", name = "TantanMon Companion" },
-	[1111111104] = { type = "recipe", key = "Premium Ramen", name = "Premium Ramen Recipe" },
-	[1111111105] = { type = "recipe", key = "Party Cake", name = "Party Cake Recipe" },
-	[1111111106] = { type = "recipe", key = "Truffle Soup", name = "Truffle Soup Recipe" },
-	[1111111107] = { type = "accessory", key = "crown", name = "Gold Crown" },
-	[1111111108] = { type = "accessory", key = "bow", name = "Pink Bow" },
-	[1111111109] = { type = "accessory", key = "chefhat", name = "Chef Hat" },
+	[1111111101] = { type = "companion", key = "cardamon", name = "Cardamon Companion" },
+	[1111111102] = { type = "companion", key = "antimon", name = "Antimon Companion" },
+	[1111111103] = { type = "companion", key = "sakuradamon", name = "Sakuradamon Companion" },
+	[1111111104] = { type = "companion", key = "tantanmon", name = "Tantanmon Companion" },
+	[1111111105] = { type = "recipe", key = "Premium Ramen", name = "Premium Ramen Recipe" },
+	[1111111106] = { type = "recipe", key = "Party Cake", name = "Party Cake Recipe" },
+	[1111111107] = { type = "recipe", key = "Truffle Soup", name = "Truffle Soup Recipe" },
+	[1111111108] = { type = "accessory", key = "crown", name = "Gold Crown" },
+	[1111111109] = { type = "accessory", key = "bow", name = "Pink Bow" },
+	[1111111110] = { type = "accessory", key = "chefhat", name = "Chef Hat" },
 }
 
 -- Premium companions in CompanionShop (0 = not configured yet)
 MarketplaceConfig.companionDevProductIds = {
-	ankomon = 0,
-	cardamon = 0,
-	antimon = 0,
-	sakuradamon = 0,
-	zundacat = 1111111101,
-	zundabunny = 1111111102,
-	tantanmon = 1111111103,
+	cardamon = 1111111101,
+	antimon = 1111111102,
+	sakuradamon = 1111111103,
+	tantanmon = 1111111104,
 }
 
 -- Client StoreScript display (derived from products; edit copy here)
@@ -41,14 +39,14 @@ MarketplaceConfig.storeDisplay = {
 		{ id = 1111111104, name = "Tantanmon", emoji = "🌶️", desc = "+20% speed & spicy burst", robux = 1000, key = "tantanmon" },
 	},
 	recipes = {
-		{ id = 1111111104, name = "Premium Ramen", emoji = "🍜", desc = "Exclusive ramen recipe", robux = 60 },
-		{ id = 1111111105, name = "Party Cake", emoji = "🎂", desc = "Fancy celebration cake", robux = 60 },
-		{ id = 1111111106, name = "Truffle Soup", emoji = "🍲", desc = "Ultra-rare truffle recipe", robux = 80 },
+		{ id = 1111111105, name = "Premium Ramen", emoji = "🍜", desc = "Exclusive ramen recipe", robux = 60 },
+		{ id = 1111111106, name = "Party Cake", emoji = "🎂", desc = "Fancy celebration cake", robux = 60 },
+		{ id = 1111111107, name = "Truffle Soup", emoji = "🍲", desc = "Ultra-rare truffle recipe", robux = 80 },
 	},
 	accessories = {
-		{ id = 1111111107, name = "Gold Crown", emoji = "👑", desc = "Wear royalty on your head", robux = 40 },
-		{ id = 1111111108, name = "Pink Bow", emoji = "🎀", desc = "Cute bow accessory", robux = 40 },
-		{ id = 1111111109, name = "Chef Hat", emoji = "🍽️", desc = "Professional chef headwear", robux = 50 },
+		{ id = 1111111108, name = "Gold Crown", emoji = "👑", desc = "Wear royalty on your head", robux = 40 },
+		{ id = 1111111109, name = "Pink Bow", emoji = "🎀", desc = "Cute bow accessory", robux = 40 },
+		{ id = 1111111110, name = "Chef Hat", emoji = "🍽️", desc = "Professional chef headwear", robux = 50 },
 	},
 }
 

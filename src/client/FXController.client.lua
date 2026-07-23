@@ -21,6 +21,8 @@ require(game.ReplicatedStorage.ConfigurationFiles.CelOutline)
 require(game.ReplicatedStorage.ConfigurationFiles.CrystalFX)
 -- Dreamy water refraction, caustics, fresnel glow
 require(game.ReplicatedStorage.ConfigurationFiles.WaterFX)
+-- Subtle chromatic aberration lens fringe on camera motion
+require(game.ReplicatedStorage.ConfigurationFiles.ChromaticAberration)
 
 local gui, bleed
 for _, g in ipairs(playerGui:GetChildren()) do

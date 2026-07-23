@@ -84,14 +84,6 @@ if not gui or not panel or not listFrame then
 	layout.Padding = UDim.new(0, 8)
 	layout.SortOrder = Enum.SortOrder.LayoutOrder
 end
-if not toggleBtn then
-	toggleBtn = Instance.new("TextButton", gui)
-	toggleBtn.Name = "ToggleButton"
-	toggleBtn.Size = UDim2.fromOffset(44, 44)
-	toggleBtn.Position = UDim2.new(0, 16, 0.5, -22)
-	toggleBtn.Text = "Bag"
-	toggleBtn.TextScaled = true
-end
 
 local toasts = gui:FindFirstChild("ToastContainer", true)
 if not toasts then
@@ -110,6 +102,7 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 local C = {
 	bg = UIConfig.COLORS.MochiCream,
@@ -242,6 +235,7 @@ end
 
 -- ---- TOGGLE ----
 local shell = CozyModalShell.wrap(panel, {
+	actionId = "materials",
 	open = function()
 		panel.Visible = true
 	end,
@@ -259,9 +253,6 @@ local function setOpen(state)
 		shell.close()
 	end
 end
-toggleBtn.MouseButton1Click:Connect(function()
-	setOpen(not panel.Visible)
-end)
 
 -- Also wire the ZundaHUD button if present
 task.spawn(function()
@@ -285,14 +276,6 @@ closeBtn.MouseButton1Click:Connect(function()
 	setOpen(false)
 	local pos = closeBtn.AbsolutePosition
 	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
-end)
-UIS.InputBegan:Connect(function(input, processed)
-	if processed then
-		return
-	end
-	if input.KeyCode == Enum.KeyCode.U then
-		setOpen(not panel.Visible)
-	end
 end)
 
 -- ---- LISTEN FOR NOTIFICATIONS ----
@@ -322,10 +305,10 @@ local function updateSkyColors()
 	local isNight = t < 6 or t > 19
 	if isNight then
 		if title then title.TextColor3 = Color3.fromRGB(160, 140, 200) end
-		toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 150)
+		if toggleBtn then toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 150) end
 	else
 		if title then title.TextColor3 = Color3.fromRGB(200, 240, 230) end
-		toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50)
+		if toggleBtn then toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50) end
 	end
 end
 Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(updateSkyColors)
@@ -342,4 +325,14 @@ task.spawn(function()
 	end
 end)
 
-print("[MaterialsInventory] Loaded - press I to toggle")
+-- Register with UIRouter for modal exclusivity and Escape handling
+UIRouter.register("materials", nil, function()
+	shell.close()
+end)
+
+-- Register with ActionRegistry for Pea Wheel dispatch
+ActionRegistry.registerCallback("materials", function()
+	setOpen(not panel.Visible)
+end)
+
+print("[MaterialsInventory] Loaded")

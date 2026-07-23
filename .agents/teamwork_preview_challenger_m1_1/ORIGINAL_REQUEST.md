@@ -1,15 +1,15 @@
-## 2026-07-22T17:38:36Z
-You are Challenger 1 for Milestone 1 of Zundamon's Kitchen V2.
-Your working directory is: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1
+## 2026-07-22T21:35:54Z
+You are Challenger 1 for Milestone 1 Gate Verification of Zundamon's Kitchen V2 - Companion System & Companion Shop Synchronization.
 
-TASK: Remote & Event System Empirical Stress Test for Milestone 1
-1. Perform empirical verification and stress testing of all remote events, functions, and service BindableEvents modified in Milestone 1:
-   - `ShowVNDialogue` remote setup & client listener in `VNController.client.lua`
-   - `GiveLoot` / `sellLoot` boot binding in `ServerMain.server.lua`
-   - `GuestServed` / `GuestTimedOut` BindableEvents in `ServingService.lua` & `EndlessLoopWiring.server.lua`
-   - `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock` in `OutfitWardrobeGui.client.lua`
-2. Run `python scripts/preflight_audit.py` (Cwd: g:\Zundamons-kItchen-V2).
-3. Run `rojo build default.project.json -o build/Zundamons-kItchen.rbxl`.
-4. Run `selene src` to confirm 0 static code errors.
-5. Write your findings and verification verdict (VERIFIED / DEFECT_FOUND) to `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\handoff.md`.
-6. Send a message to caller with your verdict and report path.
+Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1
+
+Objective:
+Empirically test and stress-test the configuration and logic changes implemented in Milestone 1.
+
+Tasks:
+1. Verify `CompanionConfig.lua` programmatically by checking table entries for all 8 companions (`parrot`, `dog`, `cat`, `ankomon`, `cardamon`, `antimon`, `sakuradamon`, `tantanmon`).
+2. Run `python scripts/preflight_audit.py` to confirm zero audit errors.
+3. Test edge cases: What happens if `CompanionConfig.companions` is queried for an invalid key? Does `GetOwnedCompanions` handle players with missing/nil data gracefully?
+4. Verify ID alignment across `MarketplaceConfig.products`, `MarketplaceConfig.companionDevProductIds`, and `MarketplaceConfig.storeDisplay.companions`.
+
+Write your stress-test report to `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_1\challenge.md` and `handoff.md`, and send a summary back via send_message. State clearly if VERIFIED or REJECTED.

@@ -65,7 +65,12 @@ GetCompanionCatalog.OnServerInvoke = function(player)
 end
 
 GetOwnedCompanions.OnServerInvoke = function(player)
-	local owned = { zundapal = true, zundamon = true, zundacat = true, zundabunny = true, tantanmon = true, dog = true, parrot = true, cat = true }
+	local owned = {}
+	for compType, def in pairs(CompanionConfig.companions) do
+		if def.free then
+			owned[compType] = true
+		end
+	end
 	local data = PlayerDataService.get(player)
 	if data then
 		for k, v in pairs(data) do

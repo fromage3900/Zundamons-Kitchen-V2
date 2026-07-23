@@ -239,12 +239,5 @@ task.spawn(function()
 	end
 end)
 
--- Keyboard shortcut (will be replaced by central input handler)
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.F1 then
-		toggle()
-	end
-end)
-
 loadVolume()
-print("[SettingsScreen] Ready — press F1 or click gear icon")
+print("[SettingsScreen] Ready — click gear icon or use Pea Wheel")

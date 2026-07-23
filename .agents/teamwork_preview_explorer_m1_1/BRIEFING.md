@@ -1,42 +1,35 @@
-# BRIEFING — 2026-07-22T13:31:30Z
+# BRIEFING — 2026-07-23T01:36:50Z
 
 ## Mission
-Server & Remote Definition Audit across `src/server/` and `src/shared/` in Zundamon's Kitchen V2.
+Investigate CompanionConfig.lua, MarketplaceConfig.lua, and codebase references to 8 companions (free: parrot, dog, cat, ankomon; premium: cardamon, antimon, sakuradamon, tantanmon) for Milestone 1 synchronization.
 
 ## 🔒 My Identity
-- Archetype: explorer
-- Roles: explorer
+- Archetype: Teamwork explorer
+- Roles: Explorer 1
 - Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1
-- Original parent: 281d54cf-b9e8-4061-a866-77c4825337fd
-- Milestone: Milestone 1 (Server & Remote Audit)
+- Original parent: c873e613-5eb4-4470-8789-0eba61b841bc
+- Milestone: Milestone 1 - Companion System & Companion Shop Synchronization
 
 ## 🔒 Key Constraints
-- Read-only investigation — do NOT implement directly in project source files.
-- Audit all Luau files in `src/server/` and `src/shared/`.
-- Check defined vs referenced RemoteEvents/RemoteFunctions.
-- Verify module imports use `ServerScriptService.Services.X` or `ServerScriptService.systems.X` and NEVER `.Server.`.
-- Identify unhandled errors, broken interfaces, syntax/runtime bugs.
-- Deliver findings in `handoff.md` and message caller (`0c8ea642-0389-4403-bc3c-eafb5b552e57`).
+- Read-only investigation — do NOT implement
+- Follow Roblox Studio & Rojo 7.7.0 Workspace Rules
+- Output analysis to analysis.md and handoff.md in working directory
+- Send summary via send_message to parent agent
 
 ## Current Parent
-- Conversation ID: 0c8ea642-0389-4403-bc3c-eafb5b552e57
-- Updated: 2026-07-22T13:31:30Z
+- Conversation ID: c873e613-5eb4-4470-8789-0eba61b841bc
+- Updated: 2026-07-23T01:36:50Z
 
 ## Investigation State
-- **Explored paths**: `src/server/`, `src/shared/`, `src/client/`, `default.project.json`.
-- **Key findings**:
-  1. Module import paths strictly comply with Rule 4 (`ServerScriptService.Services.X` & `ServerScriptService.systems.X`). No `.Server.` prepending exists.
-  2. Critical runtime event wiring failure in `EndlessLoopWiring.server.lua` line 18 (indexes non-existent `ServerScriptService.systems.ServingSystem` and unexported `GuestServed` BindableEvent).
-  3. Typo mismatch in guest dialogue remote (`ShowVNDialgue` vs client missing listener in `VNController.client.lua`).
-  4. Lazy initialization race condition for `GiveLoot` and `sellLoot` in `LootModule.lua` (which also violates ReplicatedStorage boundary by requiring `ServerScriptService.Services.PlayerDataService`).
-  5. Endless loop remotes (`ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock`) fired by server but not hooked by UI client scripts like `OutfitWardrobeGui.client.lua`.
-- **Unexplored areas**: None for this audit scope.
+- **Explored paths**: `src/shared/ConfigurationFiles/CompanionConfig.lua`, `src/shared/ConfigurationFiles/MarketplaceConfig.lua`, `src/server/CompanionShopServer.server.lua`, `src/client/CompanionShopScript.client.lua`, `src/server/Services/MarketplaceService.lua`, `src/server/CompanionManager.server.lua`, `src/server/Services/CookingService.lua`, `src/server/ZundaGatherServer.server.lua`, `src/server/Services/RewardCore.lua`
+- **Key findings**: CompanionConfig is canonical and accurate. MarketplaceConfig has ID and key mismatches between products, companionDevProductIds, and storeDisplay. CompanionShopServer is missing ankomon from free defaults and mistakenly marks tantanmon free. CompanionShopScript TAB_ORDER has obsolete keys.
+- **Unexplored areas**: None, full companion audit completed.
 
 ## Key Decisions Made
-- Audit complete. Detailed analysis and actionable fix recommendations delivered in `handoff.md`.
+- Initial briefing setup created
+- Completed comprehensive investigation and detailed configuration diffs in analysis.md and handoff.md
 
 ## Artifact Index
-- `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\ORIGINAL_REQUEST.md` — Original Request Log
-- `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\BRIEFING.md` — Working Memory Index
-- `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\progress.md` — Heartbeat & Progress Log
-- `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\handoff.md` — Handoff Report
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\ORIGINAL_REQUEST.md — Original task prompt
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\analysis.md — Full analysis report and configuration diffs
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_1\handoff.md — 5-component handoff report

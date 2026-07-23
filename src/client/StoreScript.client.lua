@@ -16,14 +16,14 @@ local compEv=RE:WaitForChild("SetCompanion",10)
 -- This store only handles recipes and accessories via Robux.
 local PRODUCTS = {
     recipes = {
-        { id=1111111104, name="Premium Ramen", emoji="🍜", desc="Exclusive ramen recipe",       robux=60  },
-        { id=1111111105, name="Party Cake",    emoji="🎂", desc="Fancy celebration cake",       robux=60  },
-        { id=1111111106, name="Truffle Soup",  emoji="🍲", desc="Ultra-rare truffle recipe",    robux=80  },
+        { id=1111111105, name="Premium Ramen", emoji="🍜", desc="Exclusive ramen recipe",       robux=60  },
+        { id=1111111106, name="Party Cake",    emoji="🎂", desc="Fancy celebration cake",       robux=60  },
+        { id=1111111107, name="Truffle Soup",  emoji="🍲", desc="Ultra-rare truffle recipe",    robux=80  },
     },
     accessories = {
-        { id=1111111107, name="Gold Crown",    emoji="👑", desc="Wear royalty on your head",    robux=40  },
-        { id=1111111108, name="Pink Bow",      emoji="🎀", desc="Cute bow accessory",           robux=40  },
-        { id=1111111109, name="Chef Hat",      emoji="🍽️", desc="Professional chef headwear",   robux=50  },
+        { id=1111111108, name="Gold Crown",    emoji="👑", desc="Wear royalty on your head",    robux=40  },
+        { id=1111111109, name="Pink Bow",      emoji="🎀", desc="Cute bow accessory",           robux=40  },
+        { id=1111111110, name="Chef Hat",      emoji="🍽️", desc="Professional chef headwear",   robux=50  },
     },
 }
 
@@ -176,14 +176,11 @@ local function buildProductCard(prod, idx, cat)
 end
 
 local FREE_COMPANIONS = {
-    { key="zundapal",   emoji="🫛", name="Zundapal",   flavor="Your Zundamon companion from the Downloads." },
-    { key="zundamon",   emoji="🍡", name="Zundamon",   flavor="The original. A loyal pea spirit." },
-    { key="zundacat",   emoji="🐱", name="ZundaCat",   flavor="A curious cat-shaped friend." },
-    { key="zundabunny", emoji="🐰", name="ZundaBunny", flavor="Hops alongside with twinkling ears." },
-    { key="tantanmon",  emoji="🌶️", name="TantanMon",  flavor="Spicy little firework." },
-    { key="dog",        emoji="🐕", name="Dog",        flavor="A faithful furry friend." },
-    { key="parrot",     emoji="🦜", name="Parrot",     flavor="A colourful chatterbox." },
-    { key="cat",        emoji="🐱", name="Cat",        flavor="A purring little menace." },
+    { key="zundapal", emoji="🫛", name="Zundapal", flavor="Your Zundamon spirit companion." },
+    { key="dog",      emoji="🐕", name="Dog",      flavor="A faithful furry friend." },
+    { key="parrot",   emoji="🦜", name="Parrot",   flavor="A colourful chatterbox." },
+    { key="cat",      emoji="🐱", name="Cat",      flavor="A purring little menace." },
+    { key="ankomon",  emoji="🫘", name="Ankomon",  flavor="A red bean spirit. Sweetens every payday." },
 }
 
 local function buildCompanionSelector()
@@ -288,5 +285,5 @@ task.spawn(function()
         end
     end
 end)
-UIS.InputBegan:Connect(function(i,g) if g then return end if i.KeyCode==Enum.KeyCode.B then toggle() end end)
-print("[RobuxStore] Ready — P key or settings/shop button")
+-- Keybind B is handled centrally via UIActionRegistry
+print("[RobuxStore] Ready — press B or click Store button")

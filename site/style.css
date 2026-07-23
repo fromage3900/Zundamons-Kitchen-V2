@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,700;1,700&family=Fredoka:wght@400;600;700&family=M+PLUS+Rounded+1c:wght@700;800;900&family=VT323&display=swap');
+
 /* ==========================================================================
    ZUNDAMON'S KITCHEN V2 — KAWAII Y2K INFINITY NIKKI DESIGN SYSTEM
    Official Roblox Game Showcase Launchpad & Interactive PC Desktop Workspace
@@ -46,16 +48,18 @@
   --term-cyan: #38bdf8;
   --term-yellow: #fef08a;
 
-  /* --- 🔤 Typography & Transitions --- */
-  --font-main: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Nunito', Roboto, sans-serif;
+  /* --- 🔤 Cute Y2K 2000s Japanese Typography --- */
+  --font-main: 'M PLUS Rounded 1c', 'Fredoka', 'Comic Neue', sans-serif;
+  --font-heading: 'Fredoka', 'M PLUS Rounded 1c', 'Comic Neue', sans-serif;
   --font-mono: 'VT323', 'Cascadia Code', 'Courier New', monospace;
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-* {
+*, *::before, *::after, body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, a, span, div, label, li, td, th {
   box-sizing: border-box;
+  font-family: 'M PLUS Rounded 1c', 'Fredoka', 'Comic Neue', sans-serif !important;
 }
 
 html, body {
@@ -63,10 +67,16 @@ html, body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  font-family: var(--font-main);
-  background: linear-gradient(180deg, var(--cream-white) 0%, var(--sakura-soft) 35%, var(--lavender-pearl) 70%, var(--zunda-light) 100%);
+  font-family: 'M PLUS Rounded 1c', 'Fredoka', 'Comic Neue', sans-serif !important;
+  background-color: #ffe5ec;
+  background-image: 
+    radial-gradient(circle, rgba(255, 71, 126, 0.22) 2px, transparent 2px),
+    radial-gradient(circle, rgba(76, 175, 80, 0.22) 2px, transparent 2px),
+    linear-gradient(135deg, #ffe5ec 0%, #e8f5e9 35%, #f3e5f5 70%, #fff9c4 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%;
+  background-position: 0 0, 14px 14px, 0 0;
   background-attachment: fixed;
-  color: #2d3748;
+  color: #1b5e20;
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
@@ -467,6 +477,74 @@ html, body {
   font-size: 13px;
   line-height: 1.6;
   color: #475569;
+}
+
+/* ==========================================================================
+   Y2K 2000s ERA GLAM & MOCHI PEA HERO SHOWCASE
+   ========================================================================== */
+.Y2K-hero-showcase {
+  background: linear-gradient(135deg, rgba(255, 240, 245, 0.95), rgba(232, 223, 245, 0.95), rgba(241, 248, 233, 0.95));
+  border: 3px solid var(--sakura-vibrant);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(255, 71, 126, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Y2K-hero-showcase:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(255, 71, 126, 0.45);
+}
+
+.hero-gif-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  min-height: 200px;
+}
+
+.hero-zunda-gif-anim {
+  max-width: 190px;
+  max-height: 190px;
+  object-fit: contain;
+  border-radius: 20px;
+  border: 3px solid #ffb7c5;
+  box-shadow: 0 8px 24px rgba(255, 133, 161, 0.4);
+  background: #ffffff;
+  animation: floatMochi 3s ease-in-out infinite alternate;
+}
+
+.hero-zunda-cutout-img {
+  max-width: 170px;
+  max-height: 170px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(76, 175, 80, 0.4));
+  animation: pulseGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes floatMochi {
+  0% { transform: translateY(0px) rotate(-2deg); }
+  100% { transform: translateY(-10px) rotate(2deg); }
+}
+
+@keyframes pulseGlow {
+  0% { filter: drop-shadow(0 8px 16px rgba(76, 175, 80, 0.3)); }
+  100% { filter: drop-shadow(0 14px 28px rgba(255, 71, 126, 0.5)); }
+}
+
+.Y2K-badge-glow {
+  background: linear-gradient(90deg, #2e7d32, #ff477e) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 6px 18px rgba(255, 71, 126, 0.4) !important;
+}
+
+h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
+  font-family: var(--font-heading) !important;
 }
 
 /* Companions Grid */

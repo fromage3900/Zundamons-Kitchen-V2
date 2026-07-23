@@ -75,6 +75,54 @@ if CONFIG.sky.skybox_rt then sky.SkyboxRt = CONFIG.sky.skybox_rt end
 if CONFIG.sky.skybox_up then sky.SkyboxUp = CONFIG.sky.skybox_up end
 sky.Parent = Lighting
 
+-- SKYBOX SETS (Brennan's nebula + starfield textures)
+local SKYBOX_SETS = {
+	day = {
+		bk = "rbxassetid://119372168213953", -- BlueNebula_01
+		dn = "rbxassetid://119372168213953", -- BlueNebula_01
+		ft = "rbxassetid://119372168213953", -- BlueNebula_01
+		lf = "rbxassetid://119372168213953", -- BlueNebula_01
+		rt = "rbxassetid://119372168213953", -- BlueNebula_01
+		up = "rbxassetid://133511173179472", -- Starfield_05
+	},
+	night = {
+		bk = "rbxassetid://129075140128878", -- PurpleNebula_01
+		dn = "rbxassetid://129075140128878", -- PurpleNebula_01
+		ft = "rbxassetid://129075140128878", -- PurpleNebula_01
+		lf = "rbxassetid://129075140128878", -- PurpleNebula_01
+		rt = "rbxassetid://129075140128878", -- PurpleNebula_01
+		up = "rbxassetid://133511173179472", -- Starfield_05
+	},
+	morning = {
+		bk = "rbxassetid://129075140128878", -- PurpleNebula_01 (soft dawn)
+		dn = "rbxassetid://119372168213953", -- BlueNebula_01
+		ft = "rbxassetid://129075140128878", -- PurpleNebula_01
+		lf = "rbxassetid://129075140128878", -- PurpleNebula_01
+		rt = "rbxassetid://129075140128878", -- PurpleNebula_01
+		up = "rbxassetid://133353217310274", -- Starfield_03
+	},
+}
+local function updateSkybox(hour)
+	local set
+	if hour >= 5 and hour < 7.5 then
+		set = SKYBOX_SETS.morning
+	elseif hour >= 7.5 and hour < 17 then
+		set = SKYBOX_SETS.day
+	elseif hour >= 17 and hour < 19.5 then
+		set = SKYBOX_SETS.morning
+	else
+		set = SKYBOX_SETS.night
+	end
+	if sky then
+		sky.SkyboxBk = set.bk
+		sky.SkyboxDn = set.dn
+		sky.SkyboxFt = set.ft
+		sky.SkyboxLf = set.lf
+		sky.SkyboxRt = set.rt
+		sky.SkyboxUp = set.up
+	end
+end
+
 -- ── CONSTELLATIONS ────────────────────────────────────────
 local constFolder = workspace:FindFirstChild("Constellations")
 if constFolder then constFolder:Destroy() end
@@ -110,63 +158,67 @@ end
 
 local kitchenCenter = Vector3.new(0, 10, 0)
 
--- ── GOD-RAY LIGHT SHAFTS ─────────────────────────────────
--- Subtle particle beams that angle toward the sun on clear days
+-- ── GOD-RAY LIGHT SHAFTS (Beam volumetric) ──────────────────
+-- Volumetric light beams radiating from a high center point
 local godRayFolder = workspace:FindFirstChild("GodRays")
 if godRayFolder then godRayFolder:Destroy() end
 godRayFolder = Instance.new("Folder")
 godRayFolder.Name = "GodRays"
 godRayFolder.Parent = workspace
 
-local function makeGodRay(pos)
-    local p = Instance.new("Part")
-    p.Name = "GodRayBeam"
-    p.Size = Vector3.new(1, 1, 1)
-    p.Position = pos
-    p.Anchored = true
-    p.CanCollide = false
-    p.CanQuery = false
-    p.CanTouch = false
-    p.Transparency = 1
-    p.Parent = godRayFolder
-    local e = Instance.new("ParticleEmitter")
-    e.Texture = "rbxassetid://101237232079937"
-    e.Rate = 1
-    e.Lifetime = NumberRange.new(5, 10)
-    e.Speed = NumberRange.new(6, 18)
-    e.SpreadAngle = Vector2.new(8, 8)
-    e.Acceleration = Vector3.new(0, -3, 0)
-    e.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.95),
-        NumberSequenceKeypoint.new(0.3, 0.90),
+local beamCenter = Instance.new("Part")
+beamCenter.Name = "BeamCenter"
+beamCenter.Size = Vector3.new(1, 1, 1)
+beamCenter.Position = kitchenCenter + Vector3.new(0, 18, 0)
+beamCenter.Anchored = true
+beamCenter.CanCollide = false
+beamCenter.CanQuery = false
+beamCenter.CanTouch = false
+beamCenter.Transparency = 1
+beamCenter.Parent = godRayFolder
+
+local rayBeams = {}
+local beamPositions = {
+    kitchenCenter + Vector3.new(14, 1, 8),
+    kitchenCenter + Vector3.new(-12, 1, 12),
+    kitchenCenter + Vector3.new(18, 1, -14),
+    kitchenCenter + Vector3.new(-16, 1, -10),
+}
+for i, gPos in ipairs(beamPositions) do
+    local ground = Instance.new("Part")
+    ground.Name = "BeamGround"..i
+    ground.Size = Vector3.new(1, 1, 1)
+    ground.Position = gPos
+    ground.Anchored = true
+    ground.CanCollide = false
+    ground.CanQuery = false
+    ground.CanTouch = false
+    ground.Transparency = 1
+    ground.Parent = godRayFolder
+
+    local att0 = Instance.new("Attachment")
+    att0.Parent = beamCenter
+    local att1 = Instance.new("Attachment")
+    att1.Parent = ground
+
+    local beam = Instance.new("Beam")
+    beam.Attachment0 = att0
+    beam.Attachment1 = att1
+    beam.Texture = "rbxassetid://101237232079937"
+    beam.TextureMode = Enum.TextureMode.Stretch
+    beam.Width0 = 8
+    beam.Width1 = 2
+    beam.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.94),
+        NumberSequenceKeypoint.new(0.2, 0.88),
         NumberSequenceKeypoint.new(1, 1),
     })
-    e.Size = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.8),
-        NumberSequenceKeypoint.new(1, 3),
-    })
-    e.Color = ColorSequence.new(Color3.fromRGB(255, 240, 220))
-    e.LightEmission = 0.25
-    e.LightInfluence = 0.3
-    e.ZOffset = 2
-    e.Rotation = NumberRange.new(0, 360)
-    e.RotSpeed = NumberRange.new(-5, 5)
-    e.VelocityInheritance = 0
-    e.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
-    e.Enabled = false
-    e.Parent = p
-end
-
-local rayPositions = {
-    kitchenCenter + Vector3.new(10, 4, 5),
-    kitchenCenter + Vector3.new(-8, 4, 8),
-    kitchenCenter + Vector3.new(15, 3, -10),
-    kitchenCenter + Vector3.new(-12, 5, -6),
-    kitchenCenter + Vector3.new(5, 4, 15),
-    kitchenCenter + Vector3.new(-5, 3, -12),
-}
-for _, pos in ipairs(rayPositions) do
-    makeGodRay(pos)
+    beam.LightEmission = 0.35
+    beam.Brightness = 0.2
+    beam.Color = ColorSequence.new(Color3.fromRGB(255, 242, 225))
+    beam.FaceCamera = true
+    beam.Parent = godRayFolder
+    table.insert(rayBeams, beam)
 end
 
 -- ── AURORA EFFECT ─────────────────────────────────────────
@@ -220,24 +272,24 @@ local function updateClouds(hour, weather)
     local isNight = hour <= 5 or hour >= 19.5
 
     local baseCover = 0.2
-    if weather == "clear" then baseCover = 0.12
-    elseif weather == "cloudy" then baseCover = 0.6
-    elseif weather == "cherry_blossom" then baseCover = 0.3
-    elseif weather == "rain" then baseCover = 0.75
-    elseif weather == "storm" then baseCover = 0.9
-    elseif weather == "snow" then baseCover = 0.65
+    if weather == "clear" then baseCover = 0.14
+    elseif weather == "cloudy" then baseCover = 0.65
+    elseif weather == "cherry_blossom" then baseCover = 0.32
+    elseif weather == "rain" then baseCover = 0.80
+    elseif weather == "storm" then baseCover = 0.92
+    elseif weather == "snow" then baseCover = 0.70
     elseif weather == "fog" then baseCover = 1.0
-    elseif weather == "aurora" then baseCover = 0.06
+    elseif weather == "aurora" then baseCover = 0.08
     end
-    if isNight and (weather == "clear" or weather == "cherry_blossom") then baseCover = 0.06 end
+    if isNight and (weather == "clear" or weather == "cherry_blossom") then baseCover = 0.08 end
     clouds.Cover = baseCover
 
-    local dens = 0.18
-    if weather == "fog" then dens = 0.55
-    elseif weather == "storm" then dens = 0.40
-    elseif weather == "rain" then dens = 0.32
-    elseif weather == "cloudy" then dens = 0.22
-    elseif weather == "snow" then dens = 0.20
+    local dens = 0.28
+    if weather == "fog" then dens = 0.70
+    elseif weather == "storm" then dens = 0.55
+    elseif weather == "rain" then dens = 0.42
+    elseif weather == "cloudy" then dens = 0.32
+    elseif weather == "snow" then dens = 0.30
     end
     clouds.Density = dens
 
@@ -285,6 +337,7 @@ end
 local function applyHour(hour)
     local a, b, t = getKeyframes(hour)
     Lighting.ClockTime         = hour
+    updateSkybox(hour)
     Lighting.Ambient           = lerpColor(a[2], b[2], t)
     Lighting.OutdoorAmbient    = lerpColor(a[3], b[3], t)
     Lighting.ColorShift_Top    = lerpColor(a[4], b[4], t)
@@ -303,7 +356,7 @@ local function applyHour(hour)
     Lighting.FogEnd   = lerp(a[8], b[8], t) * fogMult
 
     local densMult = workspace:GetAttribute("WeatherDensityMult") or 1
-    atmo.Density = lerp(a[9], b[9], t) * densMult
+    atmo.Density = lerp(a[9], b[9], t) * densMult * 0.25
     atmo.Color   = lerpColor(a[10], b[10], t)
     if a[12] ~= nil and b[12] ~= nil then
         atmo.Offset = lerp(a[12], b[12], t)
@@ -371,43 +424,43 @@ local function applyHour(hour)
         dreamBlur.Size = 0
     end
 
-    -- God rays: subtle light shafts on clear daytime
+    -- God rays: Beam volumetric light shafts on clear daytime
     local isDaytime = hour > 7 and hour < 17
     local godRayOn = isDaytime and (weather == "clear" or weather == "cherry_blossom")
-    for _, child in ipairs(godRayFolder:GetChildren()) do
-        if child:IsA("BasePart") then
-            for _, e in ipairs(child:GetChildren()) do
-                if e:IsA("ParticleEmitter") then
-                    e.Enabled = godRayOn
-                    e.Rate = godRayOn and 2 + (weather == "clear" and 1 or 0) or 0
-                end
-            end
+    for _, beam in ipairs(rayBeams) do
+        if godRayOn then
+            local pulse = 0.88 + 0.06 * math.sin(os.clock() * 0.3 + beam.Width0)
+            beam.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, math.clamp(0.94 - pulse * 0.06, 0.80, 0.95)),
+                NumberSequenceKeypoint.new(0.2, pulse),
+                NumberSequenceKeypoint.new(1, 1),
+            })
+        else
+            beam.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 1),
+                NumberSequenceKeypoint.new(1, 1),
+            })
         end
     end
 
-    -- Aurora: animated color-cycling neon curtains
-    local isNight  = hour < 5.5 or hour > 19.8
-    local auroraOn = (weather == "aurora") and isNight
+    -- Aurora: animated neon curtains — always visible (soft for all-day viewing)
     local colors = AURORA_COLORS
     local aClock = os.clock()
     for i, band in ipairs(auroraFolder:GetChildren()) do
         if band:IsA("BasePart") then
             local phase = band.Position.X * 0.05 + band.Position.Z * 0.03
-            if auroraOn then
-                if not band:GetAttribute("BaseY") then
-                    band:SetAttribute("BaseY", band.Position.Y)
-                end
-                local baseY = band:GetAttribute("BaseY")
-                local yBob = math.sin(aClock * 0.3 + phase * 1.5) * 4
-                band.Position = Vector3.new(band.Position.X, baseY + yBob, band.Position.Z)
-                local ci = ((i - 1) % #colors) + 1
-                local nextCI = ci % #colors + 1
-                local blend = (math.sin(aClock * 0.2 + phase) + 1) * 0.5
-                band.Color = colors[ci]:Lerp(colors[nextCI], blend)
-                band.Transparency = 0.12 + math.sin(aClock * 0.4 + phase) * 0.2
-            else
-                band.Transparency = 1
+            if not band:GetAttribute("BaseY") then
+                band:SetAttribute("BaseY", band.Position.Y)
             end
+            local baseY = band:GetAttribute("BaseY")
+            local yBob = math.sin(aClock * 0.3 + phase * 1.5) * 4
+            band.Position = Vector3.new(band.Position.X, baseY + yBob, band.Position.Z)
+            local ci = ((i - 1) % #colors) + 1
+            local nextCI = ci % #colors + 1
+            local blend = (math.sin(aClock * 0.2 + phase) + 1) * 0.5
+            band.Color = colors[ci]:Lerp(colors[nextCI], blend)
+            -- Softer transparency for all-day aurora (0.35–0.65 range)
+            band.Transparency = 0.45 + math.sin(aClock * 0.4 + phase) * 0.15
         end
     end
 end

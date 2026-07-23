@@ -61,7 +61,14 @@
 - `visit_zones_unique`: Visit unique locations
 - `npc_chat_all`: Chat with all NPCs
 
-### 10. New Guest Types (Infinity Nikki Aesthetic)
+### 10. Skybox — Kenney CC0 Cubemaps (Dynamic 3‑Set Swap)
+- `SkyConfig.lua`: default set = Kenney Day (lines 33–45, edited)
+- `DayNightSky.server.lua`: 3 `SKYBOX_SETS` (day/night/morning) at lines 78–119
+  - Dawn 4.5–7.5 → morning, day 7.5–17 → day, dusk 17–19.5 → morning, night else → night
+- Uploaded 18 face decals (1024×1024 RGBA, all approved)
+- Sun icon: 123736711329002, Moon icon: 85079237605725
+
+### 11. New Guest Types (Infinity Nikki Aesthetic)
 - `magical_girl`: "By the power of sparkling cuisine! I need {recipe}! ✨💖"
 - `fashionista`: "Darling, I require {recipe} — it MUST be Instagram-worthy! 📸💄"
 - `stylist`: "I need {recipe} to complete my look today! 💇‍♀️🎨"

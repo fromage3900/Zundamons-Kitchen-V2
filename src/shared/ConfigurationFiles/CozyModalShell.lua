@@ -1,11 +1,9 @@
---!strict
 -- [[ModuleScript] CozyModalShell]]
 -- Consistent wrapper for all HUD panels: close on Escape, spawn sparkles on open,
--- respects UIConfig tokens and reduced-motion preferences.
+-- respects UIConfig tokens.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 
 local UIConfig = require(ReplicatedStorage.ConfigurationFiles.UIConfig)
@@ -39,7 +37,7 @@ local function spawnOpenSparkles(panel)
 	end
 	local center = panel.AbsolutePosition + panel.AbsoluteSize * 0.5
 	local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
-	UIHelper.spawnSparkles(panel, center.X, center.Y, UIConfig.COLORS.SparkleGold, 12)
+	UIHelper.spawnSparkles(panel, center.X, center.Y, UIConfig.GAME_COLORS.SparkleGold, 12)
 end
 
 -- ── Public API ───────────────────────────────────────────────
@@ -60,20 +58,14 @@ function CozyModalShell.wrap(panel, options)
 
 		-- Animate: scale pop from 0 to full size with bouncy Back easing
 		panel.Visible = true
-		if not UserInputService.ReducedMotionEnabled then
-			panel.Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0)
-			panel.Position = UDim2.new(originalPosition.X.Scale, 0, originalPosition.Y.Scale, 0)
-			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Normal, UIConfig.EASING.Bounce, Enum.EasingDirection.Out), {
-				Size = originalSize,
-			}):Play()
-			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
-				BackgroundTransparency = UIConfig.TRANSPARENCY.Panel,
-			}):Play()
-		else
-			panel.Size = originalSize
-			panel.Position = originalPosition
-			panel.BackgroundTransparency = UIConfig.TRANSPARENCY.Panel
-		end
+		panel.Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0)
+		panel.Position = UDim2.new(originalPosition.X.Scale, 0, originalPosition.Y.Scale, 0)
+		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Normal, UIConfig.EASING.Bounce, Enum.EasingDirection.Out), {
+			Size = originalSize,
+		}):Play()
+		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+			BackgroundTransparency = UIConfig.TRANSPARENCY.Panel,
+		}):Play()
 
 		if options.open then
 			options.open()
@@ -89,22 +81,18 @@ function CozyModalShell.wrap(panel, options)
 		end
 
 		-- Animate: scale shrink to 0 with smooth Quad easing
-		if not UserInputService.ReducedMotionEnabled then
-			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth, Enum.EasingDirection.In), {
-				Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0),
-			}):Play()
-			TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
-				BackgroundTransparency = 1,
-			}):Play()
-			task.delay(UIConfig.ANIMATION.Fast + 0.05, function()
-				panel.Visible = false
-				panel.Size = originalSize
-				panel.Position = originalPosition
-				panel.BackgroundTransparency = UIConfig.TRANSPARENCY.Panel
-			end)
-		else
+		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth, Enum.EasingDirection.In), {
+			Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0),
+		}):Play()
+		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+			BackgroundTransparency = 1,
+		}):Play()
+		task.delay(UIConfig.ANIMATION.Fast + 0.05, function()
 			panel.Visible = false
-		end
+			panel.Size = originalSize
+			panel.Position = originalPosition
+			panel.BackgroundTransparency = UIConfig.TRANSPARENCY.Panel
+		end)
 
 		if options.close then
 			options.close()
@@ -117,22 +105,18 @@ function CozyModalShell.wrap(panel, options)
 		btn:SetAttribute("HoverWired", true)
 		local origSize = btn.Size
 		btn.MouseEnter:Connect(function()
-			if not UserInputService.ReducedMotionEnabled then
-				TweenService:Create(btn, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
-					Size = UDim2.new(origSize.X.Scale * 1.05, 0, origSize.Y.Scale * 1.05, 0),
-				}):Play()
-			end
+			TweenService:Create(btn, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+				Size = UDim2.new(origSize.X.Scale * 1.05, 0, origSize.Y.Scale * 1.05, 0),
+			}):Play()
 			local zsc = _G.ZundaSoundController
 			if zsc and zsc.play then
 				zsc.play("ButtonHover")
 			end
 		end)
 		btn.MouseLeave:Connect(function()
-			if not UserInputService.ReducedMotionEnabled then
-				TweenService:Create(btn, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
-					Size = origSize,
-				}):Play()
-			end
+			TweenService:Create(btn, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
+				Size = origSize,
+			}):Play()
 		end)
 	end
 
@@ -148,27 +132,9 @@ function CozyModalShell.wrap(panel, options)
 		end
 	end)
 
-	-- Escape key closes the topmost modal if this panel is the current one
-	-- Uses options.actionId (the UIRouter action ID) for comparison, not panel.Name
-	if _G.ZundaUIRouter and options.actionId then
-		local escConn
-		escConn = UserInputService.InputBegan:Connect(function(input, processed)
-			if processed then return end
-			if input.KeyCode == Enum.KeyCode.Escape then
-				if _G.ZundaUIRouter.getCurrent() == options.actionId then
-					closeShell()
-				end
-			end
-		end)
-
-		return {
-			open = openShell,
-			close = closeShell,
-			destroy = function()
-				escConn:Disconnect()
-			end,
-		}
-	end
+	-- Escape key handling is delegated to UIRouter.lua (the canonical source).
+	-- CozyModalShell does NOT register its own Escape listener to avoid double-close.
+	-- The UIRouter's global InputBegan calls closeShell() for the current modal.
 
 	return {
 		open = openShell,
@@ -178,7 +144,7 @@ end
 
 function CozyModalShell.applyReducedMotion(panel)
 	if not panel then return false end
-	return UserInputService.ReducedMotionEnabled
+	return false
 end
 
 return CozyModalShell

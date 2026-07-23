@@ -9,6 +9,11 @@
 
     <title>Zundamon's Kitchen V2 — Kawaii PC Desktop x Game Showcase Launchpad</title>
 
+    <!-- Google Fonts: Cute Y2K 2000s Aesthetic (M PLUS Rounded 1c, Fredoka, Comic Neue, VT323) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,700;1,700&family=Fredoka:wght@400;600;700&family=M+PLUS+Rounded+1c:wght@700;800;900&family=VT323&display=swap" rel="stylesheet">
+
     <!-- Embedded Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫛</text></svg>">
 
@@ -34,26 +39,20 @@
                 <a href="#desktop">PC Desktop 💻</a>
                 <a href="#promos">Codes 🎁</a>
                 <a href="#recipes" data-open-window="window-cookbook">Recipes 📖</a>
+                <a href="#credits" data-open-window="window-credits">Credits 📜</a>
                 <button id="nav-cli-btn" class="nav-btn cli-link-btn" data-open-window="window-zundacli">💻 ZundaCLI</button>
-                <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" class="nav-btn play-roblox-nav-btn pulse-cta">🎮 PLAY ON ROBLOX NOW</a>
+                <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer" class="nav-btn play-roblox-nav-btn pulse-cta">🎮 PLAY ON ROBLOX NOW</a>
             </nav>
         </div>
     </header>
 
     <!-- 2. Big Game Launch Hero Banner -->
     <section id="hero" class="game-hero">
-        <!-- Live Telemetry Ticker Banner -->
-        <div id="hero-live-ticker" class="hero-live-ticker">
-            <div class="ticker-content" id="ticker-content-text">
-                🌸 <strong>Active Event:</strong> Whims of Gourmet - Spring Festival (2.0x Style Points & Gold) &nbsp;&nbsp;|&nbsp;&nbsp; 🎯 <strong>Featured Daily Challenge:</strong> Perfect Timing &nbsp;&nbsp;|&nbsp;&nbsp; 🎁 <strong>Active Promo Code:</strong> <code>HYBRIDECS</code> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍🍳 <strong>Online Chefs:</strong> 125 CHEFS ONLINE
-            </div>
-        </div>
-
         <div class="hero-container">
             <div class="hero-content">
                 <div class="status-pill">
                     <span class="pill-dot">🟢</span>
-                    <span class="pill-text" id="status-pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS (125 CHEFS ONLINE)</span>
+                    <span class="pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS</span>
                 </div>
 
                 <h1 class="hero-title">
@@ -65,7 +64,7 @@
                 </p>
 
                 <div class="hero-actions">
-                    <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" class="cta-btn primary-cta btn-candy btn-roblox-play">
+                    <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer" class="cta-btn primary-cta btn-candy btn-roblox-play">
                         <span class="cta-icon">🎮</span>
                         <span class="cta-text">PLAY ON ROBLOX NOW</span>
                     </a>
@@ -79,17 +78,6 @@
                     </button>
                 </div>
 
-                <!-- Community Global Dishes Cooked Progress Bar -->
-                <div class="community-progress-container">
-                    <div class="progress-info">
-                        <span>👨‍🍳 <strong>Community Global Cooking Goal</strong></span>
-                        <span id="dishes-cooked-text">142,850 / 200,000 Dishes Cooked (71% Goal Completed!)</span>
-                    </div>
-                    <div class="progress-bar-track">
-                        <div id="dishes-cooked-bar" class="progress-bar-fill" style="width: 71%;"></div>
-                    </div>
-                </div>
-
                 <div class="hero-pills">
                     <span class="hero-tag">🌾 Resource Gathering</span>
                     <span class="hero-tag">🍳 Rhythm Minigames</span>
@@ -101,30 +89,14 @@
             </div>
 
             <div class="hero-card-preview">
-                <div class="zunda-hero-avatar-box">
-                    <svg viewBox="0 0 200 200" width="160" height="160" class="hero-zunda-svg">
-                        <!-- Ears -->
-                        <ellipse cx="55" cy="40" rx="24" ry="42" fill="#8bc34a" transform="rotate(-25 55 40)"/>
-                        <ellipse cx="145" cy="40" rx="24" ry="42" fill="#8bc34a" transform="rotate(25 145 40)"/>
-                        <ellipse cx="55" cy="40" rx="14" ry="28" fill="#a5d6a7" transform="rotate(-25 55 40)"/>
-                        <ellipse cx="145" cy="40" rx="14" ry="28" fill="#a5d6a7" transform="rotate(25 145 40)"/>
-                        <!-- Head -->
-                        <circle cx="100" cy="115" r="60" fill="#4caf50"/>
-                        <!-- Chef Hat -->
-                        <path d="M 70 65 C 70 40, 130 40, 130 65 Z" fill="#ffffff"/>
-                        <rect x="70" y="60" width="60" height="12" rx="4" fill="#ffb7c5"/>
-                        <!-- Face -->
-                        <circle cx="78" cy="108" r="7.5" fill="#1b5e20"/>
-                        <circle cx="122" cy="108" r="7.5" fill="#1b5e20"/>
-                        <circle cx="80" cy="105" r="2.5" fill="#ffffff"/>
-                        <circle cx="124" cy="105" r="2.5" fill="#ffffff"/>
-                        <ellipse cx="68" cy="118" rx="9" ry="4.5" fill="#ff85a1" opacity="0.8"/>
-                        <ellipse cx="132" cy="118" rx="9" ry="4.5" fill="#ff85a1" opacity="0.8"/>
-                        <path d="M 90 118 Q 100 128 110 118" fill="none" stroke="#1b5e20" stroke-width="3.5" stroke-linecap="round"/>
-                    </svg>
-                    <div class="hero-avatar-badge">
-                        <span class="badge-title">Zundamon</span>
-                        <span class="badge-sub">Level 24 Master Companion 🫛</span>
+                <div class="zunda-hero-avatar-box Y2K-hero-showcase">
+                    <div class="hero-gif-container">
+                        <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" class="hero-zunda-gif-anim">
+                        <img src="assets/zunda_transparent.png" alt="Zundamon Cutout" class="hero-zunda-cutout-img">
+                    </div>
+                    <div class="hero-avatar-badge Y2K-badge-glow">
+                        <span class="badge-title">🫛 ZUNDAMON (ずんだもん)</span>
+                        <span class="badge-sub">Ultimate Pea Spirit · Level 24 Master 🍡✨</span>
                     </div>
                 </div>
             </div>
@@ -162,27 +134,54 @@
                     <p>Place furniture, design your kitchen plot, serve hungry NPC guests, earn gold, and level up your chef rank!</p>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Active Daily Challenges Container -->
-            <div class="telemetry-challenges-container" style="margin-top: 40px;">
-                <h3 class="section-title" style="font-size: 22px;">🎯 TODAY'S FEATURED DAILY CHALLENGES</h3>
-                <p class="section-subtitle" style="margin-bottom: 20px;">Complete these daily quests in-game to earn gold, XP, and style points!</p>
-                <div id="active-challenges-list" class="challenges-grid">
-                    <div class="challenge-item-card">
-                        <div class="challenge-title">🎯 <strong>Perfect Timing</strong> <span class="challenge-diff">Difficulty ⭐⭐</span></div>
-                        <div class="challenge-desc">Cook 3 dishes with PERFECT timing</div>
-                        <div class="challenge-reward">Reward: +120 Gold, +100 XP, +15 Style Points</div>
+    <!-- Front Page Featured Zundamon Artworks & Animated GIFs Section -->
+    <section id="frontpage-artworks" class="game-section Y2K-art-section">
+        <div class="section-container">
+            <h2 class="section-title">🫛 OFFICIAL ZUNDAMON ARTWORK & ANIMATIONS</h2>
+            <p class="section-subtitle">Explore official animated GIFs, transparent cutouts, HD key visual artworks, and audio tracks!</p>
+
+            <div class="frontpage-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 24px;">
+                <!-- Card 1: Animated GIF -->
+                <div class="Y2K-art-card" style="background: rgba(255,255,255,0.92); border: 3px solid #ff477e; border-radius: 24px; padding: 16px; text-align: center; box-shadow: 0 12px 30px rgba(255,71,126,0.3);">
+                    <div style="background: #fff0f5; border-radius: 16px; padding: 12px; height: 220px; display: flex; align-items: center; justify-content: center;">
+                        <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                     </div>
-                    <div class="challenge-item-card">
-                        <div class="challenge-title">🍳 <strong>Cooking Spree</strong> <span class="challenge-diff">Difficulty ⭐</span></div>
-                        <div class="challenge-desc">Cook 5 dishes</div>
-                        <div class="challenge-reward">Reward: +80 Gold, +60 XP, +10 Style Points</div>
+                    <h3 style="margin-top: 12px; font-size: 18px; color: #ff477e;">Zundamon Animated GIF 🎞️</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 8px;">Official animated loop · 389 KB</p>
+                    <a href="assets/zundamon_animation.gif" download class="win95-btn btn-candy" style="display: inline-block; padding: 8px 16px; font-size: 13px;">⬇️ Download GIF</a>
+                </div>
+
+                <!-- Card 2: Transparent Cutout -->
+                <div class="Y2K-art-card" style="background: rgba(255,255,255,0.92); border: 3px solid #4caf50; border-radius: 24px; padding: 16px; text-align: center; box-shadow: 0 12px 30px rgba(76,175,80,0.3);">
+                    <div style="background: #e8f5e9; border-radius: 16px; padding: 12px; height: 220px; display: flex; align-items: center; justify-content: center;">
+                        <img src="assets/zunda_transparent.png" alt="Zundamon Transparent PNG" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                     </div>
-                    <div class="challenge-item-card">
-                        <div class="challenge-title">✨ <strong>Flawless Chef</strong> <span class="challenge-diff">Difficulty ⭐⭐⭐</span></div>
-                        <div class="challenge-desc">Cook 5 PERFECT dishes</div>
-                        <div class="challenge-reward">Reward: +200 Gold, +150 XP, +25 Style Points</div>
+                    <h3 style="margin-top: 12px; font-size: 18px; color: #2e7d32;">Transparent Render Cutout 🫛</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 8px;">High-res 3.6 MB transparent PNG</p>
+                    <a href="assets/zunda_transparent.png" download class="win95-btn btn-candy" style="display: inline-block; padding: 8px 16px; font-size: 13px;">⬇️ Download Cutout</a>
+                </div>
+
+                <!-- Card 3: Key Visual 1 -->
+                <div class="Y2K-art-card" style="background: rgba(255,255,255,0.92); border: 3px solid #5b21b6; border-radius: 24px; padding: 16px; text-align: center; box-shadow: 0 12px 30px rgba(91,33,182,0.3);">
+                    <div style="background: #f3e5f5; border-radius: 16px; padding: 12px; height: 220px; display: flex; align-items: center; justify-content: center;">
+                        <img src="assets/zundamon_art_1.png" alt="Zundamon Main Visual 1" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                     </div>
+                    <h3 style="margin-top: 12px; font-size: 18px; color: #5b21b6;">Main Key Visual #1 🖼️</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 8px;">3.4 MB full-color promo art</p>
+                    <a href="assets/zundamon_art_1.png" download class="win95-btn btn-candy" style="display: inline-block; padding: 8px 16px; font-size: 13px;">⬇️ Download HD Art</a>
+                </div>
+
+                <!-- Card 4: Key Visual 2 -->
+                <div class="Y2K-art-card" style="background: rgba(255,255,255,0.92); border: 3px solid #ff85a1; border-radius: 24px; padding: 16px; text-align: center; box-shadow: 0 12px 30px rgba(255,133,161,0.3);">
+                    <div style="background: #ffe5ec; border-radius: 16px; padding: 12px; height: 220px; display: flex; align-items: center; justify-content: center;">
+                        <img src="assets/zundamon_art_2.png" alt="Zundamon Main Visual 2" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                    <h3 style="margin-top: 12px; font-size: 18px; color: #ff477e;">Main Key Visual #2 🌸</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 8px;">3.4 MB pose artwork</p>
+                    <a href="assets/zundamon_art_2.png" download class="win95-btn btn-candy" style="display: inline-block; padding: 8px 16px; font-size: 13px;">⬇️ Download HD Art</a>
                 </div>
             </div>
         </div>
@@ -240,13 +239,13 @@
             <h2 class="section-title">🎁 ACTIVE RECURRING PLAYER PROMO CODES</h2>
             <p class="section-subtitle">Copy these active codes and redeem them inside Zundamon's Kitchen on Roblox!</p>
 
-            <div class="codes-grid" id="telemetry-promos-grid">
+            <div class="codes-grid">
                 <div class="code-box">
                     <div class="code-header">
                         <span class="code-val">ZUNDAMOCHI2026</span>
                         <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">📋 Copy Code</button>
                     </div>
-                    <span class="code-reward">Reward: +500 Gold, +50 Gems, 10x Fresh Zunda Mochi</span>
+                    <span class="code-reward">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
                 </div>
 
                 <div class="code-box">
@@ -254,23 +253,7 @@
                         <span class="code-val">SOUPSEASON</span>
                         <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">📋 Copy Code</button>
                     </div>
-                    <span class="code-reward">Reward: +1000 Gold, +100 Gems, 5x Wild Mushroom Pack</span>
-                </div>
-
-                <div class="code-box">
-                    <div class="code-header">
-                        <span class="code-val">KAWAIIZUNDA</span>
-                        <button class="win95-btn copy-code-btn btn-candy" data-code="KAWAIIZUNDA">📋 Copy Code</button>
-                    </div>
-                    <span class="code-reward">Reward: +750 Gold, +75 Gems, Sakura Chef Apron</span>
-                </div>
-
-                <div class="code-box">
-                    <div class="code-header">
-                        <span class="code-val">NIKKIFASHION</span>
-                        <button class="win95-btn copy-code-btn btn-candy" data-code="NIKKIFASHION">📋 Copy Code</button>
-                    </div>
-                    <span class="code-reward">Reward: +1500 Gold, +150 Gems, 3x Whim Gacha Tickets</span>
+                    <span class="code-reward">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
                 </div>
 
                 <div class="code-box">
@@ -278,7 +261,7 @@
                         <span class="code-val">HYBRIDECS</span>
                         <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">📋 Copy Code</button>
                     </div>
-                    <span class="code-reward">Reward: +2000 Gold, +200 Gems, 5x Whim Gacha Tickets</span>
+                    <span class="code-reward">Reward: +250 Gold, Matter ECS Developer Badge</span>
                 </div>
             </div>
         </div>
@@ -333,6 +316,18 @@
                     <span class="tile-title">Updates.log</span>
                     <span class="tile-desc">Patch Notes & ECS Log</span>
                 </button>
+
+                <button class="os-app-tile" data-open-window="window-gallery">
+                    <span class="tile-icon">🖼️</span>
+                    <span class="tile-title">Gallery.app</span>
+                    <span class="tile-desc">Artworks & PNG Assets</span>
+                </button>
+
+                <button class="os-app-tile" data-open-window="window-credits">
+                    <span class="tile-icon">📜</span>
+                    <span class="tile-title">Credits.app</span>
+                    <span class="tile-desc">Attribution & Licenses</span>
+                </button>
             </div>
 
             <!-- Desktop Viewport & Widgets Container -->
@@ -351,14 +346,15 @@
                         </div>
                     </div>
 
-                    <!-- Widget 2: Lo-Fi Jukebox & Rain FX Widget -->
+                    <!-- Widget 2: Lo-Fi Jukebox & zunda.mp3 Music Player Widget -->
                     <div id="widget-jukebox" class="desktop-widget jukebox-widget">
+                        <audio id="zunda-mp3-player" src="assets/zunda.mp3" preload="auto" loop></audio>
                         <div class="jukebox-track-info">
                             <span id="jukebox-disc-icon" class="jukebox-icon">🎵</span>
-                            <span id="jukebox-track-title" class="jukebox-title">Zunda Cozy Kitchen</span>
+                            <span id="jukebox-track-title" class="jukebox-title">🫛 Zunda Cozy Theme (zunda.mp3)</span>
                         </div>
                         <div class="jukebox-controls">
-                            <button id="widget-play-bgm" class="btn-candy jukebox-btn" title="Play / Pause Cozy BGM">▶ BGM</button>
+                            <button id="widget-play-bgm" class="btn-candy jukebox-btn" title="Play / Pause zunda.mp3 Theme">▶ zunda.mp3</button>
                             <button id="widget-next-track" class="btn-candy jukebox-btn mini-btn" title="Next Track">⏭</button>
                         </div>
                         <div class="rain-sfx-container" title="Rain Ambience SFX Volume">
@@ -497,13 +493,9 @@
                         </div>
                         <div class="window-body promos-body">
                             <h3>🎁 Active Roblox Promo Codes</h3>
-                            <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
-                                <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">Copy ZUNDAMOCHI2026</button>
-                                <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">Copy SOUPSEASON</button>
-                                <button class="win95-btn copy-code-btn btn-candy" data-code="KAWAIIZUNDA">Copy KAWAIIZUNDA</button>
-                                <button class="win95-btn copy-code-btn btn-candy" data-code="NIKKIFASHION">Copy NIKKIFASHION</button>
-                                <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">Copy HYBRIDECS</button>
-                            </div>
+                            <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">Copy ZUNDAMOCHI2026</button>
+                            <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">Copy SOUPSEASON</button>
+                            <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">Copy HYBRIDECS</button>
                         </div>
                     </div>
 
@@ -567,6 +559,93 @@
                         </div>
                     </section>
 
+                    <!-- 8. Gallery.app Window -->
+                    <section id="window-gallery" class="window hidden" data-window-id="gallery" style="top: 150px; left: 220px; width: 660px; height: 480px;" tabindex="0">
+                        <div class="window-header">
+                            <div class="window-title">
+                                <span class="window-icon">🖼️</span>
+                                <span class="window-title-text">Gallery.app — Zundamon Artworks & Assets</span>
+                            </div>
+                            <div class="window-controls">
+                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                            </div>
+                        </div>
+                        <div class="window-body gallery-body" style="padding: 16px; overflow-y: auto;">
+                            <h3 style="margin-bottom: 12px; color: #ff477e;">🖼️ Official Zundamon Animations, Artworks & 3D Assets</h3>
+                            <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #ffb7c5; text-align: center;">
+                                    <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
+                                    <h4 style="margin-top: 8px; font-size: 14px; color: #ff477e;">Zundamon Animated GIF 🎞️</h4>
+                                    <a href="assets/zundamon_animation.gif" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download GIF</a>
+                                </div>
+                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                                    <img src="assets/zunda_transparent.png" alt="Zundamon Transparent PNG" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #e8dff5;">
+                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon Transparent Render 🫛</h4>
+                                    <a href="assets/zunda_transparent.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download Cutout</a>
+                                </div>
+                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                                    <img src="assets/zundamon_art_1.png" alt="Zundamon Illustration 1" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
+                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon Main Visual #1</h4>
+                                    <a href="assets/zundamon_art_1.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download HD PNG</a>
+                                </div>
+                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                                    <img src="assets/zundamon_art_2.png" alt="Zundamon Illustration 2" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
+                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon Main Visual #2</h4>
+                                    <a href="assets/zundamon_art_2.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download HD PNG</a>
+                                </div>
+                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                                    <img src="assets/Tex_Head.png" alt="Zundamon Texture Head" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #231b2e;">
+                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon 3D Texture Map</h4>
+                                    <a href="assets/Tex_Head.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download Texture</a>
+                                </div>
+                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                                    <div style="width: 100%; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e8dff5; border-radius: 8px;">
+                                        <span style="font-size: 48px;">📦</span>
+                                        <span style="font-weight: bold; color: #5b21b6; margin-top: 6px;">3D FBX Mesh Pack</span>
+                                    </div>
+                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundapal Rig v4 & Pea Mesh</h4>
+                                    <span style="font-size: 11px; color: #666; display: block; margin-top: 2px;">zundapalupdate4.fbx · zundapal.fbx</span>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- 9. Credits.app Window -->
+                    <section id="window-credits" class="window hidden" data-window-id="credits" style="top: 140px; left: 180px; width: 680px; height: 500px;" tabindex="0">
+                        <div class="window-header">
+                            <div class="window-title">
+                                <span class="window-icon">📜</span>
+                                <span class="window-title-text">Credits.app — Definitive Attribution & Legal License Guidelines</span>
+                            </div>
+                            <div class="window-controls">
+                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                            </div>
+                        </div>
+                        <div class="window-body credits-body" style="padding: 18px; overflow-y: auto; color: #1b5e20; background: #fff5f8;">
+                            <h3 style="color: #ff477e; margin-bottom: 8px;">🫛 SSS LLC — Zundamon Ownership & Royalty-Free Guidelines</h3>
+                            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+                                <strong>Zundamon (ずんだもん)</strong> character design, name, official voice model, and character trademarks are owned by <strong>SSS LLC (合同会社SSS / Tohoku Zunko Project)</strong> (<a href="https://zunko.jp/" target="_blank" rel="noopener">zunko.jp</a>). Used in full compliance with official <a href="https://zunko.jp/guideline.html" target="_blank" rel="noopener">SSS LLC Royalty-Free Character Guidelines</a>. Voice synthesis powered by <strong>VOICEVOX:ずんだもん</strong> (<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">voicevox.hiroshiba.jp</a>).
+                            </p>
+
+                            <h3 style="color: #2e7d32; margin-bottom: 8px;">🎨 Kenney (www.kenney.nl) — 3D Environment, NPC & Skybox Assets</h3>
+                            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+                                3D nature props, food meshes, furniture, guest NPC avatars, and skybox cubemaps created by <strong>Kenney (www.kenney.nl)</strong> under the <strong>CC0 1.0 Universal (Public Domain)</strong> license. Browse full 3D asset catalog at <a href="https://kenney.nl/assets/category:3D/page:3" target="_blank" rel="noopener">Kenney 3D Assets Catalog (Page 3)</a>.
+                            </p>
+
+                            <h3 style="color: #5b21b6; margin-bottom: 8px;">🎵 Nomagician — Audio, BGM & UI Sound Effects</h3>
+                            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+                                Ambient background music tracks (<em>Cozy Ambience by Nomagician</em>) and UI minigame sound effects (<em>Cute, Cozy & Magical UI SFX by Nomagician</em>) created by <strong>Nomagician</strong>.
+                            </p>
+
+                            <h3 style="color: #475569; margin-bottom: 8px;">🖱️ wappon_28_dev — Custom Cursors</h3>
+                            <p style="font-size: 13px; line-height: 1.5;">
+                                Zundamon & <code>zunda_arrow</code> custom cursor sets created by <strong>wappon_28_dev</strong> (X: @yurirofu) under the MIT License.
+                            </p>
+                        </div>
+                    </section>
+
                 </div>
             </div>
 
@@ -608,7 +687,7 @@
             </div>
             <div class="footer-right">
                 <a href="https://github.com/fromage3900/Zundamons-Kitchen-V2" target="_blank" rel="noopener noreferrer">GitHub Repo</a> · 
-                <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer">Roblox Game Page</a>
+                <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer">Roblox Game Page</a>
             </div>
         </div>
     </footer>

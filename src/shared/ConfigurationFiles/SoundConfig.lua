@@ -75,8 +75,22 @@ local SoundConfig = {
         CoinEarn = 0.4,
     },
 
-    -- Ambient loop (background music)
-    AmbientLoop = "rbxassetid://87341474417325",
+    -- Ambient zone sounds (positioned 3D audio via AmbientZoneAudio)
+    ZoneAmbient = {
+        Kitchen = { soundId = "rbxassetid://9112780462", volume = 0.12, range = 20 },
+        Garden  = { soundId = "rbxassetid://9112832297", volume = 0.08, range = 30 },
+        Pond    = { soundId = "rbxassetid://9119646409", volume = 0.10, range = 25 },
+    },
+
+    -- Companion interaction sounds
+    Companion = {
+        pet       = "rbxassetid://4612374495",
+        greeting  = "rbxassetid://4612374495",
+        buff      = "rbxassetid://4612374495",
+    },
+
+    -- Ambient loop (background music - Nomagician Cozy Ambience)
+    AmbientLoop = "rbxassetid://128983191747430",
 }
 
 -- Helper: get the Sound object for a UI action

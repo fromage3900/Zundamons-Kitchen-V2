@@ -16,9 +16,9 @@ ShopConfig.clothing = {
         name        = "Chef's Apron",
         description = "A classic white apron for the dedicated cook!",
         type        = "Shirt",
-        assetId     = 0,  -- replace with real Roblox asset ID
+        assetId     = 124313400083326,
         price       = 50,
-        tier        = 1,  -- unlocked from start
+        tier        = 1,
         icon        = "🧑‍🍳",
     },
     {
@@ -26,7 +26,7 @@ ShopConfig.clothing = {
         name        = "Tall Chef Hat",
         description = "Stand tall in the kitchen!",
         type        = "Accessory",
-        assetId     = 0,
+        assetId     = 79529054188241,
         price       = 30,
         tier        = 1,
         icon        = "👨‍🍳",
@@ -36,9 +36,9 @@ ShopConfig.clothing = {
         name        = "Royal Chef Outfit",
         description = "Unlocked at Royal Chef tier. Gold trim, très chic!",
         type        = "Shirt",
-        assetId     = 0,
+        assetId     = 88512290116227,
         price       = 150,
-        tier        = 2,  -- requires Royal Chef (5 guests)
+        tier        = 2,
         icon        = "👑",
     },
     {
@@ -46,7 +46,7 @@ ShopConfig.clothing = {
         name        = "Zundamon Dress",
         description = "A green and white dress inspired by Zundamon herself!",
         type        = "Shirt",
-        assetId     = 0,
+        assetId     = 92998624991809,
         price       = 200,
         tier        = 2,
         icon        = "🌿",
@@ -56,9 +56,9 @@ ShopConfig.clothing = {
         name        = "Master Chef Robe",
         description = "Wear the mark of a Master Chef.",
         type        = "Shirt",
-        assetId     = 0,
+        assetId     = 133727406586878,
         price       = 400,
-        tier        = 3,  -- requires Master Chef (20 guests)
+        tier        = 3,
         icon        = "⭐",
     },
     {
@@ -66,9 +66,9 @@ ShopConfig.clothing = {
         name        = "Legend's Crown",
         description = "Only Legends wear this. Serve 50 guests to unlock!",
         type        = "Accessory",
-        assetId     = 0,
+        assetId     = 115422541288396,
         price       = 1000,
-        tier        = 4,  -- requires Legend (50 guests)
+        tier        = 4,
         icon        = "🏆",
     },
 }

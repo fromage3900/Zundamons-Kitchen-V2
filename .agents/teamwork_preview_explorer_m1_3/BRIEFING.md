@@ -1,36 +1,49 @@
-# BRIEFING — 2026-07-22T17:23:55Z
+# BRIEFING — 2026-07-22T21:34:30Z
 
 ## Mission
-Audit default.project.json, wally.toml, run scripts/preflight_audit.py, document failures/warnings, and write handoff report.
+Audit default unlocked companions in player data & initial state across server/client scripts for Milestone 1.
 
 ## 🔒 My Identity
 - Archetype: Explorer
-- Roles: Explorer 3
+- Roles: Read-only investigator / analyzer
 - Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3
-- Original parent: 0c8ea642-0389-4403-bc3c-eafb5b552e57
-- Milestone: Milestone 1
+- Original parent: c873e613-5eb4-4470-8789-0eba61b841bc
+- Milestone: Milestone 1 - Companion System & Companion Shop Synchronization
 
 ## 🔒 Key Constraints
-- Read-only investigation — do NOT implement
-- Operational mode: CODE_ONLY
+- Read-only investigation — do NOT implement code directly into src/
+- Follow workspace rules (Roblox Studio / Rojo 7.7.0, Infinity Nikki aesthetic, etc.)
 
 ## Current Parent
-- Conversation ID: 0c8ea642-0389-4403-bc3c-eafb5b552e57
-- Updated: 2026-07-22T17:23:55Z
+- Conversation ID: c873e613-5eb4-4470-8789-0eba61b841bc
+- Updated: 2026-07-22T21:34:30Z
 
 ## Investigation State
-- **Explored paths**: `default.project.json`, `wally.toml`, `.gitignore`, `scripts/preflight_audit.py`, `src/` Luau files via `selene` static analysis.
+- **Explored paths**:
+  - `src/shared/ConfigurationFiles/CompanionConfig.lua`
+  - `src/shared/ConfigurationFiles/CompanionVisualConfig.lua`
+  - `src/shared/ConfigurationFiles/MarketplaceConfig.lua`
+  - `src/server/Services/PlayerDataService.lua`
+  - `src/server/CompanionShopServer.server.lua`
+  - `src/server/CompanionManager.server.lua`
+  - `src/server/Services/MarketplaceService.lua`
+  - `src/server/RobuxStoreServer.server.lua`
+  - `src/client/CompanionShopScript.client.lua`
+  - `src/client/StoreScript.client.lua`
+  - `src/client/CompanionHUD.client.lua`
 - **Key findings**:
-  1. `default.project.json` correctly configures `$ignoreUnknownInstances: true` under `Workspace`.
-  2. `wally.toml` & `default.project.json` package mappings (`Packages` in `ReplicatedStorage`, `ServerPackages` in `ServerScriptService`) are fully compliant with workspace rules.
-  3. `python scripts/preflight_audit.py` passes all 3 basic preflight checks.
-  4. Extended `selene` static audit detected 9 Luau static code errors (syntax parse error in `PeaWheelController.lua`, invalid `Instance.new("UIClip")` in `DailyChecklistUI.client.lua`, invalid `Instance.new("NumberSequence")` in `CrystalFX.lua`, undefined `notify` in `ZundaGatherServer.server.lua`, etc.) and 334 warnings.
-- **Unexplored areas**: None. Audit is complete.
+  - `CompanionConfig.lua` correctly sets `free = true` for `zundapal`, `dog`, `parrot`, `cat`, `ankomon` and `free = false, price = 1000, robux = 1000` for premium companions `cardamon`, `antimon`, `sakuradamon`, `tantanmon`.
+  - CRITICAL BUG 1: `CompanionShopServer.server.lua` hardcodes `tantanmon = true` as default owned, making premium companion `tantanmon` unlocked by default.
+  - CRITICAL BUG 2: `CompanionShopServer.server.lua` omits `ankomon` from default owned companions in `GetOwnedCompanions.OnServerInvoke`.
+  - CRITICAL BUG 3: `StoreScript.client.lua` lists `tantanmon` under `FREE_COMPANIONS` and omits `ankomon`.
+  - CRITICAL BUG 4: `MarketplaceConfig.lua` contains legacy dev product mappings (`zundacat`, `zundabunny`) instead of mapping `cardamon`, `antimon`, `sakuradamon`, `tantanmon`.
+- **Unexplored areas**: None, full companion catalog & player data initialization audit completed.
 
 ## Key Decisions Made
-- Performed read-only audit of Rojo config, Wally structure, preflight script, and static code linting via Selene.
+- Prepared detailed proposed fixes and exact line-by-line diff recommendations for implementers in `analysis.md` and `handoff.md`.
 
 ## Artifact Index
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\ORIGINAL_REQUEST.md — Original task request
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\BRIEFING.md — Persistent briefing state
-- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\handoff.md — Final structured handoff report
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\ORIGINAL_REQUEST.md — Original request log
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\BRIEFING.md — Persistent state briefing
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\analysis.md — Comprehensive Companion Audit Report
+- g:\Zundamons-kItchen-V2\.agents\teamwork_preview_explorer_m1_3\handoff.md — 5-component Handoff Report

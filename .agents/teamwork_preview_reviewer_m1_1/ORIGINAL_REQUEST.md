@@ -1,25 +1,22 @@
-## 2026-07-22T17:34:07Z
-You are Reviewer 1 for Milestone 1 of Zundamon's Kitchen V2.
-Your working directory is: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_1
+## 2026-07-22T21:35:54Z
+You are Reviewer 1 for Milestone 1 Gate Verification of Zundamon's Kitchen V2 - Companion System & Companion Shop Synchronization.
 
-TASK: Code Correctness & Static Analysis Review for Milestone 1
-1. Audit all modified files in `src/client/`, `src/server/`, `src/shared/`:
-   - `src/client/Controllers/PeaWheelController.lua`
-   - `src/client/DailyChecklistUI.client.lua`
-   - `src/client/OutfitWardrobeGui.client.lua`
-   - `src/shared/ConfigurationFiles/CozyModalShell.lua`
-   - `src/shared/ConfigurationFiles/CrystalFX.lua`
-   - `src/server/ZundaGatherServer.server.lua`
-   - `src/server/DayNightSky.server.lua`
-   - `src/client/StoreScript.client.lua`
-   - `src/server/systems/EndlessLoopWiring.server.lua`
-   - `src/server/Services/ServingService.lua`
-   - `src/server/GuestManager.server.lua`
-   - `src/client/VNController.client.lua`
-   - `src/server/ServerMain.server.lua`
-2. Run `python scripts/preflight_audit.py` using `run_command` (Cwd: g:\Zundamons-kItchen-V2).
-3. Run `rojo build default.project.json -o build/Zundamons-kItchen.rbxl` using `run_command`.
-4. Run `selene src` using `run_command`.
-5. Verify zero static errors, valid Luau syntax, and clean build.
-6. Write your complete review report and verdict to `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_1\handoff.md`.
-7. Send a message to caller with your verdict (APPROVED / REJECTED) and report path.
+Working directory: g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_1
+
+Objective:
+Review the code changes made in Milestone 1 for correctness, safety, and adherence to requirements.
+
+Files to review:
+- `src/shared/ConfigurationFiles/CompanionConfig.lua`
+- `src/shared/ConfigurationFiles/MarketplaceConfig.lua`
+- `src/server/CompanionShopServer.server.lua`
+- `src/client/StoreScript.client.lua`
+- `src/client/CompanionShopScript.client.lua`
+
+Verification Criteria:
+1. `CompanionConfig.lua`: 4 free companions (`parrot`, `dog`, `cat`, `ankomon`) + starter `zundapal` have `free = true`, `price = 0`. 4 premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`) have `free = false`, `price = 1000`, `robux = 1000`.
+2. `MarketplaceConfig.lua`: DevProduct mapping for companions connects `cardamon`, `antimon`, `sakuradamon`, `tantanmon` cleanly without ID collisions or broken references.
+3. `CompanionShopServer.server.lua`: `GetOwnedCompanions` dynamically populates defaults from `CompanionConfig.companions` where `def.free == true` and merges player data flags. `tantanmon` is NOT owned by default.
+4. `StoreScript.client.lua` and `CompanionShopScript.client.lua`: UI lists and tab order correctly reflect free vs premium companions. `ResetOnSpawn = false` enforced on ScreenGuis.
+
+Write your review verdict and details into `g:\Zundamons-kItchen-V2\.agents\teamwork_preview_reviewer_m1_1\review.md` and `handoff.md`, and send a summary back via send_message. State clearly if you APPROVE or REJECT.

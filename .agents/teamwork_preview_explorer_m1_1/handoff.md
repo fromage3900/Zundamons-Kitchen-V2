@@ -1,148 +1,51 @@
-# Handoff Report — Explorer 1 (Milestone 1: Server & Remote Definition Audit)
+# Handoff Report — Milestone 1 Companion System Investigation
 
 ## 1. Observation
 
-### A. RemoteEvents & RemoteFunctions Audit Findings
+### CompanionConfig.lua (`src/shared/ConfigurationFiles/CompanionConfig.lua`)
+- `CompanionConfig.companions` defines 9 companions:
+  - Free (`free = true`, `price = 0`): `zundapal`, `dog`, `parrot`, `cat`, `ankomon`.
+  - Premium (`free = false`, `price = 1000`, `robux = 1000`): `cardamon`, `antimon`, `sakuradamon`, `tantanmon`.
+- Buffs defined:
+  - `ankomon`: `{ stat = "gold", magnitude = 0.15, description = "+15% gold from serving guests" }`
+  - `cardamon`: `{ stat = "perfect_window", magnitude = 0.30, description = "+30% wider perfect cooking window" }`
+  - `antimon`: `{ stat = "extra_drop", magnitude = 0.20, description = "+20% chance of extra drop on gather" }`
+  - `sakuradamon`: `{ stat = "xp", magnitude = 0.25, description = "+25% XP from crafting & serving" }`
+  - `tantanmon`: `{ stat = "speed", magnitude = 0.20, description = "+20% move speed & cook speed" }`
 
-1. **Typo Mismatch & Missing Client Handler for Guest Dialogue Remote (`ShowVNDialgue`)**:
-   - **`src/server/GuestManager.server.lua` (lines 213, 216, 392)**:
-     ```lua
-     local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialgue")
-     if not VNEvent then
-         VNEvent = Instance.new("RemoteEvent")
-         VNEvent.Name = "ShowVNDialgue"
-         VNEvent.Parent = RS.RemoteEvents
-     end
-     ```
-   - **`src/server/Services/ServingService.lua` (line 74)**:
-     ```lua
-     local event = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialgue")
-     if type(text) == "string" and event and event:IsA("RemoteEvent") then
-         event:FireClient(player, "guest", text)
-     end
-     ```
-   - **`src/client/VNController.client.lua`**: Contains **ZERO** references or listeners for `ShowVNDialgue` or `ShowVNDialogue`. Guest dialogue messages fired by server on guest spawn, guest wrong dish, or guest served are completely dropped on the client. Note also the spelling typo (`Dialgue` instead of `Dialogue`).
+### MarketplaceConfig.lua (`src/shared/ConfigurationFiles/MarketplaceConfig.lua`)
+- `MarketplaceConfig.products` lines 13-16:
+  - `[1111111101] = { type = "companion", key = "zundacat", name = "ZundaCat Companion" }`
+  - `[1111111102] = { type = "companion", key = "zundabunny", name = "ZundaBunny Companion" }`
+  - `[1111111103] = { type = "companion", key = "tantanmon", name = "TantanMon Companion" }`
+  - `[1111111104] = { type = "recipe", key = "Premium Ramen", name = "Premium Ramen Recipe" }`
+- `MarketplaceConfig.companionDevProductIds` lines 26-32:
+  - `cardamon = 0`, `antimon = 0`, `sakuradamon = 0` (unconfigured!).
+  - `zundacat = 1111111101`, `zundabunny = 1111111102` (obsolete keys).
+- `MarketplaceConfig.storeDisplay.companions` lines 38-41:
+  - ID `1111111101` mapped to `cardamon`, ID `1111111102` mapped to `antimon`, ID `1111111103` mapped to `sakuradamon`, ID `1111111104` mapped to `tantanmon`.
 
-2. **Unbound RemoteFunction (`GiveLoot`) & Dynamic Setup Race Condition**:
-   - **`src/client/CreateLoot.client.lua` (line 6, 189)**:
-     ```lua
-     local giveloot = RF:WaitForChild("GiveLoot")
-     local given = giveloot:InvokeServer(myloot, generatedCode)
-     ```
-   - **`src/shared/ConfigurationFiles/LootModule.lua` (lines 15, 171)**:
-     ```lua
-     local giveLoot = remoteFunctions:WaitForChild("GiveLoot") :: RemoteFunction
-     giveLoot.OnServerInvoke = LootModule.GiveLoot
-     ```
-   - `LootModule.lua` is a shared module required lazily when a mining node breaks in `Mineable.server.lua` or player leaves in `PlayerLeaving.server.lua`. Until `LootModule.lua` is required by a server script, `giveLoot.OnServerInvoke` is `nil`. If a player interacts with loot before `LootModule.lua` is required, calling `InvokeServer` throws `OnServerInvoke is non-nil / nil` runtime error.
-
-3. **Endless Loop RemoteEvents Missing Client Integration**:
-   - **`src/server/Services/ChallengeModeService.lua` & `DailyChallengeService.lua`**: Create `ChallengeMode`, `ChallengeModeStatus`, `DailyChallenge`, `DailyChallengeStatus` RemoteEvents.
-   - **`src/server/systems/EndlessLoopWiring.server.lua`**: Creates `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock` RemoteEvents.
-   - **`src/client/OutfitWardrobeGui.client.lua`**: Hardcodes mock local data table `outfitItems` (`Mint Frill Apron`, `Golden Spatula Brooch`, etc.) instead of connecting to `ChefStatsUpdate`, `StylePointsUpdate`, or `OutfitUnlock` RemoteEvents from server.
-
-4. **Casing Mismatches**:
-   - `src/shared/RemoteFunctions/sellLoot.model.json` uses camelCase `sellLoot`, whereas most other remote functions use PascalCase (`ServeGuest`, `RequestData`, `CraftFunction`).
-
----
-
-### B. Module Import Path & Rule Verification
-
-1. **Rule 4 Compliance Verification (`ServerScriptService` path prepending)**:
-   - **`default.project.json` (lines 60-66)**:
-     ```json
-     "ServerScriptService": {
-       "$className": "ServerScriptService",
-       "$path": "src/server",
-       "ServerPackages": {
-         "$path": "ServerPackages"
-       }
-     }
-     ```
-   - **Audit Result**: All server modules in `src/server/` correctly use `ServerScriptService.Services.X` or `ServerScriptService.systems.X`.
-   - **No illegal `.Server.` path prepending found** (e.g. `ServerScriptService.Server.Services.X` does NOT exist in the codebase).
-   - `PlayerDataService.lua` (line 11) uses `ServerScriptService.ServerPackages.ProfileService`, which correctly reflects the `"ServerPackages"` mapping under `ServerScriptService`.
-
-2. **Architectural Boundary Violation (`LootModule.lua`)**:
-   - **`src/shared/ConfigurationFiles/LootModule.lua` (line 20)**:
-     ```lua
-     local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
-     ```
-   - `LootModule.lua` is placed under `src/shared/ConfigurationFiles/` (syncs to `ReplicatedStorage.ConfigurationFiles.LootModule`).
-   - ReplicatedStorage modules must be client-safe. If any client script requires `LootModule`, it will crash at runtime with `ServerScriptService is not accessible to client`.
-
----
-
-### C. Runtime Bugs & Service Logic Defects
-
-1. **Critical Event Wiring Failure in `EndlessLoopWiring.server.lua`**:
-   - **`src/server/systems/EndlessLoopWiring.server.lua` (lines 17-18, 36-54)**:
-     ```lua
-     local CookingService = ServerScriptService.Services:FindFirstChild("CookingService")
-     local ServingSystem = ServerScriptService.systems:FindFirstChild("ServingSystem")
-
-     if ServingSystem and ServingSystem.GuestServed then
-         ServingSystem.GuestServed.Event:Connect(function(player, guestType, quality)
-             if ChallengeModeService.isInChallenge(player) then
-                 ChallengeModeService.onGuestServed(player, quality, guestType)
-             end
-             DailyChallengeService.updateProgress(player, "serve", 1)
-         end)
-     end
-     ```
-   - **Defect Analysis**:
-     a) `ServingSystem.server.lua` is located at `src/server/ServingSystem.server.lua` (`ServerScriptService.ServingSystem`), NOT in `ServerScriptService.systems`. Thus `ServerScriptService.systems:FindFirstChild("ServingSystem")` returns `nil`.
-     b) `ServingSystem.server.lua` is a net adapter script (16 lines), NOT a service module or BindableEvent container. It does NOT define `GuestServed` or `GuestTimedOut` BindableEvents.
-     c) `ServingService.lua` (`ServerScriptService.Services.ServingService`) is the actual domain service, but it also does not export `GuestServed` or `GuestTimedOut` BindableEvents.
-     d) As a result, guest serving NEVER triggers `ChallengeModeService.onGuestServed` or `DailyChallengeService.updateProgress(player, "serve", 1)`.
-
----
+### Server & Client Companion Scripts
+- `src/server/CompanionShopServer.server.lua` line 68: `GetOwnedCompanions.OnServerInvoke` hardcodes:
+  `local owned = { zundapal = true, zundamon = true, zundacat = true, zundabunny = true, tantanmon = true, dog = true, parrot = true, cat = true }`
+  `ankomon` is missing; `tantanmon` is hardcoded as free (`true`).
+- `src/client/CompanionShopScript.client.lua` line 196: `TAB_ORDER` includes `zundamon`, `zundacat`, `zundabunny`.
 
 ## 2. Logic Chain
-
-1. **Remote Mismatches**:
-   - Observation: `GuestManager.server.lua` and `ServingService.lua` instantiate and fire `ShowVNDialgue`. `VNController.client.lua` does not listen for `ShowVNDialgue`.
-   - Reason: The event name has a typo (`Dialgue`) and `VNController.client.lua` was never updated to attach an `OnClientEvent` listener for server-triggered dialogue.
-   - Impact: Visual novel dialogue for guest interactions (welcome, wrong dish, served) fails to display on the client UI.
-
-2. **LootModule Laziness & Shared Boundary**:
-   - Observation: `LootModule.lua` defines `giveLoot.OnServerInvoke` and `sellLoot.OnServerInvoke` at module-top level, but resides in `src/shared/ConfigurationFiles/LootModule.lua` while requiring `ServerScriptService.Services.PlayerDataService`.
-   - Reason: `LootModule` was written as a hybrid server script placed in ReplicatedStorage. It is only required when a mineable node is initialized or destroyed.
-   - Impact: (a) `GiveLoot` and `sellLoot` remotes are unbound until a mining node breaks. (b) ReplicatedStorage contains a module that hard-fails if required by client code.
-
-3. **EndlessLoopWiring Silent Disconnect**:
-   - Observation: `EndlessLoopWiring.server.lua` attempts to index `ServerScriptService.systems.ServingSystem` and listen to `.GuestServed` / `.GuestTimedOut` BindableEvents.
-   - Reason: `ServingSystem` is at `ServerScriptService.ServingSystem`, and neither `ServingSystem` nor `ServingService` defines those BindableEvents.
-   - Impact: Serving guests does not update Challenge Mode scores or Daily Challenge streak/progress, breaking the core gameplay loop integration required by Rule 6.
-
----
+1. `CompanionConfig.lua` is the canonical catalog. All 4 free (`parrot`, `dog`, `cat`, `ankomon`) and 4 premium (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`) companions are correctly configured there with exact price tags (0 vs 1,000 Robux) and unique buffs.
+2. In `MarketplaceConfig.lua`, `products` maps `1111111101`..`1111111103` to obsolete companion keys (`zundacat`, `zundabunny`) and `1111111104` to a recipe. However, `storeDisplay.companions` maps `1111111101`..`1111111104` to `cardamon`, `antimon`, `sakuradamon`, `tantanmon`. Therefore, a purchase requested from `storeDisplay` or `CompanionShopServer` resolves to the wrong product or fails because `companionDevProductIds` has 0 for `cardamon`, `antimon`, `sakuradamon`.
+3. Re-aligning `MarketplaceConfig.products`, `companionDevProductIds`, and `storeDisplay.companions` to use clean IDs `1111111101`..`1111111104` for the 4 premium companions resolves all DevProduct purchase mismatches.
+4. Correcting `GetOwnedCompanions` in `CompanionShopServer.server.lua` ensures `ankomon` is owned by default (free) and `tantanmon` requires purchase (premium).
+5. Updating `TAB_ORDER` in `CompanionShopScript.client.lua` removes obsolete tabs (`zundacat`, `zundabunny`, `zundamon`) and orders the active 9 companions cleanly.
 
 ## 3. Caveats
-
-- **Client UI Implementations**: Only client scripts present in `src/client/` were audited for remote event listener alignment. Future UI controllers added for Challenge Mode or Daily Challenges should be verified against the remotes created by `ChallengeModeService` and `DailyChallengeService`.
-- **Rojo Level Preservation**: `default.project.json` was verified to have `"$ignoreUnknownInstances": true` under `"Workspace"`, complying with Rule 1.
-
----
+- Real Roblox DevProduct IDs are currently placeholder integers (`1111111101` etc.) since `MarketplaceConfig.enabled` is currently `false` (fail-closed for testing). Real IDs can be substituted when publishing to Roblox.
+- Model prefabs for 3D companions rely on `ServerStorage.CompanionVisualCatalog` or `src/shared/Models/Companions` or fallback `zundapalupdate4` MeshParts as defined in `CompanionVisualConfig.lua`.
 
 ## 4. Conclusion
-
-- **Import Paths**: Server scripts fully comply with Rule 4 (`ServerScriptService.Services.X` and `ServerScriptService.systems.X`). No `.Server.` prepending exists.
-- **Critical Fixes Required**:
-  1. Fix `EndlessLoopWiring.server.lua`: Update `ServingSystem` lookup to require `ServerScriptService.Services.ServingService`, and add `GuestServed` / `GuestTimedOut` BindableEvents (or Direct Call callbacks) in `ServingService.lua`.
-  2. Fix `ShowVNDialgue` typo in `GuestManager.server.lua` and `ServingService.lua` (change to `ShowVNDialogue`), and add `OnClientEvent` listener in `VNController.client.lua`.
-  3. Relocate `LootModule.lua` from `src/shared/ConfigurationFiles/` to `src/server/Services/LootService.lua` (or ensure `ServerScriptService` requires it at startup in `ServerMain.server.lua` to bind `GiveLoot` and `sellLoot` immediately on server boot).
-  4. Wire `OutfitWardrobeGui.client.lua` to listen for `ChefStatsUpdate`, `StylePointsUpdate`, and `OutfitUnlock` RemoteEvents.
-
----
+The companion catalog in `CompanionConfig.lua` is properly configured. Applying the proposed diffs to `MarketplaceConfig.lua`, `CompanionShopServer.server.lua`, and `CompanionShopScript.client.lua` will complete full end-to-end synchronization for all 8 companions.
 
 ## 5. Verification Method
-
-To verify these findings and fixes:
-1. **Import Path Check**:
-   Run grep for `ServerScriptService.Server` across `src/` (returns 0 results except `ServerPackages`).
-2. **EndlessLoopWiring Verification**:
-   Inspect `src/server/systems/EndlessLoopWiring.server.lua` line 18 and `src/server/Services/ServingService.lua`. Verify if `GuestServed` BindableEvent is triggered when `ServingService.serve()` succeeds.
-3. **Dialogue Remote Verification**:
-   Check `GuestManager.server.lua` line 213 and `VNController.client.lua` line 504 for matching remote event names.
-4. **Loot Remote Verification**:
-   Verify `ServerMain.server.lua` or `Mineable.server.lua` requires `LootModule` on startup so `GiveLoot.OnServerInvoke` is bound before player input.
+1. Inspect `MarketplaceConfig.lua` to confirm `products[1111111101]` to `[1111111104]` match `companionDevProductIds` and `storeDisplay.companions` for `cardamon`, `antimon`, `sakuradamon`, `tantanmon`.
+2. Invoke `GetOwnedCompanions` RF in Studio playtest to verify `ankomon` returns `true` and `cardamon`/`antimon`/`sakuradamon`/`tantanmon` return `nil`/`false` prior to purchase.
+3. Verify `CompanionShopGui` tabs render all 9 valid companions without missing icons or obsolete entries.

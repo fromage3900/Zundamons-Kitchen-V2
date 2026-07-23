@@ -44,19 +44,20 @@ uiPadding.PaddingBottom = UDim.new(0, 8)
 uiPadding.Parent = hudButtons
 
 local UIHelper = require(RS.Shared.Modules.UIHelper)
+local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 print("[HudBootstrap] HudButtons container created")
 
 -- Create action buttons
 local BUTTONS = {
-	{ name = "HudBtn_inventory", text = "🎒", tooltip = "Inventory (I)", order = 1 },
-	{ name = "HudBtn_crafting", text = "🍳", tooltip = "Crafting (K)", order = 2 },
-	{ name = "HudBtn_quests", text = "📋", tooltip = "Quests (J)", order = 3 },
+	{ name = "HudBtn_inventory", text = "🎒", tooltip = "Inventory [I]", order = 1 },
+	{ name = "HudBtn_crafting", text = "🍳", tooltip = "Crafting", order = 2 },
+	{ name = "HudBtn_quests", text = "📋", tooltip = "Quests [J]", order = 3 },
 	{ name = "HudBtn_daily", text = "📅", tooltip = "Daily Planner", order = 4 },
-	{ name = "HudBtn_compendium", text = "📚", tooltip = "Compendium (C)", order = 5 },
-	{ name = "HudBtn_materials", text = "🧪", tooltip = "Materials (M)", order = 6 },
-	{ name = "HudBtn_settings", text = "⚙️", tooltip = "Settings", order = 7 },
-	{ name = "HudBtn_shop", text = "🛒", tooltip = "Shop", order = 8 },
+	{ name = "HudBtn_compendium", text = "📚", tooltip = "Compendium [C]", order = 5 },
+	{ name = "HudBtn_materials", text = "🧪", tooltip = "Materials", order = 6 },
+	{ name = "HudBtn_settings", text = "⚙️", tooltip = "Settings [F1]", order = 7 },
+	{ name = "HudBtn_shop", text = "🛒", tooltip = "Companions", order = 8 },
 }
 
 for _, btnDef in ipairs(BUTTONS) do
@@ -91,6 +92,20 @@ for _, btnDef in ipairs(BUTTONS) do
 		UIHelper.spawnSparkles(btn, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, UIConfig.COLORS.Primary, 6)
 		if btnDef.name == "HudBtn_daily" and _G.DailyChecklist then
 			_G.DailyChecklist.toggle()
+		else
+			local actionMap = {
+				HudBtn_inventory  = "inventory",
+				HudBtn_crafting   = "cook",
+				HudBtn_quests     = "quests",
+				HudBtn_compendium = "compendium",
+				HudBtn_materials  = "materials",
+				HudBtn_settings   = "settings",
+				HudBtn_shop       = "companions",
+			}
+			local targetAction = actionMap[btnDef.name]
+			if targetAction and ActionRegistry then
+				ActionRegistry.dispatch(targetAction)
+			end
 		end
 	end)
 

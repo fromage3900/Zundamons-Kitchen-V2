@@ -10,7 +10,8 @@ local RS = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local ClientGuiBootstrap = require(RS.ConfigurationFiles.ClientGuiBootstrap)
-local craftConfig = require(RS.ConfigurationFiles.CraftConfig)
+-- Cooking notes sent as intent-only; server derives quality.
+-- No craftConfig dependency needed on client.
 
 -- Ensure RemoteEvents folder & CookingHit RemoteEvent exist
 local remotes = RS:FindFirstChild("RemoteEvents")
@@ -382,7 +383,7 @@ function CookingController.start(
 					comboCount = 0
 					currentScore.miss = (currentScore.miss or 0) + 1
 					spawnFloatingRating("MISS!", Color3.fromRGB(255, 80, 80), panel)
-					cookingHitEvent:FireServer(now, "miss")
+					cookingHitEvent:FireServer(currentSessionId, "miss")
 
 					if pea.instance and pea.instance.Parent then
 						pea.instance:Destroy()
@@ -409,28 +410,18 @@ function CookingController.start(
 		then
 			cleanup()
 
-			local scoreList = {}
-			for _ = 1, (currentScore.perfect or 0) do
-				table.insert(scoreList, { tag = "perfect" })
+			-- Server derives authoritative quality from note timing.
+			-- Client provides a rough display-quality for the callback UI.
+			local displayQuality = "ok"
+			local perfectRatio = (currentScore.perfect or 0) / math.max(totalNotesToSpawn, 1)
+			if perfectRatio >= 0.8 then
+				displayQuality = "perfect"
+			elseif perfectRatio >= 0.5 then
+				displayQuality = "great"
 			end
-			for _ = 1, (currentScore.great or 0) do
-				table.insert(scoreList, { tag = "great" })
-			end
-			for _ = 1, (currentScore.ok or 0) do
-				table.insert(scoreList, { tag = "good" })
-			end
-			for _ = 1, (currentScore.miss or 0) do
-				table.insert(scoreList, { tag = "miss" })
-			end
-			while #scoreList < totalNotesToSpawn do
-				table.insert(scoreList, { tag = "miss" })
-			end
-
-			local quality = craftConfig.calculateQuality and craftConfig.calculateQuality(scoreList, totalNotesToSpawn)
-				or "ok"
 
 			if onComplete then
-				onComplete(quality, currentScore, maxComboCount)
+				onComplete(displayQuality, currentScore, maxComboCount)
 			end
 		end
 	end)

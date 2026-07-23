@@ -1,141 +1,100 @@
-# Handoff Report — Explorer 3: Rojo Config & Preflight Audit
+# Handoff Report — Explorer 3 (Milestone 1)
 
 ## 1. Observation
 
-### A. Rojo Configuration (`default.project.json`)
-- **File Path**: `g:\Zundamons-kItchen-V2\default.project.json`
-- **Level Preservation (`$ignoreUnknownInstances`)**:
-  - Exact snippet from lines 73-77:
-    ```json
-    "Workspace": {
-      "$className": "Workspace",
-      "$path": "src/Workspace",
-      "$ignoreUnknownInstances": true
-    }
-    ```
-  - Result: `"$ignoreUnknownInstances": true` is properly present under `"Workspace"`.
-- **Package Mappings**:
-  - `ReplicatedStorage.Packages`: Lines 10-12 map `"Packages": { "$path": "Packages" }`.
-  - `ServerScriptService.ServerPackages`: Lines 60-66 map `"ServerPackages": { "$path": "ServerPackages" }` under `"ServerScriptService"`.
-- **Filesystem Verification**:
-  - `Packages/` exists on disk containing 6 dependencies: `Matter.lua`, `Promise.lua`, `React.lua`, `ReactRoblox.lua`, `ReplicaService.lua`, `Signal.lua`, and `_Index`.
-  - `ServerPackages/` exists on disk containing `ProfileService.lua` and `_Index`.
+Direct observations from source inspection:
 
-### B. Wally Package Structure (`wally.toml` & `.gitignore`)
-- **`wally.toml` (`g:\Zundamons-kItchen-V2\wally.toml`)**:
-  - `[dependencies]`: `Matter = "matter-ecs/matter@0.8.4"`, `ReplicaService = "barenton/replicaservice@1.0.1"`, `React = "jsdotlua/react@17.1.0"`, `ReactRoblox = "jsdotlua/react-roblox@17.1.0"`, `Promise = "evaera/promise@4.0.0"`, `Signal = "sleitnick/signal@2.0.1"`.
-  - `[server-dependencies]`: `ProfileService = "alreadypro/profileservice@1.0.4"` (Server-only module correctly declared under `[server-dependencies]`).
-- **`.gitignore` (`g:\Zundamons-kItchen-V2\.gitignore`)**:
-  - Lines 3-6:
-    ```
-    Packages/
-    ServerPackages/
-    wally.exe
-    wally.zip
-    ```
-  - Result: Fully ignores `Packages/`, `ServerPackages/`, `wally.exe`, and `wally.zip`.
+1. **`src/shared/ConfigurationFiles/CompanionConfig.lua`** (lines 14-163):
+   - `zundapal`: `free = true`, `price = 0`
+   - `dog`: `free = true`, `price = 0`
+   - `parrot`: `free = true`, `price = 0`
+   - `cat`: `free = true`, `price = 0`
+   - `ankomon`: `free = true`, `price = 0`, `buff = { stat = "gold", magnitude = 0.15 }`
+   - `cardamon`: `free = false`, `price = 1000`, `robux = 1000`, `buff = { stat = "perfect_window", magnitude = 0.30 }`
+   - `antimon`: `free = false`, `price = 1000`, `robux = 1000`, `buff = { stat = "extra_drop", magnitude = 0.20 }`
+   - `sakuradamon`: `free = false`, `price = 1000`, `robux = 1000`, `buff = { stat = "xp", magnitude = 0.25 }`
+   - `tantanmon`: `free = false`, `price = 1000`, `robux = 1000`, `buff = { stat = "speed", magnitude = 0.20 }`
 
-### C. Preflight Audit Execution (`python scripts/preflight_audit.py`)
-- **Command**: `python scripts/preflight_audit.py` (Cwd: `g:\Zundamons-kItchen-V2`)
-- **Output**:
-  ```
-  ==================================================
-  🌸 ZUNDAMON'S KITCHEN V2 - PREFLIGHT AUDIT RUNNER 🌸
-  ==================================================
-  ✅ Rojo Level Preservation Check Passed: $ignoreUnknownInstances = true
-  🔍 Auditing 61 client Luau scripts...
-  ✅ Client UI Decoupling Audit Passed cleanly!
-  ✅ MarketplaceConfig detected and present.
+2. **`src/server/CompanionShopServer.server.lua`** (lines 67-82):
+   - `GetOwnedCompanions.OnServerInvoke` hardcodes:
+     `local owned = { zundapal = true, zundamon = true, zundacat = true, zundabunny = true, tantanmon = true, dog = true, parrot = true, cat = true }`
+   - `ankomon` is missing from this default table.
+   - `tantanmon` is included as `true` in this default table despite being configured as `free = false` in `CompanionConfig.lua`.
 
-  ✨ ALL PREFLIGHT AUDITS PASSED! READY FOR STUDIO & PUBLIC LAUNCH! ✨
-  ```
+3. **`src/server/Services/PlayerDataService.lua`** (lines 245-304):
+   - `createDefaultData()` initializes `companions_set = {}` and does not pre-populate `companion_owned_<comp>` keys. Free companion access relies on catalog `free = true` or `GetOwnedCompanions` returns.
 
-### D. Extended Luau Static Audit & Linting Findings (`selene src`)
-- **Command**: `selene --display-style quiet src` (Cwd: `g:\Zundamons-kItchen-V2`)
-- **Total Results**: 9 Errors, 334 Warnings, 0 Parse Errors.
-- **Verbatim Error Details**:
-  1. `src\client\Controllers\PeaWheelController.lua:77:1`: `error[parse_error]: unexpected token ""`
-     - **Cause**: Function `buildWheelGui()` (opened on line 56) is missing a closing `end` keyword before returning `PeaWheelController` on line 75.
-  2. `src\client\DailyChecklistUI.client.lua:53:14`: `error[incorrect_standard_library_use]`
-     - **Cause**: Line 53 executes `Instance.new("UIClip", header)`. `UIClip` is not a valid Roblox Instance class name.
-  3. `src\client\OutfitWardrobeGui.client.lua:158:18`: `error[incorrect_standard_library_use]`
-     - **Cause**: Line 158 calls `string.format("Level 1 (Bonus: 1.0x)")` without passing formatting vararg arguments.
-  4. `src\shared\ConfigurationFiles\CozyModalShell.lua:93:2`: `error[empty_if]`
-     - **Cause**: Line 93 defines an empty `if UserInputService.ReducedMotionEnabled then end` block with no inner statements.
-  5. `src\shared\ConfigurationFiles\CrystalFX.lua:34:29`: `error[incorrect_standard_library_use]`
-     - **Cause**: Line 34 assigns `sa.ColorMap = Instance.new("NumberSequence")`. `NumberSequence` is a Luau data type, not a Roblox `Instance`. Furthermore, `SurfaceAppearance` texture maps expect asset URL strings (e.g. `"rbxassetid://..."`).
-  6. `src\shared\ConfigurationFiles\CrystalFX.lua:35:33`: `error[incorrect_standard_library_use]`
-     - **Cause**: Line 35 assigns `sa.RoughnessMap = Instance.new("NumberSequence")`.
-  7. `src\shared\ConfigurationFiles\CrystalFX.lua:36:33`: `error[incorrect_standard_library_use]`
-     - **Cause**: Line 36 assigns `sa.MetalnessMap = Instance.new("NumberSequence")`.
-  8. `src\server\ZundaGatherServer.server.lua:48:2`: `error[undefined_variable]`
-     - **Cause**: Line 48 calls `notify(player, "🍀 Antimon found a bonus " .. bonus[1] .. "!")`, but `notify` is not defined or imported anywhere in `ZundaGatherServer.server.lua`.
-  9. `src\server\DayNightSky.server.lua:44:51`: `error[incorrect_standard_library_use]`
-     - **Cause**: Line 44 references `Enum.RolloutState.On`, which does not exist in standard Roblox Enums.
+4. **`src/server/CompanionManager.server.lua`** (lines 363-377):
+   - `SetCompanion.OnServerEvent` checks `def.free == true` or `data["companion_owned_" .. compType]`. Allows `ankomon` to be equipped server-side because `ankomon.free == true`. Rejects `tantanmon` unless purchased.
 
-- **Warnings Breakdown (334 warnings)**:
-  - Deprecated 2-argument `Instance.new("ClassName", parent)` calls across client and server scripts (e.g., `Instance.new("PointLight", star)` in `DayNightSky.server.lua:99`).
-  - Manual table clone patterns (`warning[manual_table_clone]`) in `ZundamonSync.lua:55`.
+5. **`src/client/CompanionShopScript.client.lua`** (line 196):
+   - `TAB_ORDER` includes legacy keys (`zundamon`, `zundacat`, `zundabunny`) and places `tantanmon` in the free tab sequence.
 
-### E. Rojo Build Verification
-- **Command**: `rojo build default.project.json -o build/Zundamons-kItchen.rbxl`
-- **Output**: `Built project to Zundamons-kItchen.rbxl` (Exit code: 0).
+6. **`src/client/StoreScript.client.lua`** (lines 178-187):
+   - Hardcodes `FREE_COMPANIONS` including `tantanmon`, `zundamon`, `zundacat`, `zundabunny`, and omitting `ankomon`.
+
+7. **`src/shared/ConfigurationFiles/MarketplaceConfig.lua`** (lines 12-33):
+   - `products` maps `[1111111101]` to `zundacat` and `[1111111102]` to `zundabunny`.
+   - `companionDevProductIds` maps `cardamon`, `antimon`, `sakuradamon` to `0`.
+   - Conflicts with `storeDisplay.companions` which maps `cardamon` (1111111101), `antimon` (1111111102), `sakuradamon` (1111111103), `tantanmon` (1111111104).
 
 ---
 
 ## 2. Logic Chain
 
-1. **Rojo Level Preservation**:
-   - *Observation*: `default.project.json` contains `"$ignoreUnknownInstances": true` under `"Workspace"` (lines 73-77).
-   - *Reasoning*: Rojo will respect existing 3D geometry, terrain, and models created within Roblox Studio when synchronizing code.
-   - *Deduction*: Rule 1 of Workspace Rules is 100% satisfied.
+1. **Free Companion Requirement Verification**:
+   - The project specification mandates that 4 free companions (`parrot`, `dog`, `cat`, `ankomon`) alongside starter `zundapal` are automatically owned/unlocked by all players on join.
+   - `CompanionConfig.lua` correctly sets `free = true` for `zundapal`, `dog`, `parrot`, `cat`, and `ankomon`.
+   - However, server handler `GetOwnedCompanions` in `CompanionShopServer.server.lua` fails to include `ankomon` in its default owned dictionary, causing client UI queries to report `ankomon` as unowned by default. `StoreScript.client.lua` also omits `ankomon` from `FREE_COMPANIONS`.
 
-2. **Package Mappings & Structure**:
-   - *Observation*: `default.project.json` maps `"Packages"` under `ReplicatedStorage` and `"ServerPackages"` under `ServerScriptService`. `wally.toml` places `ProfileService` under `[server-dependencies]`. `.gitignore` includes `Packages/`, `ServerPackages/`, `wally.exe`, and `wally.zip`.
-   - *Reasoning*: All client/shared dependencies (`Matter`, `ReplicaService`, `React`, `ReactRoblox`, `Promise`, `Signal`) map to `ReplicatedStorage.Packages`, while server-only dependencies (`ProfileService`) map to `ServerScriptService.ServerPackages`.
-   - *Deduction*: Rules 3 & 4 of Workspace Rules are 100% satisfied.
+2. **Premium Companion Lock Verification**:
+   - The specification mandates that premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`) require purchase (1,000 Robux each) and are NOT unlocked by default.
+   - `CompanionConfig.lua` correctly configures all 4 as `free = false`, `price = 1000`, `robux = 1000`.
+   - However, `CompanionShopServer.server.lua` hardcodes `tantanmon = true` in `GetOwnedCompanions.OnServerInvoke`, unlocking `tantanmon` for all players by default without purchase.
+   - Furthermore, `MarketplaceConfig.lua` product mapping contains legacy keys (`zundacat`, `zundabunny`) instead of mapping the 4 canonical premium companions to their respective product IDs.
 
-3. **Preflight Script Status vs Static Code Quality**:
-   - *Observation*: `python scripts/preflight_audit.py` returns status 0 (PASSED). However, running full static code linting via `selene src` uncovers 9 distinct Luau errors across 7 files.
-   - *Reasoning*: `preflight_audit.py` only checks 3 high-level requirements ($ignoreUnknownInstances, regex check for `script.Parent` in client files containing "StarterPlayerScripts" in their name, and existence of `MarketplaceConfig.lua`). It does not run full AST parsing or type checking on all Luau scripts.
-   - *Deduction*: While high-level preflight audit passes, there are 9 latent runtime/syntax errors in Luau scripts that require remediation before production release.
+3. **Synthesis & Root Cause**:
+   - The discrepancy stems from hardcoded static tables in `CompanionShopServer.server.lua`, `StoreScript.client.lua`, and `MarketplaceConfig.lua` that fell out of sync with `CompanionConfig.lua`.
+   - Replacing hardcoded static dictionaries in `GetOwnedCompanions` with dynamic queries against `CompanionConfig.companions` where `def.free == true` permanently guarantees that all free companions (including `ankomon`) are owned on join and all premium companions (including `tantanmon`) are locked until purchase.
 
 ---
 
 ## 3. Caveats
 
-- **Scope Limit**: This investigation was strictly read-only per mission constraints. No fixes were committed to source files.
-- **Sub-agent Execution**: No sub-agents were spawned; all tool calls and static code analysis were performed directly by Explorer 3.
-- **Warnings Volume**: The 334 warnings reported by `selene` are primarily style/deprecation recommendations (`Instance.new(class, parent)`) and do not block Rojo compilation, but resolving them will improve code maintainability.
+- **Legacy Player Data**: Players who had previously saved data with legacy keys (`companion_owned_zundacat`) will retain those keys, but active catalogs should ignore legacy keys not in `CompanionConfig.companions`.
+- **Marketplace DevProduct Integration**: In Studio mock mode (`RunService:IsStudio()`), DevProduct purchases rely on `MarketplaceConfig.enabled = false` / test stubs until real DevProduct IDs are provisioned on Roblox Dashboard for production.
 
 ---
 
 ## 4. Conclusion
 
-- **Rojo & Wally Audit**: PASSED. `default.project.json`, `wally.toml`, and `.gitignore` comply with all workspace rules, including Level Preservation (`$ignoreUnknownInstances: true`) and package directory mappings (`Packages` in `ReplicatedStorage`, `ServerPackages` in `ServerScriptService`).
-- **Basic Preflight Audit**: PASSED. `python scripts/preflight_audit.py` runs cleanly with exit code 0.
-- **Static Code Analysis**: ACTION REQUIRED. 9 Luau static code errors were identified in `src/` (syntax parse error in `PeaWheelController.lua`, invalid `Instance.new("UIClip")` in `DailyChecklistUI.client.lua`, invalid `Instance.new("NumberSequence")` in `CrystalFX.lua`, undefined `notify` in `ZundaGatherServer.server.lua`, etc.) that will cause runtime failures in Studio/Client execution.
+1. `CompanionConfig.lua` is canonical and accurate:
+   - Free companions: `zundapal`, `dog`, `parrot`, `cat`, `ankomon`.
+   - Premium companions (1,000 Robux): `cardamon`, `antimon`, `sakuradamon`, `tantanmon`.
+2. Three critical code fixes are required for the Implementer agent:
+   - Fix `CompanionShopServer.server.lua` (`GetOwnedCompanions`) to dynamically return all `def.free == true` companions (granting `ankomon` and locking `tantanmon`).
+   - Fix `StoreScript.client.lua` (`FREE_COMPANIONS`) to include `ankomon` and remove `tantanmon`.
+   - Fix `MarketplaceConfig.lua` to map `cardamon`, `antimon`, `sakuradamon`, `tantanmon` to product IDs `1111111101` - `1111111104`.
 
 ---
 
 ## 5. Verification Method
 
-To independently verify these findings, run the following commands from `g:\Zundamons-kItchen-V2`:
+To verify these findings independently or after implementer fixes:
 
-1. **Verify Rojo Configuration & Workspace Level Preservation**:
-   ```powershell
-   python scripts/preflight_audit.py
-   ```
-   *Expected Output*: `✅ Rojo Level Preservation Check Passed: $ignoreUnknownInstances = true`
+1. **Check `GetOwnedCompanions` invoke result**:
+   - In Roblox Studio command bar or server test script:
+     ```lua
+     local SSS = game:GetService("ServerScriptService")
+     local RF = game:GetService("ReplicatedStorage").RemoteFunctions.GetOwnedCompanions
+     local player = game.Players:GetPlayers()[1]
+     local owned = RF:Invoke(player)
+     print("Owned companions:", owned)
+     ```
+   - Expectation: `owned.parrot == true`, `owned.dog == true`, `owned.cat == true`, `owned.ankomon == true`, `owned.zundapal == true`.
+   - Expectation for premium: `owned.cardamon == nil`, `owned.antimon == nil`, `owned.sakuradamon == nil`, `owned.tantanmon == nil`.
 
-2. **Verify Rojo Build**:
-   ```powershell
-   rojo build default.project.json -o build/Zundamons-kItchen.rbxl
-   ```
-   *Expected Output*: `Built project to Zundamons-kItchen.rbxl`
-
-3. **Verify Static Luau Errors with Selene**:
-   ```powershell
-   python -c "import subprocess; res = subprocess.run(['selene', '--display-style', 'quiet', 'src'], capture_output=True, text=True, encoding='utf-8', errors='replace'); errs = [line for line in (res.stdout + res.stderr).splitlines() if 'error[' in line]; print('\n'.join(errs))"
-   ```
-   *Expected Output*: 9 errors listed with file paths and line numbers matching Section 1.D above.
+2. **Check Shop UI behavior**:
+   - Open Companion Boutique in-game (press 'O').
+   - Confirm tabs and details for `parrot`, `dog`, `cat`, `ankomon`, `zundapal` show "Equip" / "✓ Equipped".
+   - Confirm tabs and details for `cardamon`, `antimon`, `sakuradamon`, `tantanmon` show "1000 Robux" purchase prompt and NOT "Equip".

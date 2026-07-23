@@ -314,8 +314,9 @@ local function toggle()
 end
 
 closeBtn.MouseButton1Click:Connect(function()
-	open = true
-	toggle()
+	UIRouter.close("inventory")
+	open = false
+	shell.close()
 	local pos = closeBtn.AbsolutePosition
 	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, C.border, 6)
 	UIHelper.spawnSparkles(panel, pos.X + 19, pos.Y + 19, Color3.fromRGB(255, 255, 255), 3)
@@ -336,15 +337,6 @@ task.spawn(function()
 	end
 end)
 
--- Keyboard shortcut: I key
-UIS.InputBegan:Connect(function(input, gpe)
-	if gpe then
-		return
-	end
-	if input.KeyCode == Enum.KeyCode.I then
-		toggle()
-	end
-end)
 
 -- Auto-refresh while open
 task.spawn(function()

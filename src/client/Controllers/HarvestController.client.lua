@@ -274,9 +274,12 @@ local function completeHarvest()
 	playHarvestSound(nodePos)
 
 	-- The existing ZundaGatherServer handles the actual loot
-	local RE_Harvest = ReplicatedStorage:FindFirstChild("RemoteEvents") and ReplicatedStorage.RemoteEvents:FindFirstChild("HarvestNode")
+	local RE_Harvest = ReplicatedStorage:WaitForChild("RemoteEvents", 5)
+		and ReplicatedStorage.RemoteEvents:WaitForChild("HarvestNode", 5)
 	if RE_Harvest then
 		RE_Harvest:FireServer(harvestTargetNode)
+	else
+		warn("[HarvestController] HarvestNode remote not found — harvest completion skipped")
 	end
 
 	harvestTargetNode = nil
@@ -334,9 +337,14 @@ local function startHarvest(node: Instance)
 			return
 		end
 
-		-- Check if node is still available
+		-- Check if node is still available or unseeded
 		if node:GetAttribute("Available") == false then
 			cancelHarvest("Node no longer available")
+			return
+		end
+		local seededAttr = node:GetAttribute("Seeded")
+		if seededAttr ~= nil and seededAttr == false then
+			cancelHarvest("Node not seeded")
 			return
 		end
 

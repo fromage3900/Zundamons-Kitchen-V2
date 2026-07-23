@@ -12,23 +12,17 @@ local ClientGuiBootstrap = require(RS.ConfigurationFiles.ClientGuiBootstrap)
 local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 local gui = ClientGuiBootstrap.createScreenGui(player, "CompanionShopGui", 28)
 
 local RE = RS:WaitForChild("RemoteEvents")
-print("[CompanionShop] RemoteEvents found")
 local RF = RS:WaitForChild("RemoteFunctions")
-print("[CompanionShop] RemoteFunctions found")
 local PurchaseCompanion = RE:WaitForChild("PurchaseCompanion")
-print("[CompanionShop] PurchaseCompanion found")
 local SetCompanion = RE:WaitForChild("SetCompanion")
-print("[CompanionShop] SetCompanion found")
 local CompanionOwnedSync = RE:WaitForChild("CompanionOwnedSync")
-print("[CompanionShop] CompanionOwnedSync found")
 local GetCompanionCatalog = RF:WaitForChild("GetCompanionCatalog")
-print("[CompanionShop] GetCompanionCatalog found")
 local GetOwnedCompanions = RF:WaitForChild("GetOwnedCompanions")
-print("[CompanionShop] GetOwnedCompanions found")
 
 -- ── Backdrop
 local backdrop = Instance.new("Frame", gui)
@@ -192,8 +186,8 @@ local catalog = {}
 local owned = {}
 local currentKey = "zundapal"
 
--- Stable tab order so Premium ones appear at the right
-local TAB_ORDER = { "zundapal", "zundamon", "zundacat", "zundabunny", "tantanmon", "dog", "parrot", "cat", "ankomon", "cardamon", "antimon", "sakuradamon" }
+-- Stable tab order: free companions first, then premium companions
+local TAB_ORDER = { "zundapal", "parrot", "dog", "cat", "ankomon", "cardamon", "antimon", "sakuradamon", "tantanmon" }
 
 local tabBtns = {}
 
@@ -294,13 +288,6 @@ local function buildTabs()
     end
 end
 
-closeBtn.MouseButton1Click:Connect(function()
-    panel.Visible = false
-    backdrop.Visible = false
-    local pos = closeBtn.AbsolutePosition
-    UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
-end)
-
 actionBtn.MouseButton1Click:Connect(function()
     local def = catalog[currentKey]
     if not def then return end
@@ -328,29 +315,23 @@ local shell = CozyModalShell.wrap(panel, {
 	open = function()
 		backdrop.Visible = true
 		panel.Visible = true
-		print("[CompanionShop.open] Fetching catalog...")
 		local success1, catalogData = pcall(function()
 			return GetCompanionCatalog:InvokeServer()
 		end)
-		print("[CompanionShop.open] Catalog success:", success1)
 		catalog = catalogData or {}
 
-		print("[CompanionShop.open] Fetching owned companions...")
 		local success2, ownedData = pcall(function()
 			return GetOwnedCompanions:InvokeServer()
 		end)
-		print("[CompanionShop.open] Owned success:", success2)
 		owned = ownedData or {}
 
 		if owned.__active then currentKey = owned.__active end
-		print("[CompanionShop.open] Building UI...")
 		buildTabs()
 		refreshDetail()
 		refreshTabs()
 		panel.Size = UDim2.new(0, 780, 0, 510)
 		TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
 			{ Size = UDim2.new(0, 820, 0, 540) }):Play()
-		print("[CompanionShop.open] Shop opened")
 	end,
 	close = function()
 		panel.Visible = false
@@ -368,16 +349,25 @@ local function close()
 	shell.close()
 end
 
-_G.ZundaCompanionShop = { open = open, close = close, toggle = function()
+local function toggle()
 	if panel.Visible then close() else open() end
-end }
+end
 
--- Hotkey: O
-UIS.InputBegan:Connect(function(input, gpe)
-	if gpe then return end
-	if input.KeyCode == Enum.KeyCode.O then
-		if panel.Visible then close() else open() end
-	end
+-- Wire close button (after shell is defined)
+closeBtn.MouseButton1Click:Connect(function()
+    UIRouter.close("companions")
+    shell.close()
+    local pos = closeBtn.AbsolutePosition
+    UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
 end)
 
-print("[CompanionShop] Ready — press O to open")
+_G.ZundaCompanionShop = { open = open, close = close, toggle = toggle }
+
+-- Register with UIRouter for modal exclusivity and Escape handling
+-- Use shell.open/shell.close directly to avoid recursion (open/close call UIRouter)
+UIRouter.register("companions", shell.open, shell.close)
+
+-- Register with ActionRegistry for Pea Wheel and HUD dispatch
+ActionRegistry.registerCallback("companions", toggle)
+
+print("[CompanionShop] Ready — registered with ActionRegistry + UIRouter")

@@ -1,55 +1,59 @@
-# Project Plan: Zundamon's Kitchen V2 — Codebase Audit, Telemetry & Web Integration
+# Project Plan: Zundamon's Kitchen V2 — UI System Overhaul
 
 ## Overview
-Decompose, execute, and verify the deep codebase audit, bug fixes, real-time game telemetry integration, and preflight verification for Zundamon's Kitchen V2 across Roblox server/client/shared scripts and the Zunda-OS 95 web portal (`docs/` and `site/`).
+Overhaul and optimize the UI system for Zundamon's Kitchen V2 across client controllers, keybind dispatchers, startup UI boot scripts, and Rojo place build verification.
 
 ## Architecture & Requirements Summary
-1. **R1. Deep Codebase Audit & Loose-Ends Fixes**:
-   - Verify all RemoteEvent/RemoteFunction definitions in `ReplicatedStorage`.
-   - Ensure zero `script.Parent` UI references in `StarterPlayerScripts`.
-   - Ensure all modal/dialogue panels have `Visible = false` on startup in `ClientGuiBootstrap`.
-   - Ensure top-level ScreenGuis have `ResetOnSpawn = false`.
-   - Check `ServerScriptService` imports: use `ServerScriptService.Services.X` or `ServerScriptService.systems.X` (never `.Server.`).
-   - Ensure `default.project.json` includes `"$ignoreUnknownInstances": true` under `"Workspace"`.
-2. **R2. Real-Time Game Telemetry & Web Integration**:
-   - Verify `WebInfoSyncService` in server scripts and `docs/api/game_info.json`.
-   - Structure `game_info.json` with challenges, live banners, promo codes, player counts, and global stats.
-   - Update `docs/index.html`, `docs/presskit.html`, `site/index.html` (and JS modules) to fetch `docs/api/game_info.json` dynamically with live ticker and event banners.
-   - Synchronize `site/` and `docs/` using `sync_site.js`.
-3. **R3. Preflight & Acceptance Verification**:
-   - `python scripts/preflight_audit.py` returns 0 errors.
-   - Reviewer, Challenger, and Forensic Auditor verification.
+1. **R1. Centered Pea Wheel Radial Menu & Visibility**:
+   - Fix `src/client/Controllers/PeaWheelController.lua` and radial UI instances.
+   - Center overlay in middle of screen (`Position = UDim2.fromScale(0.5, 0.5)`, `AnchorPoint = Vector2.new(0.5, 0.5)`) when opened via Tab key, Q key, or hub button.
+   - Ensure all 8 radial slices (inventory, cook, quests, compendium, materials, map, shop, settings) are 100% visible without clipping off-edge.
+   - Maintain client UI decoupling rules (`ResetOnSpawn = false`, `Visible = false` on startup).
 
-## Directory & Module Structure
-- Roblox Source: `src/server/`, `src/client/`, `src/shared/`
-- Workspace Config: `default.project.json`, `wally.toml`
-- Scripts & Tools: `scripts/preflight_audit.py`, `scripts/sync_site.js`
-- Web Hub: `docs/index.html`, `docs/presskit.html`, `docs/api/game_info.json`, `site/`
+2. **R2. Single Source of Truth Keybind Dispatching**:
+   - Fix keybind dispatching across `src/client/UIActionRegistry.lua` and individual client UI scripts (`PouchScript.client.lua`, `CraftingScript.client.lua`, `StoreScript.client.lua`, etc.).
+   - Deduplicate `UserInputService.InputBegan` listeners so `UIActionRegistry.lua` acts as single source of truth.
+   - Remove redundant `InputBegan` listeners in client UI scripts to prevent double-toggle open/close bugs.
+
+3. **R3. Fast UI Boot & Traversal Performance**:
+   - Optimize `src/client/Systems/000_LegacyOverlayCleanup.client.lua` and UI startup scripts.
+   - Consolidate multiple `GetDescendants()` tree loops into a single single-pass tree traversal on PlayerGui load.
+   - Eliminate blocking `WaitForChild` delays on UI panel initialization.
+
+4. **R4. Rojo Build Compilation & Verification**:
+   - Compile all changes into `build/Zundamons-kItchen.rbxl` using `rojo build default.project.json -o build/Zundamons-kItchen.rbxl`.
+   - Verify `python scripts/preflight_audit.py` passes with 0 errors.
 
 ## Milestones
 
-### Milestone 1: Deep Codebase Audit & Luau Bug Fixes
-- **Objective**: Audit and fix all Luau scripts across `src/server`, `src/client`, `src/shared`. Ensure all RemoteEvents/RemoteFunctions exist, UI scripts follow `ClientGuiBootstrap` with modal `Visible = false` and `ResetOnSpawn = false`, import paths are consistent, and `default.project.json` has `"$ignoreUnknownInstances": true`.
-- **Target Files**: `src/client/**/*`, `src/server/**/*`, `src/shared/**/*`, `default.project.json`
+### Milestone 1: Centered Pea Wheel Radial Menu & Visibility Overhaul
+- **Objective**: Fix `PeaWheelController.lua` centering (`Position = UDim2.fromScale(0.5, 0.5)`, `AnchorPoint = Vector2.new(0.5, 0.5)`). Ensure all 8 radial slices are fully visible without screen edge clipping. Verify startup modal visibility (`Visible = false`) and `ResetOnSpawn = false`.
+- **Target Files**: `src/client/Controllers/PeaWheelController.lua`
 - **Dependencies**: None
-- **Status**: DONE
+- **Status**: PLANNED
 
-### Milestone 2: Real-Time Game Telemetry & Web Hub Integration
-- **Objective**: Enhance/verify `WebInfoSyncService` backend to sync game state to `docs/api/game_info.json`. Connect `docs/index.html`, `docs/presskit.html`, and `site/` web hubs to render real-time telemetry tickers, active daily challenges, live gacha banners, and community milestone progress without console errors. Run `sync_site.js`.
-- **Target Files**: `src/server/Services/WebInfoSyncService.lua`, `docs/api/game_info.json`, `docs/index.html`, `docs/presskit.html`, `site/*`
+### Milestone 2: Single Source of Truth Keybind Dispatching
+- **Objective**: Deduplicate keybind handling in `UIActionRegistry.lua` and remove duplicate `UserInputService.InputBegan` listeners in `PouchScript.client.lua`, `CraftingScript.client.lua`, `StoreScript.client.lua`, etc. Ensure clean single-keypress toggle for keys I, K, J, C, M, P, B, F1, Tab, Q.
+- **Target Files**: `src/client/UIActionRegistry.lua`, `src/client/PouchScript.client.lua`, `src/client/CraftingScript.client.lua`, `src/client/StoreScript.client.lua` (and other UI client scripts)
 - **Dependencies**: Milestone 1
-- **Status**: IN_PROGRESS
+- **Status**: PLANNED
 
-### Milestone 3: Preflight Audit & End-to-End Acceptance Verification
-- **Objective**: Execute `python scripts/preflight_audit.py` (must pass with 0 errors). Conduct independent review, adversarial testing, and Forensic Integrity Audit across all rules and requirements.
-- **Target Files**: `scripts/preflight_audit.py`, all codebase & site files
-- **Dependencies**: Milestones 1 & 2
+### Milestone 3: Fast UI Boot & Traversal Performance
+- **Objective**: Consolidate multiple `GetDescendants()` tree traversals in `000_LegacyOverlayCleanup.client.lua` and startup UI scripts into a single single-pass tree traversal on `PlayerGui` load. Replace blocking `WaitForChild` delays with non-blocking async references.
+- **Target Files**: `src/client/Systems/000_LegacyOverlayCleanup.client.lua`, UI startup scripts
+- **Dependencies**: Milestone 2
+- **Status**: PLANNED
+
+### Milestone 4: Rojo Build Compilation & Preflight Audit Verification
+- **Objective**: Compile place file via `rojo build default.project.json -o build/Zundamons-kItchen.rbxl` cleanly. Verify `python scripts/preflight_audit.py` returns 0 errors. Conduct full gate review (Reviewers, Challengers, Forensic Auditor).
+- **Target Files**: `default.project.json`, `build/Zundamons-kItchen.rbxl`, `scripts/preflight_audit.py`
+- **Dependencies**: Milestones 1, 2, 3
 - **Status**: PLANNED
 
 ## Verification & Audit Strategy
 For each milestone:
-1. **Exploration**: 3 Explorers analyze codebase, check contract rules, and report defect maps / integration plans.
-2. **Implementation**: 1 Worker implements fixes, executes preflight check / node tests, and reports diffs & results.
-3. **Review**: 2 Reviewers independently assess Luau correctness, decoupled UI rules, and telemetry integrity.
-4. **Adversarial Verification**: 2 Challengers stress-test edge cases, missing remote calls, and web JSON parsing.
-5. **Integrity Audit**: 1 Forensic Auditor performs static and execution analysis (HARD VETO on hardcoded cheating or fake logic).
+1. **Exploration**: 3 Explorers analyze target scripts, configuration structures, and contract rules, returning detailed analysis reports.
+2. **Implementation**: 1 Worker implements fixes, runs builds/tests/preflight check, and reports code diffs & verification output.
+3. **Review**: 2 Reviewers independently assess Luau code quality, decoupled UI rules, keybind safety, and performance traversal.
+4. **Adversarial Verification**: 2 Challengers stress-test edge cases, keybind spam, screen resize clipping, and traversal load times.
+5. **Integrity Audit**: 1 Forensic Auditor performs static analysis and integrity validation (HARD VETO on hardcoded test hacks or fake logic).

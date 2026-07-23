@@ -1,102 +1,44 @@
-# Handoff Report — Client UI Decoupling & Workspace Rules Stress Test
-
-**Verdict**: **VERIFIED**
+# Handoff Report — Milestone 1 Gate Verification (Challenger 2)
 
 ## 1. Observation
 
-- **`script.Parent` Usage Audit**:
-  - `grep_search` for `script.Parent` across `src/client/` yielded 5 total occurrences:
-    1. `src/client/Controllers/PeaWheelController.lua:13`: `local ActionRegistry = require(script.Parent.Parent.ConfigurationFiles.UIActionRegistry)`
-    2. `src/client/PeaWheelBootstrap.client.lua:6`: `local ActionRegistry = require(script.Parent.ConfigurationFiles.UIActionRegistry)`
-    3. `src/client/TimedCookingScript.client.lua:2`: `local Controllers = script.Parent:WaitForChild("Controllers")`
-    4. `src/client/ui/cooking/stories/CookingHUD.story.lua:3`: `local CookingHUD = require(script.Parent.Parent.components.CookingHUD)`
-    5. `src/client/ui/inventory/components/InventoryHUD.lua:2`: `local useInventory = require(script.Parent.Parent.hooks.useInventory)`
-  - Direct inspection confirms **ZERO** UI instance references using `script.Parent` in client scripts synced to `StarterPlayerScripts`. All UI construction and lookup queries use `PlayerGui` or `ClientGuiBootstrap`.
-
-- **Startup Modal/Dialogue Visibility**:
-  - `VNController.client.lua`: `panel.Visible = false` (line 64), `dimmer.Visible = false` (line 52).
-  - `CompendiumScript.client.lua`: `panel.Visible = false` (line 84).
-  - `CraftingScript.client.lua`: `panel.Visible = false` (line 39).
-  - `DailyChecklistUI.client.lua`: `panel.Visible = false` (line 40).
-  - `CookingResultCard.client.lua`: `gui.Enabled = false` (line 13), `backdrop.Visible = false` (line 23), `card.Visible = false` (line 31).
-  - `GuestServingUI.client.lua`: `gui.Enabled = false` (line 14), `backdrop.Visible = false` (line 24), `panel.Visible = false` (line 32).
-  - `FurniturePlacement.client.lua`: `gui.Enabled = false` (line 21), `manageFrame.Visible = false` (line 341).
-  - `SettingsScreen.client.lua`: `gui.Enabled = false` (line 18).
-  - `TeleportPicker.client.lua`: `gui.Enabled = false` (line 13).
-  - `CompanionShopScript.client.lua`: `panel.Visible = false` (line 50), `backdrop.Visible = false` (line 40).
-
-- **ScreenGui `ResetOnSpawn` Compliance**:
-  - `ClientGuiBootstrap.lua` line 16 explicitly assigns `screenGui.ResetOnSpawn = false` for all GUs generated through `ClientGuiBootstrap.createScreenGui`.
-  - Direct `Instance.new("ScreenGui")` initializations all set `ResetOnSpawn = false`:
-    - `AdminConsole.client.lua:13`: `screenGui.ResetOnSpawn = false`
-    - `CompanionHUD.client.lua:14`: `gui.ResetOnSpawn = false`
-    - `Controllers/HarvestController.client.lua:59`: `screenGui.ResetOnSpawn = false`
-    - `CookingResultCard.client.lua:11`: `gui.ResetOnSpawn = false`
-    - `FurniturePlacement.client.lua:19`: `gui.ResetOnSpawn = false`
-    - `GuestServingUI.client.lua:12`: `gui.ResetOnSpawn = false`
-    - `HudBootstrap.client.lua:14`: `hud.ResetOnSpawn = false`
-    - `HudScript.client.lua:14,19`: `sg.ResetOnSpawn = false`
-    - `RecipeUnlockToast.client.lua:10`: `gui.ResetOnSpawn = false`
-    - `SettingsScreen.client.lua:16`: `gui.ResetOnSpawn = false`
-    - `StoreScript.client.lua:149`: `toast.ResetOnSpawn = false` (Purchase Toast)
-    - `StoreScript.client.lua:254`: `toast.ResetOnSpawn = false` (Success Toast)
-    - `TeleportPicker.client.lua:11`: `gui.ResetOnSpawn = false`
-    - `WeatherClient.client.lua:75`: `auroraGui.ResetOnSpawn = false`
-
-- **Rojo `$ignoreUnknownInstances` Configuration**:
-  - `default.project.json` lines 73-77:
-    ```json
-    "Workspace": {
-      "$className": "Workspace",
-      "$path": "src/Workspace",
-      "$ignoreUnknownInstances": true
-    }
-    ```
-
-- **Audit Tool Runs**:
-  - `python scripts/preflight_audit.py` output:
-    ```
-    ==================================================
-    🌸 ZUNDAMON'S KITCHEN V2 - PREFLIGHT AUDIT RUNNER 🌸
-    ==================================================
-    ✅ Rojo Level Preservation Check Passed: $ignoreUnknownInstances = true
-    🔍 Auditing 61 client Luau scripts...
-    ✅ Client UI Decoupling Audit Passed cleanly!
-    ✅ MarketplaceConfig detected and present.
-
-    ✨ ALL PREFLIGHT AUDITS PASSED! READY FOR STUDIO & PUBLIC LAUNCH! ✨
-    ```
-    Exit code: 0.
-
-  - `selene src` output:
-    ```
-    Results:
-    0 errors
-    332 warnings
-    0 parse errors
-    ```
+- Executed empirical test harness `verify_m1_gate.py` on `g:\Zundamons-kItchen-V2`.
+- **Task 1 (`MarketplaceConfig.lua`)**:
+  - `products` contains 10 entries (`1111111101`..`1111111110`). No duplicate product IDs exist.
+  - DevProduct IDs mapped in `companionDevProductIds`: `cardamon`=1111111101, `antimon`=1111111102, `sakuradamon`=1111111103, `tantanmon`=1111111104.
+  - `storeDisplay.companions` entries match IDs 1111111101 through 1111111104.
+- **Task 2 (`CompanionShopScript.client.lua`)**:
+  - `TAB_ORDER` on line 196 contains: `{"zundapal", "parrot", "dog", "cat", "ankomon", "cardamon", "antimon", "sakuradamon", "tantanmon"}`.
+  - All 9 active companions from `CompanionConfig.lua` are present with 0 duplicates and 0 obsolete entries.
+- **Task 3 (`StoreScript.client.lua`)**:
+  - `FREE_COMPANIONS` list contains 5 items: `zundapal`, `dog`, `parrot`, `cat`, `ankomon`.
+  - Matches `def.free == true` entries in `CompanionConfig.lua` exactly (5 free companions). Premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`) are properly omitted.
+- **Task 4 (Legacy Keys Audit)**:
+  - Audited `CompanionShopScript.client.lua`, `StoreScript.client.lua`, `CompanionShopServer.server.lua`, `CompanionConfig.lua`, and `MarketplaceConfig.lua`.
+  - Found **0** occurrences of `zundacat` or `zundabunny` in runtime shop/companion scripts.
+  - `CompanionShopServer.server.lua` lines 67-87 dynamically constructs default owned companions from `CompanionConfig.companions` where `def.free == true`.
 
 ## 2. Logic Chain
 
-1. **Rojo Level Preservation**: Setting `"$ignoreUnknownInstances": true` under `"Workspace"` in `default.project.json` ensures Rojo code syncs do not delete terrain, models, or manual 3D level geometry placed in Studio. Inspection confirmed it is set to `true`.
-2. **Client UI Decoupling**: Scripts synced to `StarterPlayerScripts` execute under `PlayerScripts`. If client scripts accessed UI elements via `script.Parent`, they would fail because their parent is `PlayerScripts` rather than a GUI element. Verifying zero UI `script.Parent` references and confirming all UI elements anchor to `PlayerGui` via `ClientGuiBootstrap` or direct `PlayerGui` queries guarantees decoupling.
-3. **Panel Visibility at Startup**: Setting `Visible = false` on frames/panels or `Enabled = false` on ScreenGuis during initialization prevents overlapping UI artifacts when the game loads. Verifying all modals/dialogues comply ensures clean initial UI state.
-4. **Respawn Safety (`ResetOnSpawn = false`)**: Setting `ResetOnSpawn = false` on top-level ScreenGui instances (including dynamically created toasts) prevents UI deletion/resetting when the player respawns. Verifying 100% compliance across all 61 client scripts ensures UI state survives respawns.
-5. **Linting & Audit Compliance**: Both `preflight_audit.py` and `selene src` were executed directly. `preflight_audit.py` returned exit code 0, and `selene src` returned 0 errors.
+1. Unique product ID mapping in `MarketplaceConfig.lua` guarantees that Roblox receipt processing can cleanly route purchases to the correct companion or item without ID collision or ambiguity.
+2. Aligning `TAB_ORDER` in `CompanionShopScript.client.lua` with active companions in `CompanionConfig.lua` ensures all available companions (both free and Robux) can be viewed and equipped in the boutique UI. Sorting free companions first followed by premium companions provides a clean UX.
+3. Matching `FREE_COMPANIONS` in `StoreScript.client.lua` to `CompanionConfig.free == true` prevents UI desynchronization between `StoreScript` and `CompanionShopScript`.
+4. Removing legacy keys (`zundacat`, `zundabunny`) from runtime catalogs and dynamic ownership evaluation eliminates potential missing mesh warnings, blank tab creation, or unexpected companion equips.
 
 ## 3. Caveats
 
-- `selene src` flags 332 warnings regarding `Instance.new(className, parent)` being deprecated in Luau/Roblox guidelines. These are non-fatal linter warnings and do not constitute errors or UI decoupling defects.
+- In-world DevProduct prompt purchasing requires `MarketplaceConfig.enabled = true` and actual published Roblox DevProduct IDs before public release. In local/test environments, `MarketplaceConfig.enabled` is `false` (fail-closed), which is expected behavior for security and error prevention.
 
 ## 4. Conclusion
 
-- **Verification Verdict**: **VERIFIED**
-- All client UI scripts in `src/client/` fully comply with Workspace Rules and Client UI Decoupling requirements. `default.project.json` correctly protects Studio level geometry with `"$ignoreUnknownInstances": true`. `preflight_audit.py` passed cleanly, and `selene src` reported 0 errors.
+**Gate Decision: VERIFIED**
+
+All 4 tasks pass empirical verification. The companion system and companion shop synchronization for Milestone 1 are clean, robust, and ready for release.
 
 ## 5. Verification Method
 
 To independently verify:
-1. `python scripts/preflight_audit.py` from repository root `g:\Zundamons-kItchen-V2`.
-2. `selene src` from repository root `g:\Zundamons-kItchen-V2`.
-3. Inspect `default.project.json` line 76 for `"$ignoreUnknownInstances": true`.
-4. Run `rg "script\.Parent" src/client` to verify only module requires use `script.Parent`.
+```powershell
+python g:\Zundamons-kItchen-V2\.agents\teamwork_preview_challenger_m1_2\verify_m1_gate.py
+```
+Expected output: `ALL VERIFICATION CHECKS PASSED: VERIFIED`.

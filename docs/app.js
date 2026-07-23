@@ -921,7 +921,7 @@ class VNTalkApp {
     } else if (action === 'open_quickstart' && typeof window !== 'undefined' && window.windowManager) {
       window.windowManager.openWindow('window-updates');
     } else if (action === 'launch_roblox' && typeof window !== 'undefined') {
-      window.open('https://www.roblox.com/', '_blank');
+      window.open('https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo', '_blank');
     }
   }
 }
@@ -990,7 +990,7 @@ class QuickStartApp {
     if (launchRobloxBtn) {
       launchRobloxBtn.addEventListener('click', () => {
         playClick('down');
-        window.open('https://www.roblox.com/', '_blank');
+        window.open('https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo', '_blank');
       });
     }
 
@@ -1349,12 +1349,29 @@ class MainApp {
     if (widgetPlayBgm) {
       widgetPlayBgm.addEventListener('click', () => {
         if (typeof playClick === 'function') playClick('down');
-        if (typeof window.toggleCozyBGM === 'function') {
-          const isPlaying = window.toggleCozyBGM();
-          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ BGM';
-          if (discIconEl) {
-            discIconEl.classList.toggle('spinning', isPlaying);
+        const audioEl = document.getElementById('zunda-mp3-player');
+        if (audioEl) {
+          if (audioEl.paused) {
+            audioEl.play().then(() => {
+              widgetPlayBgm.textContent = '⏸ Pause zunda.mp3';
+              if (discIconEl) discIconEl.classList.add('spinning');
+            }).catch(() => {
+              // Fallback to Web Audio synthesis engine if MP3 file fails to play
+              if (typeof window.toggleCozyBGM === 'function') {
+                const isPlaying = window.toggleCozyBGM();
+                widgetPlayBgm.textContent = isPlaying ? '⏸ Pause Synth BGM' : '▶ zunda.mp3';
+                if (discIconEl) discIconEl.classList.toggle('spinning', isPlaying);
+              }
+            });
+          } else {
+            audioEl.pause();
+            widgetPlayBgm.textContent = '▶ zunda.mp3';
+            if (discIconEl) discIconEl.classList.remove('spinning');
           }
+        } else if (typeof window.toggleCozyBGM === 'function') {
+          const isPlaying = window.toggleCozyBGM();
+          widgetPlayBgm.textContent = isPlaying ? '⏸ Pause BGM' : '▶ zunda.mp3';
+          if (discIconEl) discIconEl.classList.toggle('spinning', isPlaying);
         }
       });
     }
@@ -1496,6 +1513,25 @@ class MainApp {
     for (let i = 0; i < 40; i++) {
       particles.push(new SparkleStar());
     }
+
+    // Y2K Interactive Mouse & Scroll Parallax Controller
+    const heroCard = document.querySelector('.hero-card-preview');
+    const heroTitle = document.querySelector('.hero-title');
+    const heroAvatar = document.querySelector('.hero-zunda-svg');
+
+    window.addEventListener('mousemove', (e) => {
+      const mouseX = (e.clientX / window.innerWidth - 0.5) * 30;
+      const mouseY = (e.clientY / window.innerHeight - 0.5) * 30;
+
+      if (heroCard) heroCard.style.transform = `translate3d(${mouseX * 0.8}px, ${mouseY * 0.8}px, 0) rotate3d(1, 1, 0, ${(mouseX - mouseY) * 0.15}deg)`;
+      if (heroTitle) heroTitle.style.transform = `translate3d(${mouseX * 0.3}px, ${mouseY * 0.3}px, 0)`;
+      if (heroAvatar) heroAvatar.style.transform = `translate3d(${-mouseX * 0.5}px, ${-mouseY * 0.5}px, 0) scale(1.05)`;
+    });
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (heroCard) heroCard.style.transform = `translate3d(0, ${scrollY * 0.15}px, 0)`;
+    });
 
     const animateParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);

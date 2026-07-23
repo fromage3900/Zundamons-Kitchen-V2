@@ -667,9 +667,12 @@ showZoneVNBindable.Event:Connect(function(zoneKey)
 end)
 
 -- Wait for _G.ZundaVN to be ready then fire welcome dialogue
-task.delay(2.5, function()
-    print("[VN] Starting welcome dialogue...")
-    print("[VN] _G.ZundaVN exists:", _G.ZundaVN ~= nil)
+task.spawn(function()
+    local maxWait = 10.0
+    local start = os.clock()
+    while not (_G.ZundaVN and _G.ZundaVN.show) and (os.clock() - start) < maxWait do
+        task.wait(0.2)
+    end
     if _G.ZundaVN and _G.ZundaVN.show then
         print("[VN] Calling show with welcome text")
         _G.ZundaVN.show("zundamon", {
@@ -680,7 +683,7 @@ task.delay(2.5, function()
         })
         print("[VN] Welcome dialogue triggered")
     else
-        warn("[VN] _G.ZundaVN.show not available!")
+        warn("[VN] _G.ZundaVN.show not available after " .. maxWait .. "s timeout!")
     end
 end)
 

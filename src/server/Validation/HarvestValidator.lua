@@ -91,7 +91,9 @@ local function validateNode(node: Instance): boolean
 	if node:GetAttribute("Available") == false then
 		return false
 	end
-	if node:GetAttribute("Seeded") == false then
+	-- Only check "Seeded" if the attribute exists (planters use this; wild gathering nodes don't have it)
+	local seeded = node:GetAttribute("Seeded")
+	if seeded ~= nil and seeded == false then
 		return false
 	end
 	return true

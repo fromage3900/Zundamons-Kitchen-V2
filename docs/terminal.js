@@ -711,7 +711,7 @@ class ZundaTerminal {
       `<div class="cli-line">│ Status     : <span class="cli-tag cli-tag-ok">[ONLINE]</span> Server Active</div>` +
       `<div class="cli-line">│ Players    : <span class="cli-highlight">1,420 Chefs Online</span></div>` +
       `<div class="cli-line">│ Genre      : Cozy Cooking & Gathering Simulation</div>` +
-      `<div class="cli-line">│ Link       : <a href="https://www.roblox.com/" target="_blank" style="color:var(--term-green); text-decoration:underline">https://www.roblox.com/</a></div>` +
+      `<div class="cli-line">│ Link       : <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" style="color:var(--term-green); text-decoration:underline">https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo</a></div>` +
       `<div class="cli-table-head">└────────────────────────────────────────────────────────┘</div>` +
       `<div class="cli-line"><span class="cli-system">[ACTION]:</span> Click link above to launch Roblox experience nanoda! 🫛✨</div>` +
       `</div>`;

@@ -219,19 +219,25 @@ local function createGuest(player)
 	guest:SetAttribute("IsChallenge", preference.challenge and true or false)
 	guest:SetAttribute("BonusGold", preference.challenge and preference.challenge.bonus_gold or 0)
 
-	-- Trigger VN dialogue for guest spawn
-	local VNDialogueData = require(RS.ConfigurationFiles.VNDialogueData)
-	local dialogue = VNDialogueData.GUEST_BY_TYPE[selectedMeshType]
-	if dialogue then
-		local text = dialogue.spawn:gsub("{recipe}", recipe)
-		-- Fire client event to show VN dialogue
-		local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
-		if not VNEvent then
-			VNEvent = Instance.new("RemoteEvent")
-			VNEvent.Name = "ShowVNDialogue"
-			VNEvent.Parent = RS.RemoteEvents
+	-- Trigger VN dialogue for guest spawn (with cooldown to avoid spam)
+	if selectedMeshType then
+		local lastDialogueTime = _G._lastGuestDialogueTime or 0
+		local now = os.clock()
+		if now - lastDialogueTime >= 60 then
+			_G._lastGuestDialogueTime = now
+			local ok, VNDialogueData = pcall(require, RS.ConfigurationFiles.VNDialogueData)
+			local dialogue = ok and VNDialogueData and VNDialogueData.GUEST_BY_TYPE and VNDialogueData.GUEST_BY_TYPE[selectedMeshType]
+			if dialogue then
+				local text = dialogue.spawn:gsub("{recipe}", recipe)
+				local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
+				if not VNEvent then
+					VNEvent = Instance.new("RemoteEvent")
+					VNEvent.Name = "ShowVNDialogue"
+					VNEvent.Parent = RS.RemoteEvents
+				end
+				VNEvent:FireClient(player, "guest", text)
+			end
 		end
-		VNEvent:FireClient(player, "guest", text)
 	end
 
 	-- Apply decoration patience buffs
@@ -426,8 +432,8 @@ local function removeGuest(guest, reason)
 	-- Trigger VN dialogue and fire GuestTimedOut event on guest timeout
 	if reason == "timeout" then
 		local meshType = guest:GetAttribute("MeshType")
-		local VNDialogueData = require(RS.ConfigurationFiles.VNDialogueData)
-		local dialogue = VNDialogueData.GUEST_BY_TYPE[meshType]
+		local ok2, VNDialogueData = pcall(require, RS.ConfigurationFiles.VNDialogueData)
+		local dialogue = ok2 and VNDialogueData and VNDialogueData.GUEST_BY_TYPE and VNDialogueData.GUEST_BY_TYPE[meshType]
 		local servingPlayer = game.Players:FindFirstChild(playerName)
 		if not servingPlayer then
 			local userId = guest:GetAttribute("ServingUserId")

@@ -1,8 +1,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
-local Debris = game:GetService("Debris")
-
 local player = Players.LocalPlayer
 
 local C_teal = Color3.fromRGB(110, 190, 215)
@@ -44,8 +42,8 @@ local function applySurfaceAppearance(part)
 	local sa = Instance.new("SurfaceAppearance")
 	sa.Name = "ZundaWaterSA"
 	sa.Color = C_teal
-	sa.Roughness = 0.3
-	sa.Metalness = 0.6
+	sa.Roughness = 0.55
+	sa.Metalness = 0.15
 	sa.Parent = part
 
 	local glow = Instance.new("PointLight", part)
@@ -69,36 +67,100 @@ local function createCaustics()
 	gui.DisplayOrder = 12
 	gui.Parent = playerGui
 
-	local caustic = Instance.new("ImageLabel", gui)
+	local 	caustic = Instance.new("ImageLabel", gui)
 	caustic.Name = "CausticLayer"
 	caustic.Size = UDim2.new(2, 0, 2, 0)
 	caustic.Position = UDim2.new(-0.5, 0, -0.5, 0)
 	caustic.BackgroundTransparency = 1
-	caustic.Image = "rbxassetid://14736459327"
-	caustic.ImageTransparency = 0.92
+	caustic.Image = "rbxassetid://101468581497208"
+	caustic.ImageTransparency = 0.90
 	caustic.ImageColor3 = C_tealLight
 	caustic.ScaleType = Enum.ScaleType.Tile
 	caustic.TileSize = UDim2.new(0, 256, 0, 256)
 
 	local caustic2 = caustic:Clone()
 	caustic2.Name = "CausticLayer2"
-	caustic2.ImageTransparency = 0.95
+	caustic2.Image = "rbxassetid://75779969994353"
+	caustic2.ImageTransparency = 0.93
 	caustic2.ImageColor3 = C_lavender
 	caustic2.TileSize = UDim2.new(0, 320, 0, 320)
 	caustic2.Parent = gui
 
+	local caustic3 = caustic:Clone()
+	caustic3.Name = "CausticLayer3"
+	caustic3.Image = "rbxassetid://83963345255414"
+	caustic3.ImageTransparency = 0.96
+	caustic3.ImageColor3 = Color3.fromRGB(200, 230, 210)
+	caustic3.TileSize = UDim2.new(0, 400, 0, 400)
+	caustic3.Parent = gui
+
+	local parallaxOffset = Vector2.new()
+	local camRefPos = workspace.CurrentCamera and workspace.CurrentCamera.CFrame.Position or Vector3.new()
 	local t = 0
 	RunService.RenderStepped:Connect(function(dt)
 		t = t + dt
-		local driftX = math.sin(t * 0.03) * 0.15
-		local driftY = math.cos(t * 0.025) * 0.12
+		local cam = workspace.CurrentCamera
+		if cam then
+			local camPos = cam.CFrame.Position
+			local targetX = (camRefPos.X - camPos.X) * 0.0008
+			local targetY = (camRefPos.Z - camPos.Z) * 0.0008
+			parallaxOffset = parallaxOffset:Lerp(Vector2.new(targetX, targetY), 0.06)
+		end
+		local driftX = math.sin(t * 0.03) * 0.15 + parallaxOffset.X
+		local driftY = math.cos(t * 0.025) * 0.12 + parallaxOffset.Y
 		caustic.Position = UDim2.new(-0.5 + driftX, 0, -0.5 + driftY, 0)
 		caustic2.Position = UDim2.new(-0.5 - driftX * 0.7, 0, -0.5 - driftY * 0.7, 0)
+		caustic3.Position = UDim2.new(-0.5 + driftX * 1.3, 0, -0.5 + driftY * 1.3, 0)
 
 		local hourColor = getTimeColor()
 		caustic.ImageColor3 = hourColor
 		caustic2.ImageColor3 = hourColor:Lerp(C_lavender, 0.5)
+		caustic3.ImageColor3 = hourColor:Lerp(Color3.fromRGB(200, 230, 210), 0.6)
 	end)
+end
+
+local function setupWaterDebris()
+	for _, part in ipairs(trackedWater) do
+		if not part.Parent then continue end
+		if part:FindFirstChild("ZundaWaterDebris") then continue end
+
+		local fx = Instance.new("Folder")
+		fx.Name = "ZundaWaterDebris"
+		fx.Parent = part
+
+		local e = Instance.new("ParticleEmitter")
+		e.Texture = "rbxassetid://73381643930763"
+		e.Rate = 0.8
+		e.Lifetime = NumberRange.new(8, 18)
+		e.Speed = NumberRange.new(0.05, 0.3)
+		e.SpreadAngle = Vector2.new(360, 360)
+		e.Acceleration = Vector3.new(0, 0.02, 0)
+		e.Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.55),
+			NumberSequenceKeypoint.new(0.3, 0.40),
+			NumberSequenceKeypoint.new(0.7, 0.50),
+			NumberSequenceKeypoint.new(1, 1),
+		})
+		e.Size = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.5),
+			NumberSequenceKeypoint.new(1, 0.8),
+		})
+		e.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 210, 220)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(245, 225, 235)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 220, 240)),
+		})
+		e.LightEmission = 0.10
+		e.LightInfluence = 0.2
+		e.ZOffset = 1
+		e.Rotation = NumberRange.new(0, 360)
+		e.RotSpeed = NumberRange.new(-10, 10)
+		e.Drag = 5
+		e.VelocityInheritance = 0
+		e.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+		e.Enabled = true
+		e.Parent = fx
+	end
 end
 
 local function setupFresnelGlow()
@@ -118,14 +180,13 @@ local function setupFresnelGlow()
 		glow.BorderSizePixel = 0
 		glow.Parent = part
 
-		Debris:AddItem(glow, 1)
 		task.spawn(function()
 			local fadeT = 0
 			while glow and glow.Parent do
 				fadeT = fadeT + 0.016
 				local hourColor = getTimeColor()
 				glow.Color = hourColor
-				glow.Transparency = 0.8 + math.sin(fadeT * 0.5) * 0.1
+				glow.Transparency = 0.85 + math.sin(fadeT * 0.4) * 0.08
 				task.wait(0.016)
 			end
 		end)
@@ -148,25 +209,25 @@ local function setupWaterSparkles()
 
 		local e = Instance.new("ParticleEmitter")
 		e.Texture = "rbxassetid://75925932500392"
-		e.Rate = 1.5
-		e.Lifetime = NumberRange.new(4, 10)
-		e.Speed = NumberRange.new(0.1, 0.8)
-		e.SpreadAngle = Vector2.new(60, 60)
-		e.Acceleration = Vector3.new(0, 0.5, 0)
+		e.Rate = 3
+		e.Lifetime = NumberRange.new(3, 8)
+		e.Speed = NumberRange.new(0.2, 1.0)
+		e.SpreadAngle = Vector2.new(30, 30)
+		e.Acceleration = Vector3.new(0, 0.6, 0)
 		e.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.94),
-			NumberSequenceKeypoint.new(0.4, 0.90),
+			NumberSequenceKeypoint.new(0, 0.92),
+			NumberSequenceKeypoint.new(0.3, 0.85),
 			NumberSequenceKeypoint.new(1, 1),
 		})
 		e.Size = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.3),
-			NumberSequenceKeypoint.new(1, 1.0),
+			NumberSequenceKeypoint.new(0, 0.4),
+			NumberSequenceKeypoint.new(1, 1.2),
 		})
 		e.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, C_tealLight),
 			ColorSequenceKeypoint.new(1, C_white),
 		})
-		e.LightEmission = 0.3
+		e.LightEmission = 0.4
 		e.LightInfluence = 0
 		e.Enabled = true
 		e.Parent = fx
@@ -180,6 +241,7 @@ local function onWaterChanged()
 	end
 	setupFresnelGlow()
 	setupWaterSparkles()
+	setupWaterDebris()
 end
 
 workspace.DescendantAdded:Connect(function(desc)
@@ -194,23 +256,24 @@ task.wait(2)
 onWaterChanged()
 createCaustics()
 
-local t2 = 0
-RunService.Heartbeat:Connect(function(dt)
-	t2 = t2 + dt
-	local hourColor = getTimeColor()
-	for _, part in ipairs(trackedWater) do
-		if not part.Parent then continue end
-		local sa = part:FindFirstChild("ZundaWaterSA")
-		if sa and sa:IsA("SurfaceAppearance") then
-			sa.Color = hourColor
+task.spawn(function()
+	while true do
+		local hourColor = getTimeColor()
+		local hour = Lighting:GetAttribute("CurrentHour") or 12
+		local night = math.max(0, -math.cos(math.rad((hour - 12) * 15)))
+		for _, part in ipairs(trackedWater) do
+			if not part.Parent then continue end
+			local sa = part:FindFirstChild("ZundaWaterSA")
+			if sa and sa:IsA("SurfaceAppearance") then
+				sa.Color = hourColor
+			end
+			local glow = part:FindFirstChild("ZundaWaterGlow")
+			if glow and glow:IsA("PointLight") then
+				glow.Brightness = 0.2 + night * 0.6
+				glow.Color = hourColor
+			end
 		end
-		local glow = part:FindFirstChild("ZundaWaterGlow")
-		if glow and glow:IsA("PointLight") then
-			local hour = Lighting:GetAttribute("CurrentHour") or 12
-			local night = math.max(0, -math.cos(math.rad((hour - 12) * 15)))
-			glow.Brightness = 0.2 + night * 0.6
-			glow.Color = hourColor
-		end
+		task.wait(0.3)
 	end
 end)
 

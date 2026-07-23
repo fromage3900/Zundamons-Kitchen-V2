@@ -1,14 +1,12 @@
 # Progress Log
 
-Last visited: 2026-07-22T17:41:45Z
+Last visited: 2026-07-22T21:36:52Z
 
-- [x] Workspace initialized (BRIEFING.md, ORIGINAL_REQUEST.md, progress.md created)
-- [x] Run preflight_audit.py, rojo build, and selene src
-- [x] Empirical investigation of Target 1: `ShowVNDialogue` remote setup & client listener in `VNController.client.lua`
-- [x] Empirical investigation of Target 2: `GiveLoot` / `sellLoot` boot binding in `ServerMain.server.lua`
-- [x] Empirical investigation of Target 3: `GuestServed` / `GuestTimedOut` BindableEvents in `ServingService.lua` & `EndlessLoopWiring.server.lua`
-- [x] Empirical investigation of Target 4: `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock` in `OutfitWardrobeGui.client.lua`
-- [x] Stress-testing & write verification script / harness (`scripts/verify_m1_remotes.py`)
-- [x] Update BRIEFING.md
-- [ ] Write handoff.md
-- [ ] Send message to parent
+- [x] Set up workspace (`ORIGINAL_REQUEST.md`, `BRIEFING.md`, `progress.md`).
+- [x] Locate files related to Milestone 1 (`CompanionConfig.lua`, `MarketplaceConfig.lua`, `CompanionService.lua`, `scripts/preflight_audit.py`, etc.).
+- [x] Run `python scripts/preflight_audit.py` and confirm zero audit errors.
+- [x] Verify `CompanionConfig.lua` programmatically for all 8 target companions + `zundapal`.
+- [x] Test edge cases (invalid keys in `CompanionConfig.companions`, missing player data in `GetOwnedCompanions`).
+- [x] Verify ID alignment across `MarketplaceConfig.products`, `MarketplaceConfig.companionDevProductIds`, and `MarketplaceConfig.storeDisplay.companions`.
+- [x] Compile empirical results into `challenge.md` and `handoff.md`.
+- [x] Send summary report back to parent via `send_message` with REJECTED state.

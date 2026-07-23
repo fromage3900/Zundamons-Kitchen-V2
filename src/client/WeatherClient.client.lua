@@ -59,6 +59,7 @@ local WEATHER_SOUNDS = {
 	cherry_blossom = resolveWeatherSound("cherry_blossom"),
 	aurora = resolveWeatherSound("aurora"),
 	fog = resolveWeatherSound("fog"),
+	wind = resolveWeatherSound("wind"),
 }
 local ambient = Instance.new("Sound")
 ambient.Name = "WeatherSound"
@@ -167,7 +168,7 @@ end
 -- Lightning flash routine: fires a quick double-strobe during storm/rain only
 local currentWeatherKey = "clear"
 local thunderSound = Instance.new("Sound", rig)
-thunderSound.SoundId = UIAssets.sounds.harvest_complete
+thunderSound.SoundId = UIAssets.sounds.thunder or UIAssets.sounds.harvest_complete
 thunderSound.Volume = 0.4
 
 local function lightningStrobe()

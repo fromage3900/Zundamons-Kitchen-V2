@@ -9,6 +9,7 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
+local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 -- ── CONFIG ─────────────────────────────────────────────────────────────────
 -- World bounds (from terrain survey)
@@ -185,12 +186,22 @@ local function toggle()
 	end
 end
 
--- Double-click map to toggle
-outer.InputBegan:Connect(function(input, gpe)
-	if gpe then return end
-	if input.UserInputType == Enum.UserInputType.MouseButton2 then
-		toggle()
-	end
-end)
+-- Add expand/collapse button on the minimap frame
+local expandBtn = Instance.new("TextButton", outer)
+expandBtn.Name = "ExpandBtn"
+expandBtn.Size = UDim2.new(0, 20, 0, 20)
+expandBtn.Position = UDim2.new(1, -24, 0, 2)
+expandBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 80)
+expandBtn.Text = "⤢"
+expandBtn.Font = Enum.Font.GothamBold
+expandBtn.TextSize = 14
+expandBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+expandBtn.BorderSizePixel = 0
+expandBtn.ZIndex = 6
+Instance.new("UICorner", expandBtn).CornerRadius = UDim.new(0, 4)
+expandBtn.MouseButton1Click:Connect(toggle)
 
-print("[Minimap] Active — top-right corner | right-click to toggle")
+-- Register with ActionRegistry for Pea Wheel dispatch
+ActionRegistry.registerCallback("map", toggle)
+
+print("[Minimap] Active — top-right corner | click ⤢ to toggle full map")

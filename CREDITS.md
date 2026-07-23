@@ -1,83 +1,56 @@
-# Credits & Licensing
+# 🌸 Credits, Attribution & Trademark Guidelines — Zundamon's Kitchen V2
 
-## Zundamon Character
-
-Zundamon (ずんだもん) is a character from the **ZUNKO PJ** project.
-
-- Character design, name, and likeness © ZUN / Shanghai Alice / Zundamon Project
-- Official website: https://zunko.jp/
-- Zundamon is a fan-made derivative character; this project is a non-commercial fan work.
-- Voice synthesis powered by **VOICEVOX** (ずんだもん voice model): https://voicevox.hiroshiba.jp/
-- Zundamon 3D model (FBX + VRM + PMX): From the Zundamon project open data
+> **Project**: Zundamon's Kitchen V2 (Roblox Tycoon & Cooking Simulation)  
+> **Repository**: `g:\Zundamons-kItchen-V2`  
+> **Last Updated**: July 23, 2026  
 
 ---
 
-## Game Assets
+## 🫛 1. SSS LLC — Zundamon Character Ownership & Royalty-Free Guidelines
 
-### Kenney Mini Characters (CC0 1.0 Public Domain)
-- **Source:** https://kenney.nl/assets/mini-characters
-- **Author:** Kenney (www.kenney.nl)
-- **License:** CC0 1.0 Universal (Public Domain)
-- **Usage:** Guest NPC placeholder models
-- **Attribution:** "Assets by Kenney (www.kenney.nl)"
-
-### Kenney Survival Kit (CC0 1.0 Public Domain)
-- **Source:** https://kenney.nl/assets/survival-kit
-- **Author:** Kenney (www.kenney.nl)
-- **License:** CC0 1.0 Universal (Public Domain)
-- **Usage:** Environmental props, buildings, harvest node base meshes
-
-### Zundamon Cursor Set (MIT License)
-- **Source:** https://github.com/wappon28dev/
-- **Author:** wappon_28_dev (X: @yurirofu)
-- **License:** MIT License
-- **Copyright:** Copyright (c) 2022 wappon_28_dev
-
-### zunda_arrow Cursor Set (MIT License)
-- **Source:** https://github.com/wappon28dev/
-- **Author:** wappon_28_dev
-- **License:** MIT License
-- **Copyright:** Copyright (c) 2022 wappon_28_dev
-
-### Young Lady Zundamon (Low-Poly Model)
-- **Source:** ZUNKO PJ / 3D model distributed with Zundamon project data
-- **License:** Per Zundamon project terms — non-commercial fan use
-
-### zundapalupdate2 Companion Mesh
-- **Source:** Custom-created companion model for Zundamon's Kitchen
-- **Usage:** Primary companion character mesh
+- **Character Name**: Zundamon (ずんだもん) & Tohoku Zunko Family
+- **Rights Holder**: **SSS LLC (合同会社SSS / Tohoku Zunko Project)**
+- **Official Portal**: [https://zunko.jp/](https://zunko.jp/)
+- **Guidelines & License**: [https://zunko.jp/guideline.html](https://zunko.jp/guideline.html)
+- **Voice Synthesis Engine**: **VOICEVOX (ずんだもん voice model)** — [https://voicevox.hiroshiba.jp/](https://voicevox.hiroshiba.jp/)
+- **Royalty-Free Usage Terms**: Zundamon's character design, name, likeness, and official Voicevox voice synthesis model are used in accordance with the official **SSS LLC Royalty-Free Character Guidelines** for fan creations and game developments. All character trademarks belong exclusively to SSS LLC.
 
 ---
 
-## Roblox Asset IDs
+## 🎨 2. Kenney — 3D Environment, Skybox & NPC Assets (CC0 1.0 Public Domain)
 
-All `rbxassetid://` values in config files reference assets uploaded to Roblox by the project maintainer.
-
-Asset registries:
-- **MeshAssets.lua** — Harvest node and environment prop meshes
-- **NPCConfig.lua** — Guest and companion model IDs
-- **CompanionManager.server.lua** — Companion character mesh IDs
-- **UIAssets.lua** — UI icon decals, sound effects, particle textures
-- **VNDialoguePortraits.lua** — VN character portrait decals
-- **DecorationConfig.lua** — Decoration item mesh IDs
-- **ArchitectureVariants.lua** — Building and prop mesh IDs
-- **ScatterConfig.lua** — Seasonal effect particle/ambient IDs
+- **Author**: **Kenney (Asset Jesus)** — [https://www.kenney.nl](https://www.kenney.nl)
+- **Asset Category Catalog**: [https://kenney.nl/assets/category:3D/page:3](https://kenney.nl/assets/category:3D/page:3)
+- **License**: **CC0 1.0 Universal (Public Domain)**
+- **Kits & Assets Used**:
+  - **Kenney Mini Characters (3D)**: Guest NPC models, customer avatars, village inhabitants.
+  - **Kenney 3D Nature & Vegetation**: Forest trees, foliage, harvest node base meshes, flowers.
+  - **Kenney Furniture & Food Kit**: Cooking appliances, kitchen counters, mochi plates, dining tables.
+  - **Kenney Survival Kit**: Wild ingredient gathering nodes, resource chests, fences.
+  - **Kenney Day/Night Skybox Cubemaps**: 18-decal dynamic skybox cubemap sets (Kenney Day, Kenney Dawn, Kenney Night).
 
 ---
 
-## Code
+## 🎵 3. Nomagician — Audio, BGM & UI Sound Effects
 
-All original Lua/Python/JavaScript code is the work of repository contributors unless otherwise noted. See `CONTRIBUTING.md` for guidelines.
-
-## Third-Party Tools
-
-- **Rojo** — Roblox Studio sync tool (https://rojo.space)
-- **Mise** — Universal toolchain manager (https://mise.jdx.dev)
-- **Wally** — Roblox package manager (https://wally.run)
-- **Ollama** — Local LLM runtime (https://ollama.com)
-- **VOICEVOX** — Japanese TTS engine (https://voicevox.hiroshiba.jp/)
+- **Author**: **Nomagician**
+- **Audio Asset Packs**:
+  - **Cozy Ambience by Nomagician**: *TreeHouse-Short BGM*, Village Ambient Soundscapes.
+  - **Cute, Cozy & Magical UI SFX by Nomagician**: UI button clicks (`a.wav` through `w.wav`), cooking minigame chimes, item pickup chimes, level-up fanfares, menu open/close sound effects.
+- **License / Terms**: Royalty-free usage for indie game development.
 
 ---
 
-*This is a fan project created for educational and entertainment purposes.*
-*No commercial use is intended or implied. All trademarks belong to their respective owners.*
+## 🖱️ 4. Cursor & UI Assets (MIT License)
+
+- **Author**: **wappon_28_dev** (X: `@yurirofu`)
+- **Asset**: Zundamon Cursor Set & `zunda_arrow` Custom Cursors
+- **License**: **MIT License** — Copyright (c) 2022 wappon_28_dev
+
+---
+
+## 📜 5. Publishing & Trademark Disclaimer
+
+- **Zundamon** is a registered character trademark of **SSS LLC**.
+- **Roblox** is a registered trademark of **Roblox Corporation**.
+- *Zundamon's Kitchen V2* is an independent game development fan creation powered by Matter ECS and Rojo 7.7.0. All third-party trademarks and copyrighted assets are acknowledged and credited in accordance with their respective open licenses (CC0 1.0, MIT, SSS LLC Character Guidelines).

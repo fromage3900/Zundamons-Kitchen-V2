@@ -85,3 +85,76 @@ Ensure all preflight automated audits pass cleanly with zero Luau static errors,
 - [ ] Web pages (docs/index.html and docs/presskit.html) render live ticker data and dynamic event banners cleanly without browser console errors.
 - [ ] All client UI scripts follow ClientGuiBootstrap and explicitly hide modals (Visible = false) on startup.
 
+## 2026-07-22T21:32:49Z
+
+Fix and synchronize the companion system and companion shop in Zundamon's Kitchen V2, ensuring 4 free companion options (parrot, dog, cat, ankomon) and 4 premium -mon variants priced at 1,000 Robux each, with 1000% reliable playtest companion spawning and Rojo place compilation.
+
+Working directory: g:\Zundamons-kItchen-V2
+
+## Requirements
+
+### R1. Companion Catalog & Pricing Configuration
+Update CompanionConfig.lua and MarketplaceConfig.lua:
+- 4 Free Companions: parrot, dog, cat, ankomon (free = true, unlocked by default for all players).
+- 4 Premium -mon Companions: cardamon, antimon, sakuradamon, tantanmon (free = false, priced at 1,000 Robux each).
+
+### R2. Playtest Companion Spawning & Rig Sync
+Fix CompanionManager.server.lua and CompanionShopServer.server.lua:
+- Guarantee companion models spawn cleanly beside the player on playtest without errors.
+- Default to zundapalupdate4 character rig mesh with 0.65x compact scale when custom models are missing.
+
+### R3. Companion Shop UI & Store Sync
+Fix CompanionShopScript.client.lua and CompanionShopServer.server.lua:
+- Ensure owned companions sync instantly across client and server.
+- Equipping any owned companion updates local and server follow state immediately.
+
+### R4. Rojo Build Compilation
+Compile all updated scripts and configurations directly into build/Zundamons-kItchen.rbxl.
+
+## Acceptance Criteria
+
+### Companion & Shop Validation
+- [ ] CompanionConfig.lua contains 4 free companions (parrot, dog, cat, ankomon) and 4 premium -mon variants priced at 1,000 Robux each.
+- [ ] Spawning companions on playtest executes without Luau runtime errors.
+- [ ] Companion Shop UI displays correct free/premium badges and price tags.
+- [ ] rojo build default.project.json -o build/Zundamons-kItchen.rbxl compiles cleanly.
+- [ ] python scripts/preflight_audit.py passes with 0 errors.
+
+## 2026-07-23T03:25:01Z
+
+<USER_REQUEST>
+Overhaul and fix the UI system for Zundamon's Kitchen V2, ensuring the Pea Wheel radial menu opens centered on-screen (eliminating off-screen invisibility), fixing double-toggle keybind conflicts, optimizing startup UI loading performance, and compiling the place via Rojo.
+
+Working directory: g:\Zundamons-kItchen-V2
+
+## Requirements
+
+### R1. Centered Pea Wheel Radial Menu & Visibility
+Fix PeaWheelController.lua:
+- Center the Pea Wheel radial menu overlay in the middle of the screen (Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5)) when opened via Tab key, Q key, or hub button.
+- Ensure all 8 radial slices (inventory, cook, quests, compendium, materials, map, shop, settings) are 100% visible on screen without clipping off-edge.
+
+### R2. Single Source of Truth Keybind Dispatching
+Fix keybind conflicts across client UI scripts:
+- Deduplicate UserInputService.InputBegan listeners so UIActionRegistry.lua acts as the single source of truth.
+- Remove duplicate InputBegan listeners in PouchScript.client.lua, CraftingScript.client.lua, StoreScript.client.lua, etc. to prevent double-toggle opening/closing bugs on keypress.
+
+### R3. Fast UI Boot & Traversal Performance
+Optimize 000_LegacyOverlayCleanup.client.lua and startup scripts:
+- Consolidate multiple GetDescendants() loops into a single single-pass tree traversal on PlayerGui load.
+- Eliminate blocking WaitForChild delays on UI panel initialization.
+
+### R4. Rojo Build Compilation & Verification
+Compile all changes directly into build/Zundamons-kItchen.rbxl.
+
+## Acceptance Criteria
+
+### UI & Keybind Validation
+- [ ] Pressing Tab, Q, or clicking the Pea Wheel hub opens the radial menu centered on screen with all 8 slice icons visible.
+- [ ] Keybinds (I, K, J, C, M, P, B, F1) toggle their respective panels ON/OFF cleanly on single keypress without double-toggling.
+- [ ] rojo build default.project.json -o build/Zundamons-kItchen.rbxl compiles with 0 errors.
+- [ ] python scripts/preflight_audit.py passes with 0 errors.
+</USER_REQUEST>
+
+
+

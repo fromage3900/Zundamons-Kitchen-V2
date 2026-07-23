@@ -8,9 +8,9 @@ if not bloomAtmo then
 	bloomAtmo.Name = "ZundaBloomAtmo"
 	bloomAtmo.Parent = Lighting
 end
-bloomAtmo.Intensity = 0.22
-bloomAtmo.Size = 42
-bloomAtmo.Threshold = 0.45
+bloomAtmo.Intensity = 0.08
+bloomAtmo.Size = 30
+bloomAtmo.Threshold = 0.55
 
 local bloomSun = Lighting:FindFirstChild("ZundaBloomSun")
 if not bloomSun then
@@ -18,9 +18,9 @@ if not bloomSun then
 	bloomSun.Name = "ZundaBloomSun"
 	bloomSun.Parent = Lighting
 end
-bloomSun.Intensity = 0.12
-bloomSun.Size = 36
-bloomSun.Threshold = 0.38
+bloomSun.Intensity = 0.04
+bloomSun.Size = 24
+bloomSun.Threshold = 0.55
 
 local sunRays = Lighting:FindFirstChild("ZundaSunRays")
 if not sunRays then
@@ -28,8 +28,8 @@ if not sunRays then
 	sunRays.Name = "ZundaSunRays"
 	sunRays.Parent = Lighting
 end
-sunRays.Intensity = 0.14
-sunRays.Spread = 0.85
+sunRays.Intensity = 0.05
+sunRays.Spread = 0.90
 
 local colorCorrection = Lighting:FindFirstChild("ZundaColorCorrection")
 if not colorCorrection then
@@ -37,17 +37,17 @@ if not colorCorrection then
 	colorCorrection.Name = "ZundaColorCorrection"
 	colorCorrection.Parent = Lighting
 end
-colorCorrection.Brightness = 0.05
-colorCorrection.Contrast = 0.03
-colorCorrection.Saturation = 0.28
-colorCorrection.TintColor = Color3.fromRGB(248, 236, 252)
+colorCorrection.Brightness = 0.03
+colorCorrection.Contrast = 0.02
+colorCorrection.Saturation = 0.15
+colorCorrection.TintColor = Color3.fromRGB(235, 225, 248)
 
 pcall(function()
-	Lighting.Ambient = Color3.fromRGB(160, 145, 185)
-	Lighting.OutdoorAmbient = Color3.fromRGB(180, 160, 210)
-	Lighting.EnvironmentDiffuseScale = 1.0
-	Lighting.EnvironmentSpecularScale = 0.85
-	Lighting.ExposureCompensation = 0.15
+	Lighting.Ambient = Color3.fromRGB(155, 142, 180)
+	Lighting.OutdoorAmbient = Color3.fromRGB(175, 158, 200)
+	Lighting.EnvironmentDiffuseScale = 0.90
+	Lighting.EnvironmentSpecularScale = 0.70
+	Lighting.ExposureCompensation = 0.08
 
 	local atmo = Lighting:FindFirstChildOfClass("Atmosphere")
 	if not atmo then
@@ -55,25 +55,35 @@ pcall(function()
 		atmo.Name = "DreamyAtmosphere"
 		atmo.Parent = Lighting
 	end
-	atmo.Density = 0.25
-	atmo.Haze = 1.8
-	atmo.Glare = 0.45
-	atmo.Color = Color3.fromRGB(235, 210, 245)
-	atmo.Decay = Color3.fromRGB(180, 140, 200)
+	atmo.Density = 0.18
+	atmo.Haze = 1.4
+	atmo.Glare = 0.25
+	atmo.Color = Color3.fromRGB(225, 208, 240)
+	atmo.Decay = Color3.fromRGB(170, 135, 195)
 end)
 
 local function setupDoF(cam)
 	if not cam then return end
 	local existing = cam:FindFirstChild("ZundaDepthOfField")
 	if existing then existing:Destroy() end
+	local existing2 = cam:FindFirstChild("ZundaTiltShift")
+	if existing2 then existing2:Destroy() end
 
 	local dof = Instance.new("DepthOfFieldEffect")
 	dof.Name = "ZundaDepthOfField"
-	dof.InFocusRadius = 24
-	dof.FocusDistance = 38
-	dof.FarIntensity = 0.45
-	dof.NearIntensity = 0.15
+	dof.InFocusRadius = 40
+	dof.FocusDistance = 50
+	dof.FarIntensity = 0.15
+	dof.NearIntensity = 0.04
 	dof.Parent = cam
+
+	local tilt = Instance.new("DepthOfFieldEffect")
+	tilt.Name = "ZundaTiltShift"
+	tilt.InFocusRadius = 20
+	tilt.FocusDistance = 120
+	tilt.FarIntensity = 0.25
+	tilt.NearIntensity = 0.30
+	tilt.Parent = cam
 end
 
 local cam = workspace.CurrentCamera
@@ -87,11 +97,11 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 	end
 end)
 
-local BloomAtmoBase = 0.22
-local BloomSunBase = 0.12
+local BloomAtmoBase = 0.08
+local BloomSunBase = 0.04
 task.spawn(function()
 	while true do
-		local breath = math.sin(os.clock() * 0.4) * 0.025
+		local breath = math.sin(os.clock() * 0.4) * 0.005
 		bloomAtmo.Intensity = BloomAtmoBase + breath
 		bloomSun.Intensity = BloomSunBase + breath * 0.5
 		task.wait(0.05)

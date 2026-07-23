@@ -1,84 +1,167 @@
-# Handoff Report — HTML Layout Restructuring Plan for `site/index.html`
+# Handoff Report — Explorer 1 (Milestone 1)
 
-**Agent**: Explorer 1 (`explorer_m1_1`)  
-**Target File**: `g:\Zundamons-kItchen-V2\site\index.html`  
-**Milestone**: Milestone 1 - Showcase Architecture & HTML Layout Restructuring  
-**Type**: Hard Handoff  
+**Working Directory**: `g:\Zundamons-kItchen-V2\.agents\explorer_m1_1\`  
+**Target File Analyzed**: `src/client/Controllers/PeaWheelController.lua`  
+**Related Files Inspected**:  
+- `src/shared/ConfigurationFiles/ClientGuiBootstrap.lua`  
+- `src/client/ConfigurationFiles/UIActionRegistry.lua`  
+- `src/client/KeybindsScript.client.lua`  
+- `src/client/HudBootstrap.client.lua`  
+- `src/client/PeaWheelStarter.client.lua`  
 
 ---
 
 ## 1. Observation
 
-Direct observations made during read-only investigation of `g:\Zundamons-kItchen-V2\site\index.html`, `site/app.js`, `site/window_manager.js`, and `orchestrator/plan.md`:
+Direct observations from source code inspection:
 
-1. **Navbar Anchor Links**:
-   - `site/index.html` lines 32–38: `<a href="#hero">Launch</a>`, `<a href="#os-desktop">PC Desktop 💻</a>`, `<a href="#features">Features</a>`, `<a href="#companions">Companions</a>`, `<a href="#promos">Codes 🎁</a>`.
-   - Requested navigation links: `#hero`, `#features`, `#desktop`, `#promos`, `#recipes`. Anchor `#recipes` is currently absent, and `#os-desktop` does not match `#desktop`.
-   - `site/index.html` line 38: `<a class="nav-btn play-roblox-nav-btn">` lacks a distinct `pulse-cta` CSS class for the requested pulsing `[ 🎮 PLAY ON ROBLOX NOW ]` CTA button.
+1. **`wheelGui` ScreenGui Construction** (`src/client/Controllers/PeaWheelController.lua`, lines 64–65):
+   ```lua
+   wheelGui = ClientGuiBootstrap.createScreenGui(player, "PeaWheelGui", 80)
+   wheelGui.ResetOnSpawn = false
+   ```
+   In `src/shared/ConfigurationFiles/ClientGuiBootstrap.lua` (lines 14–22):
+   ```lua
+   local screenGui = Instance.new("ScreenGui")
+   screenGui.Name = name
+   screenGui.ResetOnSpawn = false
+   screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+   if displayOrder then
+       screenGui.DisplayOrder = displayOrder
+   end
+   screenGui.Parent = playerGui
+   return screenGui
+   ```
+   `IgnoreGuiInset` is NOT set on `screenGui`, defaulting to `false`.
 
-2. **Hero Banner CTAs**:
-   - `site/index.html` lines 47–80: Live server status pill present (`🟢 LIVE ON ROBLOX · v2.4.0 HYBRID ECS`).
-   - `site/index.html` line 65: Secondary CTA text is `Zunda-OS PC Desktop` with href `#os-desktop` rather than `[ 🖥️ OPEN KAWAII DESKTOP ]` with href `#desktop`.
+2. **`backdropFrame` Definition** (`src/client/Controllers/PeaWheelController.lua`, lines 68–74):
+   ```lua
+   backdropFrame = Instance.new("Frame")
+   backdropFrame.Name = "Backdrop"
+   backdropFrame.Size = UDim2.fromScale(1, 1)
+   backdropFrame.BackgroundColor3 = Color3.fromRGB(10, 8, 16)
+   backdropFrame.BackgroundTransparency = 0.55
+   backdropFrame.Visible = false
+   backdropFrame.Parent = wheelGui
+   ```
+   `AnchorPoint` and `Position` are uninitialized (defaults: `Vector2.new(0, 0)` and `UDim2.new(0, 0, 0, 0)`).
 
-3. **Game Features Grid**:
-   - `site/index.html` lines 174–196: Cards present for "Gather Wild Ingredients", "Rhythm Cooking Minigame", "Companion Spirit Buffs", "Build Your Restaurant".
-   - Target headings must be updated to exact prompt names: `Resource Gathering & Harvesting`, `Rhythm Cooking Minigames`, `Companion Spirits & Pets`, `Restaurant Decorating & Tycoon`.
+3. **`wheelFrame` Container Definition** (`src/client/Controllers/PeaWheelController.lua`, lines 77–84):
+   ```lua
+   wheelFrame = Instance.new("Frame")
+   wheelFrame.Name = "WheelFrame"
+   wheelFrame.Size = UDim2.fromOffset(340, 340)
+   wheelFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+   wheelFrame.Position = UDim2.fromScale(0.5, 0.5)
+   wheelFrame.BackgroundTransparency = 1
+   wheelFrame.Visible = false
+   wheelFrame.Parent = wheelGui
+   ```
 
-4. **Promo Codes & Toast Notification System**:
-   - `site/index.html` lines 253–277: Promo code cards present with copy buttons for `ZUNDAMOCHI2026`, `SOUPSEASON`, `HYBRIDECS`.
-   - **Missing Element**: No toast container `<div id="toast-container">` exists anywhere in `site/index.html`. `app.js` copy event listeners require this element to show dynamic toast popups.
+4. **Opening Animation Resize** (`src/client/Controllers/PeaWheelController.lua`, lines 237–241):
+   ```lua
+   wheelFrame.Visible = true
+   wheelFrame.Size = UDim2.fromOffset(40, 40)
 
-5. **Embedded PC Desktop & Window Container**:
-   - `site/index.html` lines 116–165: Section ID is `os-desktop` instead of `desktop`.
-   - `site/index.html` lines 282–393: `#window-container` contains windows for `zundacli`, `cookbook`, `zundamon`, `promos`, `calculator`.
-   - **Missing Windows**: Markup for `window-vntalk` (`VNTalk.app`) and `window-updates` (`Updates.log`) is missing from `#window-container`.
-   - **Missing Widgets**: Markup for `#widget-clock-weather`, `#widget-jukebox`, and `#widget-zunda-sticker` is missing from the HTML structure.
-   - **Missing Taskbar**: Embedded `#taskbar` and `#start-menu` popover container are not explicitly laid out inside `#desktop`.
+   TweenService:Create(wheelFrame, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+       Size = UDim2.fromOffset(340, 340),
+   }):Play()
+   ```
 
-6. **Sparkling Starburst Canvas**:
-   - `site/index.html` line 21: `<canvas id="star-sparkle-canvas"></canvas>`.
-   - Standardizing to `<canvas id="star-canvas" class="starburst-canvas"></canvas>` satisfies requirement 6 while maintaining JS fallback aliases.
+5. **Slice Button Position Calculation** (`src/client/Controllers/PeaWheelController.lua`, lines 174–177):
+   ```lua
+   local angle = math.rad(-90 + (i - 1) * 45)
+   local x = math.cos(angle) * radius
+   local y = math.sin(angle) * radius
+   btn.Position = UDim2.new(0.5, x, 0.5, y)
+   ```
+
+6. **Input Event Handling** (`src/client/Controllers/PeaWheelController.lua`, lines 281–298):
+   ```lua
+   local function onInputBegan(input, processed)
+       if processed then return end
+
+       if input.KeyCode == Enum.KeyCode.Tab or input.KeyCode == Enum.KeyCode.Q then
+           if not isOpen then
+               isHolding = true
+               task.delay(HOLD_THRESHOLD, function()
+                   if isHolding and not isOpen then
+                       PeaWheelController.open()
+                   end
+                   isHolding = false
+               end)
+           else
+               PeaWheelController.close()
+               isHolding = false
+           end
+           return
+       end
+   ```
+
+7. **Hub Button Trigger** (`src/client/Controllers/PeaWheelController.lua`, lines 125–129):
+   ```lua
+   hubButton.MouseButton1Click:Connect(function()
+       if RunService:IsStudio() and RunService:IsEdit() then return end
+       if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
+       PeaWheelController.toggle()
+   end)
+   ```
 
 ---
 
 ## 2. Logic Chain
 
-1. **Observation 1 & 2** show that navigation anchors (`#os-desktop` vs `#desktop`) and CTA button labels/classes in `site/index.html` do not match the milestone layout requirements. Therefore, updating section IDs to `id="desktop"` and adding missing links (`#recipes`) and button classes (`pulse-cta`, `btn-candy`) will ensure flawless anchor scrolling and visually prominent CTAs.
-2. **Observation 4** shows the complete absence of `<div id="toast-container">`. Since 1-click clipboard copy buttons in the Promo Codes section require a DOM target to render visual toast notifications without page reloads, inserting `<div id="toast-container" class="toast-container" aria-live="polite">` before `</body>` is necessary for functionality.
-3. **Observation 5** shows missing HTML templates for `window-vntalk`, `window-updates`, desktop taskbar, start menu popover, and desktop widgets (`#widget-clock-weather`, `#widget-jukebox`, `#widget-zunda-sticker`). Without these HTML elements, `window_manager.js` and `app.js` cannot bind DOM event listeners or open these modal windows. Adding these elements to `index.html` completes the PC Desktop workspace architecture.
-4. **Observation 6** shows `<canvas id="star-sparkle-canvas">`. Standardizing the ID to `star-canvas` with full backwards-compatible JS alias ensures background particle animation renders seamlessly.
+1. **Top Bar Inset Misalignment**:
+   - `ClientGuiBootstrap.createScreenGui` returns a `ScreenGui` with `IgnoreGuiInset = false`.
+   - In Roblox UI rendering, `IgnoreGuiInset = false` offsets the root coordinate space down by ~36px (the topbar inset height).
+   - Thus, setting `wheelFrame.Position = UDim2.fromScale(0.5, 0.5)` places the center of `wheelFrame` at `(0.5 * ScreenWidth, 0.5 * (ScreenHeight - 36) + 36)`, which is 18px below the physical screen center.
+   - `backdropFrame` (`Size = UDim2.fromScale(1, 1)`) starts at Y=36px, leaving a 36px unshaded bar across the top of the screen.
+
+2. **Slice Animation Distortion**:
+   - Each slice button position uses `UDim2.new(0.5, x, 0.5, y)`. The `0.5` scale is relative to `wheelFrame.AbsoluteSize`.
+   - When `open()` sets `wheelFrame.Size = UDim2.fromOffset(40, 40)`, `0.5 * 40 = 20px`. When `wheelFrame` grows to `340x340`, `0.5 * 340 = 170px`.
+   - The 150px shift in absolute center during tweening causes the slice buttons to fly out from wrong relative coordinates during the pop-in animation.
+
+3. **Tab Key Suppression & Tap Failure**:
+   - `onInputBegan` checks `if processed then return end`. Roblox CoreGui claims `Tab` key presses for player lists or chat navigation. When `processed` is `true`, `onInputBegan` returns early before checking `input.KeyCode == Enum.KeyCode.Tab`.
+   - Furthermore, `HOLD_THRESHOLD = 0.18s` requires holding the key down. If a user quickly taps `Tab` or `Q`, `InputEnded` sets `isHolding = false` before the `0.18s` delay fires, preventing `open()`.
+
+4. **Hub Button Functionality**:
+   - The Hub Button click directly invokes `PeaWheelController.toggle()`, which circumvents `processed` checks and `HOLD_THRESHOLD` delays. It is reliable but suffers from the same `IgnoreGuiInset` off-center positioning when opening `wheelFrame`.
 
 ---
 
 ## 3. Caveats
 
-- **CSS & JS Coupling**: This report focuses on the HTML layout structure in `site/index.html`. Implementer 1 will need to ensure that corresponding CSS classes in `site/style.css` (e.g. `.toast-container`, `.desktop-widgets-bar`, `.pulse-cta`) are styled accordingly.
-- **Audio Engine**: Widget interactions (Lo-Fi Jukebox, Zundamon voice line chirp) depend on `site/assets/audio_engine.js` being loaded before `app.js`. The proposed HTML skeleton maintains script ordering (`audio_engine.js` -> `window_manager.js` -> `terminal.js` -> `app.js`).
+1. **Read-only Scope**: As Explorer 1, no source code files under `src/` were edited. All proposed changes are documented for the implementer agent.
+2. **CoreGui Overrides**: Setting `IgnoreGuiInset = true` affects all direct children of `wheelGui`. Since `wheelGui` contains only `backdropFrame`, `wheelFrame`, `hubButton`, and `tooltipLabel`, this is safe and desirable.
+3. **TextBox Focus Check**: When bypassing `processed` for Tab/Q keys, a check for `UserInputService:GetFocusedTextBox()` should be included to prevent toggling the wheel while typing in chat or input fields.
 
 ---
 
 ## 4. Conclusion
 
-`site/index.html` requires a structural refactoring to implement the 6 core components of the Kawaii PC Desktop x Game Showcase Launchpad layout:
-1. Top Game Navbar with brand logo, aligned anchor links (`#hero`, `#features`, `#desktop`, `#promos`, `#recipes`), and pulsing `[ 🎮 PLAY ON ROBLOX NOW ]` CTA.
-2. Big Game Launch Hero Banner with server status pill, tagline, dual CTAs (`[ 🎮 PLAY ON ROBLOX NOW ]` & `[ 🖥️ OPEN KAWAII DESKTOP ]`), and feature pills.
-3. 4-card Game Features Grid with updated titles and icons.
-4. Active Promo Codes section with 1-click copy buttons and a new `#toast-container` notification element.
-5. Embedded Kawaii PC Desktop workspace `#desktop` wrapping 7 window templates (adding `window-vntalk` & `window-updates`), taskbar, start menu, and 3 desktop widgets.
-6. Sparkling Starburst Canvas container `#star-canvas`.
+`PeaWheelController.lua` currently suffers from alignment, positioning, and trigger responsiveness bugs due to:
+1. Missing `wheelGui.IgnoreGuiInset = true` in `buildWheelGui()`.
+2. Missing explicit `AnchorPoint` (`Vector2.new(0.5, 0.5)`) and `Position` (`UDim2.fromScale(0.5, 0.5)`) on `backdropFrame`.
+3. Distorted slice positioning caused by resizing `wheelFrame` directly during open/close tweens instead of using `UIScale`.
+4. Input suppression on `Tab`/`Q` key presses caused by `processed` checks and `HOLD_THRESHOLD` hold-time delays.
 
-A complete blueprint and HTML code template have been provided in `g:\Zundamons-kItchen-V2\.agents\explorer_m1_1\analysis.md`.
+Implementing the 4 verified code changes in `PeaWheelController.lua` will resolve all off-screen invisibility, alignment, and key responsiveness issues.
 
 ---
 
 ## 5. Verification Method
 
-To verify the updated `site/index.html` layout:
-1. **File Inspection**: Inspect `g:\Zundamons-kItchen-V2\site\index.html` to confirm presence of:
-   - `<canvas id="star-canvas">`
-   - Navbar `<nav class="nav-links">` with hrefs `#hero`, `#features`, `#desktop`, `#promos`, `#recipes`
-   - `<div id="toast-container">`
-   - All 7 window elements (`window-zundacli`, `window-cookbook`, `window-vntalk`, `window-zundamon`, `window-promos`, `window-calculator`, `window-updates`) inside `#window-container`
-   - Embedded taskbar `#taskbar` and widgets (`#widget-clock-weather`, `#widget-jukebox`, `#widget-zunda-sticker`) inside `#desktop`
-2. **HTML Syntax Validation**: Run `npx htmlhint site/index.html` (if available) or standard HTML5 parser to verify zero unclosed tags.
-3. **Anchor Navigation Check**: Open `site/index.html` in browser and click all navbar links to verify scroll behavior targeting `#hero`, `#features`, `#desktop`, `#promos`, `#recipes`.
+To independently verify these findings and check the upcoming implementer's fix:
+
+1. **Inspect Code Locations**:
+   - Verify `wheelGui.IgnoreGuiInset = true` is set in `PeaWheelController.lua` under `buildWheelGui()`.
+   - Verify `wheelFrame.AnchorPoint = Vector2.new(0.5, 0.5)` and `wheelFrame.Position = UDim2.fromScale(0.5, 0.5)`.
+   - Verify `backdropFrame.AnchorPoint = Vector2.new(0.5, 0.5)` and `backdropFrame.Position = UDim2.fromScale(0.5, 0.5)`.
+
+2. **In-Game Playtest Verification**:
+   - Open Roblox Studio playtest (or run `roblox-studio_solo_playtest` via Studio MCP).
+   - Press `Tab` or `Q`: Confirm the Pea Wheel radial menu opens centered on physical display screen without top bar gap.
+   - Click bottom-right `HubButton`: Confirm radial menu opens smoothly at screen center.
+   - Verify all 8 slice buttons remain perfectly positioned around the center hub without visual shifting during scale transitions.

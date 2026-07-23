@@ -1,48 +1,94 @@
-# Zunda-OS 95 Visual Theme & UI/UX Review Report
+# Milestone 1 Gate Verification Report - Reviewer 2
 
-**Reviewer**: Reviewer 2 (teamwork_preview_reviewer_m1_2)  
-**Target Site Directory**: `g:\Zundamons-kItchen-V2\site`  
-**Files Examined**: `site/style.css`, `site/index.html`, `site/assets/*`  
-**Verdict**: **APPROVED**
+## Executive Summary
+**Verdict**: APPROVE
 
----
-
-## 1. Executive Summary
-
-A comprehensive visual theme, UI/UX, and codebase integrity review of the Zunda-OS 95 CLI Launch Page & Creative Hub (`site/`) was conducted. All six primary requirements specified for Milestone 1 have been implemented to high quality standards with authentic Windows 95 aesthetic compliance, robust interactivity, zero external audio/style dependencies, and zero integrity violations.
+All code changes for Milestone 1 (Companion System & Companion Shop Synchronization) satisfy architectural standards, workspace rules, UI decoupling guidelines, path consistency conventions, data integrity requirements, and pass anti-cheat / integrity checks.
 
 ---
 
-## 2. Review Checklist & Verification Results
+## Verification Criteria Breakdown
 
-| # | Requirement Area | Verification Method | Status | Details |
-|---|------------------|---------------------|--------|---------|
-| 1 | **Design Tokens (`:root`)** | Inspected `site/style.css` lines 5–55 for exact CSS variable declarations. | **PASS** | `:root` includes all 8 specified colors: `#2e7d32` (`--zunda-dark`), `#4caf50` (`--zunda-primary`), `#8bc34a` (`--zunda-light`), `#e8f5e9` (`--zunda-bg`), `#c8e6c9` (`--zunda-accent`), `#f1f8e9` (`--zunda-pastel`), `#0a150a` (`--term-bg`), `#33ff66` (`--term-green`). |
-| 2 | **Win95 3D Bevel Borders** | Examined `.bevel-outset`, `.bevel-inset`, `.win95-btn`, `.win95-input`, `.window`, and `.window-body`. | **PASS** | Outset borders use 2px light top/left and dark bottom/right borders (`--win-border-light` / `--win-border-shadow`). Inset borders invert top/left and bottom/right. `:active` buttons shift borders and padding for real 3D press feel. |
-| 3 | **Retro Taskbar & Controls** | Verified `#taskbar`, `#start-btn`, `#start-menu`, `#taskbar-windows`, `#taskbar-clock`, and tray toggles. | **PASS** | `#taskbar` is fixed at bottom (`bottom: 0`, `z-index: 9999`). `#start-btn` renders `[Start Zunda 🫛]` with start menu popup. Active windows render dynamically in taskbar. Live clock updates every 1s. BGM, SFX, and CRT toggles function correctly. |
-| 4 | **Non-blocking CRT Overlay** | Checked `#crt-overlay` CSS pointer-events and `.crt-off` toggle logic. | **PASS** | `#crt-overlay` has `pointer-events: none` preventing click-blocking on desktop elements. `.crt-off` applies `display: none !important; opacity: 0 !important;` toggleable via Start Menu. |
-| 5 | **Window Styling & Controls** | Verified `ZundaCLI.exe`, `Cookbook.app`, `VNTalk.app`, `QuickStart.txt`, window state classes, and window control buttons. | **PASS** | Windows render with active (`var(--win-title-bg)`) vs inactive (`var(--win-title-bg-inactive)`) titlebars. Controls (`_`, `🗖`, `✕`) minimize, maximize, and close windows properly. |
-| 6 | **Keyframes & Responsiveness** | Verified `@keyframes floatPea` and media queries in `site/style.css`. | **PASS** | `@keyframes floatPea` animates pea icons with translateY/rotate/scale. Media queries handle responsive adjustments at `@media (max-width: 1024px)` and `@media (max-width: 768px)` (fullscreen mobile windows). |
+### 1. Rojo Level Preservation
+- **Status**: PASSED
+- **Evidence**: `default.project.json`, lines 78–82:
+  ```json
+  "Workspace": {
+    "$className": "Workspace",
+    "$path": "src/Workspace",
+    "$ignoreUnknownInstances": true
+  }
+  ```
+- **Analysis**: `$ignoreUnknownInstances` is explicitly set to `true` under `"Workspace"`. Level geometry placed manually in Roblox Studio is preserved during sync.
+
+### 2. Client UI Decoupling
+- **Status**: PASSED
+- **Evidence**:
+  - `src/client/StoreScript.client.lua`: Uses `ClientGuiBootstrap.createScreenGui(player, "ZundaShopGui", 26)`. Zero usage of `script.Parent`. `panel.Visible = false` on startup (line 45). Toast ScreenGuis set `ResetOnSpawn = false` (lines 149, 251).
+  - `src/client/CompanionShopScript.client.lua`: Uses `ClientGuiBootstrap.createScreenGui(player, "CompanionShopGui", 28)`. Zero usage of `script.Parent`. `backdrop.Visible = false` (line 40) and `panel.Visible = false` (line 50) on startup.
+  - `src/shared/ConfigurationFiles/ClientGuiBootstrap.lua`: Line 16 explicitly sets `screenGui.ResetOnSpawn = false` for all dynamically generated top-level ScreenGui objects.
+
+### 3. Import Path Consistency
+- **Status**: PASSED
+- **Evidence**: `src/server/CompanionShopServer.server.lua`, line 32:
+  ```lua
+  local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
+  ```
+- **Analysis**: Direct reference to `ServerScriptService.Services.PlayerDataService` without any extraneous `.Server.` path segment, satisfying Rule 4.
+
+### 4. Data Integrity (`GetOwnedCompanions`)
+- **Status**: PASSED
+- **Evidence**: `src/server/CompanionShopServer.server.lua`, lines 67–87:
+  ```lua
+  GetOwnedCompanions.OnServerInvoke = function(player)
+      local owned = {}
+      for compType, def in pairs(CompanionConfig.companions) do
+          if def.free then
+              owned[compType] = true
+          end
+      end
+      local data = PlayerDataService.get(player)
+      if data then
+          for k, v in pairs(data) do
+              if v == true then
+                  local pre, name = string.match(k, "(companion_owned_)(.+)")
+                  if pre then
+                      owned[name] = true
+                  end
+              end
+          end
+          owned.__active = data.active_companion or "zundapal"
+      end
+      return owned
+  end
+  ```
+- **Analysis**:
+  - Free companions (`zundapal`, `dog`, `parrot`, `cat`, `ankomon`) are populated automatically.
+  - Premium companions (`cardamon`, `antimon`, `sakuradamon`, `tantanmon`) have `def.free = false` in `CompanionConfig.lua` and are ONLY added to `owned` if `data["companion_owned_" .. compType] == true`. Unowned premium companions are NOT leaked to the client.
+  - If player data is fresh or `data` is `nil` during load, the function returns the base table of free companions without crashing. On client (`CompanionShopScript.client.lua`), `owned = ownedData or {}` and `owned.__active` handle `nil` state safely.
 
 ---
 
-## 3. Adversarial Stress-Test & Vulnerability Assessment
+## Adversarial Criticism & Stress-Testing
 
-### Tested Scenarios
-1. **CRT Click Passthrough**: Verified `#crt-overlay` has `pointer-events: none`. Desktop icons, windows, inputs, and start menu buttons remain 100% clickable with CRT enabled.
-2. **Audio Synthesizer Resiliency**: Verified `assets/audio_engine.js` handles missing AudioContext gracefully and resumes AudioContext on user gesture to comply with browser autoplay policies.
-3. **Window Drag & Bounds**: Window titlebar header listens for mouse events, updates `z-index` dynamically, and allows free dragging without clipping layout.
-4. **Mobile Responsiveness**: On viewports $\le 768\text{px}$, windows automatically switch to full-width and full-height layouts without horizontal overflow.
+1. **Unowned Companion Spoofing via `SetCompanion` RemoteEvent**:
+   - **Hypothesis**: Can a client force-equip a premium companion by firing `SetCompanion:FireServer("cardamon")` directly?
+   - **Verification**: Examined `src/server/CompanionManager.server.lua` lines 363–377. The server validates `isFree` vs `data["companion_owned_" .. compType]` before updating `active_companion` or creating the 3D model. Spoofing is blocked.
 
-### Findings & Integrity Audit
-- **Integrity Violations**: None found. No dummy or facade functions; CLI parser, search filtering, VN dialogue branching, procedural Web Audio API sounds, particle system, and window management are fully functional.
-- **Critical / Major Findings**: None.
-- **Minor Observations**:
-  - `zIndexCount` increments on each window focus (`zIndexCount++`). In extreme theoretical usage ($> 10^9$ clicks), zIndex value grows; this is harmless under standard browser number limits.
+2. **Purchasing & Fail-Closed Marketplace Configuration**:
+   - **Hypothesis**: Can clients exploit purchase requests if MarketplaceConfig is disabled or improperly configured?
+   - **Verification**: Examined `src/server/CompanionShopServer.server.lua` lines 46–58 and `src/server/Services/MarketplaceService.lua` lines 31–35. Purchases fail closed when `MarketplaceConfig.enabled` is false, preventing unauthorized transactions or corrupt receipt handling.
+
+3. **Integrity Violation Assessment**:
+   - No hardcoded test results or dummy facade implementations.
+   - Core purchase, receipt mutation, companion spawning, and UI synchronization logic are fully implemented and integrated.
 
 ---
 
-## 4. Final Verdict
+## Summary of Findings
 
-**VERDICT**: **APPROVED**  
-All visual theme, UI/UX, and functional requirements for Milestone 1 are satisfied.
+- **Critical**: 0
+- **Major**: 0
+- **Minor**: 0
+
+**Final Verdict**: **APPROVE**
