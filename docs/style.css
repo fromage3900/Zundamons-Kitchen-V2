@@ -82,8 +82,54 @@ html, body {
 }
 
 /* ==========================================================================
-   STARBURST CANVAS BACKDROP
+   FIGMA DESIGN SYSTEM — IRIDESCENCE & STARFIELD MOTION (from EnvironmentPortfolio)
    ========================================================================== */
+
+:root {
+  --pattern-stars: radial-gradient(circle, rgba(255, 255, 255, 0.82) 0 0.9px, transparent 1.5px),
+    radial-gradient(circle, rgba(255, 110, 180, 0.72) 0 0.85px, transparent 1.45px),
+    radial-gradient(circle, rgba(201, 168, 106, 0.88) 0 1px, transparent 1.65px),
+    radial-gradient(circle, rgba(204, 153, 255, 0.7) 0 1px, transparent 1.75px),
+    radial-gradient(circle, rgba(102, 217, 255, 0.55) 0 1.1px, transparent 1.9px);
+  --pattern-stars-size: 73px 73px, 127px 127px, 199px 199px, 283px 283px, 347px 347px;
+  --pattern-stars-pos: 0 0, 31px 17px, 11px 53px, 67px 29px, 43px 91px;
+}
+
+.iridescent-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.iridescent-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(135deg, rgba(255, 128, 171, 0.15) 0%, rgba(128, 222, 234, 0.15) 33%, rgba(255, 235, 59, 0.15) 66%, rgba(179, 136, 255, 0.15) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.iridescent-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 36px rgba(255, 71, 126, 0.35) !important;
+}
+
+.iridescent-card:hover::before {
+  opacity: 1;
+  animation: iridescentShift 3s linear infinite;
+}
+
+@keyframes iridescentShift {
+  0% { transform: rotate(25deg) translateY(0); }
+  50% { transform: rotate(25deg) translateY(-12px); }
+  100% { transform: rotate(25deg) translateY(0); }
+}
 #star-canvas, #star-sparkle-canvas {
   position: fixed;
   top: 0;
