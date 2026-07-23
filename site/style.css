@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Fredoka:wght@400;600;700&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Sniglet:wght@800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Instrument+Serif:ital@0;1&family=Syne:wght@500;600;700;800&family=VT323&display=swap");
 
 /* ==========================================================================
-   ZUNDAMON'S KITCHEN V2 — KAWAII Y2K FIGMA DESKTOP DESIGN SYSTEM
-   Featuring Melodia Aurora & Cosmic Motion from EnvironmentPortfolio
+   ZUNDAMON'S KITCHEN V2 — MELODIA HIGH-CONCEPT DESIGN SYSTEM
+   Official Game Launchpad & Zunda-OS 95 Interactive Desktop Workspace
    ========================================================================== */
 
 :root {
-  /* --- 🌸 Sakura Pink Palette --- */
+  /* --- 🌸 Sakura Pink & Edamame Mint Palette --- */
   --sakura-light: #fff0f5;
   --sakura-soft: #ffe5ec;
   --sakura-base: #ffb7c5;
@@ -33,20 +33,37 @@
   --glass-border-hover: 2px solid rgba(255, 71, 126, 0.9);
   --glass-backdrop-filter: blur(16px);
 
-  /* --- 🔤 Ultra-Cute Y2K Japanese Typography --- */
-  --font-main: 'Fredoka', 'M PLUS Rounded 1c', 'Sniglet', 'Cherry Bomb One', cursive, sans-serif;
-  --font-heading: 'Cherry Bomb One', 'Fredoka', 'M PLUS Rounded 1c', 'Sniglet', cursive, sans-serif;
-  --font-mono: 'VT323', 'Cascadia Code', 'Courier New', monospace;
+  /* --- 🔤 Melodia Typography SSOT --- */
+  --font-brand: "Syne", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Instrument Serif", "Iowan Old Style", Palatino, serif;
+  --font-body: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-mono: "Azeret Mono", "VT323", monospace;
+
+  --tracking-brand: 0.12em;
+  --tracking-display: 0.02em;
+  --tracking-body: 0.005em;
 }
 
-*, *::before, *::after, body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, a, span, div, label, li, td, th {
+*, *::before, *::after, body, button, input, select, textarea, p, a, span, div, label, li, td, th {
   box-sizing: border-box;
-  font-family: 'Fredoka', 'M PLUS Rounded 1c', 'Sniglet', sans-serif !important;
+  font-family: var(--font-body) !important;
+  letter-spacing: var(--tracking-body);
 }
 
-h1, h2, h3, h4, .hero-title, .section-title, .brand-title, .tile-title, .window-title-text {
-  font-family: 'Fredoka', 'M PLUS Rounded 1c', 'Cherry Bomb One', cursive, sans-serif !important;
-  letter-spacing: 0.5px;
+h1, h2, h3, h4, .hero-title, .section-title, .window-title-text {
+  font-family: var(--font-display) !important;
+  letter-spacing: var(--tracking-display);
+  font-weight: 400;
+}
+
+.brand-title, .nav-brand, .badge-title, .tile-title, .v-badge {
+  font-family: var(--font-brand) !important;
+  letter-spacing: var(--tracking-brand);
+  text-transform: uppercase;
+}
+
+.cli-line, .terminal-body, code, pre {
+  font-family: var(--font-mono) !important;
 }
 
 html, body {
@@ -54,11 +71,11 @@ html, body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  font-family: 'Fredoka', 'M PLUS Rounded 1c', sans-serif !important;
+  font-family: var(--font-body) !important;
   background-color: #ffe5ec;
   background-image: 
-    radial-gradient(circle, rgba(255, 71, 126, 0.25) 2.5px, transparent 2.5px),
-    radial-gradient(circle, rgba(76, 175, 80, 0.25) 2.5px, transparent 2.5px),
+    radial-gradient(circle, rgba(255, 71, 126, 0.18) 2px, transparent 2px),
+    radial-gradient(circle, rgba(76, 175, 80, 0.18) 2px, transparent 2px),
     linear-gradient(135deg, #ffe5ec 0%, #e8f5e9 35%, #f3e5f5 70%, #fff9c4 100%);
   background-size: 32px 32px, 32px 32px, 100% 100%;
   background-position: 0 0, 16px 16px, 0 0;

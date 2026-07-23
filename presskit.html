@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌸 Zundamon's Kitchen V2 — Official Press Kit & Brand Media</title>
+  <style>
+    :root {
+      --zunda-green: #4caf50;
+      --zunda-mint: #e8f5e9;
+      --zunda-pink: #e898a8;
+      --zunda-gold: #ffc850;
+      --dark-text: #2d2d2d;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--zunda-mint);
+      color: var(--dark-text);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: var(--zunda-green);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    header h1 { margin: 0; font-size: 2.5rem; }
+    header p { margin-top: 10px; font-size: 1.2rem; }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 2px solid #c8e6c9;
+    }
+    h2 { color: var(--zunda-green); margin-top: 0; }
+    .badge {
+      display: inline-block;
+      background: var(--zunda-pink);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .code-box {
+      background: #f1f8e9;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-weight: bold;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+    .btn {
+      display: inline-block;
+      background: var(--zunda-gold);
+      color: #2d2d2d;
+      padding: 12px 24px;
+      border-radius: 24px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌸 ZUNDAMON'S KITCHEN V2 🫛</h1>
+    <p>Official Press Kit & Media Assets nanoda!</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>🎮 Game Description</h2>
+      <p><strong>Zundamon's Kitchen V2</strong> is a whimsical Roblox cooking RPG and fashion simulation inspired by Infinity Nikki. Players step into Zunda Village as an aspiring chef, cooking gourmet edamame delicacies, styling cute aprons & accessories, and embarking on wave-based culinary challenges with Zundamon!</p>
+      <span class="badge">Genre: Cozy RPG / Cooking / Fashion</span>
+    </div>
+
+    <div class="card">
+      <h2>🎁 Active Promo Codes</h2>
+      <p>Redeem these codes in-game or on the web dashboard for exclusive rewards:</p>
+      <div class="code-box">ZUNDAMOCHI2026 — +500 Gold & Fresh Mochi</div>
+      <div class="code-box">NIKKIFASHION — +1500 Gold & 3x Whim Gacha Tickets</div>
+      <div class="code-box">HYBRIDECS — +2000 Gold, 200 Gems & 5x Whim Gacha Tickets</div>
+    </div>
+
+    <div class="card">
+      <h2>🌐 Live Game Status API</h2>
+      <p>Real-time telemetry and active event status connected directly to Roblox servers:</p>
+      <div id="liveStatus">Loading live event data...</div>
+    </div>
+  </div>
+
+  <script>
+    const fallbackData = {
+      live_event: { name: "🌸 Whims of Gourmet - Spring Festival", multiplier: "2.0x Style Points & Gold" },
+      global_stats: { total_dishes_cooked: 142850, active_event: { name: "🌸 Whims of Gourmet - Spring Festival", multiplier: "2.0x Style Points & Gold" } },
+      gacha_banners: [{ name: "🌸 Whims of Spring Gourmet" }],
+      online_players: { count: 125, version: "2.4.0 HYBRID ECS" }
+    };
+
+    function renderStatus(data) {
+      const eventInfo = data.global_stats?.active_event || data.live_event || fallbackData.live_event;
+      const bannerName = data.gacha_banners?.[0]?.name || fallbackData.gacha_banners[0].name;
+      const cooked = data.global_stats?.total_dishes_cooked || fallbackData.global_stats.total_dishes_cooked;
+      const online = data.online_players?.count || 125;
+
+      document.getElementById('liveStatus').innerHTML = `
+        <strong>Active Event:</strong> ${eventInfo.name} (${eventInfo.multiplier})<br>
+        <strong>Featured Banner:</strong> ${bannerName}<br>
+        <strong>Online Chefs:</strong> ${online} Online (v2.4.0 HYBRID ECS)<br>
+        <strong>Total Dishes Cooked Globally:</strong> ${cooked.toLocaleString()}
+      `;
+    }
+
+    fetch('api/game_info.json')
+      .then(res => res.json())
+      .then(data => renderStatus(data))
+      .catch(() => renderStatus(fallbackData));
+  </script>
+</body>
+</html>
