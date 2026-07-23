@@ -12,8 +12,7 @@ if not LocalPlayer then
 	return
 end
 
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local ConfigurationFiles = Shared:WaitForChild("ConfigurationFiles")
+local ConfigurationFiles = ReplicatedStorage:WaitForChild("ConfigurationFiles")
 local ClientGuiBootstrap = require(ConfigurationFiles:WaitForChild("ClientGuiBootstrap"))
 local UIConfig = require(ConfigurationFiles:WaitForChild("UIConfig"))
 local ChefStatsConfig = require(ConfigurationFiles:WaitForChild("ChefStatsConfig"))
@@ -57,7 +56,7 @@ titleLabel.Name = "TitleLabel"
 titleLabel.Size = UDim2.new(1, -60, 1, 0)
 titleLabel.Position = UDim2.new(0, 20, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Font = UIConfig.FONTS.Decorative
+titleLabel.FontFace = UIConfig.FONTS.Decorative
 titleLabel.TextSize = 24
 titleLabel.TextColor3 = UIConfig.COLORS.ZundaDark
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -70,7 +69,7 @@ closeBtn.Name = "CloseButton"
 closeBtn.Size = UDim2.new(0, 40, 0, 40)
 closeBtn.Position = UDim2.new(1, -50, 0, 10)
 closeBtn.BackgroundColor3 = UIConfig.COLORS.ZundamonPink
-closeBtn.Font = UIConfig.FONTS.Title
+closeBtn.FontFace = UIConfig.FONTS.Title
 closeBtn.TextSize = 20
 closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.Text = "✕"
@@ -96,7 +95,7 @@ statsCorner.Parent = statsPanel
 local statsTitle = Instance.new("TextLabel")
 statsTitle.Size = UDim2.new(1, 0, 0, 30)
 statsTitle.BackgroundTransparency = 1
-statsTitle.Font = UIConfig.FONTS.Heading
+statsTitle.FontFace = UIConfig.FONTS.Heading
 statsTitle.TextSize = 16
 statsTitle.TextColor3 = UIConfig.COLORS.ZundaDark
 statsTitle.Text = "📊 Chef Attributes"
@@ -139,7 +138,7 @@ local function createStatCard(key: string, data: any, order: number)
 	nameLabel.Size = UDim2.new(1, -40, 0, 20)
 	nameLabel.Position = UDim2.new(0, 35, 0, 5)
 	nameLabel.BackgroundTransparency = 1
-	nameLabel.Font = UIConfig.FONTS.Body
+	nameLabel.FontFace = UIConfig.FONTS.Body
 	nameLabel.TextSize = 14
 	nameLabel.TextColor3 = UIConfig.COLORS.TextDark
 	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -151,7 +150,7 @@ local function createStatCard(key: string, data: any, order: number)
 	valLabel.Size = UDim2.new(1, -40, 0, 20)
 	valLabel.Position = UDim2.new(0, 35, 0, 25)
 	valLabel.BackgroundTransparency = 1
-	valLabel.Font = UIConfig.FONTS.Mono
+	valLabel.FontFace = UIConfig.FONTS.Mono
 	valLabel.TextSize = 13
 	valLabel.TextColor3 = data.color
 	valLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -189,7 +188,7 @@ galleryCorner.Parent = galleryPanel
 local galleryTitle = Instance.new("TextLabel")
 galleryTitle.Size = UDim2.new(1, 0, 0, 30)
 galleryTitle.BackgroundTransparency = 1
-galleryTitle.Font = UIConfig.FONTS.Heading
+galleryTitle.FontFace = UIConfig.FONTS.Heading
 galleryTitle.TextSize = 16
 galleryTitle.TextColor3 = UIConfig.COLORS.ZundaDark
 galleryTitle.Text = "🎀 Fashion Collection & Accessories"
@@ -242,7 +241,7 @@ for _, outfit in ipairs(outfitItems) do
 	name.Size = UDim2.new(1, -8, 0, 30)
 	name.Position = UDim2.new(0, 4, 0, 50)
 	name.BackgroundTransparency = 1
-	name.Font = UIConfig.FONTS.Body
+	name.FontFace = UIConfig.FONTS.Body
 	name.TextSize = 12
 	name.TextColor3 = outfit.unlocked and UIConfig.COLORS.TextDark or UIConfig.COLORS.TextDisabled
 	name.TextWrapped = true
@@ -254,7 +253,7 @@ for _, outfit in ipairs(outfitItems) do
 	btn.Size = UDim2.new(1, -12, 0, 24)
 	btn.Position = UDim2.new(0, 6, 1, -30)
 	btn.BackgroundColor3 = outfit.unlocked and UIConfig.COLORS.ZundamonGold or UIConfig.COLORS.BorderDim
-	btn.Font = UIConfig.FONTS.Heading
+	btn.FontFace = UIConfig.FONTS.Heading
 	btn.TextSize = 11
 	btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
 	btn.Text = outfit.unlocked and "Equip" or "Locked"

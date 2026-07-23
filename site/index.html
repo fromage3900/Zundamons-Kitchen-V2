@@ -19,657 +19,517 @@
 
     <!-- Primary Stylesheet with Cache Buster -->
     <link rel="stylesheet" href="style.css?v=2.5.0">
+
+    <!-- Google <model-viewer> 3D Web Component -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 </head>
 <body>
 
-    <!-- 6. Sparkling Starburst Canvas -->
+    <!-- Sparkling Starburst Canvas -->
     <canvas id="star-canvas" class="starburst-canvas"></canvas>
 
-    <!-- 1. Top Game Navbar -->
-    <header class="game-navbar">
-        <div class="nav-container">
-            <a href="#" class="nav-brand">
-                <span class="brand-emoji">🫛</span>
-                <span class="brand-title">Zundamon's Kitchen <small class="v-badge">V2</small></span>
+    <!-- CRT Screen Filter Overlay (Toggleable) -->
+    <div id="crt-overlay" class="crt-overlay crt-off"></div>
+
+    <!-- Top OS Taskbar (#taskbar) at top:0, height:38px, z-index:9000 -->
+    <div id="taskbar" class="os-taskbar">
+        <button id="start-btn" class="taskbar-start-btn">🫛 Start</button>
+        <div id="taskbar-windows" class="taskbar-windows-container"></div>
+        
+        <div class="taskbar-system-tray">
+            <button id="taskbar-jukebox-btn" class="taskbar-tray-btn" title="Toggle Lo-Fi BGM (zunda.mp3)">
+                <span class="disc-icon">🎵</span> BGM
+            </button>
+            <div id="taskbar-clock-weather" class="taskbar-clock-weather-pill" title="Click weather to cycle forecast!">
+                <span id="taskbar-clock" class="taskbar-clock">12:00:00 PM</span>
+                <span class="tray-separator">|</span>
+                <span id="taskbar-weather" class="taskbar-weather">🌤️ 22°C</span>
+            </div>
+            <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" 
+               target="_blank" rel="noopener noreferrer" 
+               class="taskbar-roblox-play-btn btn-candy pulse-cta">
+                <span class="btn-icon">🎮</span>
+                <span class="btn-text">PLAY ON ROBLOX</span>
             </a>
-
-            <nav class="nav-links">
-                <a href="#hero">Launch</a>
-                <a href="#features">Features</a>
-                <a href="#desktop">PC Desktop 💻</a>
-                <a href="#promos">Codes 🎁</a>
-                <a href="#recipes" data-open-window="window-cookbook">Recipes 📖</a>
-                <a href="#credits" data-open-window="window-credits">Credits 📜</a>
-                <button id="nav-cli-btn" class="nav-btn cli-link-btn" data-open-window="window-zundacli">💻 ZundaCLI</button>
-                <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer" class="nav-btn play-roblox-nav-btn pulse-cta">🎮 PLAY ON ROBLOX NOW</a>
-            </nav>
         </div>
-    </header>
+    </div>
 
-    <!-- 2. Big Game Launch Hero Banner -->
-    <section id="hero" class="game-hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <div class="status-pill">
-                    <span class="pill-dot">🟢</span>
-                    <span class="pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS</span>
+    <!-- Start Menu Popover (#start-menu) at top:38px, left:4px, z-index:9500 -->
+    <div id="start-menu" class="start-menu-popover hidden">
+        <div class="start-menu-header">
+            <span class="start-user-icon">🫛</span>
+            <span>Zunda-OS 95 Menu</span>
+        </div>
+        <div class="start-menu-items">
+            <button class="start-item" data-open-window="window-zundacli">💻 ZundaCLI.exe</button>
+            <button class="start-item" data-open-window="window-cookbook">📖 Cookbook.app</button>
+            <button class="start-item" data-open-window="window-vntalk">💬 VNTalk.app</button>
+            <button class="start-item" data-open-window="window-companions">🫛 Companions.app</button>
+            <button class="start-item" data-open-window="window-features">✨ Features.app</button>
+            <button class="start-item" data-open-window="window-promos">🎁 Promos.app</button>
+            <button class="start-item" data-open-window="window-gallery">🖼️ Gallery.app</button>
+            <button class="start-item" data-open-window="window-credits">📜 Credits.app</button>
+            <hr class="start-divider" style="margin: 4px 8px; border: 0; border-top: 1px solid var(--sakura-base);">
+            <button class="start-item" data-open-window="window-calculator">🧮 Calculator.app</button>
+            <button class="start-item" data-open-window="window-updates">📜 Updates.log</button>
+            <button id="menu-toggle-crt" class="start-item">📺 Toggle CRT Filter</button>
+            <button id="menu-shutdown" class="start-item" style="color: #d32f2f;">🔴 Shut Down</button>
+        </div>
+    </div>
+
+    <!-- Full-Bleed Desktop Workspace Canvas (#desktop-viewport) -->
+    <div id="desktop-viewport" class="desktop-viewport">
+        
+        <!-- Background Mascot Watermark Backdrop -->
+        <div class="desktop-wallpaper-mascot-container">
+            <img src="assets/zundamon_animation.gif" alt="Zundamon Animated" class="desktop-mascot-gif">
+            <img src="assets/zunda_transparent.webp" alt="Zundamon Mascot" class="desktop-mascot-png">
+        </div>
+
+        <!-- 8 Desktop Shortcut Icons (Grid/Column on left of desktop) -->
+        <div class="desktop-shortcuts-grid" id="desktop-shortcuts">
+            <button class="desktop-icon" data-open-window="window-zundacli" title="Open ZundaCLI.exe">
+                <span class="icon-img">💻</span>
+                <span class="icon-label">ZundaCLI.exe</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-cookbook" title="Open Cookbook.app">
+                <span class="icon-img">📖</span>
+                <span class="icon-label">Cookbook.app</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-vntalk" title="Open VNTalk.app">
+                <span class="icon-img">💬</span>
+                <span class="icon-label">VNTalk.app</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-companions" title="Open Companions.app">
+                <span class="icon-img">🫛</span>
+                <span class="icon-label">Companions.app</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-features" title="Open Features.app">
+                <span class="icon-img">✨</span>
+                <span class="icon-label">Features.app</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-promos" title="Open Promos.app">
+                <span class="icon-img">🎁</span>
+                <span class="icon-label">Promos.app</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-gallery" title="Open Gallery.app">
+                <span class="icon-img">🖼️</span>
+                <span class="icon-label">Gallery.app</span>
+            </button>
+            <button class="desktop-icon" data-open-window="window-credits" title="Open Credits.app">
+                <span class="icon-img">📜</span>
+                <span class="icon-label">Credits.app</span>
+            </button>
+        </div>
+
+        <!-- Desktop Floating Widgets Bar -->
+        <div class="desktop-widgets-bar" style="position: absolute; top: 16px; right: 16px; z-index: 25;">
+            <!-- Widget 1: Digital Clock & Weather Widget -->
+            <div id="widget-clock-weather" class="desktop-widget clock-weather-widget" title="Click weather to cycle forecast nanoda!">
+                <div class="clock-display-pill">
+                    <span class="clock-icon">⏰</span>
+                    <span id="widget-digital-time" class="widget-time">12:00:00 PM</span>
                 </div>
+                <div class="weather-display-pill" id="widget-weather-pill">
+                    <span id="widget-weather-icon" class="weather-icon">🌤️</span>
+                    <span id="widget-weather-text" class="widget-weather">Zunda Village: 22°C Clear</span>
+                </div>
+            </div>
 
-                <h1 class="hero-title">
-                    Cook, Gather & Build Your <span class="highlight-text">Kitchen Empire!</span> 🫛✨
-                </h1>
+            <!-- Widget 2: Lo-Fi Jukebox Widget -->
+            <div id="widget-jukebox" class="desktop-widget jukebox-widget">
+                <audio id="zunda-mp3-player" src="assets/zunda.mp3" preload="auto" loop></audio>
+                <div class="jukebox-track-info">
+                    <span id="jukebox-disc-icon" class="jukebox-icon">🎵</span>
+                    <span id="jukebox-track-title" class="jukebox-title">🫛 Zunda Cozy Theme</span>
+                </div>
+                <div class="jukebox-controls">
+                    <button id="widget-play-bgm" class="btn-candy jukebox-btn" title="Play / Pause BGM">▶ BGM</button>
+                </div>
+            </div>
 
-                <p class="hero-subtitle">
-                    Step into the cozy world of <strong>Zundamon's Kitchen V2</strong>! Gather wild ingredients across magical forests, master rhythm-game cooking recipes, serve hungry NPC guests, and team up with adorable Zundamon companions!
-                </p>
+            <!-- Widget 3: Zundamon Desktop Sticker Widget -->
+            <div id="widget-zunda-sticker" class="desktop-widget zunda-sticker-widget" title="Click Zundamon nanoda!">
+                <div class="sticker-mascot-box">
+                    <img src="assets/zundamon_animation.gif" alt="Zundamon Pet" style="width: 36px; height: 36px; object-fit: contain;">
+                </div>
+                <div id="widget-speech-bubble" class="sticker-bubble">Nanoda! ✨</div>
+            </div>
+        </div>
 
-                <div class="hero-actions">
-                    <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer" class="cta-btn primary-cta btn-candy btn-roblox-play">
-                        <span class="cta-icon">🎮</span>
-                        <span class="cta-text">PLAY ON ROBLOX NOW</span>
+        <!-- OS Window Container (#window-container) -->
+        <div id="window-container">
+
+            <!-- 1. ZundaCLI.exe Window -->
+            <section id="window-zundacli" class="window hidden" data-window-id="window-zundacli" style="top: 50px; left: 120px; width: 680px; height: 440px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon"><img src="assets/crt_monitor.svg" width="16" height="16" alt="Icon"></span>
+                        <span class="window-title-text">ZundaCLI.exe — Pastel Dev Console</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body cli-body" data-term-theme="pastel">
+                    <div id="cli-output" class="cli-terminal-log" role="log" aria-live="polite">
+                        <p class="cli-welcome">Zundamon's Kitchen V2 [Pastel Web Terminal v4.09]</p>
+                        <p class="cli-welcome">Type <span class="cli-highlight">'help'</span>, <span class="cli-highlight">'recipes'</span>, or <span class="cli-highlight">'promos'</span> for commands.</p>
+                    </div>
+                    <form id="cli-input-form" class="cli-prompt-line" autocomplete="off" onsubmit="return false;">
+                        <label for="cli-input" class="cli-prompt-label">zunda&gt;</label>
+                        <input type="text" id="cli-input" class="cli-input-field" placeholder="Type command (e.g. help, recipes, promo)..." spellcheck="false">
+                    </form>
+                </div>
+            </section>
+
+            <!-- 2. Cookbook.app Window -->
+            <section id="window-cookbook" class="window hidden" data-window-id="window-cookbook" style="top: 70px; left: 160px; width: 720px; height: 500px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">📖</span>
+                        <span class="window-title-text">Cookbook.app — Zunda Recipe Book</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body cookbook-body">
+                    <div class="recipe-toolbar">
+                        <input type="search" id="recipe-search" class="win95-input" placeholder="Search recipes (e.g. Mochi, Latte, Parfait)...">
+                    </div>
+                    <div id="recipe-grid" class="recipe-cards-grid"></div>
+                </div>
+            </section>
+
+            <!-- 3. VNTalk.app Window -->
+            <section id="window-vntalk" class="window hidden" data-window-id="window-vntalk" style="top: 90px; left: 200px; width: 640px; height: 460px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">💬</span>
+                        <span class="window-title-text">VNTalk.app — Companion Visual Novel</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body vntalk-body">
+                    <div class="vn-dialogue-box">
+                        <div class="vn-speaker">Zundamon (ずんだもん)</div>
+                        <p id="vn-text" class="vn-text-content">"Welcome to Zunda Village nanoda! I can help you harvest ingredients and cook delicious mochi! What shall we craft today?"</p>
+                        <div class="vn-choices">
+                            <button class="win95-btn btn-candy vn-choice-btn" data-choice="cook">🍳 Let's cook some Zunda Mochi!</button>
+                            <button class="win95-btn btn-candy vn-choice-btn" data-choice="gather">🌾 Show me where to gather ingredients!</button>
+                            <button class="win95-btn btn-candy vn-choice-btn" data-choice="chirp" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('nanoda_arpeggio')">🔊 Say catchphrase nanoda!</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Companions.app Window -->
+            <section id="window-companions" class="window hidden" data-window-id="window-companions" style="top: 110px; left: 220px; width: 700px; height: 500px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🫛</span>
+                        <span class="window-title-text">Companions.app — Companion Spirits Roster</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body companions-body" style="padding: 16px; overflow-y: auto;">
+                    <h3 style="color: var(--zunda-deep); margin-bottom: 8px;">🫛 MEET THE COMPANION SPIRITS</h3>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Select companion spirits to view active abilities, stat boosts, and voice lines!</p>
+
+                    <div class="comp-chips-bar" style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+                        <button class="comp-chip active" data-comp="zundamon" style="padding: 6px 12px; border-radius: 9999px; border: 1px solid var(--zunda-base); background: var(--zunda-light); cursor: pointer; font-weight: bold;">🫛 Zundamon</button>
+                        <button class="comp-chip" data-comp="sakuradamon" style="padding: 6px 12px; border-radius: 9999px; border: 1px solid var(--sakura-base); background: #fff0f5; cursor: pointer; font-weight: bold;">🌸 Sakuradamon</button>
+                        <button class="comp-chip" data-comp="ankomon" style="padding: 6px 12px; border-radius: 9999px; border: 1px solid #d81b60; background: #fce4ec; cursor: pointer; font-weight: bold;">🫘 Ankomon</button>
+                        <button class="comp-chip" data-comp="cardamon" style="padding: 6px 12px; border-radius: 9999px; border: 1px solid #f57f17; background: #fffde7; cursor: pointer; font-weight: bold;">🍋 Cardamon</button>
+                        <button class="comp-chip" data-comp="antimon" style="padding: 6px 12px; border-radius: 9999px; border: 1px solid #388e3c; background: #e8f5e9; cursor: pointer; font-weight: bold;">🌿 Antimon</button>
+                    </div>
+
+                    <div class="zunda-hero-panel">
+                        <div class="zunda-stats-panel">
+                            <div class="vn-dialogue-card" style="background: rgba(255,255,255,0.9); border: 2px solid var(--sakura-base); border-radius: 12px; padding: 16px;">
+                                <p id="zunda-dialogue-text" class="vn-quote" style="font-size: 14px; font-weight: 600; color: var(--zunda-deep);">"I will stay close while you gather and cook nanoda! 🫛"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Features.app Window -->
+            <section id="window-features" class="window hidden" data-window-id="window-features" style="top: 60px; left: 140px; width: 680px; height: 480px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">✨</span>
+                        <span class="window-title-text">Features.app — Game Specs & Hybrid ECS Overview</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body features-body" style="padding: 16px; overflow-y: auto;">
+                    <div class="status-pill" style="display: inline-flex; align-items: center; gap: 6px; background: var(--zunda-light); border: 1px solid var(--zunda-soft); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 800; color: var(--zunda-deep); margin-bottom: 14px;">
+                        <span class="pill-dot">🟢</span>
+                        <span class="pill-text">LIVE ON ROBLOX · v2.4.0 HYBRID ECS</span>
+                    </div>
+
+                    <h3 style="color: var(--zunda-deep); margin-bottom: 10px;">✨ WHY PLAY ZUNDAMON'S KITCHEN?</h3>
+                    
+                    <div class="features-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div class="feature-card" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="feat-icon" style="font-size: 24px;">🌾</div>
+                            <h4 style="font-size: 14px; margin: 4px 0; color: var(--zunda-deep);">Resource Gathering</h4>
+                            <p style="font-size: 12px; color: #64748b;">Harvest fresh berries, sacred wheat, and crystal mushrooms from interactive resource nodes.</p>
+                        </div>
+                        <div class="feature-card" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="feat-icon" style="font-size: 24px;">🍳</div>
+                            <h4 style="font-size: 14px; margin: 4px 0; color: var(--zunda-deep);">Rhythm Cooking</h4>
+                            <p style="font-size: 12px; color: #64748b;">Tap along to catchy beats and land Perfect combos to craft S-Rank dishes like Zunda Mochi.</p>
+                        </div>
+                        <div class="feature-card" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="feat-icon" style="font-size: 24px;">🫛</div>
+                            <h4 style="font-size: 14px; margin: 4px 0; color: var(--zunda-deep);">Companion Spirits</h4>
+                            <p style="font-size: 12px; color: #64748b;">Unlock & bond with 5 unique companion spirits granting XP, Gold, and Gathering boosts.</p>
+                        </div>
+                        <div class="feature-card" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="feat-icon" style="font-size: 24px;">🏠</div>
+                            <h4 style="font-size: 14px; margin: 4px 0; color: var(--zunda-deep);">Restaurant Tycoon</h4>
+                            <p style="font-size: 12px; color: #64748b;">Place furniture, design your kitchen plot, serve hungry NPC guests, and level up your chef rank!</p>
+                        </div>
+                    </div>
+
+                    <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer" class="cta-btn primary-cta btn-candy btn-roblox-play" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 9999px; background: linear-gradient(180deg, var(--zunda-leaf), var(--zunda-base)); color: white; text-decoration: none; font-weight: bold;">
+                        <span>🎮</span> PLAY ON ROBLOX NOW
                     </a>
-                    <a href="#desktop" class="cta-btn secondary-cta btn-candy">
-                        <span class="cta-icon">🖥️</span>
-                        <span class="cta-text">OPEN KAWAII DESKTOP</span>
-                    </a>
-                    <button class="cta-btn terminal-cta btn-candy" data-open-window="window-zundacli">
-                        <span class="cta-icon">💻</span>
-                        <span class="cta-text">Open Terminal</span>
-                    </button>
                 </div>
+            </section>
 
-                <div class="hero-pills">
-                    <span class="hero-tag">🌾 Resource Gathering</span>
-                    <span class="hero-tag">🍳 Rhythm Minigames</span>
-                    <span class="hero-tag">🫛 Companion Spirits</span>
-                    <span class="hero-tag">🏠 Restaurant Decorating</span>
-                    <span class="hero-tag">⚡ Hybrid ECS Engine</span>
-                    <span class="hero-tag">📜 68+ Quests</span>
-                </div>
-            </div>
-
-            <div class="hero-card-preview">
-                <div class="zunda-hero-avatar-box Y2K-hero-showcase">
-                    <div class="hero-gif-container">
-                        <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" class="hero-zunda-gif-anim">
-                        <img src="assets/zunda_transparent.png" alt="Zundamon Cutout" class="hero-zunda-cutout-img">
+            <!-- 6. Promos.app Window -->
+            <section id="window-promos" class="window hidden" data-window-id="window-promos" style="top: 130px; left: 240px; width: 600px; height: 440px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🎁</span>
+                        <span class="window-title-text">Promos.app — Roblox Promo Codes</span>
                     </div>
-                    <div class="hero-avatar-badge Y2K-badge-glow">
-                        <span class="badge-title">🫛 ZUNDAMON (ずんだもん)</span>
-                        <span class="badge-sub">Ultimate Pea Spirit · Level 24 Master 🍡✨</span>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
                     </div>
                 </div>
-            </div>
+                <div class="window-body promos-body" style="padding: 16px; overflow-y: auto;">
+                    <h3 style="color: var(--zunda-deep); margin-bottom: 12px;">🎁 Active Roblox Promo Codes</h3>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 14px;">1-click copy codes to redeem in Zundamon's Kitchen V2 on Roblox!</p>
+
+                    <div class="codes-grid" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="code-box" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="code-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="code-val" style="font-family: var(--font-mono); font-weight: bold; color: var(--sakura-hot);">ZUNDAMOCHI2026</span>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026" style="padding: 4px 12px; font-size: 12px;">📋 Copy Code</button>
+                            </div>
+                            <span class="code-reward" style="font-size: 11px; color: #64748b; display: block; margin-top: 4px;">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
+                        </div>
+
+                        <div class="code-box" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="code-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="code-val" style="font-family: var(--font-mono); font-weight: bold; color: var(--sakura-hot);">SOUPSEASON</span>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON" style="padding: 4px 12px; font-size: 12px;">📋 Copy Code</button>
+                            </div>
+                            <span class="code-reward" style="font-size: 11px; color: #64748b; display: block; margin-top: 4px;">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
+                        </div>
+
+                        <div class="code-box" style="background: rgba(255,255,255,0.9); border: 1px solid var(--sakura-base); border-radius: 12px; padding: 12px;">
+                            <div class="code-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="code-val" style="font-family: var(--font-mono); font-weight: bold; color: var(--sakura-hot);">HYBRIDECS</span>
+                                <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS" style="padding: 4px 12px; font-size: 12px;">📋 Copy Code</button>
+                            </div>
+                            <span class="code-reward" style="font-size: 11px; color: #64748b; display: block; margin-top: 4px;">Reward: +250 Gold, Matter ECS Developer Badge</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Gallery.app Window -->
+            <section id="window-gallery" class="window hidden" data-window-id="window-gallery" style="top: 100px; left: 180px; width: 680px; height: 480px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🖼️</span>
+                        <span class="window-title-text">Gallery.app — Zundamon Artworks & Assets</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body gallery-body" style="padding: 16px; overflow-y: auto;">
+                    <h3 style="margin-bottom: 12px; color: #ff477e;">🖼️ Official Zundamon Animations, Artworks & 3D Assets</h3>
+                    <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
+                        <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #ffb7c5; text-align: center;">
+                            <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" style="width: 100%; height: 140px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
+                            <h4 style="margin-top: 8px; font-size: 13px; color: #ff477e;">Zundamon Animated GIF 🎞️</h4>
+                            <a href="assets/zundamon_animation.gif" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 11px;">⬇️ Download GIF</a>
+                        </div>
+                        <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                            <img src="assets/zunda_transparent.webp" alt="Zundamon Cutout WebP" style="width: 100%; height: 140px; object-fit: contain; border-radius: 8px; background: #e8dff5;">
+                            <h4 style="margin-top: 8px; font-size: 13px; color: #2e7d32;">Zundamon Cutout 🫛</h4>
+                            <a href="assets/zunda_transparent.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 11px;">⬇️ Download HD PNG Cutout</a>
+                        </div>
+                        <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                            <img src="assets/zundamon_art_1.png" alt="Zundamon Illustration 1" style="width: 100%; height: 140px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
+                            <h4 style="margin-top: 8px; font-size: 13px; color: #2e7d32;">Zundamon Main Visual #1</h4>
+                            <a href="assets/zundamon_art_1.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 11px;">⬇️ Download HD PNG</a>
+                        </div>
+                        <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
+                            <div style="width: 100%; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e8dff5; border-radius: 8px;">
+                                <span style="font-size: 40px;">📦</span>
+                                <span style="font-weight: bold; color: #5b21b6; margin-top: 4px; font-size: 12px;">3D FBX Mesh Pack</span>
+                            </div>
+                            <h4 style="margin-top: 8px; font-size: 13px; color: #2e7d32;">Zundapal Rig & Pea Mesh</h4>
+                            <div style="margin-top: 6px; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;">
+                                <a href="assets/zundapalupdate4.fbx" download class="win95-btn btn-candy" style="font-size: 10px; padding: 3px 6px;">⬇️ Rig v4 FBX</a>
+                                <a href="assets/SM_Pea.fbx" download class="win95-btn btn-candy" style="font-size: 10px; padding: 3px 6px;">⬇️ SM_Pea FBX</a>
+                            </div>
+                        </div>
+
+                        <!-- 3D Interactive Model Viewer Container -->
+                        <div class="gallery-card model-viewer-card" style="background: rgba(255,255,255,0.92); border-radius: 12px; padding: 14px; border: 3px solid #ff477e; text-align: center; grid-column: 1 / -1;">
+                            <h4 style="margin-bottom: 6px; font-size: 14px; color: #ff477e;">🎮 Interactive 3D Zundamon Mesh Viewer</h4>
+                            <p style="font-size: 11px; color: #666; margin-bottom: 8px;">Click and drag to rotate & zoom 3D Zundamon meshes directly inside OS window nanoda!</p>
+                            <div class="model-viewer-wrapper" style="width: 100%; height: 260px; background: radial-gradient(circle, #e8f5e9 0%, #c8e6c9 100%); border-radius: 10px; overflow: hidden; position: relative;">
+                                <model-viewer src="assets/zundamon.glb"
+                                              alt="3D Interactive Zundamon Model"
+                                              auto-rotate
+                                              camera-controls
+                                              shadow-intensity="1"
+                                              exposure="1"
+                                              style="width: 100%; height: 100%;">
+                                </model-viewer>
+                            </div>
+                            <div style="margin-top: 8px; display: flex; justify-content: center; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <a href="assets/zundamon.glb" download class="win95-btn btn-candy" style="font-size: 11px; padding: 4px 10px;">⬇️ Download 3D GLB</a>
+                                <a href="assets/zundapalupdate4.fbx" download class="win95-btn btn-candy" style="font-size: 11px; padding: 4px 10px;">⬇️ Download Rig v4 FBX</a>
+                                <a href="assets/SM_Pea.fbx" download class="win95-btn btn-candy" style="font-size: 11px; padding: 4px 10px;">⬇️ Download SM_Pea FBX</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Credits.app Window -->
+            <section id="window-credits" class="window hidden" data-window-id="window-credits" style="top: 140px; left: 200px; width: 680px; height: 500px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">📜</span>
+                        <span class="window-title-text">Credits.app — Definitive Attribution & Legal License Guidelines</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body credits-body" style="padding: 18px; overflow-y: auto; color: #1b5e20; background: #fff5f8;">
+                    <h3 style="color: #ff477e; margin-bottom: 8px;">🫛 SSS LLC — Zundamon Ownership & Royalty-Free Guidelines</h3>
+                    <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+                        <strong>Zundamon (ずんだもん)</strong> character design, name, official voice model, and character trademarks are owned by <strong>SSS LLC (合同会社SSS / Tohoku Zunko Project)</strong> (<a href="https://zunko.jp/" target="_blank" rel="noopener">zunko.jp</a>). Used in full compliance with official <a href="https://zunko.jp/guideline.html" target="_blank" rel="noopener">SSS LLC Royalty-Free Character Guidelines</a>. Voice synthesis powered by <strong>VOICEVOX:ずんだもん</strong> (<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">voicevox.hiroshiba.jp</a>).
+                    </p>
+
+                    <h3 style="color: #2e7d32; margin-bottom: 8px;">🎨 Kenney (www.kenney.nl) — 3D Environment, NPC & Skybox Assets</h3>
+                    <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+                        3D nature props, food meshes, furniture, guest NPC avatars, and skybox cubemaps created by <strong>Kenney (www.kenney.nl)</strong> under the <strong>CC0 1.0 Universal (Public Domain)</strong> license.
+                    </p>
+
+                    <h3 style="color: #5b21b6; margin-bottom: 8px;">🎵 Nomagician — Audio, BGM & UI Sound Effects</h3>
+                    <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+                        Ambient background music tracks and UI minigame sound effects created by <strong>Nomagician</strong>.
+                    </p>
+
+                    <h3 style="color: #475569; margin-bottom: 8px;">🖱️ wappon_28_dev — Custom Cursors</h3>
+                    <p style="font-size: 13px; line-height: 1.5;">
+                        Zundamon & <code>zunda_arrow</code> custom cursor sets created by <strong>wappon_28_dev</strong> (X: @yurirofu) under the MIT License.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Sub-Utility: Calculator.app Window -->
+            <section id="window-calculator" class="window hidden" data-window-id="window-calculator" style="top: 160px; left: 240px; width: 560px; height: 420px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">🧮</span>
+                        <span class="window-title-text">Calculator.app — Dish Profit Calculator</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body calc-body">
+                    <div class="calc-form-group" style="margin-bottom:8px;">
+                        <label for="calc-dish-select">Select Recipe:</label>
+                        <select id="calc-dish-select" class="win95-input">
+                            <option value="zunda-mochi" data-cost="20" data-sell="120">🫛 Zunda Mochi (Cost: 20, Sell: 120)</option>
+                            <option value="edamame-parfait" data-cost="50" data-sell="300">🍨 Edamame Parfait (Cost: 50, Sell: 300)</option>
+                            <option value="zunda-shake" data-cost="15" data-sell="80">🥤 Zunda Shake (Cost: 15, Sell: 80)</option>
+                            <option value="dango-trio" data-cost="30" data-sell="180">🍡 Triple Color Dango (Cost: 30, Sell: 180)</option>
+                        </select>
+                    </div>
+                    <div class="calc-form-group" style="margin-bottom:8px;">
+                        <label for="calc-qty">Quantity to Cook:</label>
+                        <input type="number" id="calc-qty" value="10" min="1" class="win95-input">
+                    </div>
+                    <div class="calc-results" style="margin-top:8px;">
+                        <p>Total Crafting Cost: <strong id="res-cost">200</strong> Gold</p>
+                        <p>Estimated Revenue: <strong id="res-sell">1,200</strong> Gold</p>
+                        <p>Estimated Net Profit: <strong id="res-profit">+1,000 Gold</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sub-Utility: Updates.log Window -->
+            <section id="window-updates" class="window hidden" data-window-id="window-updates" style="top: 180px; left: 280px; width: 620px; height: 440px;" tabindex="0">
+                <div class="window-header">
+                    <div class="window-title">
+                        <span class="window-icon">📜</span>
+                        <span class="window-title-text">Updates.log — Patch Notes & ECS Engine Log</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
+                        <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
+                        <button class="win-btn win-close" data-action="close" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-body updates-body">
+                    <h3>📜 Version 2.4.0 Patch Notes (Hybrid ECS Release)</h3>
+                    <ul class="update-log-list">
+                        <li><strong>[ECS Core]</strong> Integrated Matter ECS query pipeline for 60fps server-side updates.</li>
+                        <li><strong>[Rhythm Engine]</strong> Added 4 signature recipes with Web Audio API beat sync.</li>
+                        <li><strong>[Companions]</strong> Unlocked 5 Companion Spirits with active XP, Gold, and Gathering stat buffs.</li>
+                        <li><strong>[UI/UX]</strong> Y2K Infinity Nikki Kawaii Design System overhaul with glassmorphism & candy buttons.</li>
+                        <li><strong>[Rojo 7.7.0]</strong> Full $ignoreUnknownInstances level preservation sync enabled.</li>
+                    </ul>
+                </div>
+            </section>
+
         </div>
-    </section>
+    </div>
 
-    <!-- 3. Game Features Grid -->
-    <section id="features" class="game-section">
-        <div class="section-container">
-            <h2 class="section-title">✨ WHY PLAY ZUNDAMON'S KITCHEN?</h2>
-            <p class="section-subtitle">Discover a heartwarming culinary adventure built for cozy players on Roblox!</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feat-icon">🌾</div>
-                    <h3>Resource Gathering & Harvesting</h3>
-                    <p>Harvest fresh berries, sacred wheat, and crystal mushrooms from interactive resource nodes across Zunda Village.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feat-icon">🍳</div>
-                    <h3>Rhythm Cooking Minigames</h3>
-                    <p>Tap along to catchy culinary beats! Land Perfect combos to craft S-Rank dishes like Zunda Mochi and Edamame Parfait.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feat-icon">🫛</div>
-                    <h3>Companion Spirits & Pets</h3>
-                    <p>Unlock & bond with 5 unique companion spirits (Zundamon, Sakuradamon, Ankomon, Cardamon, Antimon) granting XP, Gold, and Gathering boosts!</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feat-icon">🏠</div>
-                    <h3>Restaurant Decorating & Tycoon</h3>
-                    <p>Place furniture, design your kitchen plot, serve hungry NPC guests, earn gold, and level up your chef rank!</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Front Page Featured Zundamon Artworks & Animated GIFs Section -->
-    <section id="frontpage-artworks" class="game-section Y2K-art-section">
-        <div class="section-container">
-            <h2 class="section-title">🫛 OFFICIAL ZUNDAMON ANIMATED ASSETS</h2>
-            <p class="section-subtitle">Official Zundamon animated GIFs & transparent high-res character renders!</p>
-
-            <div class="frontpage-gallery-grid" style="display: flex; justify-content: center; gap: 24px; margin-top: 20px; flex-wrap: wrap;">
-                <!-- Card 1: Animated GIF -->
-                <div class="Y2K-art-card iridescent-card" style="background: rgba(255,255,255,0.94); border: 3px solid #ff477e; border-radius: 20px; padding: 14px; text-align: center; box-shadow: 0 8px 24px rgba(255,71,126,0.25); width: 260px;">
-                    <div style="background: #fff0f5; border-radius: 14px; padding: 8px; height: 130px; display: flex; align-items: center; justify-content: center;">
-                        <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" style="max-width: 100%; max-height: 110px; object-fit: contain;">
-                    </div>
-                    <h3 style="margin-top: 10px; font-size: 16px; color: #ff477e;">Zundamon Animated GIF 🎞️</h3>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 6px;">Official animated loop · 389 KB</p>
-                    <a href="assets/zundamon_animation.gif" download class="win95-btn btn-candy" style="display: inline-block; padding: 6px 14px; font-size: 12px;">⬇️ Download GIF</a>
-                </div>
-
-                <!-- Card 2: Transparent Cutout -->
-                <div class="Y2K-art-card iridescent-card" style="background: rgba(255,255,255,0.94); border: 3px solid #4caf50; border-radius: 20px; padding: 14px; text-align: center; box-shadow: 0 8px 24px rgba(76,175,80,0.25); width: 260px;">
-                    <div style="background: #e8f5e9; border-radius: 14px; padding: 8px; height: 130px; display: flex; align-items: center; justify-content: center;">
-                        <img src="assets/zunda_transparent.png" alt="Zundamon Transparent PNG" style="max-width: 100%; max-height: 110px; object-fit: contain;">
-                    </div>
-                    <h3 style="margin-top: 10px; font-size: 16px; color: #2e7d32;">Transparent Render Cutout 🫛</h3>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 6px;">High-res 3.6 MB transparent PNG</p>
-                    <a href="assets/zunda_transparent.png" download class="win95-btn btn-candy" style="display: inline-block; padding: 6px 14px; font-size: 12px;">⬇️ Download Cutout</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Companion Roster Showcase Section -->
-    <section id="companions" class="game-section alt-bg">
-        <div class="section-container">
-            <h2 class="section-title">🫛 MEET THE COMPANION SPIRITS</h2>
-            <p class="section-subtitle">Your loyal companions follow you through the village and boost your kitchen abilities!</p>
-
-            <div class="companions-grid">
-                <div class="companion-card active-card">
-                    <div class="comp-emoji">🫛</div>
-                    <h3>Zundamon</h3>
-                    <span class="comp-role">Original Pea Spirit</span>
-                    <p class="comp-desc">"I will stay close while you gather and cook nanoda!"</p>
-                    <div class="comp-buff-badge">Free Starting Companion</div>
-                    <button class="win95-btn btn-candy chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('nanoda_arpeggio')">🔊 Voice Line</button>
-                </div>
-
-                <div class="companion-card">
-                    <div class="comp-emoji">🌸</div>
-                    <h3>Sakuradamon</h3>
-                    <span class="comp-role">Blossom Spirit</span>
-                    <p class="comp-desc">"Blossom petals drift on the breeze... Carries good lessons on the wind!"</p>
-                    <div class="comp-buff-badge">+25% Chef XP</div>
-                    <button class="win95-btn btn-candy chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('chirp')">🔊 Voice Line</button>
-                </div>
-
-                <div class="companion-card">
-                    <div class="comp-emoji">🫘</div>
-                    <h3>Ankomon</h3>
-                    <span class="comp-role">Red Bean Spirit</span>
-                    <p class="comp-desc">"Training begins at dawn! Sweetens every guest payday."</p>
-                    <div class="comp-buff-badge">+15% Gold Revenue</div>
-                    <button class="win95-btn btn-candy chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('chirp')">🔊 Voice Line</button>
-                </div>
-
-                <div class="companion-card">
-                    <div class="comp-emoji">🍋</div>
-                    <h3>Cardamon</h3>
-                    <span class="comp-role">Cardamom Seedling</span>
-                    <p class="comp-desc">"A steady hand makes the finest dishes."</p>
-                    <div class="comp-buff-badge">+30% Perfect Window</div>
-                    <button class="win95-btn btn-candy chirp-btn" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('chirp')">🔊 Voice Line</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Active Promo Codes Box -->
-    <section id="promos" class="game-section">
-        <div class="section-container">
-            <h2 class="section-title">🎁 ACTIVE RECURRING PLAYER PROMO CODES</h2>
-            <p class="section-subtitle">Copy these active codes and redeem them inside Zundamon's Kitchen on Roblox!</p>
-
-            <div class="codes-grid">
-                <div class="code-box">
-                    <div class="code-header">
-                        <span class="code-val">ZUNDAMOCHI2026</span>
-                        <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">📋 Copy Code</button>
-                    </div>
-                    <span class="code-reward">Reward: +500 Gold, 10x Fresh Zunda Mochi, 1x Rare Chef Apron</span>
-                </div>
-
-                <div class="code-box">
-                    <div class="code-header">
-                        <span class="code-val">SOUPSEASON</span>
-                        <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">📋 Copy Code</button>
-                    </div>
-                    <span class="code-reward">Reward: +1,000 Kitchen EXP, 5x Wild Mushroom Pack</span>
-                </div>
-
-                <div class="code-box">
-                    <div class="code-header">
-                        <span class="code-val">HYBRIDECS</span>
-                        <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">📋 Copy Code</button>
-                    </div>
-                    <span class="code-reward">Reward: +250 Gold, Matter ECS Developer Badge</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Embedded Kawaii PC Desktop Workspace Section -->
-    <section id="desktop" class="game-section os-desktop-section alt-bg">
-        <div class="section-container">
-            <h2 class="section-title">🖥️ KAWAII PC DESKTOP WORKSPACE</h2>
-            <p class="section-subtitle">Click app icons below to open interactive windows, terminal prompts, and recipe tools!</p>
-
-            <!-- 7 App Launch Tiles Grid -->
-            <div class="os-app-launcher-grid">
-                <button class="os-app-tile" data-open-window="window-zundacli">
-                    <span class="tile-icon">💻</span>
-                    <span class="tile-title">ZundaCLI.exe</span>
-                    <span class="tile-desc">Pastel Console Prompt</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-cookbook">
-                    <span class="tile-icon">📖</span>
-                    <span class="tile-title">Cookbook.app</span>
-                    <span class="tile-desc">Recipes & Score Targets</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-vntalk">
-                    <span class="tile-icon">💬</span>
-                    <span class="tile-title">VNTalk.app</span>
-                    <span class="tile-desc">Companion Dialogues</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-zundamon">
-                    <span class="tile-icon">🫛</span>
-                    <span class="tile-title">Zundamon.app</span>
-                    <span class="tile-desc">Companion Stats & Moods</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-promos">
-                    <span class="tile-icon">🎁</span>
-                    <span class="tile-title">Promos.app</span>
-                    <span class="tile-desc">1-Click Code Redeem</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-calculator">
-                    <span class="tile-icon">🧮</span>
-                    <span class="tile-title">Calculator.app</span>
-                    <span class="tile-desc">Dish Profit Crafter</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-updates">
-                    <span class="tile-icon">📜</span>
-                    <span class="tile-title">Updates.log</span>
-                    <span class="tile-desc">Patch Notes & ECS Log</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-gallery">
-                    <span class="tile-icon">🖼️</span>
-                    <span class="tile-title">Gallery.app</span>
-                    <span class="tile-desc">Artworks & PNG Assets</span>
-                </button>
-
-                <button class="os-app-tile" data-open-window="window-credits">
-                    <span class="tile-icon">📜</span>
-                    <span class="tile-title">Credits.app</span>
-                    <span class="tile-desc">Attribution & Licenses</span>
-                </button>
-            </div>
-
-            <!-- Desktop Viewport & Widgets Container -->
-            <div id="desktop-viewport" class="desktop-viewport">
-                <!-- Desktop Widgets Bar -->
-                <div class="desktop-widgets-bar">
-                    <!-- Widget 1: Clock & Weather Widget -->
-                    <div id="widget-clock-weather" class="desktop-widget clock-weather-widget" title="Click weather to cycle forecast nanoda!">
-                        <div class="clock-display-pill">
-                            <span class="clock-icon">⏰</span>
-                            <span id="widget-digital-time" class="widget-time">12:00:00 PM</span>
-                        </div>
-                        <div class="weather-display-pill" id="widget-weather-pill">
-                            <span id="widget-weather-icon" class="weather-icon">🌤️</span>
-                            <span id="widget-weather-text" class="widget-weather">Zunda Village: 22°C Clear</span>
-                        </div>
-                    </div>
-
-                    <!-- Widget 2: Lo-Fi Jukebox & zunda.mp3 Music Player Widget -->
-                    <div id="widget-jukebox" class="desktop-widget jukebox-widget">
-                        <audio id="zunda-mp3-player" src="assets/zunda.mp3" preload="auto" loop></audio>
-                        <div class="jukebox-track-info">
-                            <span id="jukebox-disc-icon" class="jukebox-icon">🎵</span>
-                            <span id="jukebox-track-title" class="jukebox-title">🫛 Zunda Cozy Theme (zunda.mp3)</span>
-                        </div>
-                        <div class="jukebox-controls">
-                            <button id="widget-play-bgm" class="btn-candy jukebox-btn" title="Play / Pause zunda.mp3 Theme">▶ zunda.mp3</button>
-                            <button id="widget-next-track" class="btn-candy jukebox-btn mini-btn" title="Next Track">⏭</button>
-                        </div>
-                        <div class="rain-sfx-container" title="Rain Ambience SFX Volume">
-                            <span class="rain-icon">🌧️</span>
-                            <input type="range" id="rain-sfx-slider" min="0" max="100" value="40" class="rain-slider">
-                        </div>
-                    </div>
-
-                    <!-- Widget 3: Animated Zundamon Desktop Sticker Widget -->
-                    <div id="widget-zunda-sticker" class="desktop-widget zunda-sticker-widget" title="Click Zundamon nanoda!" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('nanoda_arpeggio')">
-                        <div class="sticker-mascot-box">
-                            <img src="assets/zundamon_animation.gif" alt="Zundamon Pet" style="width: 54px; height: 54px; object-fit: contain;">
-                        </div>
-                        <div id="widget-speech-bubble" class="sticker-bubble">Nanoda! ✨</div>
-                    </div>
-                </div>
-
-                <!-- Window Manager Container (7 App Windows) -->
-                <div id="window-container">
-
-                    <!-- 1. ZundaCLI.exe Window -->
-                    <section id="window-zundacli" class="window hidden" data-window-id="zundacli" style="top: 60px; left: 80px; width: 680px; height: 440px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon"><img src="assets/crt_monitor.svg" width="16" height="16" alt="Icon"></span>
-                                <span class="window-title-text">ZundaCLI.exe — Pastel Dev Console</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body cli-body" data-term-theme="pastel">
-                            <div id="cli-output" class="cli-terminal-log" role="log" aria-live="polite">
-                                <p class="cli-welcome">Zundamon's Kitchen V2 [Pastel Web Terminal v4.09]</p>
-                                <p class="cli-welcome">Type <span class="cli-highlight">'help'</span>, <span class="cli-highlight">'recipes'</span>, or <span class="cli-highlight">'promos'</span> for commands.</p>
-                            </div>
-                            <form id="cli-input-form" class="cli-prompt-line" autocomplete="off" onsubmit="return false;">
-                                <label for="cli-input" class="cli-prompt-label">zunda&gt;</label>
-                                <input type="text" id="cli-input" class="cli-input-field" placeholder="Type command (e.g. help, recipes, promo)..." spellcheck="false">
-                            </form>
-                        </div>
-                    </section>
-
-                    <!-- 2. Cookbook.app Window -->
-                    <section id="window-cookbook" class="window hidden" data-window-id="cookbook" style="top: 80px; left: 120px; width: 720px; height: 500px;" tabindex="0">
-                        <div class="window-header" id="recipes">
-                            <div class="window-title">
-                                <span class="window-icon">📖</span>
-                                <span class="window-title-text">Cookbook.app — Zunda Recipe Book</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body cookbook-body">
-                            <div class="recipe-toolbar">
-                                <input type="search" id="recipe-search" class="win95-input" placeholder="Search recipes (e.g. Mochi, Shake, Dango)...">
-                            </div>
-                            <div id="recipe-grid" class="recipe-cards-grid"></div>
-                        </div>
-                    </section>
-
-                    <!-- 3. VNTalk.app Window -->
-                    <section id="window-vntalk" class="window hidden" data-window-id="vntalk" style="top: 100px; left: 160px; width: 640px; height: 460px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">💬</span>
-                                <span class="window-title-text">VNTalk.app — Companion Visual Novel</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body vntalk-body">
-                            <div class="vn-dialogue-box">
-                                <div class="vn-speaker">Zundamon (ずんだもん)</div>
-                                <p id="vn-text" class="vn-text-content">"Welcome to Zunda Village nanoda! I can help you harvest ingredients and cook delicious mochi! What shall we craft today?"</p>
-                                <div class="vn-choices">
-                                    <button class="win95-btn btn-candy vn-choice-btn" data-choice="cook">🍳 Let's cook some Zunda Mochi!</button>
-                                    <button class="win95-btn btn-candy vn-choice-btn" data-choice="gather">🌾 Show me where to gather ingredients!</button>
-                                    <button class="win95-btn btn-candy vn-choice-btn" data-choice="chirp" onclick="if(window.playZundaVoiceLine)window.playZundaVoiceLine('nanoda_arpeggio')">🔊 Say catchphrase nanoda!</button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 4. Zundamon.app Window -->
-                    <section id="window-zundamon" class="window hidden" data-window-id="zundamon" style="top: 120px; left: 180px; width: 680px; height: 480px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">🫛</span>
-                                <span class="window-title-text">Zundamon Companion Hub</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body zundamon-body">
-                            <div class="zunda-hero-panel">
-                                <div class="zunda-avatar-card">
-                                    <div class="zunda-name-badge">
-                                        <span class="zunda-name">Zundamon (ずんだもん)</span>
-                                        <span class="zunda-title">Pea Spirit Companion 🫛</span>
-                                    </div>
-                                </div>
-                                <div class="zunda-stats-panel">
-                                    <div class="vn-dialogue-card">
-                                        <p id="zunda-dialogue-text" class="vn-quote">"Morning, {player}! The garden is sparkling nanoda! Let us make one dish we are proud of today!"</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 5. Promos.app Window -->
-                    <div class="window window-promos hidden" id="window-promos" data-window-id="promos" style="top: 140px; left: 200px; width: 600px; height: 440px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">🎁</span>
-                                <span class="window-title-text">Promos.app — Roblox Promo Codes</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body promos-body">
-                            <h3>🎁 Active Roblox Promo Codes</h3>
-                            <button class="win95-btn copy-code-btn btn-candy" data-code="ZUNDAMOCHI2026">Copy ZUNDAMOCHI2026</button>
-                            <button class="win95-btn copy-code-btn btn-candy" data-code="SOUPSEASON">Copy SOUPSEASON</button>
-                            <button class="win95-btn copy-code-btn btn-candy" data-code="HYBRIDECS">Copy HYBRIDECS</button>
-                        </div>
-                    </div>
-
-                    <!-- 6. Calculator.app Window -->
-                    <section id="window-calculator" class="window hidden" data-window-id="calculator" style="top: 160px; left: 240px; width: 560px; height: 420px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">🧮</span>
-                                <span class="window-title-text">Calculator.app — Dish Profit Calculator</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body calc-body">
-                            <div class="calc-form-group" style="margin-bottom:8px;">
-                                <label for="calc-dish-select">Select Recipe:</label>
-                                <select id="calc-dish-select" class="win95-input">
-                                    <option value="zunda-mochi" data-cost="20" data-sell="120">🫛 Zunda Mochi (Cost: 20, Sell: 120)</option>
-                                    <option value="edamame-parfait" data-cost="50" data-sell="300">🍨 Edamame Parfait (Cost: 50, Sell: 300)</option>
-                                    <option value="zunda-shake" data-cost="15" data-sell="80">🥤 Zunda Shake (Cost: 15, Sell: 80)</option>
-                                    <option value="dango-trio" data-cost="30" data-sell="180">🍡 Triple Color Dango (Cost: 30, Sell: 180)</option>
-                                </select>
-                            </div>
-                            <div class="calc-form-group" style="margin-bottom:8px;">
-                                <label for="calc-qty">Quantity to Cook:</label>
-                                <input type="number" id="calc-qty" value="10" min="1" class="win95-input">
-                            </div>
-                            <div class="calc-results" style="margin-top:8px;">
-                                <p>Total Crafting Cost: <strong id="res-cost">200</strong> Gold</p>
-                                <p>Estimated Revenue: <strong id="res-sell">1,200</strong> Gold</p>
-                                <p>Estimated Net Profit: <strong id="res-profit">+1,000 Gold</strong></p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 7. Updates.log Window -->
-                    <section id="window-updates" class="window hidden" data-window-id="updates" style="top: 180px; left: 280px; width: 620px; height: 440px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">📜</span>
-                                <span class="window-title-text">Updates.log — Patch Notes & ECS Engine Log</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body updates-body">
-                            <h3>📜 Version 2.4.0 Patch Notes (Hybrid ECS Release)</h3>
-                            <ul class="update-log-list">
-                                <li><strong>[ECS Core]</strong> Integrated Matter ECS query pipeline for 60fps server-side updates.</li>
-                                <li><strong>[Rhythm Engine]</strong> Added 4 signature recipes with Web Audio API beat sync.</li>
-                                <li><strong>[Companions]</strong> Unlocked 5 Companion Spirits with active XP, Gold, and Gathering stat buffs.</li>
-                                <li><strong>[UI/UX]</strong> Y2K Infinity Nikki Kawaii Design System overhaul with glassmorphism & candy buttons.</li>
-                                <li><strong>[Rojo 7.7.0]</strong> Full $ignoreUnknownInstances level preservation sync enabled.</li>
-                            </ul>
-                        </div>
-                    </section>
-
-                    <!-- 8. Gallery.app Window -->
-                    <section id="window-gallery" class="window hidden" data-window-id="gallery" style="top: 150px; left: 220px; width: 660px; height: 480px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">🖼️</span>
-                                <span class="window-title-text">Gallery.app — Zundamon Artworks & Assets</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body gallery-body" style="padding: 16px; overflow-y: auto;">
-                            <h3 style="margin-bottom: 12px; color: #ff477e;">🖼️ Official Zundamon Animations, Artworks & 3D Assets</h3>
-                            <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
-                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #ffb7c5; text-align: center;">
-                                    <img src="assets/zundamon_animation.gif" alt="Zundamon Animated GIF" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
-                                    <h4 style="margin-top: 8px; font-size: 14px; color: #ff477e;">Zundamon Animated GIF 🎞️</h4>
-                                    <a href="assets/zundamon_animation.gif" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download GIF</a>
-                                </div>
-                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
-                                    <img src="assets/zunda_transparent.png" alt="Zundamon Transparent PNG" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #e8dff5;">
-                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon Transparent Render 🫛</h4>
-                                    <a href="assets/zunda_transparent.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download Cutout</a>
-                                </div>
-                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
-                                    <img src="assets/zundamon_art_1.png" alt="Zundamon Illustration 1" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
-                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon Main Visual #1</h4>
-                                    <a href="assets/zundamon_art_1.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download HD PNG</a>
-                                </div>
-                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
-                                    <img src="assets/zundamon_art_2.png" alt="Zundamon Illustration 2" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #fff0f5;">
-                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon Main Visual #2</h4>
-                                    <a href="assets/zundamon_art_2.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download HD PNG</a>
-                                </div>
-                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
-                                    <img src="assets/Tex_Head.png" alt="Zundamon Texture Head" style="width: 100%; height: 180px; object-fit: contain; border-radius: 8px; background: #231b2e;">
-                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundamon 3D Texture Map</h4>
-                                    <a href="assets/Tex_Head.png" download class="win95-btn btn-candy" style="display: inline-block; margin-top: 6px; font-size: 12px;">⬇️ Download Texture</a>
-                                </div>
-                                <div class="gallery-card" style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 12px; border: 2px solid #a5d6a7; text-align: center;">
-                                    <div style="width: 100%; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e8dff5; border-radius: 8px;">
-                                        <span style="font-size: 48px;">📦</span>
-                                        <span style="font-weight: bold; color: #5b21b6; margin-top: 6px;">3D FBX Mesh Pack</span>
-                                    </div>
-                                    <h4 style="margin-top: 8px; font-size: 14px; color: #2e7d32;">Zundapal Rig v4 & Pea Mesh</h4>
-                                    <span style="font-size: 11px; color: #666; display: block; margin-top: 2px;">zundapalupdate4.fbx · zundapal.fbx</span>
-                                </div>
-                            </div>
-                        </div>
-                    <!-- 9. Credits.app Window -->
-                    <section id="window-credits" class="window hidden" data-window-id="credits" style="top: 140px; left: 180px; width: 680px; height: 500px;" tabindex="0">
-                        <div class="window-header">
-                            <div class="window-title">
-                                <span class="window-icon">📜</span>
-                                <span class="window-title-text">Credits.app — Definitive Attribution & Legal License Guidelines</span>
-                            </div>
-                            <div class="window-controls">
-                                <button class="win-btn win-minimize" data-action="minimize" title="Minimize">_</button>
-                                <button class="win-btn win-maximize" data-action="maximize" title="Maximize">□</button>
-                                <button class="win-btn win-close" data-action="close" title="Close">✕</button>
-                            </div>
-                        </div>
-                        <div class="window-body credits-body" style="padding: 18px; overflow-y: auto; color: #1b5e20; background: #fff5f8;">
-                            <h3 style="color: #ff477e; margin-bottom: 8px;">🫛 SSS LLC — Zundamon Ownership & Royalty-Free Guidelines</h3>
-                            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
-                                <strong>Zundamon (ずんだもん)</strong> character design, name, official voice model, and character trademarks are owned by <strong>SSS LLC (合同会社SSS / Tohoku Zunko Project)</strong> (<a href="https://zunko.jp/" target="_blank" rel="noopener">zunko.jp</a>). Used in full compliance with official <a href="https://zunko.jp/guideline.html" target="_blank" rel="noopener">SSS LLC Royalty-Free Character Guidelines</a>. Voice synthesis powered by <strong>VOICEVOX:ずんだもん</strong> (<a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">voicevox.hiroshiba.jp</a>).
-                            </p>
-
-                            <h3 style="color: #2e7d32; margin-bottom: 8px;">🎨 Kenney (www.kenney.nl) — 3D Environment, NPC & Skybox Assets</h3>
-                            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
-                                3D nature props, food meshes, furniture, guest NPC avatars, and skybox cubemaps created by <strong>Kenney (www.kenney.nl)</strong> under the <strong>CC0 1.0 Universal (Public Domain)</strong> license. Browse full 3D asset catalog at <a href="https://kenney.nl/assets/category:3D/page:3" target="_blank" rel="noopener">Kenney 3D Assets Catalog (Page 3)</a>.
-                            </p>
-
-                            <h3 style="color: #5b21b6; margin-bottom: 8px;">🎵 Nomagician — Audio, BGM & UI Sound Effects</h3>
-                            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
-                                Ambient background music tracks (<em>Cozy Ambience by Nomagician</em>) and UI minigame sound effects (<em>Cute, Cozy & Magical UI SFX by Nomagician</em>) created by <strong>Nomagician</strong>.
-                            </p>
-
-                            <h3 style="color: #475569; margin-bottom: 8px;">🖱️ wappon_28_dev — Custom Cursors</h3>
-                            <p style="font-size: 13px; line-height: 1.5;">
-                                Zundamon & <code>zunda_arrow</code> custom cursor sets created by <strong>wappon_28_dev</strong> (X: @yurirofu) under the MIT License.
-                            </p>
-                        </div>
-                    </section>
-
-                </div>
-            </div>
-
-            <!-- Embedded Taskbar -->
-            <div id="taskbar" class="os-taskbar">
-                <button id="start-btn" class="taskbar-start-btn">🫛 Start</button>
-                <div id="taskbar-windows" class="taskbar-windows-container"></div>
-                <div id="taskbar-clock" class="taskbar-clock">12:00 PM</div>
-            </div>
-
-            <!-- Start Menu Popover -->
-            <div id="start-menu" class="start-menu-popover hidden">
-                <div class="start-menu-header">
-                    <span class="start-user-icon">🫛</span>
-                    <span>Zunda-OS 95 Menu</span>
-                </div>
-                <div class="start-menu-items">
-                    <button class="start-item" data-open-window="window-zundacli">💻 ZundaCLI.exe</button>
-                    <button class="start-item" data-open-window="window-cookbook">📖 Cookbook.app</button>
-                    <button class="start-item" data-open-window="window-vntalk">💬 VNTalk.app</button>
-                    <button class="start-item" data-open-window="window-zundamon">🫛 Zundamon.app</button>
-                    <button class="start-item" data-open-window="window-promos">🎁 Promos.app</button>
-                    <button class="start-item" data-open-window="window-calculator">🧮 Calculator.app</button>
-                    <button class="start-item" data-open-window="window-updates">📜 Updates.log</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Toast Notification Container (R4) -->
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-    <!-- Main Game Footer -->
-    <footer class="game-footer">
-        <div class="footer-container">
-            <div class="footer-left">
-                <p><strong>Zundamon's Kitchen V2</strong> — All-Ages Family Friendly Roblox Experience</p>
-                <p class="copyright">© 2026 Zundamon's Kitchen Team. Built with Luau, Matter ECS, and Roblox Studio.</p>
-            </div>
-            <div class="footer-right">
-                <a href="https://github.com/fromage3900/Zundamons-Kitchen-V2" target="_blank" rel="noopener noreferrer">GitHub Repo</a> · 
-                <a href="https://www.roblox.com/games/102953611950557/Zundamons-Kitchen-V2-Electric-Boogaloo" target="_blank" rel="noopener noreferrer">Roblox Game Page</a>
-            </div>
-        </div>
-    </footer>
 
     <!-- Application Scripts -->
     <script src="assets/audio_engine.js?v=2.5.0"></script>

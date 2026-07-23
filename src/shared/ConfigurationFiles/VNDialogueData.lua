@@ -292,6 +292,12 @@ local SIDE_DIALOGUES = {
 
 local VNDialogueData = {}
 
+-- Exposed directly for consumers (e.g. VNController) that read the tables
+-- rather than going through the getter functions below.
+VNDialogueData.SPEAKERS = SPEAKERS
+VNDialogueData.COMPANION_DIALOGUE = COMPANION_DIALOGUE
+VNDialogueData.SIDE_DIALOGUES = SIDE_DIALOGUES
+
 function VNDialogueData.getSpeaker(id: string)
 	return SPEAKERS[id] or SPEAKERS.zundapal
 end

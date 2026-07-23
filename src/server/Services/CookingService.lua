@@ -25,6 +25,7 @@ local BEGIN_COOLDOWN = 1.0
 local MAX_STATION_DISTANCE = 24
 
 local CookingService = {}
+CookingService.CookCompleted = Instance.new("BindableEvent")
 local activeWorld: any = nil
 local activeByPlayer: { [number]: { entityId: any, sessionId: string } } = {}
 local lastBeginAt: { [number]: number } = {}
@@ -149,6 +150,9 @@ local function finish(world: any, entityId: any, session: any)
 		bonusGold = reward.ok and reward.gold or 0,
 		dishCount = reward.ok and dishAmount or 0,
 	})
+	if reward.ok then
+		CookingService.CookCompleted:Fire(player, session.recipeId, quality)
+	end
 	world:despawn(entityId)
 end
 

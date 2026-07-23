@@ -7,7 +7,7 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 if playerGui:FindFirstChild("ZundaWhimsicalOverlay") then
-	return
+	return true
 end
 
 local SkyConfig = require(RS.ConfigurationFiles.SkyConfig)
@@ -333,3 +333,5 @@ if weatherRE2 then
 end
 
 print("[WhimsicalOverlay] Gradient wash + lens flare + vignette breath + ground wash active")
+
+return true

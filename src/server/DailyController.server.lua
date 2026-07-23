@@ -79,7 +79,9 @@ local function onCharacterAdded(player)
 end
 
 Players.PlayerAdded:Connect(function(player)
-	player.CharacterAdded:Connect(onCharacterAdded)
+	player.CharacterAdded:Connect(function()
+		onCharacterAdded(player)
+	end)
 end)
 
 for _, player in ipairs(Players:GetPlayers()) do

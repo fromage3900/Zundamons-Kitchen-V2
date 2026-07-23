@@ -200,3 +200,5 @@ local startHour = Lighting:GetAttribute("CurrentHour") or 12
 updateInkWeight(startWeather, startHour)
 
 print("[CelOutline] Ink overlay active — layers: hitline, soft-edge, ink-wash, shadow-ramp, hatch")
+
+return true

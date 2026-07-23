@@ -15,7 +15,7 @@ local PlayerDataService = require(ServerScriptService.Services.PlayerDataService
 local ChefStatsConfig = require(ReplicatedStorage.ConfigurationFiles.ChefStatsConfig)
 
 -- Get existing services for integration
-local CookingService = ServerScriptService.Services:FindFirstChild("CookingService")
+local CookingService = require(ServerScriptService.Services.CookingService)
 local ServingService = require(ServerScriptService.Services.ServingService)
 
 -- ─── RemoteEvent Setup ───────────────────────────────────────────────────────

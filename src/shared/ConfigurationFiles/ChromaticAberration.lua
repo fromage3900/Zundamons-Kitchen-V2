@@ -47,3 +47,5 @@ RunService.RenderStepped:Connect(function()
 end)
 
 print("[ChromaticAberration] Subtle lens chromatic aberration active")
+
+return true

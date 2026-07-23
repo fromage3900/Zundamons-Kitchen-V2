@@ -34,7 +34,18 @@ class WindowManager {
   registerWindows() {
     if (typeof document === 'undefined') return;
 
-    const managedIds = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-zundamon', 'window-promos', 'window-calculator', 'window-updates'];
+    const managedIds = [
+      'window-zundacli',
+      'window-cookbook',
+      'window-vntalk',
+      'window-companions',
+      'window-features',
+      'window-promos',
+      'window-gallery',
+      'window-credits',
+      'window-calculator',
+      'window-updates'
+    ];
 
     // Discover any elements with .window class
     const foundElements = document.querySelectorAll('.window');
@@ -53,14 +64,14 @@ class WindowManager {
   }
 
   bringToFront(winTarget) {
-    const winEl = typeof winTarget === 'string' ? this.getWindow(winTarget) : winTarget;
-    if (!winEl) return;
+    const win = typeof winTarget === 'string' ? this.getWindow(winTarget) : winTarget;
+    if (!win) return;
 
     this.currentZIndex = Math.min(this.maxZIndex, this.currentZIndex + 1);
-    winEl.style.zIndex = this.currentZIndex;
+    win.style.zIndex = this.currentZIndex;
 
     this.windows.forEach(w => {
-      if (w === winEl) {
+      if (w === win) {
         w.classList.add('active-window', 'window-active');
         w.classList.remove('inactive-window', 'window-inactive');
         this.activeWindow = w;
@@ -152,9 +163,9 @@ class WindowManager {
 
       win.classList.add('maximized', 'window-maximized');
       win.style.left = '0px';
-      win.style.top = '0px';
+      win.style.top = '38px';
       win.style.width = '100%';
-      win.style.height = 'calc(100vh - 36px)';
+      win.style.height = 'calc(100vh - 38px)';
 
       if (typeof window !== 'undefined' && typeof window.playWindowSFX === 'function') {
         window.playWindowSFX('maximize');
@@ -164,7 +175,7 @@ class WindowManager {
       // Restore geometry memory
       win.classList.remove('maximized', 'window-maximized');
       win.style.left = win.dataset.prevLeft || '60px';
-      win.style.top = win.dataset.prevTop || '40px';
+      win.style.top = win.dataset.prevTop || '48px';
       win.style.width = win.dataset.prevWidth || '680px';
       win.style.height = win.dataset.prevHeight || '440px';
 
@@ -216,7 +227,18 @@ class WindowManager {
 
     this.taskbarWindows.innerHTML = '';
 
-    const managedOrder = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-zundamon', 'window-promos', 'window-calculator', 'window-updates'];
+    const managedOrder = [
+      'window-zundacli',
+      'window-cookbook',
+      'window-vntalk',
+      'window-companions',
+      'window-features',
+      'window-promos',
+      'window-gallery',
+      'window-credits',
+      'window-calculator',
+      'window-updates'
+    ];
 
     const winsToRender = [];
     managedOrder.forEach(id => {
@@ -371,6 +393,8 @@ class WindowManager {
         const rawTop = initialTop + dy;
 
         // Viewport boundary clamping engine: Math.max(0, Math.min(pos, max))
+        // Top taskbar occupies height 38px, so top boundary is clamped to min 38px.
+        const minTop = 38;
         const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
         const viewportHeight = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
@@ -378,10 +402,10 @@ class WindowManager {
         const winHeight = win.offsetHeight;
 
         const maxLeft = Math.max(0, viewportWidth - winWidth);
-        const maxTop = Math.max(0, viewportHeight - winHeight);
+        const maxTop = Math.max(minTop, viewportHeight - winHeight);
 
         const clampedLeft = Math.max(0, Math.min(rawLeft, maxLeft));
-        const clampedTop = Math.max(0, Math.min(rawTop, maxTop));
+        const clampedTop = Math.max(minTop, Math.min(rawTop, maxTop));
 
         win.style.left = `${clampedLeft}px`;
         win.style.top = `${clampedTop}px`;
@@ -459,7 +483,18 @@ class WindowManager {
       }
     };
 
-    const targetIds = ['window-zundacli', 'window-cookbook', 'window-vntalk', 'window-zundamon', 'window-promos', 'window-calculator', 'window-updates'];
+    const targetIds = [
+      'window-zundacli',
+      'window-cookbook',
+      'window-vntalk',
+      'window-companions',
+      'window-features',
+      'window-promos',
+      'window-gallery',
+      'window-credits',
+      'window-calculator',
+      'window-updates'
+    ];
     targetIds.forEach(id => {
       const win = this.getWindow(id);
       if (win) {

@@ -10,8 +10,7 @@ if not LocalPlayer then
 	return
 end
 
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local ConfigurationFiles = Shared:WaitForChild("ConfigurationFiles")
+local ConfigurationFiles = ReplicatedStorage:WaitForChild("ConfigurationFiles")
 local ClientGuiBootstrap = require(ConfigurationFiles:WaitForChild("ClientGuiBootstrap"))
 local UIConfig = require(ConfigurationFiles:WaitForChild("UIConfig"))
 
@@ -42,7 +41,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 45)
 title.Position = UDim2.new(0, 0, 0, 10)
 title.BackgroundTransparency = 1
-title.Font = UIConfig.FONTS.Decorative
+title.FontFace = UIConfig.FONTS.Decorative
 title.TextSize = 20
 title.TextColor3 = UIConfig.COLORS.ZundaDark
 title.Text = "🎁 REDEEM PROMO CODE 🫛"
@@ -64,7 +63,7 @@ local textBox = Instance.new("TextBox")
 textBox.Size = UDim2.new(1, -20, 1, 0)
 textBox.Position = UDim2.new(0, 10, 0, 0)
 textBox.BackgroundTransparency = 1
-textBox.Font = UIConfig.FONTS.Heading
+textBox.FontFace = UIConfig.FONTS.Heading
 textBox.TextSize = 16
 textBox.TextColor3 = UIConfig.COLORS.TextDark
 textBox.PlaceholderText = "Enter code (e.g. ZUNDAMOCHI2026)..."
@@ -76,7 +75,7 @@ local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, -40, 0, 30)
 statusLabel.Position = UDim2.new(0, 20, 0, 120)
 statusLabel.BackgroundTransparency = 1
-statusLabel.Font = UIConfig.FONTS.Body
+statusLabel.FontFace = UIConfig.FONTS.Body
 statusLabel.TextSize = 13
 statusLabel.TextColor3 = UIConfig.COLORS.ZundamonGreen
 statusLabel.Text = ""
@@ -87,7 +86,7 @@ local submitBtn = Instance.new("TextButton")
 submitBtn.Size = UDim2.new(0, 180, 0, 44)
 submitBtn.Position = UDim2.new(0.5, -90, 1, -60)
 submitBtn.BackgroundColor3 = UIConfig.COLORS.ZundamonGold
-submitBtn.Font = UIConfig.FONTS.Title
+submitBtn.FontFace = UIConfig.FONTS.Title
 submitBtn.TextSize = 16
 submitBtn.TextColor3 = UIConfig.COLORS.TextOnPrimary
 submitBtn.Text = "REDEEM CODE ✨"

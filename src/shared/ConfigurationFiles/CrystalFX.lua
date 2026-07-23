@@ -89,3 +89,5 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 
 print("[CrystalFX] Crystal refraction system active — tag parts with 'Crystal' in Studio")
+
+return true

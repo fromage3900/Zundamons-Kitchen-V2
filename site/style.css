@@ -33,44 +33,59 @@
   --glass-border-hover: 2px solid rgba(255, 71, 126, 0.9);
   --glass-backdrop-filter: blur(16px);
 
+  /* --- 🎨 Pastel Color Theme SSOT --- */
+  --pastel-zunda: #4caf50;
+  --pastel-gold: #ffd54f;
+  --pastel-pink: #ff91a4;
+  --pastel-mint: #80cbd3;
+
+  /* --- 🖥️ Desktop & Surface Tokens --- */
+  --bg-desktop: #1b281b;
+
   /* --- 🔤 Melodia Typography SSOT --- */
-  --font-brand: "Syne", "Avenir Next", "Segoe UI", sans-serif;
-  --font-display: "Instrument Serif", "Iowan Old Style", Palatino, serif;
-  --font-body: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
-  --font-mono: "Azeret Mono", "VT323", monospace;
+  --font-brand: 'Syne', sans-serif;
+  --font-display: 'Instrument Serif', serif;
+  --font-body: 'Bricolage Grotesque', sans-serif;
+  --font-mono: 'Azeret Mono', 'VT323', monospace;
 
   --tracking-brand: 0.12em;
   --tracking-display: 0.02em;
   --tracking-body: 0.005em;
 }
 
-*, *::before, *::after, body, button, input, select, textarea, p, a, span, div, label, li, td, th {
+*, *::before, *::after {
   box-sizing: border-box;
-  font-family: var(--font-body) !important;
+}
+
+body, button, input, select, textarea, p, a, span, div, label, li, td, th {
+  font-family: var(--font-body);
   letter-spacing: var(--tracking-body);
 }
 
 h1, h2, h3, h4, .hero-title, .section-title, .window-title-text {
-  font-family: var(--font-display) !important;
+  font-family: var(--font-display);
   letter-spacing: var(--tracking-display);
   font-weight: 400;
 }
 
-.brand-title, .nav-brand, .badge-title, .tile-title, .v-badge {
-  font-family: var(--font-brand) !important;
+.brand-title, .nav-brand, .badge-title, .tile-title, .v-badge, .taskbar-start-btn, #start-btn, .start-menu-header {
+  font-family: var(--font-brand);
   letter-spacing: var(--tracking-brand);
   text-transform: uppercase;
 }
 
-.cli-line, .terminal-body, code, pre {
-  font-family: var(--font-mono) !important;
+.cli-line, .terminal-body, .cli-body, .cli-input-field, .cli-terminal-log, code, pre, .taskbar-clock, #taskbar-clock, .clock-display-pill, .code-val, .widget-time, #widget-digital-time {
+  font-family: var(--font-mono);
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
   font-family: var(--font-body) !important;
   background-color: #ffe5ec;
   background-image: 
@@ -79,10 +94,8 @@ html, body {
     linear-gradient(135deg, #ffe5ec 0%, #e8f5e9 35%, #f3e5f5 70%, #fff9c4 100%);
   background-size: 32px 32px, 32px 32px, 100% 100%;
   background-position: 0 0, 16px 16px, 0 0;
-  background-attachment: fixed;
   color: #1b5e20;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
+  overflow: hidden !important;
 }
 
 /* ==========================================================================
@@ -637,8 +650,8 @@ html, body {
   box-shadow: 0 6px 18px rgba(255, 71, 126, 0.4) !important;
 }
 
-h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
-  font-family: var(--font-heading) !important;
+h1, h2, h3, h4, .hero-title, .section-title {
+  font-family: var(--font-display);
 }
 
 /* Companions Grid */
@@ -864,15 +877,12 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 }
 
 /* Desktop Viewport & Widgets Container */
-.desktop-viewport {
+#desktop-viewport, .desktop-viewport {
+  width: 100vw;
+  height: 100vh;
   position: relative;
-  min-height: 480px;
-  background: rgba(255, 245, 248, 0.5);
-  border: 2px solid var(--sakura-base);
-  border-radius: 20px;
-  padding: 16px;
   overflow: hidden;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+  background: var(--bg-desktop, #1b281b);
 }
 
 .desktop-widgets-bar {
@@ -1133,8 +1143,8 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: var(--glass-backdrop-filter);
   -webkit-backdrop-filter: var(--glass-backdrop-filter);
-  border: 2px solid var(--sakura-base);
-  border-radius: 20px;
+  border: 2px solid var(--pastel-mint, #80cbd3);
+  border-radius: 16px;
   box-shadow: 0 16px 48px rgba(91, 33, 182, 0.2), 0 4px 16px rgba(255, 133, 161, 0.25);
   overflow: hidden;
   display: flex;
@@ -1143,7 +1153,7 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 }
 
 .window.active-window, .window.window-active {
-  border-color: var(--sakura-hot);
+  border-color: var(--pastel-pink, #ff91a4);
   box-shadow: 0 20px 56px rgba(255, 71, 126, 0.35), 0 0 0 3px rgba(255, 183, 197, 0.5);
 }
 
@@ -1158,9 +1168,10 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 }
 
 .window-header {
-  background: linear-gradient(180deg, var(--sakura-vibrant) 0%, var(--sakura-hot) 100%);
+  font-family: var(--font-display);
+  background: linear-gradient(90deg, var(--pastel-pink, #ff91a4) 0%, var(--pastel-zunda, #4caf50) 100%);
   color: #ffffff;
-  padding: 10px 16px;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1192,6 +1203,10 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
   z-index: 2;
 }
 
+.window-title-text {
+  font-family: var(--font-brand);
+}
+
 .window-controls {
   display: flex;
   align-items: center;
@@ -1202,8 +1217,8 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 .win-btn {
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1217,15 +1232,15 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 }
 
 .win-minimize {
-  background: linear-gradient(180deg, #a5d6a7 0%, #4caf50 100%) !important; /* Edamame Mint Candy */
+  background: linear-gradient(180deg, var(--pastel-mint, #80cbd3) 0%, var(--pastel-zunda, #4caf50) 100%);
 }
 
 .win-maximize {
-  background: linear-gradient(180deg, #ffe082 0%, #ffb300 100%) !important; /* Citrus Yellow Candy */
+  background: linear-gradient(180deg, #fff176 0%, var(--pastel-gold, #ffd54f) 100%);
 }
 
 .win-close {
-  background: linear-gradient(180deg, #ff85a1 0%, #ef4444 100%) !important; /* Hot Sakura Candy */
+  background: linear-gradient(180deg, #ff85a1 0%, var(--pastel-pink, #ff91a4) 100%);
 }
 
 .win-btn:hover {
@@ -1335,43 +1350,56 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 /* ==========================================================================
    TASKBAR & START MENU POPOVER
    ========================================================================== */
-.os-taskbar {
-  margin-top: 16px;
+#taskbar, .os-taskbar {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 38px;
+  z-index: 9000;
+  position: fixed;
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: var(--glass-backdrop-filter);
-  border: 2px solid var(--sakura-base);
-  border-radius: 9999px;
-  padding: 6px 16px;
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  border-bottom: 2px solid var(--sakura-base);
+  padding: 0 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: var(--shadow-soft-pink);
+  margin-top: 0;
 }
 
-.taskbar-start-btn {
+.taskbar-start-btn, #start-btn {
+  font-family: var(--font-brand);
   background: linear-gradient(180deg, var(--zunda-leaf), var(--zunda-base));
   color: #ffffff;
   border: none;
-  padding: 6px 16px;
+  padding: 4px 14px;
   border-radius: 9999px;
   font-weight: 800;
   font-size: 13px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
   transition: transform var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-brand);
 }
 
-.taskbar-start-btn:hover {
+.taskbar-start-btn:hover, #start-btn:hover {
   transform: scale(1.05);
 }
 
-.taskbar-windows-container {
+#taskbar-windows, .taskbar-windows-container {
   display: flex;
   gap: 8px;
+  align-items: center;
   overflow-x: auto;
+  flex: 1;
+  margin: 0 12px;
 }
 
 .taskbar-item {
+  font-family: var(--font-body);
   background: var(--sakura-soft);
   border: 1px solid var(--sakura-base);
   border-radius: 9999px;
@@ -1383,34 +1411,46 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
-.taskbar-item.active {
-  background: var(--sakura-hot);
+.taskbar-item.active, .taskbar-item:active {
+  background: var(--pastel-pink, #ff91a4);
   color: #ffffff;
+  border-color: var(--sakura-hot);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(255, 71, 126, 0.4);
 }
 
-.taskbar-clock {
+#taskbar-clock, .taskbar-clock {
+  font-family: var(--font-mono);
   font-weight: 800;
   font-size: 12px;
   color: var(--zunda-deep);
+  background: var(--zunda-light);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--zunda-soft);
+  white-space: nowrap;
 }
 
-.start-menu-popover {
-  position: absolute;
-  bottom: 60px;
-  left: 20px;
+#start-menu, .start-menu-popover {
+  position: fixed;
+  top: 38px;
+  left: 4px;
+  z-index: 9500;
   width: 240px;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
   border: 2px solid var(--sakura-hot);
-  border-radius: 16px;
+  border-radius: 0 0 16px 16px;
   box-shadow: var(--shadow-window);
   overflow: hidden;
-  z-index: 1500;
 }
 
 .start-menu-header {
+  font-family: var(--font-brand);
   background: linear-gradient(90deg, var(--sakura-hot), var(--zunda-base));
   color: #ffffff;
   padding: 12px;
@@ -1418,6 +1458,7 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
   display: flex;
   align-items: center;
   gap: 8px;
+  text-transform: uppercase;
 }
 
 .start-menu-items {
@@ -1427,6 +1468,7 @@ h1, h2, h3, h4, .hero-title, .section-title, .nav-brand {
 }
 
 .start-item {
+  font-family: var(--font-body);
   background: transparent;
   border: none;
   text-align: left;

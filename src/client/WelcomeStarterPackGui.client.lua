@@ -12,8 +12,7 @@ if not LocalPlayer then
 	return
 end
 
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local ConfigurationFiles = Shared:WaitForChild("ConfigurationFiles")
+local ConfigurationFiles = ReplicatedStorage:WaitForChild("ConfigurationFiles")
 local ClientGuiBootstrap = require(ConfigurationFiles:WaitForChild("ClientGuiBootstrap"))
 local UIConfig = require(ConfigurationFiles:WaitForChild("UIConfig"))
 
@@ -53,7 +52,7 @@ bCorner.Parent = titleBanner
 local titleText = Instance.new("TextLabel")
 titleText.Size = UDim2.new(1, 0, 1, 0)
 titleText.BackgroundTransparency = 1
-titleText.Font = UIConfig.FONTS.Decorative
+titleText.FontFace = UIConfig.FONTS.Decorative
 titleText.TextSize = 26
 titleText.TextColor3 = Color3.new(1, 1, 1)
 titleText.Text = "🎁 WELCOME CHEF STARTER GIFT! 🌸"
@@ -69,7 +68,7 @@ content.Parent = mainFrame
 local subText = Instance.new("TextLabel")
 subText.Size = UDim2.new(1, 0, 0, 40)
 subText.BackgroundTransparency = 1
-subText.Font = UIConfig.FONTS.Heading
+subText.FontFace = UIConfig.FONTS.Heading
 subText.TextSize = 16
 subText.TextColor3 = UIConfig.COLORS.TextDark
 subText.TextWrapped = true
@@ -117,7 +116,7 @@ for _, r in ipairs(rewards) do
 	rName.Size = UDim2.new(1, -8, 0, 20)
 	rName.Position = UDim2.new(0, 4, 0, 52)
 	rName.BackgroundTransparency = 1
-	rName.Font = UIConfig.FONTS.Heading
+	rName.FontFace = UIConfig.FONTS.Heading
 	rName.TextSize = 12
 	rName.TextColor3 = UIConfig.COLORS.ZundaDark
 	rName.Text = r.name
@@ -127,7 +126,7 @@ for _, r in ipairs(rewards) do
 	rDesc.Size = UDim2.new(1, -8, 0, 20)
 	rDesc.Position = UDim2.new(0, 4, 0, 72)
 	rDesc.BackgroundTransparency = 1
-	rDesc.Font = UIConfig.FONTS.Caption
+	rDesc.FontFace = UIConfig.FONTS.Caption
 	rDesc.TextSize = 10
 	rDesc.TextColor3 = UIConfig.COLORS.TextDarkSec
 	rDesc.Text = r.desc
@@ -140,7 +139,7 @@ claimBtn.Name = "ClaimButton"
 claimBtn.Size = UDim2.new(0, 220, 0, 50)
 claimBtn.Position = UDim2.new(0.5, -230, 1, -65)
 claimBtn.BackgroundColor3 = UIConfig.COLORS.ZundamonGold
-claimBtn.Font = UIConfig.FONTS.Title
+claimBtn.FontFace = UIConfig.FONTS.Title
 claimBtn.TextSize = 18
 claimBtn.TextColor3 = UIConfig.COLORS.TextOnPrimary
 claimBtn.Text = "✨ CLAIM ALL GIFTS! ✨"
@@ -156,7 +155,7 @@ inviteBtn.Name = "InviteButton"
 inviteBtn.Size = UDim2.new(0, 220, 0, 50)
 inviteBtn.Position = UDim2.new(0.5, 10, 1, -65)
 inviteBtn.BackgroundColor3 = UIConfig.COLORS.ZundamonPink
-inviteBtn.Font = UIConfig.FONTS.Title
+inviteBtn.FontFace = UIConfig.FONTS.Title
 inviteBtn.TextSize = 16
 inviteBtn.TextColor3 = Color3.new(1, 1, 1)
 inviteBtn.Text = "🤝 INVITE FRIENDS (+💎)"

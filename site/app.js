@@ -1430,25 +1430,39 @@ class MainApp {
   }
 
   initSystemTray() {
-    const bgmToggle = document.getElementById('bgm-toggle');
-    if (bgmToggle) {
-      bgmToggle.addEventListener('click', () => {
-        if (typeof window.toggleCozyBGM === 'function') {
-          const isPlaying = window.toggleCozyBGM();
-          bgmToggle.style.opacity = isPlaying ? '1.0' : '0.5';
+    const jukeboxBtn = document.getElementById('taskbar-jukebox-btn') || document.getElementById('bgm-toggle');
+    if (jukeboxBtn) {
+      jukeboxBtn.addEventListener('click', () => {
+        playClick('down');
+        const audioEl = document.getElementById('zunda-mp3-player');
+        if (audioEl) {
+          if (audioEl.paused) {
+            audioEl.play().catch(() => {
+              if (typeof window.toggleCozyBGM === 'function') window.toggleCozyBGM();
+            });
+          } else {
+            audioEl.pause();
+          }
+        } else if (typeof window.toggleCozyBGM === 'function') {
+          window.toggleCozyBGM();
         }
       });
     }
 
-    const sfxToggle = document.getElementById('sfx-toggle');
-    if (sfxToggle) {
-      sfxToggle.addEventListener('click', () => {
-        if (window.ZundaAudio) {
-          const muted = window.ZundaAudio.toggleMute();
-          sfxToggle.style.opacity = muted ? '0.4' : '1.0';
-          const iconSpan = sfxToggle.querySelector('.tray-icon');
-          if (iconSpan) iconSpan.textContent = muted ? '🔇' : '🔊';
-        }
+    const clockWeatherPill = document.getElementById('taskbar-clock-weather');
+    if (clockWeatherPill) {
+      const weatherText = document.getElementById('taskbar-weather');
+      const weatherStates = [
+        '🌤️ 22°C',
+        '🌸 20°C',
+        '🌧️ 18°C',
+        '🌙 16°C'
+      ];
+      let idx = 0;
+      clockWeatherPill.addEventListener('click', () => {
+        playClick('down');
+        idx = (idx + 1) % weatherStates.length;
+        if (weatherText) weatherText.textContent = weatherStates[idx];
       });
     }
   }

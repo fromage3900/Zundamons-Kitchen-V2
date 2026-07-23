@@ -7,8 +7,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local ConfigurationFiles = Shared:WaitForChild("ConfigurationFiles")
+local ConfigurationFiles = ReplicatedStorage:WaitForChild("ConfigurationFiles")
 local DailyChallengeConfig = require(ConfigurationFiles:WaitForChild("DailyChallengeConfig"))
 local GachaConfig = require(ConfigurationFiles:WaitForChild("GachaConfig"))
 

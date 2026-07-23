@@ -93,3 +93,5 @@ local initialWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 onWeatherChanged(initialWeather)
 
 print("[MagicCircle] Rotating filigree halo active at kitchen center")
+
+return true

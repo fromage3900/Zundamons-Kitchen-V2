@@ -84,25 +84,55 @@ local function loadMeshTemplate(meshType)
 		return nil
 	end
 
-	local success, model = pcall(function()
+	local success, loaded = pcall(function()
 		local assetId = tonumber(template.meshId:match("%d+"))
 		return InsertService:LoadAsset(assetId)
 	end)
 
-	if not success or not model then
-		warn("[GuestManager] Failed to load mesh:", meshType, model)
+	if not success or not loaded then
+		warn("[GuestManager] Failed to load mesh:", meshType, loaded)
 		return nil
 	end
 
-	-- Ensure model has required structure
-	if not model:FindFirstChild("Torso") then
-		warn("[GuestManager] Mesh missing Torso:", meshType)
-		model:Destroy()
+	-- Kenney rig assets load as a wrapper Model containing a nested character
+	-- Model with MeshParts named "body-mesh"/"head-mesh" (not "Torso"/"Head").
+	-- Find + normalize them, and flatten everything to direct children so the
+	-- rest of this script's FindFirstChild("Torso") lookups keep working.
+	local bodyPart, headPart
+	for _, d in ipairs(loaded:GetDescendants()) do
+		if d:IsA("BasePart") then
+			local lname = d.Name:lower()
+			if not bodyPart and (lname:find("body") or lname == "torso") then
+				bodyPart = d
+			elseif not headPart and lname:find("head") then
+				headPart = d
+			end
+		end
+	end
+
+	if not bodyPart then
+		warn("[GuestManager] Mesh missing body part:", meshType)
+		loaded:Destroy()
 		return nil
 	end
 
-	meshTemplateCache[meshType] = model
-	return model:Clone()
+	local flat = Instance.new("Model")
+	flat.Name = meshType
+	bodyPart.Name = "Torso"
+	bodyPart.Parent = flat
+	if headPart then
+		headPart.Name = "Head"
+		headPart.Parent = flat
+	end
+	for _, d in ipairs(loaded:GetDescendants()) do
+		if d:IsA("BasePart") and d ~= bodyPart and d ~= headPart then
+			d.Parent = flat
+		end
+	end
+	loaded:Destroy()
+
+	meshTemplateCache[meshType] = flat
+	return flat:Clone()
 end
 
 -- Create a guest for a specific player

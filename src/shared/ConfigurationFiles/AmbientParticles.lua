@@ -4,7 +4,7 @@ local RS = game:GetService("ReplicatedStorage")
 
 -- Only init once
 if workspace:FindFirstChild("ZundaAmbientFX") then
-	return
+	return true
 end
 
 local FX = Instance.new("Folder")
@@ -298,3 +298,5 @@ local initialWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 onWeatherChanged(initialWeather)
 
 print("[AmbientParticles] Dust motes, fireflies, sakura petals active")
+
+return true

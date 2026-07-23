@@ -141,3 +141,5 @@ local initialWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 onWeatherChanged(initialWeather)
 
 print("[GroundMist] Low-lying mist patches active")
+
+return true

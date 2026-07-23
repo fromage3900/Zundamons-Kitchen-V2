@@ -6,8 +6,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local ConfigurationFiles = Shared:WaitForChild("ConfigurationFiles")
+local ConfigurationFiles = ReplicatedStorage:WaitForChild("ConfigurationFiles")
 local GachaConfig = require(ConfigurationFiles:WaitForChild("GachaConfig"))
 
 local GachaService = {}

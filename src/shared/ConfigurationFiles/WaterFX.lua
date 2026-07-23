@@ -38,12 +38,16 @@ local function getTimeColor()
 end
 
 local function applySurfaceAppearance(part)
+	-- SurfaceAppearance can only be parented to MeshParts; water made of plain
+	-- Parts keeps its material look instead of erroring out the module load.
+	if not part:IsA("MeshPart") then return end
 	if part:FindFirstChild("ZundaWaterSA") then return end
 	local sa = Instance.new("SurfaceAppearance")
 	sa.Name = "ZundaWaterSA"
 	sa.Color = C_teal
-	sa.Roughness = 0.55
-	sa.Metalness = 0.15
+	-- SurfaceAppearance has no scalar Roughness/Metalness properties (only
+	-- RoughnessMap/MetalnessMap texture ids); assigning them threw and killed
+	-- FXController's require chain.
 	sa.Parent = part
 
 	local glow = Instance.new("PointLight", part)
@@ -177,7 +181,6 @@ local function setupFresnelGlow()
 		glow.Material = Enum.Material.Neon
 		glow.Color = C_tealLight
 		glow.Transparency = 0.85
-		glow.BorderSizePixel = 0
 		glow.Parent = part
 
 		task.spawn(function()

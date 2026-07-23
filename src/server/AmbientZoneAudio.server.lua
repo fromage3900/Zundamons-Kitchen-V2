@@ -47,10 +47,11 @@ for zoneName, cfg in pairs(ZONE_AUDIO) do
 	sound.Parent = part
 	sound:Play()
 
+	-- AudioEmitter has no CFrame of its own; it must be parented to a BasePart
+	-- (here, the positioned zone part) to inherit its position.
 	local emitter = Instance.new("AudioEmitter")
 	emitter.Name = "Emitter"
-	emitter.CFrame = CFrame.new(cfg.position)
-	emitter.Parent = sound
+	emitter.Parent = part
 end
 
 local Players = game:GetService("Players")
@@ -60,9 +61,12 @@ local function onPlayerAdded(player)
 		if hrp then
 			local existing = hrp:FindFirstChild("ZoneAudioReceiver")
 			if not existing then
-				local receiver = Instance.new("AudioReceiver")
-				receiver.Name = "ZoneAudioReceiver"
-				receiver.Parent = hrp
+				-- New audio API instances aren't enabled in every place; fail soft.
+				pcall(function()
+					local receiver = Instance.new("AudioReceiver")
+					receiver.Name = "ZoneAudioReceiver"
+					receiver.Parent = hrp
+				end)
 			end
 		end
 	end)
