@@ -12,7 +12,7 @@ CompanionConfig.npcSpeakers = {
 }
 
 CompanionConfig.companions = {
-	zundapal = {
+	zundamon = {
 		emoji = "🌱",
 		glow = Color3.fromRGB(180, 200, 255),
 		glowRange = 18,
@@ -24,9 +24,9 @@ CompanionConfig.companions = {
 		buff = nil,
 		free = true,
 		price = 0,
-		displayName = "Zundapal",
-		flavor = "Your Zundamon spirit companion.",
-		llmPersona = "You appear as the Zundamon mesh companion.",
+		displayName = "Zundamon",
+		flavor = "Your village guide and cherished spirit companion.",
+		llmPersona = "You are Zundamon, the village guide and companion who walks beside the player.",
 	},
 	dog = {
 		emoji = "🐕",
@@ -163,7 +163,7 @@ CompanionConfig.companions = {
 }
 
 function CompanionConfig.getCompanion(compType: string)
-	return CompanionConfig.companions[compType] or CompanionConfig.companions.zundapal
+	return CompanionConfig.companions[compType] or CompanionConfig.companions.zundamon
 end
 
 shared.ZundaCompanionCatalog = CompanionConfig.companions

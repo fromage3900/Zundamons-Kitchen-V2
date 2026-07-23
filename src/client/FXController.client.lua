@@ -18,9 +18,16 @@ require(game.ReplicatedStorage.ConfigurationFiles.MagicCircle)
 -- Cel-shaded ink outline overlay (hitline, ink wash, shadow ramp, hatch)
 require(game.ReplicatedStorage.ConfigurationFiles.CelOutline)
 -- Crystal refraction + iridescence (tag parts with "Crystal" in Studio)
-require(game.ReplicatedStorage.ConfigurationFiles.CrystalFX)
+-- DISABLED: No "Crystal"-tagged parts exist in the workspace yet.
+-- The RenderStepped workspace scan was running every frame with zero results.
+-- Re-enable when Crystal-tagged parts are added to the level.
+-- require(game.ReplicatedStorage.ConfigurationFiles.CrystalFX)
 -- Dreamy water refraction, caustics, fresnel glow
-require(game.ReplicatedStorage.ConfigurationFiles.WaterFX)
+-- DISABLED: Per-instance task.wait(0.016) loops, workspace-wide scan every
+-- frame via findWaterParts(), and glow-part leak on re-init were causing
+-- measurable frame-time cost and log spam. Needs consolidation into a single
+-- Heartbeat updater before re-enabling.
+-- require(game.ReplicatedStorage.ConfigurationFiles.WaterFX)
 -- Subtle chromatic aberration lens fringe on camera motion
 require(game.ReplicatedStorage.ConfigurationFiles.ChromaticAberration)
 

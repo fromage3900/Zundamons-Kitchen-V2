@@ -1,6 +1,20 @@
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local RS = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 -- Only init once
 if workspace:FindFirstChild("ZundaAmbientFX") then
@@ -197,7 +211,7 @@ for _, pos in ipairs(dustPositions) do
 	makeDustEmitter(pos)
 end
 
--- Fireflies near vegetation zones
+-- Fireflies near vegetation zones (disabled if reduced motion)
 local fireflyPositions = {
 	kitchenCenter + Vector3.new(60, 6, 40),
 	kitchenCenter + Vector3.new(-50, 5, 50),
@@ -206,11 +220,13 @@ local fireflyPositions = {
 	kitchenCenter + Vector3.new(30, 5, 60),
 	kitchenCenter + Vector3.new(-30, 5, -50),
 }
-for _, pos in ipairs(fireflyPositions) do
-	makeFireflyEmitter(pos)
+if not reducedMotion then
+	for _, pos in ipairs(fireflyPositions) do
+		makeFireflyEmitter(pos)
+	end
 end
 
--- Sakura petal zones (active in cherry_blossom weather or year-round garden)
+-- Sakura petal zones (disabled if reduced motion)
 local sakuraPositions = {
 	kitchenCenter + Vector3.new(40, 14, 20),
 	kitchenCenter + Vector3.new(-35, 12, 30),
@@ -218,8 +234,10 @@ local sakuraPositions = {
 	kitchenCenter + Vector3.new(60, 10, -10),
 	kitchenCenter + Vector3.new(-55, 13, -25),
 }
-for _, pos in ipairs(sakuraPositions) do
-	makeSakuraEmitter(pos)
+if not reducedMotion then
+	for _, pos in ipairs(sakuraPositions) do
+		makeSakuraEmitter(pos)
+	end
 end
 
 -- Bubble motes: heat-shimmer-like spheres rising near kitchen + water zones
@@ -234,7 +252,7 @@ for _, pos in ipairs(bubblePositions) do
 	makeBubbleMoteEmitter(pos)
 end
 
--- Magic sparkles: subtle twinkling motes around the kitchen center (clear/aurora nights)
+-- Magic sparkles: subtle twinkling motes around the kitchen center (disabled if reduced motion)
 local sparklePositions = {
 	kitchenCenter + Vector3.new(0, 8, 0),
 	kitchenCenter + Vector3.new(10, 6, 8),
@@ -242,8 +260,10 @@ local sparklePositions = {
 	kitchenCenter + Vector3.new(6, 9, -10),
 	kitchenCenter + Vector3.new(-12, 5, 5),
 }
-for _, pos in ipairs(sparklePositions) do
-	makeMagicSparkleEmitter(pos)
+if not reducedMotion then
+	for _, pos in ipairs(sparklePositions) do
+		makeMagicSparkleEmitter(pos)
+	end
 end
 
 -- Listen to weather changes to adjust visibility
@@ -292,8 +312,8 @@ Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(function()
 	onWeatherChanged(weather)
 end)
 
--- Initial state
-task.wait(2)
+-- Initial state (staggered from other FX modules for smoother startup)
+task.wait(0.8)
 local initialWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 onWeatherChanged(initialWeather)
 

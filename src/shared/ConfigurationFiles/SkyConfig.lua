@@ -48,9 +48,11 @@ SkyConfig.sky = {
 -- ATMOSPHERE BASE
 -- ============================================================
 SkyConfig.atmosphere = {
-    decay   = Color3.fromRGB(55, 120, 210),
-    glare   = 0.28,
-    haze    = 4.0,
+    -- AAA polish: reduced blue decay that was tinting characters.
+    -- Old value was RGB(55, 120, 210) — very blue. Now warmer/neutral.
+    decay   = Color3.fromRGB(100, 130, 195),
+    glare   = 0.25,
+    haze    = 3.5,
 }
 
 -- ============================================================

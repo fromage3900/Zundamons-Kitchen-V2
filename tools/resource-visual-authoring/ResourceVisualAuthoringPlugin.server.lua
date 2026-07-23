@@ -292,6 +292,12 @@ local function makeVisual(asset: Instance?, normalized: string, root: BasePart):
 		local mesh = Instance.new("SpecialMesh")
 		mesh.MeshType = Enum.MeshType.FileMesh
 		mesh.MeshId = normalized
+		-- FIX: Set TextureId to prevent untextured rendering (untextured bug fix)
+		-- Extract numeric ID and use it for texture lookup (Roblox often uses matching IDs)
+		local numericId = string.match(normalized, "%d+")
+		if numericId then
+			mesh.TextureId = "rbxassetid://" .. numericId
+		end
 		mesh.Scale = Vector3.new(scale, scale, scale)
 		mesh.Parent = part
 		candidate = part
@@ -339,9 +345,50 @@ local function writeCatalogEntry(normalized: string)
 	entry.Parent = entries
 end
 
+local function getAssetLibraryPrefab(variantId: string): Model?
+	if variantId == "" then
+		return nil
+	end
+	local assetLibrary = ServerStorage:FindFirstChild("AssetLibrary")
+	if not assetLibrary then
+		return nil
+	end
+	local resourceNodes = assetLibrary:FindFirstChild("ResourceNodes")
+	if not resourceNodes then
+		return nil
+	end
+	local prefab = resourceNodes:FindFirstChild(variantId)
+	if prefab and prefab:IsA("Model") then
+		return prefab
+	end
+	return nil
+end
+
 local function applyToRoot(root: BasePart, loaded: Instance?, normalized: string)
-	-- Build first so malformed imported geometry cannot destroy the current visual.
-	local candidate = makeVisual(loaded, normalized, root)
+	-- FIX: First check for baked prefab in ServerStorage.AssetLibrary.ResourceNodes (invisible/untextured bug fix)
+	local variantId = variantBox.Text
+	local prefab = getAssetLibraryPrefab(variantId)
+	local candidate: Instance
+
+	if prefab then
+		-- Clone the complete baked model from AssetLibrary
+		candidate = prefab:Clone()
+		candidate.Name = "Candidate"
+		-- Prepare it for the root with proper welds and physics.
+		-- (Each parenthesized/truncated parseTransform() call below used to
+		-- collapse to its first return value, so the offset accidentally
+		-- reused `scale` in place of `yOffset` -- compute all three once.)
+		local scale, yOffset, yRotation = parseTransform()
+		local offset = CFrame.new(0, yOffset, 0) * CFrame.Angles(0, math.rad(yRotation), 0)
+		if not prepareVisual(candidate, root, scale, offset) then
+			candidate:Destroy()
+			candidate = makeVisual(loaded, normalized, root)
+		end
+	else
+		-- Fall back to makeVisual (either from loaded asset or bare mesh)
+		candidate = makeVisual(loaded, normalized, root)
+	end
+
 	local old = root:FindFirstChild("_ResourceVisual")
 	local backup = root:FindFirstChild("_ResourceVisualBackup")
 	if backup then
@@ -365,7 +412,37 @@ local function applyToRoot(root: BasePart, loaded: Instance?, normalized: string
 	if root:GetAttribute("ResourceRootTransparency") == nil then
 		root:SetAttribute("ResourceRootTransparency", root.Transparency)
 	end
+	-- FIX: Only set root.Transparency = 1 AFTER confirming candidate was created successfully (invisible bug fix)
 	root.Transparency = 1
+	-- FIX: Adjust root size to match the visual's actual extents to fix collision/visual decoupling (collision bug fix)
+	-- Calculate the extents of the candidate visual
+	local candidateParts = visualParts(candidate)
+	if #candidateParts > 0 then
+		local minBound = Vector3.new(math.huge, math.huge, math.huge)
+		local maxBound = Vector3.new(-math.huge, -math.huge, -math.huge)
+		for _, part in candidateParts do
+			local size = part.Size / 2
+			local cf = part.CFrame
+			-- Check all 8 corners of the part's bounding box
+			for dx = -1, 1, 2 do
+				for dy = -1, 1, 2 do
+					for dz = -1, 1, 2 do
+						local corner = cf * CFrame.new(size.X * dx, size.Y * dy, size.Z * dz)
+						local pos = corner.Position
+						minBound = Vector3.new(math.min(minBound.X, pos.X), math.min(minBound.Y, pos.Y), math.min(minBound.Z, pos.Z))
+						maxBound = Vector3.new(math.max(maxBound.X, pos.X), math.max(maxBound.Y, pos.Y), math.max(maxBound.Z, pos.Z))
+					end
+				end
+			end
+		end
+		-- Set root size to match the visual bounds
+		if minBound.X ~= math.huge then
+			local newSize = maxBound - minBound
+			local newCenter = (minBound + maxBound) / 2
+			local rootToCenter = newCenter - root.Position
+			root.Size = Vector3.new(math.max(newSize.X, 0.2), math.max(newSize.Y, 0.2), math.max(newSize.Z, 0.2))
+		end
+	end
 	root:SetAttribute("ResourceArchetype", archetypeBox.Text)
 	root:SetAttribute("VisualVariant", variantBox.Text)
 	root:SetAttribute("VisualAssetId", normalized)

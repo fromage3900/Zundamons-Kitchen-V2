@@ -49,7 +49,7 @@ local STEPS = {
 	{
 		id = "companion",
 		title = "✨  Your Companion",
-		desc = "A Zundapal follows you everywhere! Click on them to chat and build your bond. Premium companions give special buffs!",
+		desc = "Zundamon, your village guide, walks beside you everywhere! Click on them to chat and build your bond. Premium companions give special buffs!",
 		target = nil,
 		waitFor = nil,
 		auto = 5,

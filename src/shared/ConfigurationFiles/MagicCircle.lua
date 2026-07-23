@@ -1,6 +1,20 @@
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local RS = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 if workspace:FindFirstChild("ZundaMagicCircle") then
 	return
@@ -74,21 +88,28 @@ Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(function()
 	onWeatherChanged(weather)
 end)
 
-task.spawn(function()
-	while circlePart.Parent do
-		circlePart.CFrame = circlePart.CFrame * CFrame.Angles(0, math.rad(0.3), 0)
-		local breath = math.sin(os.clock() * 0.5) * 0.05
-		if circlePart.Transparency < 1 then
-			circlePart.Transparency = 0.5 + breath * 0.5
-			glow.Transparency = 0.8 + breath * 0.3
-			local pulse = 0.3 + math.sin(os.clock() * 0.5) * 0.1
-			decal.Transparency = pulse
+if not reducedMotion then
+	task.spawn(function()
+		while circlePart.Parent do
+			circlePart.CFrame = circlePart.CFrame * CFrame.Angles(0, math.rad(0.3), 0)
+			local breath = math.sin(os.clock() * 0.5) * 0.05
+			if circlePart.Transparency < 1 then
+				circlePart.Transparency = 0.5 + breath * 0.5
+				glow.Transparency = 0.8 + breath * 0.3
+				local pulse = 0.3 + math.sin(os.clock() * 0.5) * 0.1
+				decal.Transparency = pulse
+			end
+			task.wait(0.05)
 		end
-		task.wait(0.05)
-	end
-end)
+	end)
+else
+	-- Static values when reduced motion is enabled
+	circlePart.Transparency = 0.6
+	glow.Transparency = 0.85
+	decal.Transparency = 0.35
+end
 
-task.wait(2)
+task.wait(1.0)
 local initialWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 onWeatherChanged(initialWeather)
 

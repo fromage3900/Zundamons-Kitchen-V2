@@ -1,6 +1,17 @@
+-- Infinity Nikki Dreamy Post-Processing
+-- AAA cinematic: subtle bloom, warm atmosphere, clean focus on characters
 local Lighting = game:GetService("Lighting")
 local Tween = game:GetService("TweenService")
 local RS = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
 
 local bloomAtmo = Lighting:FindFirstChild("ZundaBloomAtmo")
 if not bloomAtmo then
@@ -37,29 +48,21 @@ if not colorCorrection then
 	colorCorrection.Name = "ZundaColorCorrection"
 	colorCorrection.Parent = Lighting
 end
-colorCorrection.Brightness = 0.03
-colorCorrection.Contrast = 0.02
-colorCorrection.Saturation = 0.15
-colorCorrection.TintColor = Color3.fromRGB(235, 225, 248)
+colorCorrection.Brightness = 0.02
+colorCorrection.Contrast = 0.04
+colorCorrection.Saturation = 0.10
+colorCorrection.TintColor = Color3.fromRGB(248, 242, 252)  -- barely-there warm tint
 
 pcall(function()
-	Lighting.Ambient = Color3.fromRGB(155, 142, 180)
-	Lighting.OutdoorAmbient = Color3.fromRGB(175, 158, 200)
+	Lighting.Ambient = Color3.fromRGB(175, 168, 195)
+	Lighting.OutdoorAmbient = Color3.fromRGB(195, 185, 210)
 	Lighting.EnvironmentDiffuseScale = 0.90
 	Lighting.EnvironmentSpecularScale = 0.70
-	Lighting.ExposureCompensation = 0.08
+	Lighting.ExposureCompensation = 0.06
 
-	local atmo = Lighting:FindFirstChildOfClass("Atmosphere")
-	if not atmo then
-		atmo = Instance.new("Atmosphere")
-		atmo.Name = "DreamyAtmosphere"
-		atmo.Parent = Lighting
-	end
-	atmo.Density = 0.18
-	atmo.Haze = 1.4
-	atmo.Glare = 0.25
-	atmo.Color = Color3.fromRGB(225, 208, 240)
-	atmo.Decay = Color3.fromRGB(170, 135, 195)
+	-- Leave Atmosphere to DayNightSky's keyframe system for smooth transitions.
+	-- Overriding here with static values caused a conflicting purple wash
+	-- over characters. The SkyConfig keyframes handle density/color naturally.
 end)
 
 local function setupDoF(cam)
@@ -69,21 +72,16 @@ local function setupDoF(cam)
 	local existing2 = cam:FindFirstChild("ZundaTiltShift")
 	if existing2 then existing2:Destroy() end
 
+	-- AAA cinematic DoF: very subtle, focused on character distance (~20 studs).
+	-- The old TiltShift (NearIntensity=0.30) was blurring nearby characters badly.
+	-- Removed entirely — AAA games don't use fake tilt-shift overlays.
 	local dof = Instance.new("DepthOfFieldEffect")
 	dof.Name = "ZundaDepthOfField"
-	dof.InFocusRadius = 40
-	dof.FocusDistance = 50
-	dof.FarIntensity = 0.15
-	dof.NearIntensity = 0.04
+	dof.InFocusRadius = 25        -- wider focus zone so characters stay sharp
+	dof.FocusDistance = 22         -- character interaction distance
+	dof.FarIntensity = 0.08        -- very subtle background blur
+	dof.NearIntensity = 0.02       -- barely-there foreground blur
 	dof.Parent = cam
-
-	local tilt = Instance.new("DepthOfFieldEffect")
-	tilt.Name = "ZundaTiltShift"
-	tilt.InFocusRadius = 20
-	tilt.FocusDistance = 120
-	tilt.FarIntensity = 0.25
-	tilt.NearIntensity = 0.30
-	tilt.Parent = cam
 end
 
 local cam = workspace.CurrentCamera
@@ -99,14 +97,22 @@ end)
 
 local BloomAtmoBase = 0.08
 local BloomSunBase = 0.04
-task.spawn(function()
-	while true do
-		local breath = math.sin(os.clock() * 0.4) * 0.005
-		bloomAtmo.Intensity = BloomAtmoBase + breath
-		bloomSun.Intensity = BloomSunBase + breath * 0.5
-		task.wait(0.05)
-	end
-end)
+if not reducedMotion then
+	task.spawn(function()
+		while true do
+			local breath = math.sin(os.clock() * 0.4) * 0.005
+			bloomAtmo.Intensity = BloomAtmoBase + breath
+			bloomSun.Intensity = BloomSunBase + breath * 0.5
+			task.wait(0.05)
+		end
+	end)
+end
+-- Watch for runtime reduced-motion toggle
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 local SkyConfig = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("SkyConfig"))
 local activeTween
@@ -135,7 +141,7 @@ if weatherRE then
 end
 
 task.spawn(function()
-	task.wait(2)
+	task.wait(0.5)
 	local initial = workspace:GetAttribute("CurrentWeather") or "clear"
 	applyWeatherCC(initial)
 end)

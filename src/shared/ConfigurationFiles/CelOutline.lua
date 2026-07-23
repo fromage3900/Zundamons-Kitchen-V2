@@ -1,8 +1,22 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
+local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 if playerGui:FindFirstChild("ZundaCelOutline") then
 	return
@@ -156,26 +170,28 @@ local function updateInkWeight(weatherKey, hour)
 end
 
 -- Temporal animation: breath + micro-drift on line positions
-local t = 0
-RunService.RenderStepped:Connect(function(dt)
-	t = t + dt
+if not reducedMotion then
+	local t = 0
+	RunService.RenderStepped:Connect(function(dt)
+		t = t + dt
 
-	local breath = 0.5 + 0.5 * math.sin(t * 0.4)
-	local driftX = math.sin(t * 0.15) * 0.005
-	local driftY = math.sin(t * 0.12 + 1.3) * 0.005
+		local breath = 0.5 + 0.5 * math.sin(t * 0.4)
+		local driftX = math.sin(t * 0.15) * 0.005
+		local driftY = math.sin(t * 0.12 + 1.3) * 0.005
 
-	local baseTrans = hitline.ImageTransparency
-	if baseTrans < 0.99 then
-		local pulse = math.sin(t * 0.3) * 0.015
-		hitline.ImageTransparency = math.clamp(baseTrans + pulse, 0.80, 0.97)
-	end
+		local baseTrans = hitline.ImageTransparency
+		if baseTrans < 0.99 then
+			local pulse = math.sin(t * 0.3) * 0.015
+			hitline.ImageTransparency = math.clamp(baseTrans + pulse, 0.80, 0.97)
+		end
 
-	-- Slow drift on ink wash for organic feel
-	local wBase = inkWash.ImageTransparency
-	if wBase < 0.99 then
-		inkWash.Position = UDim2.new(-0.25 + driftX, 0, driftY, 0)
-	end
-end)
+		-- Slow drift on ink wash for organic feel
+		local wBase = inkWash.ImageTransparency
+		if wBase < 0.99 then
+			inkWash.Position = UDim2.new(-0.25 + driftX, 0, driftY, 0)
+		end
+	end)
+end
 
 Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(function()
 	local hour = Lighting:GetAttribute("CurrentHour") or 12
@@ -197,7 +213,7 @@ if weatherRE then
 	end)
 end
 
-task.wait(2)
+task.wait(1.4)
 local startWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 local startHour = Lighting:GetAttribute("CurrentHour") or 12
 updateInkWeight(startWeather, startHour)

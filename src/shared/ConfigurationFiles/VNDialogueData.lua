@@ -9,7 +9,7 @@ local RGB = Color3.fromRGB
 -- Speaker configurations with companion emojis
 local SPEAKERS = {
 	zundamon    = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) },
-	zundapal    = { name = "Zundapal", emoji = "🍡", accent = RGB(200, 230, 180), portrait = RGB(210, 235, 195) },
+	zundapal    = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }, -- Backward compat alias for zundamon
 	zundacat    = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) },
 	zundabunny  = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) },
 	tantanmon   = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) },
@@ -31,54 +31,28 @@ local SPEAKERS = {
 local COMPANION_DIALOGUE = {
 	zundamon = {
 		morning = {
-			"Morning, {player}! The garden is sparkling with morning dew! 🌄🌱",
-			"Let us make one dish we are proud of today, chef!",
-			"I can smell fresh Zunda Peas blooming across the village~ ✨",
+			"Good morning, {player}! The garden is sparkling with dew, and I can smell Zunda Peas blooming~ ☀️🌱",
+			"Ready to cook up something wonderful today? Let us make one dish we are proud of!",
+			"I'll be right here beside you as you explore and gather. What should we cook first?",
 		},
 		afternoon = {
-			"You are finding your rhythm, {player}! 🔥🍡",
-			"I will stay close while you gather and craft marvelous dishes!",
-			"Did you see Nikki the Drifter at the Hilltop Shrine today?",
+			"You are finding your rhythm, {player}! I can see it in every move~ 🔥",
+			"The guests look hungry — let's get cooking! I will stay close while you work your magic.",
+			"You're doing great! Have you tried any of the new recipes yet?",
 		},
 		evening = {
-			"The kitchen feels warm after a long day of good work. 🌅",
-			"What was your favorite little moment today, {player}?",
-			"The sunset glows green and pink like our Zunda Mochi! 🌸",
+			"The kitchen feels warm after a long day of good work. The sunset is so pretty from here... 🌅",
+			"What was your favorite little moment today, {player}? You worked so hard.",
+			"I'll be right here beside you, always~ The stars are beginning to twinkle.",
 		},
 		night = {
-			"Quiet kitchens keep the sweetest memories. 🌙⭐",
-			"Rest when you are ready; tomorrow brings new recipes!",
-			"I will guard the recipe book while you sleep~ 📖",
+			"Psst — {player}... still awake? 🌙 Quiet kitchens keep the sweetest memories.",
+			"The stars are beautiful tonight... Even chefs deserve a rest. I'll keep watch~",
+			"Rest when you are ready; tomorrow brings new recipes! I will guard the kitchen while you sleep. ⭐",
 		},
-		level1_10 = { "Welcome to Zunda Village! I will guide your spatula! 🌱" },
-		level11_20 = { "Your rhythm cooking accuracy is getting sharper! ✨" },
-		level21_50 = { "A true Master Chef! The whole village talks about your food! 👑" },
-	},
-
-	zundapal = {
-		morning = {
-			"Good morning, {player}~ ☀️",
-			"Ready to cook up something wonderful today?",
-			"I can already smell the kitchen from here! 🍳",
-		},
-		afternoon = {
-			"Hey, {player}! You're doing great~ ✨",
-			"Have you tried any of the new recipes yet?",
-			"The guests look hungry... let's get cooking! 🍡",
-		},
-		evening = {
-			"The sunset is so pretty from here... 🌅",
-			"You worked so hard today, {player}.",
-			"I'll be right here beside you, always~ 💫",
-		},
-		night = {
-			"Psst — {player}... still awake? 🌙",
-			"The stars are beautiful tonight...",
-			"Even chefs deserve a rest. I'll keep watch~ ⭐",
-		},
-		level1_10 = { "Starting your journey? I believe in you! 🌱", "Let's gather some basic ingredients first." },
-		level11_20 = { "You're getting the hang of this! ✨", "Try making Zunda Mochi - it's my favorite!" },
-		level21_50 = { "Amazing progress, chef! 🌟", "You've mastered so many recipes already." },
+		level1_10 = { "Welcome to Zunda Village! I believe in you, and I will guide your journey! 🌱" },
+		level11_20 = { "You're getting the hang of this! Your rhythm cooking accuracy is getting sharper! ✨" },
+		level21_50 = { "A true Master Chef! The whole village talks about your amazing food! 👑" },
 	},
 
 	zundacat = {
@@ -278,13 +252,13 @@ local COMPANION_DIALOGUE = {
 -- Side dialogue triggers (item/lore discoveries)
 local SIDE_DIALOGUES = {
 	zunda_pea = {
-		speaker = "zundapal",
+		speaker = "zundamon",
 		text = "Oh! You found some Zunda Peas! 🌱",
 		hint = "Those are my favorite~ They're so sweet and green!",
 		recipe = "Did you know you can make Zunda Mochi with them? 🍡",
 	},
 	zunda_mochi = {
-		speaker = "zundapal",
+		speaker = "zundamon",
 		text = "Zunda Mochi! The pride of Zunda Village! 🍡",
 		hint = "Serve it to guests while it's fresh for extra gold!",
 	},
@@ -299,11 +273,11 @@ VNDialogueData.COMPANION_DIALOGUE = COMPANION_DIALOGUE
 VNDialogueData.SIDE_DIALOGUES = SIDE_DIALOGUES
 
 function VNDialogueData.getSpeaker(id: string)
-	return SPEAKERS[id] or SPEAKERS.zundapal
+	return SPEAKERS[id] or SPEAKERS.zundamon
 end
 
 function VNDialogueData.getCompanionDialogue(compType: string, timeOfDay: string?, level: number?)
-	local compPool = COMPANION_DIALOGUE[compType] or COMPANION_DIALOGUE.zundapal
+	local compPool = COMPANION_DIALOGUE[compType] or COMPANION_DIALOGUE.zundamon
 	local tod = timeOfDay or "morning"
 
 	-- Level overrides

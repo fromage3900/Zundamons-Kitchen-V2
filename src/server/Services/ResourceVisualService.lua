@@ -310,6 +310,29 @@ end
 
 local function applyModel(node: Instance, root: BasePart, managed: Folder, descriptor: any): (boolean, string)
 	local normalized = Catalog.normalizeAssetId(descriptor.assetId)
+
+	-- PRIMARY: Check for baked prefab in ServerStorage.AssetLibrary.ResourceNodes (author-owned)
+	local assetLibrary = ServerStorage:FindFirstChild("AssetLibrary")
+	if assetLibrary then
+		local resourceNodes = assetLibrary:FindFirstChild("ResourceNodes")
+		local prefabVariant = resourceNodes and resourceNodes:FindFirstChild(node:GetAttribute("VisualVariant") or "")
+		if prefabVariant and prefabVariant:IsA("Model") then
+			local candidate = prefabVariant:Clone()
+			candidate.Name = CANDIDATE_NAME
+			candidate.Parent = managed
+			if normalizeCandidate(candidate, root, root.CFrame * descriptor.offset, descriptor.scale) then
+				local fallback = managed:FindFirstChild(FALLBACK_NAME)
+				if fallback then
+					setDescendantsVisible(fallback, false)
+				end
+				setStatus(node, "applied", "prefab:" .. node:GetAttribute("VisualVariant"))
+				return true, "applied"
+			end
+			candidate:Destroy()
+		end
+	end
+
+	-- FALLBACK: InsertService for third-party public assets (Kenney packs, etc.)
 	local template = modelCache[normalized]
 	if not template then
 		local numericId = tonumber(string.match(normalized, "%d+"))
@@ -340,6 +363,28 @@ local function applyModel(node: Instance, root: BasePart, managed: Folder, descr
 end
 
 local function applyMeshAsync(node: Instance, root: BasePart, managed: Folder, descriptor: any): (boolean, string)
+	-- PRIMARY: Check for baked prefab in ServerStorage.AssetLibrary.ResourceNodes (author-owned)
+	local assetLibrary = ServerStorage:FindFirstChild("AssetLibrary")
+	if assetLibrary then
+		local resourceNodes = assetLibrary:FindFirstChild("ResourceNodes")
+		local prefabVariant = resourceNodes and resourceNodes:FindFirstChild(node:GetAttribute("VisualVariant") or "")
+		if prefabVariant and prefabVariant:IsA("Model") then
+			local candidate = prefabVariant:Clone()
+			candidate.Name = CANDIDATE_NAME
+			candidate.Parent = managed
+			if normalizeCandidate(candidate, root, root.CFrame * descriptor.offset, descriptor.scale) then
+				local fallback = managed:FindFirstChild(FALLBACK_NAME)
+				if fallback then
+					setDescendantsVisible(fallback, false)
+				end
+				setStatus(node, "applied", "prefab:" .. node:GetAttribute("VisualVariant"))
+				return true, "applied"
+			end
+			candidate:Destroy()
+		end
+	end
+
+	-- FALLBACK: ContentProvider:PreloadAsync for third-party public assets
 	local candidate = Instance.new("Part")
 	candidate.Name = CANDIDATE_NAME
 	candidate.Size = Vector3.new(2, 2, 2)
@@ -391,7 +436,6 @@ function ResourceVisualService.apply(node: Instance, descriptor: any?): (boolean
 	if root:GetAttribute("ResourceRootTransparency") == nil then
 		root:SetAttribute("ResourceRootTransparency", root.Transparency)
 	end
-	root.Transparency = 1
 	local archetypeId = node:GetAttribute("ResourceArchetype") or root:GetAttribute("ResourceArchetype") or "Unknown"
 	local managed = managedFolder(root)
 	local oldCandidate = managed:FindFirstChild(CANDIDATE_NAME)
@@ -415,10 +459,24 @@ function ResourceVisualService.apply(node: Instance, descriptor: any?): (boolean
 	resolved.scale = if typeof(resolved.scale) == "Vector3" then resolved.scale else Vector3.new(1, 1, 1)
 	resolved.offset = if typeof(resolved.offset) == "CFrame" then resolved.offset else CFrame.identity
 
+	-- Only hide the root AFTER confirming a visual has been successfully applied.
+	-- This prevents the "invisible bug" where root becomes transparent but no replacement visual loads.
+	local success, result
 	if resolved.assetType == "Model" or resolved.assetType == "Prefab" then
-		return applyModel(node, root, managed, resolved)
+		success, result = applyModel(node, root, managed, resolved)
+	else
+		success, result = applyMeshAsync(node, root, managed, resolved)
 	end
-	return applyMeshAsync(node, root, managed, resolved)
+
+	if success then
+		root.Transparency = 1
+	end
+
+	if success then
+		return true, result
+	else
+		return false, result
+	end
 end
 
 return ResourceVisualService

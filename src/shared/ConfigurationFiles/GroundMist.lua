@@ -1,5 +1,19 @@
 local Lighting = game:GetService("Lighting")
 local RS = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 if workspace:FindFirstChild("ZundaGroundMist") then
 	return
@@ -62,8 +76,10 @@ local mistPositions = {
 	kitchenCenter + Vector3.new(-50, 0, 30),
 }
 
-for _, pos in ipairs(mistPositions) do
-	makeMistPatch(pos)
+if not reducedMotion then
+	for _, pos in ipairs(mistPositions) do
+		makeMistPatch(pos)
+	end
 end
 
 local function onWeatherChanged(weatherKey)
@@ -136,7 +152,7 @@ Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(function()
 	onWeatherChanged(weather)
 end)
 
-task.wait(2)
+task.wait(1.6)
 local initialWeather = workspace:GetAttribute("CurrentWeather") or "clear"
 onWeatherChanged(initialWeather)
 

@@ -176,7 +176,7 @@ local function buildProductCard(prod, idx, cat)
 end
 
 local FREE_COMPANIONS = {
-    { key="zundapal", emoji="🌱", name="Zundapal", flavor="Your Zundamon spirit companion." },
+    { key="zundamon", emoji="🌱", name="Zundamon", flavor="Your village guide and cherished spirit companion." },
     { key="dog",      emoji="🐕", name="Dog",      flavor="A faithful furry friend." },
     { key="parrot",   emoji="🦜", name="Parrot",   flavor="A colourful chatterbox." },
     { key="cat",      emoji="🐱", name="Cat",      flavor="A purring little menace." },

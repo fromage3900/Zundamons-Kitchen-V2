@@ -1,8 +1,22 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
+local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local ClientGuiBootstrap = require(game.ReplicatedStorage.ConfigurationFiles.ClientGuiBootstrap)
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 local TX = {
 	crystalEmit1 = "rbxassetid://93110600603968",
@@ -49,28 +63,37 @@ local glowLayer = makeLayer("RadialGlow", TX.radialPattern, 1, {scale=Enum.Scale
 
 local off = {a=Vector2.new(0,0), b=Vector2.new(0,0), c=Vector2.new(0,0), s1=Vector2.new(0,0), s2=Vector2.new(0,0)}
 
-RunService.RenderStepped:Connect(function(dt)
-	local hour = Lighting.ClockTime
-	local isNight = hour <= 6 or hour >= 19
-	local t = os.clock()
+if not reducedMotion then
+	RunService.RenderStepped:Connect(function(dt)
+		local hour = Lighting.ClockTime
+		local isNight = hour <= 6 or hour >= 19
+		local t = os.clock()
 
-	-- NOTE: ImageLabel has no TileOffset property; the old per-frame assignments
-	-- to it threw an error every RenderStepped (log flood + wasted frame time).
-	-- Removed. (Tiled textures can't be scroll-offset directly on an ImageLabel.)
-	crystalA.ImageTransparency = 0.90 + math.sin(t*0.3)*0.03
-	crystalB.ImageTransparency = 0.93 + math.sin(t*0.4+1)*0.02
-	crystalC.ImageTransparency = 0.95 + math.sin(t*0.25+2)*0.02
+		-- NOTE: ImageLabel has no TileOffset property; the old per-frame assignments
+		-- to it threw an error every RenderStepped (log flood + wasted frame time).
+		-- Removed. (Tiled textures can't be scroll-offset directly on an ImageLabel.)
+		crystalA.ImageTransparency = 0.90 + math.sin(t*0.3)*0.03
+		crystalB.ImageTransparency = 0.93 + math.sin(t*0.4+1)*0.02
+		crystalC.ImageTransparency = 0.95 + math.sin(t*0.25+2)*0.02
 
-	if isNight then
-		starLayer.ImageTransparency = 0.75 + math.sin(t*0.2)*0.05
-		starLayer2.ImageTransparency = 0.82 + math.sin(t*0.25+1)*0.04
-	else
-		starLayer.ImageTransparency = 0.93
-		starLayer2.ImageTransparency = 0.95
-	end
+		if isNight then
+			starLayer.ImageTransparency = 0.75 + math.sin(t*0.2)*0.05
+			starLayer2.ImageTransparency = 0.82 + math.sin(t*0.25+1)*0.04
+		else
+			starLayer.ImageTransparency = 0.93
+			starLayer2.ImageTransparency = 0.95
+		end
 
-
-	glowLayer.ImageTransparency = 0.92 + math.sin(t*0.2)*0.03
-end)
+		glowLayer.ImageTransparency = 0.92 + math.sin(t*0.2)*0.03
+	end)
+else
+	-- Static values when reduced motion is enabled
+	crystalA.ImageTransparency = 0.92
+	crystalB.ImageTransparency = 0.94
+	crystalC.ImageTransparency = 0.96
+	starLayer.ImageTransparency = 0.88
+	starLayer2.ImageTransparency = 0.93
+	glowLayer.ImageTransparency = 0.93
+end
 
 print("[SkyOverlay] Multi-layer sky overlay active")

@@ -185,6 +185,33 @@ local function buildCompanion(player, compType)
 		companionModel.PrimaryPart = body
 	end
 
+	-- ── Animation support ──────────────────────────────────────────
+	-- Detect Humanoid (Avatar-Importer rigs) or AnimationController (non-humanoid rigs)
+	local animator = nil
+	local humanoid = companionModel:FindFirstChildOfClass("Humanoid")
+	local animationController = companionModel:FindFirstChildOfClass("AnimationController")
+
+	if humanoid then
+		-- Avatar rig: use Humanoid's Animator
+		animator = humanoid:FindFirstChildOfClass("Animator")
+		if not animator then
+			animator = Instance.new("Animator")
+			animator.Parent = humanoid
+		end
+		print("[CompanionManager.buildCompanion] Using Humanoid Animator for", compType)
+	elseif animationController then
+		-- Non-humanoid rig: use AnimationController's Animator
+		animator = animationController:FindFirstChildOfClass("Animator")
+		if not animator then
+			animator = Instance.new("Animator")
+			animator.Parent = animationController
+		end
+		print("[CompanionManager.buildCompanion] Using AnimationController Animator for", compType)
+	else
+		-- Static mesh: no animation support
+		print("[CompanionManager.buildCompanion] No Humanoid or AnimationController; animation disabled for", compType)
+	end
+
 	-- Scale to roughly human height. The authored zundapal mesh is ~50 studs tall;
 	-- a Roblox character is ~5. Scale by (target / current) so it stands human-sized.
 	local COMPANION_HEIGHT = 5.2
@@ -337,6 +364,33 @@ local function buildCompanion(player, compType)
 	local ORIENT_CORRECTION = CFrame.Angles(0, 0, math.rad(180)) -- roll 180° to un-flip; keeps facing
 	task.spawn(function()
 		local t = 0
+		local currentAnimState = "idle" -- Track current animation state
+		local idleTrack = nil
+		local walkTrack = nil
+
+		-- Load animation tracks if animator is available
+		if animator then
+			local compVisual = CompanionVisualConfig.get(compType)
+			local idleAnimId = compVisual and compVisual.idleAnimationId
+			local walkAnimId = compVisual and compVisual.walkAnimationId
+
+			if idleAnimId and idleAnimId ~= "" then
+				local idleAnim = Instance.new("Animation")
+				idleAnim.AnimationId = idleAnimId
+				idleTrack = animator:LoadAnimation(idleAnim)
+				idleTrack.Priority = Enum.AnimationPriority.Core
+			end
+
+			if walkAnimId and walkAnimId ~= "" then
+				local walkAnim = Instance.new("Animation")
+				walkAnim.AnimationId = walkAnimId
+				walkTrack = animator:LoadAnimation(walkAnim)
+				walkTrack.Priority = Enum.AnimationPriority.Core
+			end
+
+			print("[CompanionManager.buildCompanion] Animation tracks loaded for", compType, "- idle:", idleTrack ~= nil, "walk:", walkTrack ~= nil)
+		end
+
 		while body and body.Parent and companionModel.Parent do
 			t = t + 0.05
 			local char2 = player.Character
@@ -346,6 +400,30 @@ local function buildCompanion(player, compType)
 				local sideOff = hrp2.CFrame.RightVector * (3.5 + math.sin(t * 0.3) * 0.4)
 				local target  = hrp2.Position + sideOff + Vector3.new(0, floatY, 0)
 				local dist    = (body.Position - target).Magnitude
+
+				-- ── Animation state management ────────────────────────
+				-- Determine if companion is moving or idle based on distance to target
+				local isMoving = dist > 1.0
+				local newAnimState = isMoving and "walk" or "idle"
+
+				if newAnimState ~= currentAnimState then
+					-- State transition: stop old, play new
+					if currentAnimState == "idle" and idleTrack then
+						idleTrack:Stop(0.2)
+					elseif currentAnimState == "walk" and walkTrack then
+						walkTrack:Stop(0.2)
+					end
+
+					if newAnimState == "walk" and walkTrack then
+						walkTrack:Play(0.2)
+					elseif newAnimState == "idle" and idleTrack then
+						idleTrack:Play(0.2)
+					end
+
+					currentAnimState = newAnimState
+				end
+
+				-- ── Movement physics ──────────────────────────────────
 				if dist > 0.3 then
 					body.AssemblyLinearVelocity = (target - body.Position).Unit * math.min(dist * 5, 35)
 				end
@@ -372,7 +450,19 @@ local function onPlayerAdded(player)
 	player.CharacterAdded:Connect(function()
 		task.wait(2)
 		local data = PlayerDataService.getOrCreate(player)
-		local compType = data.active_companion or "zundapal"
+
+		-- Migration: convert old "zundapal" references to "zundamon"
+		if data.active_companion == "zundapal" then
+			data.active_companion = "zundamon"
+		end
+		if data.companion_owned_zundapal then
+			data.companion_owned_zundamon = true
+		end
+		if data.companions_set and data.companions_set.zundapal then
+			data.companions_set.zundamon = true
+		end
+
+		local compType = data.active_companion or "zundamon"
 		buildCompanion(player, compType)
 	end)
 end

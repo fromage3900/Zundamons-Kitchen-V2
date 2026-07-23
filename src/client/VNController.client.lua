@@ -434,7 +434,7 @@ end
 playNode = function(node)
     if type(node) == "function" then node = node() end
     if type(node) ~= "table" then return end
-    local speakerKey = node.speaker or "zundapal"
+    local speakerKey = node.speaker or "zundamon"
 
     local function presentChoices()
         if not node.choices then return end
@@ -503,10 +503,10 @@ _G.ZundaVN = {
         if not isOpen then
             openPanel()
         end
-        setSpeaker("zundapal")
+        setSpeaker("zundamon")
         seqIdx = 1
         seqLines = { text }
-        seqLines._defaultSpeaker = "zundapal"
+        seqLines._defaultSpeaker = "zundamon"
         if typeThread then
             pcall(task.cancel, typeThread)
         end
@@ -517,7 +517,7 @@ _G.ZundaVN = {
     setThinking = function(thinking)
         if thinking then
             typing = false
-            dlgText.Text = "Zundapal is thinking… ✨"
+            dlgText.Text = "Zundamon is thinking… ✨"
             advArrow.Visible = false
         end
     end,
@@ -549,7 +549,7 @@ end)
 -- ── Event listeners ───────────────────────────────────────────
 local RE = RS:WaitForChild("RemoteEvents")
 
--- ── BRANCHING ZUNDAPAL DIALOGUE TREE ─────────────────────────────
+-- ── BRANCHING ZUNDAMON DIALOGUE TREE ─────────────────────────────
 local function buildCompanionTree(compType)
     local speakerKey = SPEAKERS[compType] and compType or "zundamon"
     local companionDialogue = COMPANION_DIALOGUE[speakerKey] or COMPANION_DIALOGUE.zundamon
@@ -569,52 +569,52 @@ local function buildCompanionTree(compType)
     }
 
     local cookingTipsNode = {
-        speaker = "zundapal",
+        speaker = speakerKey,
         lines = {
-            {speaker="zundapal", text="Cooking tip time! \u{1F468}\u{200D}\u{1F373}"},
-            {speaker="zundapal", text="Watch the timing bar carefully. When the indicator hits the bright-green middle…"},
-            {speaker="zundapal", text="…that’s a PERFECT cook — you get bonus gold AND a chance at a free extra dish! ✨"},
+            {speaker=speakerKey, text="Cooking tip time! \u{1F468}\u{200D}\u{1F373}"},
+            {speaker=speakerKey, text="Watch the timing bar carefully. When the indicator hits the bright-green middle…"},
+            {speaker=speakerKey, text="…that’s a PERFECT cook — you get bonus gold AND a chance at a free extra dish! ✨"},
         },
         prompt = "Want to hear more?",
         choices = {
             {text="What about Zunda Mochi?", next={
-                speaker="zundapal",
+                speaker=speakerKey,
                 lines={
-                    {speaker="zundapal", text="Zunda Mochi needs 5 Zunda Peas and 8 Wheat \u{1F361}"},
-                    {speaker="zundapal", text="Pick the peas in the Kitchen Garden — they sparkle pink!"},
+                    {speaker=speakerKey, text="Zunda Mochi needs 5 Zunda Peas and 8 Wheat \u{1F361}"},
+                    {speaker=speakerKey, text="Pick the peas in the Kitchen Garden — they sparkle pink!"},
                 },
             }},
             {text="And the legendary Zunda Paradise?", next={
-                speaker="zundapal",
+                speaker=speakerKey,
                 lines={
-                    {speaker="zundapal", text="Oooh you ambitious chef! \u{2728}"},
-                    {speaker="zundapal", text="Zunda Paradise wants 15 Zunda Peas, 10 Edamame Pods, 5 Sweet Peas and 3 Pea Flowers."},
-                    {speaker="zundapal", text="Only true masters can pull it off!"},
+                    {speaker=speakerKey, text="Oooh you ambitious chef! \u{2728}"},
+                    {speaker=speakerKey, text="Zunda Paradise wants 15 Zunda Peas, 10 Edamame Pods, 5 Sweet Peas and 3 Pea Flowers."},
+                    {speaker=speakerKey, text="Only true masters can pull it off!"},
                 },
             }},
-            {text="Thanks, that's all.", next=leafEnd},
+            {text="Thanks, that’s all.", next=leafEnd},
         },
     }
 
     local questHintsNode = {
-        speaker = "zundapal",
+        speaker = speakerKey,
         lines = {
-            {speaker="zundapal", text="Let me check the quest board… \u{1F4DC}"},
+            {speaker=speakerKey, text="Let me check the quest board… \u{1F4DC}"},
         },
         prompt = "What are you curious about?",
         choices = {
             {text="Where do I find Zunda Peas?", next={
-                speaker="zundapal",
+                speaker=speakerKey,
                 lines={
-                    {speaker="zundapal", text="In the Kitchen Garden, behind the bakery!"},
-                    {speaker="zundapal", text="They sparkle pink — you can’t miss them \u{1F495}"},
+                    {speaker=speakerKey, text="In the Kitchen Garden, behind the bakery!"},
+                    {speaker=speakerKey, text="They sparkle pink — you can’t miss them \u{1F495}"},
                 },
             }},
             {text="How do I serve guests?", next={
-                speaker="zundapal",
+                speaker=speakerKey,
                 lines={
-                    {speaker="zundapal", text="Cook the dish they want, then walk over with it in your pouch."},
-                    {speaker="zundapal", text="Click the guest — they’ll pay in gold and a smile~"},
+                    {speaker=speakerKey, text="Cook the dish they want, then walk over with it in your pouch."},
+                    {speaker=speakerKey, text="Click the guest — they’ll pay in gold and a smile~"},
                 },
             }},
             {text="Tell me about the village.", next={
@@ -645,10 +645,10 @@ local function buildCompanionTree(compType)
             {text="Give me a cooking tip \u{1F373}",   next=cookingTipsNode},
             {text="I need quest help \u{1F4DC}",      next=questHintsNode},
             {text="Just saying hi \u{1F495}",          next={
-                speaker="zundapal",
+                speaker=speakerKey,
                 lines={
-                    {speaker="zundapal", text="Hehe — hi! \u{1F49A}"},
-                    {speaker="zundapal", text="It’s really nice to see your face today, "..player.Name.."."},
+                    {speaker=speakerKey, text="Hehe — hi! \u{1F49A}"},
+                    {speaker=speakerKey, text="It’s really nice to see your face today, "..player.Name.."."},
                 },
             }},
             {text="Bye for now",                       next=leafEnd},
@@ -668,7 +668,7 @@ if qcRE then
     qcRE.OnClientEvent:Connect(function(quest)
         local lines = {
             {speaker="zundamon", text="Quest complete! 🎉  \""..quest.title.."\""},
-            {speaker="zundapal", text="You did it, "..player.Name.."! ✨ +"..(quest.reward or 0).." gold~"},
+            {speaker="zundamon", text="You did it, "..player.Name.."! ✨ +"..(quest.reward or 0).." gold~"},
             {speaker="zundamon", text=quest.unlock_hint or "Keep exploring — new surprises await!"},
         }
         _G.ZundaVN.show("zundamon", lines)
@@ -732,7 +732,7 @@ task.spawn(function()
             "Welcome to Zunda Village, "..player.Name.."! 🌸",
             "I'm Zundamon — I'll guide you through your culinary adventure!",
             "Press M for the map  •  I for your pouch  •  J for quests~",
-            "Your Zundapal companion is right beside you — click them to chat! 🍡",
+            "I'm right beside you! Click me to chat whenever you like~ 🍡",
         })
         print("[VN] Welcome dialogue triggered")
     else

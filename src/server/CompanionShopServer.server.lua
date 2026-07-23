@@ -81,7 +81,7 @@ GetOwnedCompanions.OnServerInvoke = function(player)
 				end
 			end
 		end
-		owned.__active = data.active_companion or "zundapal"
+		owned.__active = data.active_companion or "zundamon"
 	end
 	return owned
 end

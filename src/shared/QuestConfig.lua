@@ -76,7 +76,7 @@ QuestConfig.achievements = {
 		desc = "Reach chef level 5",
 		goal = 5,
 		metric = "chefLevel",
-		reward = { unlock = "Zundapal dialogue unlocked" },
+		reward = { unlock = "Zundamon dialogue unlocked" },
 		icon = "🍙",
 		level = 5,
 	},
