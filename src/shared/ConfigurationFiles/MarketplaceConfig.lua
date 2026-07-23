@@ -35,30 +35,10 @@ MarketplaceConfig.companionDevProductIds = {
 -- Client StoreScript display (derived from products; edit copy here)
 MarketplaceConfig.storeDisplay = {
 	companions = {
-		{
-			id = 1111111101,
-			name = "ZundaCat",
-			emoji = "🐱",
-			desc = "A playful feline companion",
-			robux = 80,
-			key = "zundacat",
-		},
-		{
-			id = 1111111102,
-			name = "ZundaBunny",
-			emoji = "🐰",
-			desc = "Fluffy bunny bestie",
-			robux = 80,
-			key = "zundabunny",
-		},
-		{
-			id = 1111111103,
-			name = "TantanMon",
-			emoji = "🌶️",
-			desc = "Spicy & spirited companion",
-			robux = 100,
-			key = "tantanmon",
-		},
+		{ id = 1111111101, name = "Cardamon", emoji = "🍋", desc = "+30% wider perfect cooking window", robux = 1000, key = "cardamon" },
+		{ id = 1111111102, name = "Antimon", emoji = "🌿", desc = "+20% extra gather drop chance", robux = 1000, key = "antimon" },
+		{ id = 1111111103, name = "Sakuradamon", emoji = "🌸", desc = "+25% XP bonus from cooking & serving", robux = 1000, key = "sakuradamon" },
+		{ id = 1111111104, name = "Tantanmon", emoji = "🌶️", desc = "+20% speed & spicy burst", robux = 1000, key = "tantanmon" },
 	},
 	recipes = {
 		{ id = 1111111104, name = "Premium Ramen", emoji = "🍜", desc = "Exclusive ramen recipe", robux = 60 },

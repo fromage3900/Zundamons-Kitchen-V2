@@ -67,6 +67,12 @@ sky.CelestialBodiesShown = true
 sky.SunAngularSize  = CONFIG.sky.sun_angular_size
 sky.MoonAngularSize = CONFIG.sky.moon_angular_size
 sky.StarCount       = CONFIG.sky.star_count
+if CONFIG.sky.skybox_bk then sky.SkyboxBk = CONFIG.sky.skybox_bk end
+if CONFIG.sky.skybox_dn then sky.SkyboxDn = CONFIG.sky.skybox_dn end
+if CONFIG.sky.skybox_ft then sky.SkyboxFt = CONFIG.sky.skybox_ft end
+if CONFIG.sky.skybox_lf then sky.SkyboxLf = CONFIG.sky.skybox_lf end
+if CONFIG.sky.skybox_rt then sky.SkyboxRt = CONFIG.sky.skybox_rt end
+if CONFIG.sky.skybox_up then sky.SkyboxUp = CONFIG.sky.skybox_up end
 sky.Parent = Lighting
 
 -- ── CONSTELLATIONS ────────────────────────────────────────

@@ -1,3 +1,4 @@
+--!strict
 -- [[ModuleScript] CompanionConfig]]
 -- Canonical companion catalog for shop, buffs, follow mesh, and LLM context.
 
@@ -22,9 +23,10 @@ CompanionConfig.companions = {
 		},
 		buff = nil,
 		free = true,
+		price = 0,
 		displayName = "Zundapal",
-		flavor = "Your Zundamon companion from the Downloads.",
-		llmPersona = "You appear as the imported Zundamon mesh companion.",
+		flavor = "Your Zundamon spirit companion.",
+		llmPersona = "You appear as the Zundamon mesh companion.",
 	},
 	dog = {
 		emoji = "🐕",
@@ -37,6 +39,7 @@ CompanionConfig.companions = {
 		},
 		buff = nil,
 		free = true,
+		price = 0,
 		displayName = "Dog",
 		flavor = "A faithful furry friend.",
 		llmPersona = "You are a loyal dog companion beside the player.",
@@ -52,6 +55,7 @@ CompanionConfig.companions = {
 		},
 		buff = nil,
 		free = true,
+		price = 0,
 		displayName = "Parrot",
 		flavor = "A colourful chatterbox.",
 		llmPersona = "You are a chatty parrot companion beside the player.",
@@ -67,69 +71,10 @@ CompanionConfig.companions = {
 		},
 		buff = nil,
 		free = true,
+		price = 0,
 		displayName = "Cat",
 		flavor = "A purring little menace.",
 		llmPersona = "You are a cat companion beside the player.",
-	},
-	zundamon = {
-		emoji = "🫛",
-		glow = Color3.fromRGB(140, 255, 160),
-		glowRange = 16,
-		sparkleColors = {
-			Color3.fromRGB(180, 255, 180),
-			Color3.fromRGB(255, 220, 100),
-			Color3.fromRGB(200, 240, 255),
-		},
-		buff = nil,
-		free = true,
-		displayName = "Zundamon",
-		flavor = "The original. A loyal pea spirit.",
-		llmPersona = "You appear as Zundamon's pea-spirit form beside the player.",
-	},
-	zundacat = {
-		emoji = "🐱",
-		glow = Color3.fromRGB(255, 200, 140),
-		glowRange = 14,
-		sparkleColors = {
-			Color3.fromRGB(255, 210, 180),
-			Color3.fromRGB(255, 180, 120),
-			Color3.fromRGB(255, 240, 200),
-		},
-		buff = nil,
-		free = true,
-		displayName = "Zundacat",
-		flavor = "A curious cat-shaped friend.",
-		llmPersona = "You are in your playful cat companion form.",
-	},
-	zundabunny = {
-		emoji = "🐰",
-		glow = Color3.fromRGB(220, 180, 255),
-		glowRange = 14,
-		sparkleColors = {
-			Color3.fromRGB(240, 210, 255),
-			Color3.fromRGB(200, 160, 255),
-			Color3.fromRGB(255, 220, 255),
-		},
-		buff = nil,
-		free = true,
-		displayName = "Zundabunny",
-		flavor = "Hops alongside with twinkling ears.",
-		llmPersona = "You are in your bunny companion form with extra cheer.",
-	},
-	tantanmon = {
-		emoji = "🌶️",
-		glow = Color3.fromRGB(255, 100, 60),
-		glowRange = 18,
-		sparkleColors = {
-			Color3.fromRGB(255, 140, 100),
-			Color3.fromRGB(255, 60, 40),
-			Color3.fromRGB(255, 200, 100),
-		},
-		buff = nil,
-		free = true,
-		displayName = "Tantanmon",
-		flavor = "Spicy little firework.",
-		llmPersona = "You are in your spicy tan companion form.",
 	},
 	ankomon = {
 		emoji = "🫘",
@@ -141,8 +86,8 @@ CompanionConfig.companions = {
 			Color3.fromRGB(255, 200, 200),
 		},
 		buff = { stat = "gold", magnitude = 0.15, description = "+15% gold from serving guests" },
-		free = false,
-		price = 500,
+		free = true,
+		price = 0,
 		displayName = "Ankomon",
 		flavor = "A red bean spirit. Sweetens every payday.",
 		llmPersona = "Your Ankomon form grants the player bonus gold when serving guests.",
@@ -158,7 +103,8 @@ CompanionConfig.companions = {
 		},
 		buff = { stat = "perfect_window", magnitude = 0.30, description = "+30% wider perfect cooking window" },
 		free = false,
-		price = 500,
+		price = 1000,
+		robux = 1000,
 		displayName = "Cardamon",
 		flavor = "A cardamom seedling. Steadies your hands.",
 		llmPersona = "Your Cardamon form helps the player land perfect cooks.",
@@ -174,7 +120,8 @@ CompanionConfig.companions = {
 		},
 		buff = { stat = "extra_drop", magnitude = 0.20, description = "+20% chance of extra drop on gather" },
 		free = false,
-		price = 500,
+		price = 1000,
+		robux = 1000,
 		displayName = "Antimon",
 		flavor = "A minty wisp. Whispers where to dig.",
 		llmPersona = "Your Antimon form helps the player find extra gather drops.",
@@ -190,18 +137,34 @@ CompanionConfig.companions = {
 		},
 		buff = { stat = "xp", magnitude = 0.25, description = "+25% XP from crafting & serving" },
 		free = false,
-		price = 500,
+		price = 1000,
+		robux = 1000,
 		displayName = "Sakuradamon",
 		flavor = "A blossom spirit. Carries good lessons on the breeze.",
 		llmPersona = "Your Sakuradamon form grants bonus chef XP.",
 	},
+	tantanmon = {
+		emoji = "🌶️",
+		glow = Color3.fromRGB(255, 100, 60),
+		glowRange = 18,
+		sparkleColors = {
+			Color3.fromRGB(255, 140, 100),
+			Color3.fromRGB(255, 60, 40),
+			Color3.fromRGB(255, 200, 100),
+		},
+		buff = { stat = "speed", magnitude = 0.20, description = "+20% move speed & cook speed" },
+		free = false,
+		price = 1000,
+		robux = 1000,
+		displayName = "Tantanmon",
+		flavor = "Spicy little firework.",
+		llmPersona = "You are in your spicy tan companion form.",
+	},
 }
 
 function CompanionConfig.getCompanion(compType: string)
-	return CompanionConfig.companions[compType] or CompanionConfig.companions.zundamon
+	return CompanionConfig.companions[compType] or CompanionConfig.companions.zundapal
 end
 
--- Backward compatibility for scripts still reading shared catalog
 shared.ZundaCompanionCatalog = CompanionConfig.companions
-
 return CompanionConfig

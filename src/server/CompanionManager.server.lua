@@ -112,11 +112,27 @@ local function loadCompanionModel(compType)
 
     local success, model = pcall(function()
         local assetId = tonumber(meshId:match("%d+"))
-        return InsertService:LoadAsset(assetId)
+        return assetId and InsertService:LoadAsset(assetId) or nil
     end)
 
     if not success or not model then
-        warn("[CompanionManager.loadCompanionModel] Failed to load model:", compType, model)
+        -- Studio playtest fallback: clone zundapalupdate4 / zundapalupdate2 from workspace or ServerStorage
+        local fallbackMesh = workspace:FindFirstChild("zundapalupdate4") or workspace:FindFirstChild("zundapalupdate2")
+        if not fallbackMesh and studioCatalog then
+            fallbackMesh = studioCatalog:FindFirstChild("zundapalupdate4", true)
+        end
+        if fallbackMesh and fallbackMesh:IsA("Model") then
+            print("[CompanionManager.loadCompanionModel] Using robust playtest fallback zundapalupdate4 for", compType)
+            local clone = fallbackMesh:Clone()
+            sanitizeModel(clone)
+            clone.PrimaryPart = clone.PrimaryPart or clone:FindFirstChildWhichIsA("BasePart", true)
+            if clone.PrimaryPart then
+                applyAppearance(clone, visual)
+                companionModelCache[compType] = clone
+                return clone:Clone()
+            end
+        end
+        warn("[CompanionManager.loadCompanionModel] Asset load failed for:", compType)
         return nil
     end
 

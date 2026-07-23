@@ -1,70 +1,67 @@
--- WaterConfig: deep anime watercolour with animated shimmer
 local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
 local Terrain = workspace:FindFirstChild("Terrain")
 if not Terrain then return end
 
--- Deep pastel teal with slight blue-purple tint for magic feel
-Terrain.WaterColor = Color3.fromRGB(110, 190, 215)
-Terrain.WaterTransparency = 0.25
-Terrain.WaterReflectance = 0.75
-Terrain.WaterWaveSize = 0.4
+local C_day = Color3.fromRGB(110, 190, 215)
+local C_dawn = Color3.fromRGB(160, 150, 215)
+local C_dusk = Color3.fromRGB(175, 165, 195)
+local C_night = Color3.fromRGB(55, 50, 95)
 
-pcall(function()
-	Terrain.MaterialColors[Enum.Material.Water] = Color3.fromRGB(110, 190, 215)
-end)
-
--- Water shimmer particle system near kitchen
-local function setupWaterShimmer()
-	local waterParts = {}
-	for _, part in ipairs(workspace:GetDescendants()) do
-		if part:IsA("BasePart") and part.Material == Enum.Material.Water then
-			table.insert(waterParts, part)
-		end
-	end
-	if #waterParts == 0 then return end
-	for _, wp in ipairs(waterParts) do
-		if wp:FindFirstChild("ZundaWaterFX") then continue end
-		local fx = Instance.new("Folder")
-		fx.Name = "ZundaWaterFX"
-		fx.Parent = wp
-		local e = Instance.new("ParticleEmitter")
-		e.Texture = "rbxassetid://75925932500392"
-		e.Rate = 0.5
-		e.Lifetime = NumberRange.new(6, 12)
-		e.Speed = NumberRange.new(0.2, 1)
-		e.SpreadAngle = Vector2.new(45, 45)
-		e.Acceleration = Vector3.new(0, 0.3, 0)
-		e.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.95),
-			NumberSequenceKeypoint.new(0.5, 0.92),
-			NumberSequenceKeypoint.new(1, 1),
-		})
-		e.Size = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.5),
-			NumberSequenceKeypoint.new(1, 1.2),
-		})
-		e.Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 230, 245)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 240, 255)),
-		})
-		e.LightEmission = 0.2
-		e.LightInfluence = 0
-		e.Enabled = true
-		e.Parent = fx
+local function getWaterColor(hour)
+	if hour >= 5 and hour < 8 then
+		return C_day:Lerp(C_dawn, 1 - (hour - 5) / 3)
+	elseif hour >= 8 and hour < 17 then
+		return C_day
+	elseif hour >= 17 and hour < 20 then
+		return C_day:Lerp(C_dusk, (hour - 17) / 3)
+	elseif hour >= 20 and hour < 22 then
+		return C_dusk:Lerp(C_night, (hour - 20) / 2)
+	else
+		return C_night:Lerp(C_dawn, math.sin((hour - 22) / 7 * math.pi) * 0.4)
 	end
 end
 
-setupWaterShimmer()
+local function applyWater(hour)
+	local color = getWaterColor(hour)
+	Terrain.WaterColor = color
+	Terrain.WaterReflectance = 0.85
+	Terrain.WaterTransparency = 0.20
+	Terrain.WaterWaveSize = 0.35
 
--- Animated water properties for breathing wave effect
+	pcall(function()
+		Terrain.MaterialColors[Enum.Material.Water] = color
+		Terrain.MaterialColors[Enum.Material.DeepWater] = color:Lerp(Color3.fromRGB(40, 35, 80), 0.3)
+	end)
+end
+
+local startHour = Lighting:GetAttribute("CurrentHour") or 12
+applyWater(startHour)
+
 local t = 0
 RunService.Heartbeat:Connect(function(dt)
-	if not Terrain then return end
 	t = t + dt
-	local wavePulse = 0.3 + math.sin(t * 0.15) * 0.12
-	local transPulse = 0.22 + math.sin(t * 0.08) * 0.06
-	Terrain.WaterWaveSize = wavePulse
+	if not Terrain then return end
+
+	local hour = Lighting:GetAttribute("CurrentHour") or 12
+	local wavePulse = 0.28 + math.sin(t * 0.12) * 0.12
+	local transPulse = 0.18 + math.sin(t * 0.06) * 0.06
+	local refPulse = 0.82 + math.sin(t * 0.09) * 0.06
+
+	local color = getWaterColor(hour)
+	Terrain.WaterColor = color
+	Terrain.WaterReflectance = refPulse
 	Terrain.WaterTransparency = transPulse
+	Terrain.WaterWaveSize = wavePulse
+
+	pcall(function()
+		Terrain.MaterialColors[Enum.Material.Water] = color
+	end)
 end)
 
-print("[WaterConfig] Deep anime water + shimmer active")
+Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(function()
+	local hour = Lighting:GetAttribute("CurrentHour") or 12
+	applyWater(hour)
+end)
+
+print("[WaterConfig] Dreamy reflective water active")

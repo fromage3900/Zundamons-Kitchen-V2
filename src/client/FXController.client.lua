@@ -19,6 +19,8 @@ require(game.ReplicatedStorage.ConfigurationFiles.MagicCircle)
 require(game.ReplicatedStorage.ConfigurationFiles.CelOutline)
 -- Crystal refraction + iridescence (tag parts with "Crystal" in Studio)
 require(game.ReplicatedStorage.ConfigurationFiles.CrystalFX)
+-- Dreamy water refraction, caustics, fresnel glow
+require(game.ReplicatedStorage.ConfigurationFiles.WaterFX)
 
 local gui, bleed
 for _, g in ipairs(playerGui:GetChildren()) do

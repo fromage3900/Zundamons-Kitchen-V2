@@ -56,12 +56,12 @@ ProgressionConfig.guest_preferences = {
 
 -- Guest spawning settings
 ProgressionConfig.guest_settings = {
-	max_guests_at_once = 6,
-	spawn_interval_min = 12,
-	spawn_interval_max = 25,
-	guest_patience = 120,
-	patience_warning = 30,
-	patience_critical = 10,
+	max_guests_at_once = 3,
+	spawn_interval_min = 30,
+	spawn_interval_max = 60,
+	guest_patience = 240,
+	patience_warning = 60,
+	patience_critical = 20,
 }
 
 -- Guest patience UI colors
