@@ -357,6 +357,24 @@ local function advanceLine()
     end
 end
 
+-- Idle auto-advance: dialogue left unattended used to sit open forever (the
+-- welcome VN lingered behind other panels as apparent screen clutter). Once a
+-- line finishes typing, advance it automatically after a readable pause —
+-- but never while a branching choice is waiting for a real decision.
+local AUTO_ADVANCE_AFTER = 9
+task.spawn(function()
+    local idleSince = os.clock()
+    while true do
+        task.wait(0.5)
+        if not isOpen or typing or choiceFrame.Visible then
+            idleSince = os.clock()
+        elseif os.clock() - idleSince >= AUTO_ADVANCE_AFTER then
+            idleSince = os.clock()
+            advanceLine()
+        end
+    end
+end)
+
 -- ── Public API ────────────────────────────────────────────────
 -- show(speakerOrKey, lines, onComplete?)
 -- lines can be:

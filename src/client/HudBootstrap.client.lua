@@ -22,8 +22,10 @@ print("[HudBootstrap] ZundaHUD created")
 local existingButtons = hud:FindFirstChild("HudButtons")
 local hudButtons = if existingButtons and existingButtons:IsA("Frame") then existingButtons else Instance.new("Frame")
 hudButtons.Name = "HudButtons"
-hudButtons.Size = UDim2.new(0, 400, 0, 60)
-hudButtons.Position = UDim2.new(1, -420, 1, -80)
+-- 8 buttons x44 + 7 gaps x8 + 16 padding = 424 wide; right edge stops at -110
+-- so the row never overlaps the PeaWheel hub button in the corner (64px + inset).
+hudButtons.Size = UDim2.new(0, 424, 0, 60)
+hudButtons.Position = UDim2.new(1, -534, 1, -80)
 -- FIX: Use brighter background so HUD is visible against dark Studio background
 hudButtons.BackgroundColor3 = Color3.fromRGB(40, 35, 55) -- Brighter dark purple instead of muddy brown
 hudButtons.BackgroundTransparency = 0.15
@@ -135,7 +137,10 @@ end
 local existingStatBar = hud:FindFirstChild("StatBar")
 local statBar = if existingStatBar and existingStatBar:IsA("Frame") then existingStatBar else Instance.new("Frame")
 statBar.Name = "StatBar"
-statBar.Size = UDim2.new(0, 300, 0, 40)
+-- AutomaticSize: content (gold/guests pills + weather chip) exceeds any fixed
+-- width; a fixed 300px frame with centered layout pushed "Gold" off-screen left.
+statBar.Size = UDim2.new(0, 0, 0, 40)
+statBar.AutomaticSize = Enum.AutomaticSize.X
 statBar.Position = UDim2.new(0, 20, 1, -60)
 -- FIX: Use brighter background so StatBar is visible
 statBar.BackgroundColor3 = Color3.fromRGB(40, 35, 55)

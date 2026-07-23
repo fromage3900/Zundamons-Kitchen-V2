@@ -21,10 +21,16 @@ local statBar = hud:WaitForChild("StatBar") :: Frame
 
 local layout = statBar:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+-- Left-aligned: StatBar is AutomaticSize.X, so content defines the width and
+-- grows rightward from the anchored left edge (centered overflowed off-screen).
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
 layout.Padding = UDim.new(0, 10)
 layout.Parent = statBar
+local pad = statBar:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding")
+pad.PaddingLeft = UDim.new(0, 12)
+pad.PaddingRight = UDim.new(0, 12)
+pad.Parent = statBar
 
 local function label(name: string): TextLabel
 	local existing = statBar:FindFirstChild(name)

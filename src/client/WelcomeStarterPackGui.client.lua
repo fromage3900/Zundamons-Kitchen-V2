@@ -189,6 +189,14 @@ task.spawn(function()
 		if LocalPlayer:GetAttribute("OnboardingActive") == false then break end
 		task.wait(0.5)
 	end
+	-- Never stack on top of an open VN dialogue either (welcome VN auto-advances,
+	-- so this clears within seconds; cap the wait regardless).
+	local vnDeadline = os.clock() + 60
+	while os.clock() < vnDeadline do
+		local vn = _G.ZundaVN
+		if not (vn and vn.isOpen and vn.isOpen()) then break end
+		task.wait(0.5)
+	end
 	mainFrame.Visible = true
 end)
 
