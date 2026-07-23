@@ -63,7 +63,7 @@ local function updateUI()
     lastGuests = guests
 
     -- Update labels
-    goldLabel.Text = "🪙  " .. gold .. " Gold"
+    goldLabel.Text = "💰  " .. gold .. " Gold"
     guestsLabel.Text = "👥  " .. guests .. " Guests Served"
 
     -- Find current tier and next milestone

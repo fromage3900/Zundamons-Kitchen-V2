@@ -33,7 +33,7 @@ function DiscordWebhookService.broadcastGachaPull(player: Player, itemName: stri
 
 	local embed = {
 		title = "🌟 5-STAR LEGENDARY PULL! 🌟",
-		description = string.format("**%s** just pulled **[%s]** from the *%s* banner nanoda! 🫛✨", player.Name, itemName, bannerName or "Whim Banner"),
+		description = string.format("**%s** just pulled **[%s]** from the *%s* banner nanoda! 🌱✨", player.Name, itemName, bannerName or "Whim Banner"),
 		color = 16766720, -- Gold #FFC800
 		fields = {
 			{ name = "🎮 Play Now", value = "[Join Zundamon's Kitchen V2](https://www.roblox.com/)", inline = true },

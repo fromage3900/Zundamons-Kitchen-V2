@@ -179,27 +179,14 @@ inviteBtn.MouseButton1Click:Connect(function()
 	end)
 end)
 
--- Auto-show the FTUE starter pack only AFTER onboarding: wait for the tutorial
--- card to finish (or 90s timeout) so the gift never fights the tutorial overlay.
+-- Auto-show the FTUE starter pack only AFTER onboarding. The tutorial publishes
+-- LocalPlayer's OnboardingActive attribute (true while running, false when
+-- dismissed/skipped/already-done); polling the tutorial card raced its slow
+-- spawn+data startup and showed the gift mid-tutorial.
 task.spawn(function()
-	local playerGui = LocalPlayer:WaitForChild("PlayerGui")
-	local function tutorialCard()
-		local tut = playerGui:FindFirstChild("TutorialGui")
-		return tut and tut:FindFirstChild("TutorialCard")
-	end
-	-- Phase 1: give the tutorial up to 15s to appear (returning players may have
-	-- it suppressed entirely; then we just show the gift).
-	local appearDeadline = os.clock() + 15
-	while os.clock() < appearDeadline do
-		local card = tutorialCard()
-		if card and card.Visible then break end
-		task.wait(0.5)
-	end
-	-- Phase 2: if it appeared, hold the gift until onboarding finishes (90s cap).
-	local finishDeadline = os.clock() + 90
-	while os.clock() < finishDeadline do
-		local card = tutorialCard()
-		if not (card and card.Visible) then break end
+	local deadline = os.clock() + 300
+	while os.clock() < deadline do
+		if LocalPlayer:GetAttribute("OnboardingActive") == false then break end
 		task.wait(0.5)
 	end
 	mainFrame.Visible = true

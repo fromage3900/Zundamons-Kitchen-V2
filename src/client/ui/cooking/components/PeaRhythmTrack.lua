@@ -13,7 +13,7 @@ local function PeaRhythmTrack(props)
 			Position = UDim2.new(1 - (props.timeElapsed / props.duration) + (offset / 100), 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
-			Text = "🫛",
+			Text = "🌱",
 			TextSize = 32,
 			-- Fade out peas that have passed the "hit zone"
 			TextTransparency = (1 - (props.timeElapsed / props.duration) + (offset / 100)) < 0.1 and 1 or 0,

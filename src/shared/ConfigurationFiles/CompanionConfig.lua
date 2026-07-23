@@ -13,7 +13,7 @@ CompanionConfig.npcSpeakers = {
 
 CompanionConfig.companions = {
 	zundapal = {
-		emoji = "🫛",
+		emoji = "🌱",
 		glow = Color3.fromRGB(180, 200, 255),
 		glowRange = 18,
 		sparkleColors = {
@@ -77,7 +77,7 @@ CompanionConfig.companions = {
 		llmPersona = "You are a cat companion beside the player.",
 	},
 	ankomon = {
-		emoji = "🫘",
+		emoji = "🥜",
 		glow = Color3.fromRGB(220, 90, 90),
 		glowRange = 18,
 		sparkleColors = {

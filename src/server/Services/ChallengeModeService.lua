@@ -23,7 +23,7 @@ ChallengeModeService.tiers = {
 	{ name = "Silver",  minScore = 500,   color = Color3.fromRGB(192, 192, 192),  icon = "🥈", requiredWave = 10 },
 	{ name = "Gold",    minScore = 2000,  color = Color3.fromRGB(255, 215, 0),    icon = "🥇", requiredWave = 20 },
 	{ name = "Platinum", minScore = 8000, color = Color3.fromRGB(140, 200, 255),  icon = "💎", requiredWave = 35 },
-	{ name = "Zunda",   minScore = 30000, color = Color3.fromRGB(160, 210, 150), icon = "🫛", requiredWave = 50 },
+	{ name = "Zunda",   minScore = 30000, color = Color3.fromRGB(160, 210, 150), icon = "🌱", requiredWave = 50 },
 }
 
 -- ── Wave Configuration ──────────────────────────────────────────────────────

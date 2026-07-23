@@ -5,4 +5,4 @@ local PeaWheelController = require(script.Parent.Controllers.PeaWheelController)
 
 -- The PeaWheelController builds its GUI lazily on first open/toggle.
 -- We just need to require it so the module initializes and wires its InputBegan listener.
-print("[PeaWheelStarter] PeaWheelController loaded — wheel ready on Tab/G key")
+print("[PeaWheelStarter] PeaWheelController loaded — wheel ready on Tab/Q or the bottom-right button")

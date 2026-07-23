@@ -187,7 +187,7 @@ ScatterConfig.defaults = {
 
 ScatterConfig.discoveryHints = {
 	ZundaFlower = "A gentle flower that glows with morning dew~ 🌼",
-	ZundaPea = "Plump green peas that sparkle pink! 🫛",
+	ZundaPea = "Plump green peas that sparkle pink! 🌱",
 	["Zunda Mushroom"] = "Tiny mushrooms that dance in the shade 🍄",
 	["Zunda Berry"] = "Sweet berries that blush when you approach 🍓",
 	["Zunda Root"] = "Mystery roots that hum softly when dug 🌱",

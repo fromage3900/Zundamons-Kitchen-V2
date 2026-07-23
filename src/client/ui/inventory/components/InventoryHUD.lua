@@ -76,7 +76,7 @@ local function InventoryHUD()
 					Size = UDim2.new(0.5, -20, 1, 0),
 					Position = UDim2.new(0.5, 0, 0, 0),
 					BackgroundTransparency = 1,
-					Text = "🪙 " .. tostring(gold),
+					Text = "💰 " .. tostring(gold),
 					TextColor3 = Color3.fromRGB(255, 215, 0),
 					Font = Enum.Font.GothamBold,
 					TextSize = 20,

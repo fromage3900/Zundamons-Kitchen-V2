@@ -42,7 +42,7 @@ DecorationConfig.garden_items = {
 		price       = 60,
 		tier        = 1,
 		zone        = "garden",
-		icon        = "🪑",
+		icon        = "🛋️",
 		buff        = { stat = "gold", magnitude = 0.05 },
 	},
 	{
@@ -84,7 +84,7 @@ DecorationConfig.cottage_items = {
 		price       = 30,
 		tier        = 1,
 		zone        = "cottage",
-		icon        = "🪑",
+		icon        = "🛋️",
 		buff        = { stat = "patience", magnitude = 0.05 },
 	},
 	{

@@ -13,7 +13,7 @@ return {
     { id = "gather_50",        name = "Gatherer",           desc = "Gather 50 items",                   icon = "🌾",  metric = "totalGather",  goal = 50 },
     { id = "gather_500",       name = "Resourceful",        desc = "Gather 500 items",                  icon = "🌿",  metric = "totalGather",  goal = 500 },
     { id = "gold_100",         name = "First Hundred",      desc = "Earn 100 gold",                     icon = "💰",  metric = "totalGold",    goal = 100 },
-    { id = "gold_1000",        name = "Coin Collector",     desc = "Earn 1000 gold",                    icon = "🪙",  metric = "totalGold",    goal = 1000 },
+    { id = "gold_1000",        name = "Coin Collector",     desc = "Earn 1000 gold",                    icon = "💰",  metric = "totalGold",    goal = 1000 },
     { id = "gold_10000",       name = "Wealthy Cook",       desc = "Earn 10000 gold",                   icon = "💎",  metric = "totalGold",    goal = 10000 },
     { id = "lvl_5",            name = "Sous Chef",          desc = "Reach Chef Level 5",                icon = "🍳",  metric = "chefLevel",    goal = 5 },
     { id = "lvl_10",           name = "Chef",               desc = "Reach Chef Level 10",               icon = "👨‍🍳", metric = "chefLevel",    goal = 10 },

@@ -166,7 +166,7 @@ local function buildWheelGui()
 	hubButton.AnchorPoint = Vector2.new(1, 1)
 	hubButton.Position = UDim2.fromScale(1, 1) - UDim2.fromOffset(24, 24)
 	hubButton.BackgroundColor3 = Color3.fromRGB(40, 30, 50)
-	-- 🫛 (pea pod, Unicode 14) is not in Roblox's emoji set and renders as a tofu box.
+	-- 🌱 (pea pod, Unicode 14) is not in Roblox's emoji set and renders as a tofu box.
 	-- 🌱 is supported and on-theme.
 	hubButton.Text = "🌱"
 	hubButton.TextScaled = true

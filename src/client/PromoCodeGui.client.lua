@@ -44,7 +44,7 @@ title.BackgroundTransparency = 1
 title.FontFace = UIConfig.FONTS.Decorative
 title.TextSize = 20
 title.TextColor3 = UIConfig.COLORS.ZundaDark
-title.Text = "🎁 REDEEM PROMO CODE 🫛"
+title.Text = "🎁 REDEEM PROMO CODE 🌱"
 title.Parent = mainFrame
 
 -- Text Input

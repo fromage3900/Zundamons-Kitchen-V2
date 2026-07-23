@@ -43,8 +43,8 @@ local crystalB = makeLayer("CrystalB", TX.crystalEmit3, 3, {tile=UDim2.new(0,120
 local crystalC = makeLayer("CrystalC", TX.crystal1, 3, {tile=UDim2.new(0,300,0,300), alpha=0.96, color=Color3.fromRGB(230,220,250)})
 local starLayer = makeLayer("StarryNight", TX.starry1, 4, {tile=UDim2.new(0,400,0,400), alpha=0.88, color=Color3.fromRGB(200,200,255)})
 local starLayer2 = makeLayer("StarryNight2", TX.starry2, 4, {tile=UDim2.new(0,300,0,300), alpha=0.93, color=Color3.fromRGB(180,190,255)})
-local heartLayer = makeLayer("HeartAccent", TX.hearts, 5, {scale=Enum.ScaleType.Fit, size=UDim2.new(0.25,0,0.25,0), pos=UDim2.new(0.72,0,0.72,0), alpha=0.90, color=Color3.fromRGB(255,200,220)})
-local musicLayer = makeLayer("MusicAccent", TX.sheetMusic, 5, {scale=Enum.ScaleType.Fit, size=UDim2.new(0.2,0,0.2,0), pos=UDim2.new(0.02,0,0.02,0), alpha=0.93, color=Color3.fromRGB(200,180,255)})
+-- HeartAccent/MusicAccent decal layers removed 2026-07-23: large decorative
+-- images over the play area read as leftover UI clutter, not ambience.
 local glowLayer = makeLayer("RadialGlow", TX.radialPattern, 1, {scale=Enum.ScaleType.Fit, size=UDim2.new(1,0,1,0), pos=UDim2.new(0,0,0,0), alpha=0.93})
 
 local off = {a=Vector2.new(0,0), b=Vector2.new(0,0), c=Vector2.new(0,0), s1=Vector2.new(0,0), s2=Vector2.new(0,0)}
@@ -69,8 +69,6 @@ RunService.RenderStepped:Connect(function(dt)
 		starLayer2.ImageTransparency = 0.95
 	end
 
-	heartLayer.Position = UDim2.new(0.72, math.sin(t*0.15)*8, 0.72, math.cos(t*0.2)*8)
-	musicLayer.Position = UDim2.new(0.02, math.sin(t*0.1)*4, 0.02, math.cos(t*0.12)*4)
 
 	glowLayer.ImageTransparency = 0.92 + math.sin(t*0.2)*0.03
 end)

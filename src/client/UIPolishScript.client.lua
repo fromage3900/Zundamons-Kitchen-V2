@@ -105,7 +105,7 @@ local function getSparkle()
     return s
 end
 
-local STAR_SHAPES = { "✦", "✨", "❀", "🫛", "♡" }
+local STAR_SHAPES = { "✦", "✨", "❀", "🌱", "♡" }
 
 local function spawnSparkles(screenX, screenY)
     local count = math.random(6, 10)

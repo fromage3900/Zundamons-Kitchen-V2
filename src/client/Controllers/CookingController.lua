@@ -186,7 +186,7 @@ local function createPea(track: Frame, spawnTime: number, noteIndex: number)
 	local icon = Instance.new("TextLabel")
 	icon.Size = UDim2.new(1, 0, 1, 0)
 	icon.BackgroundTransparency = 1
-	icon.Text = "🫛"
+	icon.Text = "🌱"
 	icon.TextSize = 18
 	icon.Parent = pea
 

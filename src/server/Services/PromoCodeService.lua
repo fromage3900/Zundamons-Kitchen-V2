@@ -28,7 +28,7 @@ function PromoCodeService.redeemCode(player: Player, rawCode: string): { success
 	end
 
 	if claimedCodes[userId][code] then
-		return { success = false, message = "Code already redeemed nanoda! 🫛" }
+		return { success = false, message = "Code already redeemed nanoda! 🌱" }
 	end
 
 	local rewardData = PromoCodeService.activeCodes[code]

@@ -229,6 +229,7 @@ local function dismiss()
 		overlay:Destroy()
 		card:Destroy()
 		markTutorialDone()
+		player:SetAttribute("OnboardingActive", false)
 	end)
 end
 
@@ -268,7 +269,10 @@ showStep = function(idx)
 	resetAutoTimer(STEPS[idx])
 end
 
--- Wait for character spawn + PlayerGui, then start
+-- Wait for character spawn + PlayerGui, then start.
+-- OnboardingActive attribute is the contract other UI (starter gift popup) gates
+-- on: true while the tutorial runs, false once it's dismissed or skipped.
+player:SetAttribute("OnboardingActive", true)
 task.spawn(function()
     print("[Tutorial] Starting initialization...")
     player:WaitForChild("PlayerGui")
@@ -279,6 +283,7 @@ task.spawn(function()
     print("[Tutorial] Tutorial done:", tutorialDone)
     if tutorialDone then
         print("[Tutorial] Tutorial already completed, skipping")
+        player:SetAttribute("OnboardingActive", false)
         return
     end
     task.wait(1.5)

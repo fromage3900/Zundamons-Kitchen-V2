@@ -187,7 +187,7 @@ function GameUIComponents.createIngredientCard(props: {
 	icon.Size = UDim2.new(0, 48, 0, 48)
 	icon.Position = UDim2.new(0.5, -24, 0, 16)
 	icon.BackgroundTransparency = 1
-	icon.Text = p.Icon or "🫛"
+	icon.Text = p.Icon or "🌱"
 	icon.Font = UIConfig.FONTS.Title
 	icon.TextSize = 32
 	icon.TextColor3 = UIConfig.COLORS.TextPrimary

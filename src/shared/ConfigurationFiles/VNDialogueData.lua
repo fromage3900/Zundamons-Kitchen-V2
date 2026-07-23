@@ -8,12 +8,12 @@ local RGB = Color3.fromRGB
 
 -- Speaker configurations with companion emojis
 local SPEAKERS = {
-	zundamon    = { name = "Zundamon", emoji = "🫛", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) },
+	zundamon    = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) },
 	zundapal    = { name = "Zundapal", emoji = "🍡", accent = RGB(200, 230, 180), portrait = RGB(210, 235, 195) },
 	zundacat    = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) },
 	zundabunny  = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) },
 	tantanmon   = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) },
-	ankomon     = { name = "Ankomon", emoji = "🫘", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) },
+	ankomon     = { name = "Ankomon", emoji = "🥜", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) },
 	cardamon    = { name = "Cardamon", emoji = "🍋", accent = RGB(235, 205, 125), portrait = RGB(248, 230, 175) },
 	antimon     = { name = "Antimon", emoji = "🌿", accent = RGB(145, 215, 195), portrait = RGB(195, 235, 220) },
 	sakuradamon = { name = "Sakuradamon", emoji = "🌸", accent = RGB(255, 180, 200), portrait = RGB(255, 220, 230) },
@@ -31,7 +31,7 @@ local SPEAKERS = {
 local COMPANION_DIALOGUE = {
 	zundamon = {
 		morning = {
-			"Morning, {player}! The garden is sparkling with morning dew! 🌄🫛",
+			"Morning, {player}! The garden is sparkling with morning dew! 🌄🌱",
 			"Let us make one dish we are proud of today, chef!",
 			"I can smell fresh Zunda Peas blooming across the village~ ✨",
 		},
@@ -161,7 +161,7 @@ local COMPANION_DIALOGUE = {
 
 	ankomon = {
 		morning = {
-			"Training begins at dawn, {player}. 🫘",
+			"Training begins at dawn, {player}. 🥜",
 			"Every great chef needs discipline and focus. ⚖️",
 			"Shall we practice precision timing today?",
 		},
@@ -279,7 +279,7 @@ local COMPANION_DIALOGUE = {
 local SIDE_DIALOGUES = {
 	zunda_pea = {
 		speaker = "zundapal",
-		text = "Oh! You found some Zunda Peas! 🫛",
+		text = "Oh! You found some Zunda Peas! 🌱",
 		hint = "Those are my favorite~ They're so sweet and green!",
 		recipe = "Did you know you can make Zunda Mochi with them? 🍡",
 	},
@@ -317,7 +317,7 @@ function VNDialogueData.getCompanionDialogue(compType: string, timeOfDay: string
 		end
 	end
 
-	local pool = compPool[tod] or compPool.morning or { "Hello chef! Let's cook together! 🫛" }
+	local pool = compPool[tod] or compPool.morning or { "Hello chef! Let's cook together! 🌱" }
 	return pool[math.random(1, #pool)]
 end
 

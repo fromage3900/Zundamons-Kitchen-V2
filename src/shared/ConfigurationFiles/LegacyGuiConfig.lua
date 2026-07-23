@@ -19,6 +19,7 @@ LegacyGuiConfig.destroyScreenGuis = {
 	"DataGUI",
 	"ProgressionPanel",
 	"MaterialsInventory", -- duplicate of MaterialsGui
+	"ZundaFrame", -- Studio border-decal shell; reads as screen clutter (2026-07-23)
 }
 
 -- Descendant names removed anywhere under PlayerGui (watercolour vignette layers).
