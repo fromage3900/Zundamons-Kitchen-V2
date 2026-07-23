@@ -183,13 +183,17 @@ local shell = CozyModalShell.wrap(panel, {
 	end,
 })
 
+-- IMPORTANT: Do NOT call UIRouter.open/close inside show/hide callbacks.
+-- UIRouter.register stores these callbacks. When UIRouter.open("settings") is called,
+-- it calls show(). If show() then calls UIRouter.open("settings"), that calls show() again
+-- → INFINITE RECURSION → STACK OVERFLOW.
+-- The registered callbacks should ONLY call shell.open/close().
+-- Buttons and close triggers call UIRouter.close("settings") directly, which calls hide().
 local function show()
-	UIRouter.open("settings")
 	shell.open()
 end
 
 local function hide()
-	UIRouter.close("settings")
 	shell.close()
 end
 
@@ -202,18 +206,20 @@ local function toggle()
 end
 
 -- Register with UIRouter for modal exclusivity and Escape handling
+-- UIRouter.register's onOpen/onClose are called BY UIRouter.open/close.
+-- They must NOT call UIRouter.open/close themselves.
 UIRouter.register("settings", show, hide)
 
 -- Register callback with ActionRegistry for Pea Wheel dispatch
 ActionRegistry.registerCallback("settings", toggle)
 
 closeBtn.MouseButton1Click:Connect(function()
-	hide()
+	UIRouter.close("settings")
 	local pos = closeBtn.AbsolutePosition
 	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255, 255, 255), 5)
 end)
 backdrop.MouseButton1Click:Connect(function()
-	hide()
+	UIRouter.close("settings")
 	local pos = backdrop.AbsolutePosition
 	UIHelper.spawnSparkles(panel, pos.X + 10, pos.Y + 10, Color3.fromRGB(255, 255, 255), 4)
 end)

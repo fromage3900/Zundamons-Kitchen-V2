@@ -383,7 +383,12 @@ function CookingController.start(
 					comboCount = 0
 					currentScore.miss = (currentScore.miss or 0) + 1
 					spawnFloatingRating("MISS!", Color3.fromRGB(255, 80, 80), panel)
-					cookingHitEvent:FireServer(currentSessionId, "miss")
+					-- FIX: Send the actual note index number, not the string "miss".
+					-- The server (CookingService.hit) expects (player, sessionId, noteIndex)
+					-- where noteIndex is a number. A string causes server-side errors.
+					-- Server will treat a note as missed if its timing window expires.
+					-- Do NOT send a miss event — the server detects misses autonomously.
+					-- Only send notes that the player actually interacted with.
 
 					if pea.instance and pea.instance.Parent then
 						pea.instance:Destroy()

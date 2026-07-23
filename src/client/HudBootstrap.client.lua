@@ -24,8 +24,9 @@ local hudButtons = if existingButtons and existingButtons:IsA("Frame") then exis
 hudButtons.Name = "HudButtons"
 hudButtons.Size = UDim2.new(0, 400, 0, 60)
 hudButtons.Position = UDim2.new(1, -420, 1, -80)
-hudButtons.BackgroundColor3 = UIConfig.COLORS.Surface
-hudButtons.BackgroundTransparency = 0.2
+-- FIX: Use brighter background so HUD is visible against dark Studio background
+hudButtons.BackgroundColor3 = Color3.fromRGB(40, 35, 55) -- Brighter dark purple instead of muddy brown
+hudButtons.BackgroundTransparency = 0.15
 hudButtons.BorderSizePixel = 0
 hudButtons.Parent = hud
 Instance.new("UICorner", hudButtons).CornerRadius = UDim.new(0, 12)
@@ -48,7 +49,15 @@ local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild
 
 print("[HudBootstrap] HudButtons container created")
 
--- Create action buttons
+-- FIX: Check if buttons already exist (prevents duplicates on respawn)
+local existingButtonCount = 0
+for _, child in ipairs(hudButtons:GetChildren()) do
+	if child:IsA("TextButton") and child.Name:match("^HudBtn_") then
+		existingButtonCount = existingButtonCount + 1
+	end
+end
+
+-- Create action buttons (only if they don't already exist)
 local BUTTONS = {
 	{ name = "HudBtn_inventory", text = "🎒", tooltip = "Inventory [I]", order = 1 },
 	{ name = "HudBtn_crafting", text = "🍳", tooltip = "Crafting", order = 2 },
@@ -60,56 +69,66 @@ local BUTTONS = {
 	{ name = "HudBtn_shop", text = "🛒", tooltip = "Companions", order = 8 },
 }
 
-for _, btnDef in ipairs(BUTTONS) do
-	local btn = Instance.new("TextButton")
-	btn.Name = btnDef.name
-	btn.Size = UDim2.new(0, 44, 0, 44)
-	btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
-	btn.Text = btnDef.text
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 24
-	btn.TextColor3 = UIConfig.COLORS.TextPrimary
-	btn.BorderSizePixel = 0
-	btn.LayoutOrder = btnDef.order
-	btn.Parent = hudButtons
-
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-
-	-- Add hover effect
-	btn.MouseEnter:Connect(function()
-		btn.BackgroundColor3 = UIConfig.COLORS.Primary
-		btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
-	end)
-
-	btn.MouseLeave:Connect(function()
-		btn.BackgroundColor3 = UIConfig.COLORS.SurfaceLight
-		btn.TextColor3 = UIConfig.COLORS.TextPrimary
-	end)
-
-	-- Cute sparkle on every HUD button click
-	btn.MouseButton1Click:Connect(function()
-		local pos = btn.AbsolutePosition
-		UIHelper.spawnSparkles(btn, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, UIConfig.COLORS.Primary, 6)
-		if btnDef.name == "HudBtn_daily" and _G.DailyChecklist then
-			_G.DailyChecklist.toggle()
-		else
-			local actionMap = {
-				HudBtn_inventory  = "inventory",
-				HudBtn_crafting   = "cook",
-				HudBtn_quests     = "quests",
-				HudBtn_compendium = "compendium",
-				HudBtn_materials  = "materials",
-				HudBtn_settings   = "settings",
-				HudBtn_shop       = "companions",
-			}
-			local targetAction = actionMap[btnDef.name]
-			if targetAction and ActionRegistry then
-				ActionRegistry.dispatch(targetAction)
-			end
+if existingButtonCount < #BUTTONS then
+	for _, btnDef in ipairs(BUTTONS) do
+		-- Skip if this button already exists
+		if hudButtons:FindFirstChild(btnDef.name) then
+			continue
 		end
-	end)
+		
+		local btn = Instance.new("TextButton")
+		btn.Name = btnDef.name
+		btn.Size = UDim2.new(0, 44, 0, 44)
+		-- FIX: Use brighter button background so it's visible
+		btn.BackgroundColor3 = Color3.fromRGB(60, 52, 75) -- Brighter than SurfaceLight
+		btn.Text = btnDef.text
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 24
+		btn.TextColor3 = UIConfig.COLORS.TextWhite
+		btn.BorderSizePixel = 0
+		btn.LayoutOrder = btnDef.order
+		btn.Parent = hudButtons
 
-	print("[HudBootstrap] Created button:", btnDef.name)
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+		-- Add hover effect
+		btn.MouseEnter:Connect(function()
+			btn.BackgroundColor3 = UIConfig.COLORS.Primary
+			btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
+		end)
+
+		btn.MouseLeave:Connect(function()
+			btn.BackgroundColor3 = Color3.fromRGB(60, 52, 75)
+			btn.TextColor3 = UIConfig.COLORS.TextWhite
+		end)
+
+		-- Cute sparkle on every HUD button click
+		btn.MouseButton1Click:Connect(function()
+			local pos = btn.AbsolutePosition
+			UIHelper.spawnSparkles(btn, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, UIConfig.COLORS.Primary, 6)
+			if btnDef.name == "HudBtn_daily" and _G.DailyChecklist then
+				_G.DailyChecklist.toggle()
+			else
+				local actionMap = {
+					HudBtn_inventory  = "inventory",
+					HudBtn_crafting   = "cook",
+					HudBtn_quests     = "quests",
+					HudBtn_compendium = "compendium",
+					HudBtn_materials  = "materials",
+					HudBtn_settings   = "settings",
+					HudBtn_shop       = "companions",
+				}
+				local targetAction = actionMap[btnDef.name]
+				if targetAction and ActionRegistry then
+					ActionRegistry.dispatch(targetAction)
+				end
+			end
+		end)
+
+		print("[HudBootstrap] Created button:", btnDef.name)
+	end
+else
+	print("[HudBootstrap] Buttons already exist (" .. existingButtonCount .. "), skipping creation")
 end
 
 -- Create StatBar (for XP, level, etc.)
@@ -118,8 +137,9 @@ local statBar = if existingStatBar and existingStatBar:IsA("Frame") then existin
 statBar.Name = "StatBar"
 statBar.Size = UDim2.new(0, 300, 0, 40)
 statBar.Position = UDim2.new(0, 20, 1, -60)
-statBar.BackgroundColor3 = UIConfig.COLORS.Surface
-statBar.BackgroundTransparency = 0.2
+-- FIX: Use brighter background so StatBar is visible
+statBar.BackgroundColor3 = Color3.fromRGB(40, 35, 55)
+statBar.BackgroundTransparency = 0.15
 statBar.BorderSizePixel = 0
 statBar.Parent = hud
 Instance.new("UICorner", statBar).CornerRadius = UDim.new(0, 10)

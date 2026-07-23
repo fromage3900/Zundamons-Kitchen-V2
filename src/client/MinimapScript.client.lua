@@ -177,12 +177,25 @@ local shell = CozyModalShell.wrap(outer, {
 	end,
 })
 
+-- FIX: Register "map" with UIRouter so Escape key closes the map.
+-- Without this, UIRouter.close("map") and UIRouter.getCurrent() for "map" don't work.
+-- The onOpen/onClose callbacks must NOT call UIRouter.open/close themselves
+-- to avoid infinite recursion.
+local function show()
+	shell.open()
+end
+
+local function hide()
+	shell.close()
+end
+
+UIRouter.register("map", show, hide)
+
 local function toggle()
 	if outer.Visible then
 		UIRouter.close("map")
 	else
 		UIRouter.open("map")
-		shell.open()
 	end
 end
 

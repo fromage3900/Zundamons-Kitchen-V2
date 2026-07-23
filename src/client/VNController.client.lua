@@ -667,7 +667,13 @@ showZoneVNBindable.Event:Connect(function(zoneKey)
 end)
 
 -- Wait for _G.ZundaVN to be ready then fire welcome dialogue
+-- FIX: Use a flag to prevent welcome dialogue on respawn/rejoin.
+-- The welcome should only play ONCE per session, not on every character respawn.
 task.spawn(function()
+    if _G.ZundaVN_welcomeShown then
+        print("[VN] Welcome already shown this session, skipping")
+        return
+    end
     local maxWait = 10.0
     local start = os.clock()
     while not (_G.ZundaVN and _G.ZundaVN.show) and (os.clock() - start) < maxWait do
@@ -675,6 +681,7 @@ task.spawn(function()
     end
     if _G.ZundaVN and _G.ZundaVN.show then
         print("[VN] Calling show with welcome text")
+        _G.ZundaVN_welcomeShown = true
         _G.ZundaVN.show("zundamon", {
             "Welcome to Zunda Village, "..player.Name.."! 🌸",
             "I'm Zundamon — I'll guide you through your culinary adventure!",
