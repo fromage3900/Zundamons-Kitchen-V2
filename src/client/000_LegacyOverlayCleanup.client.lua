@@ -58,6 +58,12 @@ local function destroyNamedDescendants(root: Instance)
 end
 
 local function isLegacyVignetteFrame(frame: Frame): boolean
+	-- Guard: this is called while walking GetDescendants(), which includes non-Frame
+	-- instances (e.g. UICorner has no .Size). Reading .Size on those threw and aborted
+	-- the entire cleanup pass, leaving legacy overlays alive.
+	if not frame:IsA("Frame") then
+		return false
+	end
 	if frame.Size ~= UDim2.fromScale(1, 1) then
 		return false
 	end
@@ -135,10 +141,20 @@ local function cleanupScreenGui(gui: ScreenGui)
 	if destroyLegacyStarterShell(gui) then
 		return
 	end
-	destroyStudioGreyFullscreen(gui)
-	destroyNamedDescendants(gui)
-	destroyHeuristicVignettes(gui)
-	stripEmbeddedScripts(gui)
+	-- Single-pass descendant cleanup to maximize startup performance
+	for _, inst in ipairs(gui:GetDescendants()) do
+		if isStudioGreyFullscreen(inst) then
+			inst:Destroy()
+			logRemoved("grey fullscreen " .. inst:GetFullName())
+		elseif inst:IsA("LocalScript") then
+			inst.Enabled = false
+			inst:Destroy()
+			logRemoved("Embedded LocalScript " .. inst:GetFullName())
+		elseif isLegacyVignetteFrame(inst) then
+			inst:Destroy()
+			logRemoved("Vignette " .. inst:GetFullName())
+		end
+	end
 end
 
 local function cleanupPlayerGui()

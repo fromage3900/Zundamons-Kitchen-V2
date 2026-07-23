@@ -58,6 +58,12 @@
         "$path": "src/shared/components"
       }
     },
+    "Lighting": {
+      "$className": "Lighting",
+      "$properties": {
+        "ClockTime": 14
+      }
+    },
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "$path": "src/server",
@@ -82,3 +88,4 @@
     }
   }
 }
+

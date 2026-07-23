@@ -51,7 +51,7 @@ local DEFAULTS: { { id: string, label: string, icon: string, description: string
 		label = "Cook",
 		icon = "🍳",
 		description = "Open cooking station",
-		defaultKey = nil :: Enum.KeyCode?,
+		defaultKey = Enum.KeyCode.K,
 		category = "Gameplay",
 		isAvailable = function() return true end,
 		callback = nil :: (() -> ())?,
@@ -111,7 +111,9 @@ local DEFAULTS: { { id: string, label: string, icon: string, description: string
 		label = "Settings",
 		icon = "⚙",
 		description = "Open settings & keybinds",
-		defaultKey = Enum.KeyCode.F1,
+		-- Settings opens via the Pea Wheel slice and HUD button (both dispatch()).
+		-- F1 is reserved for the Keybinds help panel to avoid a double-bind.
+		defaultKey = nil :: Enum.KeyCode?,
 		category = "System",
 		isAvailable = function() return true end,
 		callback = nil :: (() -> ())?,
@@ -123,6 +125,21 @@ for _, def in ipairs(DEFAULTS) do
 	actions[def.id] = def
 	bindKey(def.id, def.defaultKey)
 end
+
+-- ── Central keyboard dispatch (SINGLE SOURCE OF TRUTH) ────────
+-- Exactly one listener turns any bound key into dispatch(actionId). No other script
+-- should listen for panel hotkeys — panels expose behaviour via registerCallback().
+-- This module is a cached ModuleScript, so this connects exactly once.
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+	if UserInputService:GetFocusedTextBox() ~= nil then return end
+	local actionId = keyToAction[input.KeyCode]
+	if actionId then
+		UI_ActionRegistry.dispatch(actionId)
+	end
+end)
 
 -- ── Public API ───────────────────────────────────────────────
 function UI_ActionRegistry.getAction(id: string)

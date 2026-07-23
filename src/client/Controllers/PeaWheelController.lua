@@ -1,9 +1,11 @@
 --!strict
 -- [[LocalScript] PeaWheelController]]
 -- Input state machine and action dispatch for the Pea Wheel radial menu.
+-- Features centered 360° radial menu overlay with bottom-right quick trigger button.
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,18 +18,48 @@ local UIConfig = require(ReplicatedStorage.ConfigurationFiles.UIConfig)
 
 local PeaWheelController = {}
 
-local wheelGui = nil
-local hubButton = nil
-local sliceButtons = {}
-local tooltipLabel = nil
-local gamepadConn = nil
-local gamepadReleaseConn = nil
+local wheelGui: ScreenGui? = nil
+local backdropFrame: Frame? = nil
+local wheelFrame: Frame? = nil
+local hubButton: TextButton? = nil
+local centerHub: Frame? = nil
+local sliceButtons: { [number]: TextButton } = {}
+local tooltipLabel: TextLabel? = nil
 
 local isOpen = false
 local selectedIndex = 1
-local isHolding = false
-local HOLD_THRESHOLD = 0.18
-local reducedMotion = UserInputService.ReducedMotionEnabled
+-- ReducedMotionEnabled lives on GuiService, not UserInputService. Reading it off
+-- UserInputService threw and crashed the whole module load, so the wheel never built.
+local reducedMotion = GuiService.ReducedMotionEnabled
+
+local wheelScale: UIScale? = nil
+local currentTargetScale = 1.0
+
+local function updateWheelScale()
+	if not wheelFrame then return end
+	if not wheelScale then
+		wheelScale = wheelFrame:FindFirstChildOfClass("UIScale")
+	end
+	if not wheelScale then return end
+
+	local camera = workspace.CurrentCamera
+	local viewportSize = camera and camera.ViewportSize or Vector2.new(1920, 1080)
+	local viewW = viewportSize.X
+	local viewH = viewportSize.Y
+
+	if viewW <= 0 or viewH <= 0 then return end
+
+	-- Wheel total footprint: 386px vertical height, 332px horizontal width.
+	-- Scale factor ensures wheel bounds never clip off screen edges (88% viewport margin factor).
+	local scaleH = (viewH * 0.88) / 386
+	local scaleW = (viewW * 0.88) / 332
+	local fitScale = math.min(scaleH, scaleW)
+	currentTargetScale = math.clamp(fitScale, 0.55, 1.20)
+
+	if isOpen then
+		wheelScale.Scale = currentTargetScale
+	end
+end
 
 local PEA_WHEEL = UIConfig.PEA_WHEEL or {}
 
@@ -59,104 +91,146 @@ local function buildWheelGui()
 		return wheelGui
 	end
 
-	wheelGui = ClientGuiBootstrap.createScreenGui(player, "PeaWheelGui", 80)
+	-- DisplayOrder must sit ABOVE full-screen overlays (UIPolishGui sparkles and
+	-- TutorialGui both use 999) or the wheel opens behind them and looks like the
+	-- hub click did nothing. The radial menu is top-level when open.
+	wheelGui = ClientGuiBootstrap.createScreenGui(player, "PeaWheelGui", 1000)
 	wheelGui.ResetOnSpawn = false
+	wheelGui.IgnoreGuiInset = true
 
-	-- Respect reduced motion preference
-	if reducedMotion then
-		wheelGui.DisplayOrder = 80
+	-- Backdrop
+	backdropFrame = Instance.new("Frame")
+	backdropFrame.Name = "Backdrop"
+	backdropFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	backdropFrame.Position = UDim2.fromScale(0.5, 0.5)
+	backdropFrame.Size = UDim2.fromScale(1, 1)
+	backdropFrame.BackgroundColor3 = Color3.fromRGB(10, 8, 16)
+	backdropFrame.BackgroundTransparency = 0.55
+	backdropFrame.Visible = false
+	backdropFrame.Parent = wheelGui
+
+	-- Centered Wheel Container
+	wheelFrame = Instance.new("Frame")
+	wheelFrame.Name = "WheelFrame"
+	wheelFrame.Size = UDim2.fromOffset(340, 340)
+	wheelFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	wheelFrame.Position = UDim2.fromScale(0.5, 0.5)
+	wheelFrame.BackgroundTransparency = 1
+	wheelFrame.Visible = false
+	wheelFrame.Parent = wheelGui
+
+	-- Dynamic UIScale to prevent edge clipping on small/mobile viewports
+	wheelScale = Instance.new("UIScale")
+	wheelScale.Name = "WheelScale"
+	wheelScale.Scale = 1
+	wheelScale.Parent = wheelFrame
+
+	updateWheelScale()
+
+	if workspace.CurrentCamera then
+		workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updateWheelScale)
 	end
-
-	-- Hub button (bottom-right)
-	hubButton = Instance.new("TextButton")
-	hubButton.Name = "HubButton"
-	hubButton.Size = UDim2.fromOffset(PEA_WHEEL.HubSize or 88, PEA_WHEEL.HubSize or 88)
-	hubButton.AnchorPoint = Vector2.new(1, 1)
-	hubButton.Position = UDim2.fromScale(1, 1) - UDim2.fromOffset(24, 24)
-	hubButton.BackgroundColor3 = PEA_WHEEL.Colors and PEA_WHEEL.Colors.Center or Color3.fromRGB(30, 25, 20)
-	hubButton.Text = "🫛"
-	hubButton.TextScaled = true
-	hubButton.Font = Enum.Font.GothamBold
-	hubButton.TextColor3 = PEA_WHEEL.Colors and PEA_WHEEL.Colors.CenterText or Color3.fromRGB(255, 250, 245)
-	hubButton.Parent = wheelGui
-	Instance.new("UICorner", hubButton).CornerRadius = UDim.new(0.5, 0)
-	local hubStroke = Instance.new("UIStroke", hubButton)
-	hubStroke.Color = PEA_WHEEL.Colors and PEA_WHEEL.Colors.Stroke or Color3.fromRGB(200, 160, 240)
-	hubStroke.Thickness = 2
-	hubStroke.Transparency = 0.2
-
-	-- Hub button click handler (connected when hub is created)
-	hubButton.MouseButton1Click:Connect(function()
-		if RunService:IsStudio() and RunService:IsEdit() then
-			return
-		end
-		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then
-			return
-		end
-		PeaWheelController.toggle()
-		if not reducedMotion then
-			local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
-			if UIHelper and UIHelper.spawnSparkles then
-				UIHelper.spawnSparkles(
-					hubButton,
-					hubButton.AbsoluteSize.X / 2,
-					hubButton.AbsoluteSize.Y / 2,
-					Color3.fromRGB(255, 255, 255),
-					8
-				)
-			end
+	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+		if workspace.CurrentCamera then
+			workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updateWheelScale)
+			updateWheelScale()
 		end
 	end)
 
-	-- Tooltip
+	-- Center Hub Core
+	centerHub = Instance.new("Frame")
+	centerHub.Name = "CenterHub"
+	centerHub.Size = UDim2.fromOffset(88, 88)
+	centerHub.AnchorPoint = Vector2.new(0.5, 0.5)
+	centerHub.Position = UDim2.fromScale(0.5, 0.5)
+	centerHub.BackgroundColor3 = Color3.fromRGB(30, 25, 40)
+	centerHub.Parent = wheelFrame
+	Instance.new("UICorner", centerHub).CornerRadius = UDim.new(0.5, 0)
+	local centerStroke = Instance.new("UIStroke", centerHub)
+	centerStroke.Color = Color3.fromRGB(255, 183, 197)
+	centerStroke.Thickness = 3
+
+	local hubIcon = Instance.new("TextLabel")
+	hubIcon.Name = "HubIcon"
+	hubIcon.Size = UDim2.fromScale(1, 1)
+	hubIcon.BackgroundTransparency = 1
+	hubIcon.Text = "🌱"
+	hubIcon.TextScaled = true
+	hubIcon.Font = Enum.Font.FredokaOne
+	hubIcon.Parent = centerHub
+
+	-- Bottom-Right Quick Trigger Button
+	hubButton = Instance.new("TextButton")
+	hubButton.Name = "HubButton"
+	hubButton.Size = UDim2.fromOffset(64, 64)
+	hubButton.AnchorPoint = Vector2.new(1, 1)
+	hubButton.Position = UDim2.fromScale(1, 1) - UDim2.fromOffset(24, 24)
+	hubButton.BackgroundColor3 = Color3.fromRGB(40, 30, 50)
+	-- 🫛 (pea pod, Unicode 14) is not in Roblox's emoji set and renders as a tofu box.
+	-- 🌱 is supported and on-theme.
+	hubButton.Text = "🌱"
+	hubButton.TextScaled = true
+	hubButton.Font = Enum.Font.FredokaOne
+	hubButton.TextColor3 = Color3.fromRGB(255, 250, 245)
+	hubButton.Parent = wheelGui
+	Instance.new("UICorner", hubButton).CornerRadius = UDim.new(0.5, 0)
+	local hubStroke = Instance.new("UIStroke", hubButton)
+	hubStroke.Color = Color3.fromRGB(255, 183, 197)
+	hubStroke.Thickness = 2
+
+	hubButton.MouseButton1Click:Connect(function()
+		if RunService:IsStudio() and RunService:IsEdit() then return end
+		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
+		PeaWheelController.toggle()
+	end)
+
+	-- Tooltip Label
 	tooltipLabel = Instance.new("TextLabel")
 	tooltipLabel.Name = "Tooltip"
-	tooltipLabel.Size = UDim2.fromOffset(180, 32)
-	tooltipLabel.AnchorPoint = Vector2.new(0.5, 1)
-	tooltipLabel.Position = UDim2.new(0.5, 0, 0, -16)
+	tooltipLabel.Size = UDim2.fromOffset(220, 36)
+	tooltipLabel.AnchorPoint = Vector2.new(0.5, 0)
+	tooltipLabel.Position = UDim2.new(0.5, 0, 1, 14)
 	tooltipLabel.BackgroundTransparency = 1
 	tooltipLabel.Text = ""
-	tooltipLabel.Font = Enum.Font.Gotham
-	tooltipLabel.TextSize = 14
-	tooltipLabel.TextColor3 = Color3.fromRGB(240, 240, 255)
-	tooltipLabel.TextStrokeTransparency = 0.3
+	tooltipLabel.Font = Enum.Font.FredokaOne
+	tooltipLabel.TextSize = 18
+	tooltipLabel.TextColor3 = Color3.fromRGB(255, 245, 250)
+	tooltipLabel.TextStrokeTransparency = 0.2
 	tooltipLabel.Visible = false
-	tooltipLabel.Parent = hubButton
+	tooltipLabel.Parent = wheelFrame
 
-	-- Slice buttons (initially hidden)
+	-- Build 8 Radial Slices centered around wheelFrame
 	sliceButtons = {}
 	local sliceList = ActionRegistry.getOrderedSliceList()
+	local radius = 125
+
 	for i, actionId in ipairs(sliceList) do
 		local def = ActionRegistry.getAction(actionId)
-		if not def then
-			continue
-		end
+		if not def then continue end
 
 		local btn = Instance.new("TextButton")
 		btn.Name = "Slice_" .. actionId
-		btn.Size = UDim2.fromOffset(PEA_WHEEL.SliceSize or 72, PEA_WHEEL.SliceSize or 72)
-		-- Infinity Nikki pastel tint per slice
-		local pastel = NIKKI_PASTELS[i] or PEA_WHEEL.Colors and PEA_WHEEL.Colors.Slice or Color3.fromRGB(60, 50, 70)
+		btn.Size = UDim2.fromOffset(68, 68)
+		btn.AnchorPoint = Vector2.new(0.5, 0.5)
+
+		local pastel = NIKKI_PASTELS[i] or Color3.fromRGB(255, 182, 193)
 		btn.BackgroundColor3 = pastel
 		btn.Text = def.icon
 		btn.TextScaled = true
-		btn.Font = Enum.Font.GothamBold
+		btn.Font = Enum.Font.FredokaOne
 		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		btn.Visible = false
-		btn.Parent = hubButton
+		btn.Parent = wheelFrame
 		Instance.new("UICorner", btn).CornerRadius = UDim.new(0.5, 0)
 		local stroke = Instance.new("UIStroke", btn)
-		stroke.Color = PEA_WHEEL.Colors and PEA_WHEEL.Colors.Stroke or Color3.fromRGB(200, 160, 240)
-		stroke.Thickness = 2
-		stroke.Transparency = 0.3
+		stroke.Color = Color3.fromRGB(255, 255, 255)
+		stroke.Thickness = 2.5
+		stroke.Transparency = 0.2
 
-		-- Position at 45 degree intervals
+		-- Position evenly at 45° intervals starting from top (-90°)
 		local angle = math.rad(-90 + (i - 1) * 45)
-		local radius = (PEA_WHEEL.HubSize or 88) / 2 + (PEA_WHEEL.SliceSize or 72) / 2 + 12
 		local x = math.cos(angle) * radius
 		local y = math.sin(angle) * radius
-		btn.Position = UDim2.new(0.5, x - (PEA_WHEEL.SliceSize or 72) / 2, 0.5, y - (PEA_WHEEL.SliceSize or 72) / 2)
-		btn.AnchorPoint = Vector2.new(0.5, 0.5)
+		btn.Position = UDim2.new(0.5, x, 0.5, y)
 
 		btn.MouseButton1Click:Connect(function()
 			if isOpen then
@@ -179,102 +253,54 @@ end
 
 -- ── Visual Updates ───────────────────────────────────────────
 function PeaWheelController.updateSelectionVisual()
-	if not hubButton or not tooltipLabel then
-		return
-	end
+	if not wheelFrame or not tooltipLabel then return end
 	local sliceList = ActionRegistry.getOrderedSliceList()
 	local actionId = sliceList[selectedIndex]
 	local def = ActionRegistry.getAction(actionId)
 
-	-- Reset all slices
-	for _, btn in ipairs(sliceButtons) do
-		btn.Size = UDim2.fromOffset(PEA_WHEEL.SliceSize or 72, PEA_WHEEL.SliceSize or 72)
-		btn.BackgroundColor3 = PEA_WHEEL.Colors and PEA_WHEEL.Colors.Slice or Color3.fromRGB(60, 50, 70)
-		local s = btn:FindFirstChildOfClass("UIStroke")
-		if s then
-			s.Transparency = 0.3
-		end
-	end
-
-	-- Highlight selected
-	local selectedBtn = sliceButtons[selectedIndex]
-	if selectedBtn then
-		local targetSize = (PEA_WHEEL.SliceSize or 72) * (PEA_WHEEL.SelectedScale or 1.12)
-		TweenService:Create(selectedBtn, TweenInfo.new(PEA_WHEEL.AnimDuration or 0.18), {
+	for i, btn in ipairs(sliceButtons) do
+		local isSel = (i == selectedIndex)
+		local targetSize = isSel and 82 or 68
+		TweenService:Create(btn, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = UDim2.fromOffset(targetSize, targetSize),
-			BackgroundColor3 = PEA_WHEEL.Colors and PEA_WHEEL.Colors.SliceHover or Color3.fromRGB(100, 200, 80),
 		}):Play()
-		local s = selectedBtn:FindFirstChildOfClass("UIStroke")
-		if s then
-			s.Transparency = 0.0
-		end
-		-- Cute sparkle frill on selection
-		local UIHelper = require(ReplicatedStorage.Shared.Modules.UIHelper)
-		if UIHelper and UIHelper.spawnSparkles then
-			UIHelper.spawnSparkles(
-				selectedBtn,
-				selectedBtn.AbsoluteSize.X / 2,
-				selectedBtn.AbsoluteSize.Y / 2,
-				Color3.fromRGB(255, 255, 255),
-				6
-			)
+		local stroke = btn:FindFirstChildOfClass("UIStroke")
+		if stroke then
+			stroke.Thickness = isSel and 4 or 2.5
+			stroke.Transparency = isSel and 0 or 0.2
 		end
 	end
 
-	-- Tooltip
 	if def then
-		tooltipLabel.Text = def.icon .. " " .. def.label
+		tooltipLabel.Text = def.icon .. "  " .. def.label
 		tooltipLabel.Visible = true
 	end
 end
 
 -- ── Open / Close / Toggle ────────────────────────────────────
 function PeaWheelController.open()
-	if isOpen then
-		return
-	end
-	if RunService:IsStudio() and RunService:IsEdit() then
-		return
-	end
-
-	-- Play wheel open sound
-	local zsc = _G.ZundaSoundController
-	if zsc and zsc.play then
-		zsc.play("WheelOpen")
-	end
+	if isOpen then return end
+	if RunService:IsStudio() and RunService:IsEdit() then return end
 
 	local gui = buildWheelGui()
-	if not gui then
-		return
-	end
-
-	-- Check cooking conflict
-	local canOpen = true
-	if _G.TimedCooking and _G.TimedCooking.isCooking then
-		canOpen = not _G.TimedCooking.isCooking()
-	end
-	if not canOpen then
-		return
-	end
+	if not gui or not wheelFrame or not backdropFrame then return end
 
 	isOpen = true
 	selectedIndex = 1
 
-	-- Animate hub
-	hubButton.Size = UDim2.fromOffset(4, 4)
-	TweenService:Create(hubButton, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Size = UDim2.fromOffset(PEA_WHEEL.HubSize or 88, PEA_WHEEL.HubSize or 88),
-	}):Play()
+	updateWheelScale()
 
-	-- Reveal slices staggered
-	for i, btn in ipairs(sliceButtons) do
-		btn.Visible = true
+	backdropFrame.Visible = true
+	wheelFrame.Visible = true
+	wheelFrame.Size = UDim2.fromOffset(340, 340)
+
+	if wheelScale then
 		if reducedMotion then
-			btn.Size = UDim2.fromOffset(PEA_WHEEL.SliceSize or 72, PEA_WHEEL.SliceSize or 72)
+			wheelScale.Scale = currentTargetScale
 		else
-			btn.Size = UDim2.fromOffset(0, 0)
-			TweenService:Create(btn, TweenInfo.new(0.18 + i * 0.03, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-				Size = UDim2.fromOffset(PEA_WHEEL.SliceSize or 72, PEA_WHEEL.SliceSize or 72),
+			wheelScale.Scale = currentTargetScale * 0.15
+			TweenService:Create(wheelScale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+				Scale = currentTargetScale,
 			}):Play()
 		end
 	end
@@ -283,37 +309,29 @@ function PeaWheelController.open()
 end
 
 function PeaWheelController.close()
-	if not isOpen then
-		return
-	end
+	if not isOpen then return end
 	isOpen = false
 
-	-- Play wheel close sound
-	local zsc = _G.ZundaSoundController
-	if zsc and zsc.play then
-		zsc.play("WheelClose")
+	if wheelFrame and backdropFrame then
+		if wheelScale and not reducedMotion then
+			TweenService:Create(wheelScale, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+				Scale = currentTargetScale * 0.15,
+			}):Play()
+			task.delay(0.16, function()
+				if wheelFrame then wheelFrame.Visible = false end
+				if backdropFrame then backdropFrame.Visible = false end
+				if wheelScale then wheelScale.Scale = currentTargetScale end
+			end)
+		else
+			if wheelFrame then wheelFrame.Visible = false end
+			if backdropFrame then backdropFrame.Visible = false end
+			if wheelScale then wheelScale.Scale = currentTargetScale end
+		end
 	end
 
-	if not hubButton or not tooltipLabel then
-		return
+	if tooltipLabel then
+		tooltipLabel.Visible = false
 	end
-
-	-- Hide slices
-	for _, btn in ipairs(sliceButtons) do
-		TweenService:Create(btn, TweenInfo.new(0.12), { Size = UDim2.fromOffset(0, 0) }):Play()
-		task.delay(0.14, function()
-			if btn and btn.Parent then
-				btn.Visible = false
-			end
-		end)
-	end
-
-	tooltipLabel.Visible = false
-
-	-- Collapse hub
-	TweenService:Create(hubButton, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-		Size = UDim2.fromOffset(PEA_WHEEL.HubSize or 88, PEA_WHEEL.HubSize or 88),
-	}):Play()
 end
 
 function PeaWheelController.toggle()
@@ -324,60 +342,35 @@ function PeaWheelController.toggle()
 	end
 end
 
--- ── Selection & Dispatch ─────────────────────────────────────
-function PeaWheelController.select(actionId)
-	if not isOpen then
-		return
-	end
-	-- Play wheel select sound
-	local zsc = _G.ZundaSoundController
-	if zsc and zsc.play then
-		zsc.play("WheelSelect")
-	end
+function PeaWheelController.select(actionId: string)
+	if not isOpen then return false end
 	local ok = ActionRegistry.dispatch(actionId)
-	if ok then
-		PeaWheelController.close()
-	end
+	PeaWheelController.close()
 	return ok
 end
 
 -- ── Keyboard Input ───────────────────────────────────────────
 local function onInputBegan(input, processed)
-	if processed then
-		return
-	end
-
-	-- Cooking conflict guard
-	if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then
-		return
-	end
-
-	-- Tab hold / release
-	if input.KeyCode == Enum.KeyCode.Tab then
-		if not isOpen then
-			isHolding = true
-			task.delay(HOLD_THRESHOLD, function()
-				if isHolding and not isOpen then
-					PeaWheelController.open()
-				end
-				isHolding = false
-			end)
-		else
-			PeaWheelController.close()
-			isHolding = false
+	-- Keybind: Tab or Q key to toggle radial wheel instantly when not typing in text box
+	if input.KeyCode == Enum.KeyCode.Tab or input.KeyCode == Enum.KeyCode.Q then
+		if UserInputService:GetFocusedTextBox() ~= nil then
+			return
 		end
+		PeaWheelController.toggle()
 		return
 	end
 
-	-- Arrow keys / WASD navigate slices when open
+	if processed then return end
+
+	-- Slice Navigation when Open
 	if isOpen then
 		local sliceList = ActionRegistry.getOrderedSliceList()
 		local count = #sliceList
 		if input.KeyCode == Enum.KeyCode.Right or input.KeyCode == Enum.KeyCode.D then
-			selectedIndex = ((selectedIndex - 1) % count) + 1
+			selectedIndex = (selectedIndex % count) + 1
 			PeaWheelController.updateSelectionVisual()
 		elseif input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.A then
-			selectedIndex = ((selectedIndex - 2) % count) + 1
+			selectedIndex = ((selectedIndex - 2 + count) % count) + 1
 			PeaWheelController.updateSelectionVisual()
 		elseif input.KeyCode == Enum.KeyCode.Return or input.KeyCode == Enum.KeyCode.Space then
 			local actionId = sliceList[selectedIndex]
@@ -391,19 +384,16 @@ local function onInputBegan(input, processed)
 end
 
 local function onInputEnded(input, processed)
-	if input.KeyCode == Enum.KeyCode.Tab then
-		isHolding = false
-	end
+	-- Retained for input end handling if required
 end
 
--- ── Initialization ───────────────────────────────────────────
 UserInputService.InputBegan:Connect(onInputBegan)
 UserInputService.InputEnded:Connect(onInputEnded)
 
--- Expose Globals
+buildWheelGui()
+
 _G.PeaWheelController = PeaWheelController
 _G.PeaWheel = PeaWheelController
 
-print("[PeaWheelController] Ready — hub at bottom-right, hold Tab to open")
-
+print("[PeaWheelController] Ready — centered radial menu overlay initialized ✓")
 return PeaWheelController

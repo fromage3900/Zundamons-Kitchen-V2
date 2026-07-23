@@ -248,14 +248,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	setOpen(false)
 end)
 
-UIS.InputBegan:Connect(function(input, processed)
-	if processed then
-		return
-	end
-	if input.KeyCode == Enum.KeyCode.K then
-		setOpen(not panel.Visible)
-	end
-end)
+-- Keybind K is handled centrally via UIActionRegistry
 
 -- Wire the ZundaHUD button if present (added in HudButtons row)
 task.spawn(function()
@@ -274,6 +267,14 @@ task.spawn(function()
 			setOpen(not panel.Visible)
 		end)
 	end
+end)
+
+-- Register with the central action registry so the Pea Wheel "Cook" slice and the
+-- K key (both dispatched by UIActionRegistry) actually open/close this panel.
+local ActionRegistry = require(player:WaitForChild("PlayerScripts")
+	:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+ActionRegistry.registerCallback("cook", function()
+	setOpen(not panel.Visible)
 end)
 
 print("[CraftingScript] Loaded - Press K to open crafting panel")
