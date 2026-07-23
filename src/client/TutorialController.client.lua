@@ -3,7 +3,7 @@ local RS = game:GetService("ReplicatedStorage")
 local Tween = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
-local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "TutorialGui", 999)
+local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "TutorialGui", 150)
 
 local STEPS = {
 	{

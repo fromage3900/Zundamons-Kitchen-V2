@@ -12,6 +12,9 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "ZundaCelOutline"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+-- Scene-FX layer: ink/outline wash renders behind all interactive UI.
+gui.DisplayOrder = 3
+gui.IgnoreGuiInset = true
 gui.Enabled = true
 gui.Parent = playerGui
 

@@ -19,6 +19,9 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "ZundaWhimsicalOverlay"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+-- Scene-FX layer: sits BEHIND all interactive UI (panels 15+, PeaWheel 1000).
+gui.DisplayOrder = 2
+gui.IgnoreGuiInset = true
 gui.Enabled = true
 gui.Parent = playerGui
 
