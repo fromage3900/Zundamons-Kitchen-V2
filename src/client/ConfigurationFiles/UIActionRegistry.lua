@@ -133,6 +133,18 @@ local DEFAULTS: { { id: string, label: string, icon: string, description: string
 		callback = nil :: (() -> ())?,
 	},
 	{
+		id = "daily",
+		label = "Daily",
+		icon = "📅",
+		description = "Open your daily planner/checklist",
+		-- The old bottom-right HUD button row was the only way to reach this;
+		-- give it a real keybind now that the row is gone.
+		defaultKey = Enum.KeyCode.N,
+		category = "Progression",
+		isAvailable = function() return true end,
+		callback = nil :: (() -> ())?,
+	},
+	{
 		id = "wardrobe",
 		label = "Wardrobe",
 		icon = "👗",

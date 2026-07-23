@@ -218,4 +218,19 @@ _G.DailyChecklist = {
 	end,
 }
 
+-- registerCallback() sometimes doesn't stick on the first attempt during the
+-- heavy initial-load frame (root cause unconfirmed -- possibly a Rojo live-sync
+-- module reload racing this call). Retry until getAction() actually reflects it
+-- rather than trusting a single call.
+task.spawn(function()
+	local ActionRegistry = require(game:GetService("Players").LocalPlayer.PlayerScripts
+		:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+	for _ = 1, 10 do
+		ActionRegistry.registerCallback("daily", _G.DailyChecklist.toggle)
+		local def = ActionRegistry.getAction("daily")
+		if def and def.callback then break end
+		task.wait(0.5)
+	end
+end)
+
 print("[DailyChecklistUI] loaded")
