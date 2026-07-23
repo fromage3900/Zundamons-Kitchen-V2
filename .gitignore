@@ -20,13 +20,14 @@ sourcemap.json
 Saved/
 *.log
 *.tmp
+*.blend
 *.blend1
 *.assbin
 
 # Local MCP and editor state
 .roblox-mcp/
 .opencode/
-.agents/mcp/
+.agents/
 .idea/
 .vscode/
 .vs/
@@ -40,3 +41,7 @@ Desktop.ini
 # Ollama content workers output
 scripts/ollama_output/
 scripts/__pycache__/
+
+# Scratch / one-off dev junk
+mcp_req.json
+test_terminal_sim.js
