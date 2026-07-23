@@ -330,15 +330,10 @@ function OutfitWardrobe.toggle()
 	mainFrame.Visible = not mainFrame.Visible
 end
 
--- Hook into Keybinds
-local UserInputService = game:GetService("UserInputService")
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then
-		return
-	end
-	if input.KeyCode == Enum.KeyCode.K then
-		OutfitWardrobe.toggle()
-	end
-end)
+-- Hotkey handling is centralized in UIActionRegistry (see "wardrobe" action) —
+-- this used to have its own raw K listener that fired alongside "cook".
+local ActionRegistry = require(game:GetService("Players").LocalPlayer.PlayerScripts
+	:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+ActionRegistry.registerCallback("wardrobe", OutfitWardrobe.toggle)
 
 return OutfitWardrobe

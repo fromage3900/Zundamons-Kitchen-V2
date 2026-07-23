@@ -33,7 +33,9 @@ local UI_SOUNDS = {
 	u2 = "rbxassetid://79124840858038", -- CoinEarn variant
 }
 
+local soundCount = 0
 for letter, soundId in pairs(UI_SOUNDS) do
+	soundCount += 1
 	local existing = SoundService:FindFirstChild(letter)
 	if existing and existing:IsA("Sound") then
 		if existing.SoundId ~= soundId then
@@ -52,4 +54,6 @@ end
 -- Set master volume for UI sounds
 SoundService:SetAttribute("SettingsBaseVolume", 0.7)
 
-print("[SoundServiceSetup] " .. #UI_SOUNDS .. " UI sounds initialized (Nomagician-ready)")
+-- UI_SOUNDS is string-keyed, so #UI_SOUNDS was always 0 here regardless of the
+-- pairs() loop above actually creating every sound correctly.
+print("[SoundServiceSetup] " .. soundCount .. " UI sounds initialized (Nomagician-ready)")

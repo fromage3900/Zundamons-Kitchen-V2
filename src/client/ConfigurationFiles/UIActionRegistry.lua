@@ -8,6 +8,8 @@ local UI_ActionRegistry = {}
 local actions = {}
 local keyToAction = {}
 local currentBindings = {}
+local pendingDispatches: { [string]: boolean } = {}
+local PENDING_TTL = 8
 
 -- ── Helpers ──────────────────────────────────────────────────
 local function bindKey(actionId, keyCode)
@@ -118,6 +120,31 @@ local DEFAULTS: { { id: string, label: string, icon: string, description: string
 		isAvailable = function() return true end,
 		callback = nil :: (() -> ())?,
 	},
+	{
+		id = "peawheel",
+		label = "Pea Wheel",
+		icon = "🌱",
+		description = "Toggle the radial quick-action wheel",
+		-- Not a Pea Wheel slice itself — this is the wheel's own open/close toggle,
+		-- previously a rogue listener inside PeaWheelController bypassing this registry.
+		defaultKey = Enum.KeyCode.Tab,
+		category = "System",
+		isAvailable = function() return true end,
+		callback = nil :: (() -> ())?,
+	},
+	{
+		id = "wardrobe",
+		label = "Wardrobe",
+		icon = "👗",
+		description = "Open your outfit wardrobe",
+		-- No default key: every obvious letter is already claimed by another
+		-- action. Button-only for now (was a rogue K listener that double-fired
+		-- alongside "cook").
+		defaultKey = nil :: Enum.KeyCode?,
+		category = "Inventory",
+		isAvailable = function() return true end,
+		callback = nil :: (() -> ())?,
+	},
 }
 
 -- ── Initialization ───────────────────────────────────────────
@@ -132,11 +159,13 @@ end
 -- This module is a cached ModuleScript, so this connects exactly once.
 local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
 	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
 	if UserInputService:GetFocusedTextBox() ~= nil then return end
 	local actionId = keyToAction[input.KeyCode]
 	if actionId then
+		-- Dispatch even when gameProcessed: the core Backpack CoreScript sinks
+		-- our I bind (marks it processed), which silently killed the hotkey.
+		-- Textbox focus is checked above, so typing never triggers actions.
 		UI_ActionRegistry.dispatch(actionId)
 	end
 end)
@@ -186,7 +215,18 @@ function UI_ActionRegistry.dispatch(actionId: string): boolean
 		def.callback()
 		return true
 	end
-	warn("[UI_ActionRegistry] No callback registered for: " .. actionId)
+	-- Panel scripts register their callback whenever they finish loading, with
+	-- no ordering guarantee vs. HUD/Pea Wheel bootstrap — a click that lands
+	-- before that happens used to be silently, permanently dropped. Queue it
+	-- instead so registerCallback() can auto-fire it once the panel is ready.
+	warn("[UI_ActionRegistry] No callback registered for: " .. actionId .. " — queuing dispatch")
+	pendingDispatches[actionId] = true
+	task.delay(PENDING_TTL, function()
+		if pendingDispatches[actionId] then
+			pendingDispatches[actionId] = nil
+			warn("[UI_ActionRegistry] Dispatch for " .. actionId .. " expired after " .. PENDING_TTL .. "s — panel never registered a callback")
+		end
+	end)
 	return false
 end
 
@@ -197,6 +237,10 @@ function UI_ActionRegistry.registerCallback(actionId: string, fn: () -> ())
 		return
 	end
 	def.callback = fn
+	if pendingDispatches[actionId] then
+		pendingDispatches[actionId] = nil
+		fn()
+	end
 end
 
 function UI_ActionRegistry.getOrderedSliceList(): {string}

@@ -2,25 +2,28 @@
 -- Zones: Kitchen (crackling fire), Garden (birds), Pond (water stream)
 
 local ZONE_AUDIO = {
+	-- rollOffMax widened: the actual SpawnLocation sits ~53/63/73 studs from
+	-- Kitchen/Garden/Pond respectively, which was beyond each zone's old max
+	-- (25/35/30) — the ambience was completely inaudible from spawn.
 	Kitchen = {
 		soundId = "rbxassetid://9112780462",
-		volume = 0.12,
+		volume = 0.15,
 		rollOffMin = 5,
-		rollOffMax = 25,
+		rollOffMax = 60,
 		position = Vector3.new(40, 4, -72),
 	},
 	Garden = {
 		soundId = "rbxassetid://9112832297",
-		volume = 0.08,
+		volume = 0.15,
 		rollOffMin = 8,
-		rollOffMax = 35,
+		rollOffMax = 70,
 		position = Vector3.new(56, 4, -64),
 	},
 	Pond = {
 		soundId = "rbxassetid://9119646409",
-		volume = 0.10,
+		volume = 0.15,
 		rollOffMin = 6,
-		rollOffMax = 30,
+		rollOffMax = 80,
 		position = Vector3.new(52, 10, -88),
 	},
 }

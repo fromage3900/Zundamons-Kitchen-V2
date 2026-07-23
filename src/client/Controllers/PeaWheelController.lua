@@ -179,8 +179,6 @@ local function buildWheelGui()
 	hubStroke.Thickness = 2
 
 	hubButton.MouseButton1Click:Connect(function()
-		if RunService:IsStudio() and RunService:IsEdit() then return end
-		if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return end
 		PeaWheelController.toggle()
 	end)
 
@@ -280,7 +278,6 @@ end
 -- ── Open / Close / Toggle ────────────────────────────────────
 function PeaWheelController.open()
 	if isOpen then return end
-	if RunService:IsStudio() and RunService:IsEdit() then return end
 
 	local gui = buildWheelGui()
 	if not gui or not wheelFrame or not backdropFrame then return end
@@ -334,7 +331,18 @@ function PeaWheelController.close()
 	end
 end
 
+local function canTogglePeaWheel(): boolean
+	-- RunService:IsEdit() now throws ("lacking capability Plugin") when called
+	-- from a normal client script, not just in Studio's plugin sandbox — this
+	-- guard used to silently crash every toggle attempt. A LocalScript only
+	-- ever runs in an actual game/Play context, so the guard was never doing
+	-- anything useful even before it started erroring.
+	if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return false end
+	return true
+end
+
 function PeaWheelController.toggle()
+	if not canTogglePeaWheel() then return end
 	if isOpen then
 		PeaWheelController.close()
 	else
@@ -350,16 +358,9 @@ function PeaWheelController.select(actionId: string)
 end
 
 -- ── Keyboard Input ───────────────────────────────────────────
+-- The Tab/Q global toggle is owned by UIActionRegistry ("peawheel" action) —
+-- this listener only handles in-wheel navigation while it's already open.
 local function onInputBegan(input, processed)
-	-- Keybind: Tab or Q key to toggle radial wheel instantly when not typing in text box
-	if input.KeyCode == Enum.KeyCode.Tab or input.KeyCode == Enum.KeyCode.Q then
-		if UserInputService:GetFocusedTextBox() ~= nil then
-			return
-		end
-		PeaWheelController.toggle()
-		return
-	end
-
 	if processed then return end
 
 	-- Slice Navigation when Open
@@ -391,6 +392,8 @@ UserInputService.InputBegan:Connect(onInputBegan)
 UserInputService.InputEnded:Connect(onInputEnded)
 
 buildWheelGui()
+
+ActionRegistry.registerCallback("peawheel", PeaWheelController.toggle)
 
 _G.PeaWheelController = PeaWheelController
 _G.PeaWheel = PeaWheelController

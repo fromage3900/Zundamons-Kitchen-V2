@@ -109,7 +109,7 @@ function UIHelper.createItemIcon(itemName: string, size: UDim2?, parent: Instanc
 	return label
 end
 
-function UIHelper:getCategory(itemName: string): string
+function UIHelper.getCategory(itemName: string): string
 	local catMap = {
 		ZundaFlower = "forage", ZundaPea = "forage", ZundaBerry = "forage",
 		ZundaMushroom = "forage", ZundaRoot = "forage", Apple = "forage",

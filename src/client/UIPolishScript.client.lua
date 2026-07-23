@@ -166,6 +166,10 @@ local function hookButton(btn)
         local abs = btn.AbsolutePosition
         local siz = btn.AbsoluteSize
         spawnSparkles(abs.X + siz.X/2, abs.Y + siz.Y/2)
+        local zsc = _G.ZundaSoundController
+        if zsc and zsc.play then
+            zsc.play("ButtonClick")
+        end
     end)
 end
 

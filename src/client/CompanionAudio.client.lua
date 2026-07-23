@@ -21,6 +21,13 @@ local function playSound(id, vol)
 	end)
 end
 
+-- The companion FOLLOWS the player, so "within range" is the steady state.
+-- Chime only on the rising edge (re-entering range) with a long cooldown —
+-- the old rate-based re-arm played the sound every ~1s forever.
+local wasNear = false
+local lastChime = 0
+local CHIME_COOLDOWN = 30
+
 RunService.Heartbeat:Connect(function()
 	local char = player.Character
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -33,18 +40,19 @@ RunService.Heartbeat:Connect(function()
 	if not primary then return end
 
 	local dist = (hrp.Position - primary.Position).Magnitude
-	if dist < COMPANION_DISTANCE then
+	local isNear = dist < COMPANION_DISTANCE
+	if isNear and not wasNear and os.clock() - lastChime >= CHIME_COOLDOWN then
+		lastChime = os.clock()
 		local sparkle = primary:FindFirstChild("CompanionSparkles")
 		if sparkle and sparkle:IsA("ParticleEmitter") then
-			if sparkle.Rate < 20 then
-				sparkle.Rate = 25
-				playSound(UIAssets.sounds.companion_pet, 0.3)
-				task.delay(1, function()
-					if sparkle.Parent then sparkle.Rate = 12 end
-				end)
-			end
+			sparkle.Rate = 25
+			task.delay(1, function()
+				if sparkle.Parent then sparkle.Rate = 12 end
+			end)
 		end
+		playSound(UIAssets.sounds.companion_pet, 0.3)
 	end
+	wasNear = isNear
 end)
 
 print("[CompanionAudio] Proximity audio ready")

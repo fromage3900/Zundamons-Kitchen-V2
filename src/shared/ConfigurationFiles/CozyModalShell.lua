@@ -59,7 +59,10 @@ function CozyModalShell.wrap(panel, options)
 		-- Animate: scale pop from 0 to full size with bouncy Back easing
 		panel.Visible = true
 		panel.Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0)
-		panel.Position = UDim2.new(originalPosition.X.Scale, 0, originalPosition.Y.Scale, 0)
+		-- Position never moves during open/close — only Size is tweened. Previously
+		-- this rebuilt Position from Scale only, stripping the Offset component,
+		-- which pushed panels using pixel-offset Position (no AnchorPoint 0.5,0.5)
+		-- off-screen every time they opened.
 		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Normal, UIConfig.EASING.Bounce, Enum.EasingDirection.Out), {
 			Size = originalSize,
 		}):Play()

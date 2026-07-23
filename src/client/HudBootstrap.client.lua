@@ -7,6 +7,11 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 
+-- ZundaSoundController populates _G.ZundaSoundController in its own module body,
+-- but nothing required it anywhere, so panel-open/close/hover/click sounds were
+-- always silently no-op'd. This is the "wire everything up" entry point.
+require(player:WaitForChild("PlayerScripts"):WaitForChild("Controllers"):WaitForChild("ZundaSoundController"))
+
 -- Share one persistent root with HudScript regardless of LocalScript start order.
 local existingHud = playerGui:FindFirstChild("ZundaHUD")
 local hud = if existingHud and existingHud:IsA("ScreenGui") then existingHud else Instance.new("ScreenGui")
