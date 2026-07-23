@@ -8,6 +8,17 @@ local LegacyGuiConfig = {}
 LegacyGuiConfig.destroyScreenGuis = {
 	"ZundaFX",
 	"PostProcessOverlay",
+	-- Dead-generation Studio shells confirmed live 2026-07-23 (superseded by the
+	-- PeaWheel/ActionRegistry UI; the custom hotbar is non-functional — the
+	-- default Roblox backpack is the real tool bar):
+	"Custom Inventory",
+	"ToolsGUI",
+	"Tools",
+	"SellLoot",
+	"PlanterGui",
+	"DataGUI",
+	"ProgressionPanel",
+	"MaterialsInventory", -- duplicate of MaterialsGui
 }
 
 -- Descendant names removed anywhere under PlayerGui (watercolour vignette layers).

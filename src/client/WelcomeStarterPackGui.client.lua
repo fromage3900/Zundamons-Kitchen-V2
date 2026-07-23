@@ -17,7 +17,9 @@ local ClientGuiBootstrap = require(ConfigurationFiles:WaitForChild("ClientGuiBoo
 local UIConfig = require(ConfigurationFiles:WaitForChild("UIConfig"))
 
 -- Create ScreenGui via ClientGuiBootstrap (Rule 2)
-local screenGui = ClientGuiBootstrap.createScreenGui(LocalPlayer, "WelcomeStarterPackGui", 25)
+-- Panel layer (see docs/FX_UI_LAYERING_PLAN.md): must sit ABOVE the tutorial dim
+-- (150) or the gift appears dimmed/"stuck" under the onboarding overlay.
+local screenGui = ClientGuiBootstrap.createScreenGui(LocalPlayer, "WelcomeStarterPackGui", 210)
 
 -- Main Modal Frame
 local mainFrame = Instance.new("Frame")
@@ -177,8 +179,29 @@ inviteBtn.MouseButton1Click:Connect(function()
 	end)
 end)
 
--- Auto Show FTUE Starter Pack after 1.5 seconds on join
-task.delay(1.5, function()
+-- Auto-show the FTUE starter pack only AFTER onboarding: wait for the tutorial
+-- card to finish (or 90s timeout) so the gift never fights the tutorial overlay.
+task.spawn(function()
+	local playerGui = LocalPlayer:WaitForChild("PlayerGui")
+	local function tutorialCard()
+		local tut = playerGui:FindFirstChild("TutorialGui")
+		return tut and tut:FindFirstChild("TutorialCard")
+	end
+	-- Phase 1: give the tutorial up to 15s to appear (returning players may have
+	-- it suppressed entirely; then we just show the gift).
+	local appearDeadline = os.clock() + 15
+	while os.clock() < appearDeadline do
+		local card = tutorialCard()
+		if card and card.Visible then break end
+		task.wait(0.5)
+	end
+	-- Phase 2: if it appeared, hold the gift until onboarding finishes (90s cap).
+	local finishDeadline = os.clock() + 90
+	while os.clock() < finishDeadline do
+		local card = tutorialCard()
+		if not (card and card.Visible) then break end
+		task.wait(0.5)
+	end
 	mainFrame.Visible = true
 end)
 
