@@ -58,6 +58,11 @@ register("Seed", "rbxassetid://132798405534424", "Mesh", false)
 register("SeedLeaf", "rbxassetid://110157288415078", "Mesh", false)
 register("Leaf", "rbxassetid://118786859560292", "Mesh", false)
 register("Mature", "rbxassetid://85258154641863", "Mesh", false)
+register("EdamamePod_Default", "rbxassetid://106482523402868", "Mesh", false)
+register("ZundaLeaf_Default", "rbxassetid://118786859560292", "Mesh", false)
+register("SweetPea_Default", "rbxassetid://107116519758062", "Mesh", false)
+register("PeaFlower_Default", "rbxassetid://130899236683010", "Mesh", false)
+register("SaltedPeaBouquet_Default", "rbxassetid://86582218951352", "Mesh", false)
 
 local defaultsByArchetype: { [string]: string } = {
 	AppleTree = "Variant1",
@@ -75,6 +80,11 @@ local defaultsByArchetype: { [string]: string } = {
 	ZundaRoot = "Root_01",
 	["Zunda Root"] = "Root_01",
 	CarrotPlot = "Mature",
+	EdamamePod = "EdamamePod_Default",
+	ZundaLeaf = "ZundaLeaf_Default",
+	SweetPea = "SweetPea_Default",
+	PeaFlower = "PeaFlower_Default",
+	SaltedPeaBouquet = "SaltedPeaBouquet_Default",
 }
 
 function Catalog.normalizeAssetId(value: any): string

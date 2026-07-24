@@ -18,6 +18,11 @@ local variantsByVisualKey: { [string]: { string } } = {
 	["Zunda Berry"] = { "BerryBush_01", "BerryBush_02", "BerryBush_03" },
 	["Zunda Root"] = { "Root_01", "Root_02" },
 	CarrotPlot = { "Seed", "SeedLeaf", "Leaf", "Mature" },
+	EdamamePod = { "EdamamePod_Default" },
+	ZundaLeaf = { "ZundaLeaf_Default" },
+	SweetPea = { "SweetPea_Default" },
+	PeaFlower = { "PeaFlower_Default" },
+	SaltedPeaBouquet = { "SaltedPeaBouquet_Default" },
 }
 
 MeshAssets.meshes = {}
