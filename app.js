@@ -728,9 +728,13 @@ const VN_DIALOGUE_TREE = {
   start: {
     speaker: "Zundamon (ずんだもん)",
     expression: "happy",
-    text: "Welcome to Zundamon's Kitchen V2 nanoda! What delicious edamame treats or dev secrets shall we explore today?",
+    text: "Welcome to Zundamon's Kitchen V2 nanoda! What delicious edamame treats, roaming wildlife secrets, or dev tips shall we explore today?",
     choices: [
       { text: "🫛 Tell me about Zunda recipes!", target: "topic_recipes" },
+      { text: "⚔️ Discover the Sengoku History of Zunda Mochi!", target: "topic_history" },
+      { text: "🦊 What animals roam Zunda Village?", target: "topic_wildlife" },
+      { text: "🎯 Rhythm Minigame & S-Rank Cooking Tips!", target: "topic_rhythm_tips" },
+      { text: "🐾 Tell me about Companion Spirits & Buffs!", target: "topic_companions" },
       { text: "🎮 How do I play Zundamon's Kitchen on Roblox?", target: "topic_roblox" },
       { text: "💡 Share a fun Zunda fact nanoda!", target: "topic_facts" },
       { text: "🔊 Hear Zundamon's Voice Lines!", target: "topic_voice" },
@@ -743,6 +747,41 @@ const VN_DIALOGUE_TREE = {
     text: "Zunda Mochi is made by crushing fresh green edamame beans with sugar and salt! We also serve Zunda Shakes, Parfaits, and Dango nanoda!",
     choices: [
       { text: "📖 Open Cookbook.app Recipe Book", action: "open_cookbook" },
+      { text: "↩️ Back to main menu", target: "start" }
+    ]
+  },
+  topic_history: {
+    speaker: "Zundamon (ずんだもん)",
+    expression: "excited",
+    text: "Zunda Mochi originated in Sendai during the Sengoku era nanoda! Legend says Date Masamune's army crushed fresh soybeans with their sword hilt pommels for high-energy battlefield stamina!",
+    choices: [
+      { text: "🍡 Tell me how Zunda Mochi is made today!", target: "topic_recipes" },
+      { text: "↩️ Back to main menu", target: "start" }
+    ]
+  },
+  topic_wildlife: {
+    speaker: "Zundamon (ずんだもん)",
+    expression: "cozy",
+    text: "Zunda Village has 25+ roaming ambient animals nanoda! You'll spot foxes, tigers, penguins, giraffes, crabs, and bunnies wandering peacefully through the forest and garden paths!",
+    choices: [
+      { text: "🐾 Tell me about Companion Spirits instead!", target: "topic_companions" },
+      { text: "↩️ Back to main menu", target: "start" }
+    ]
+  },
+  topic_rhythm_tips: {
+    speaker: "Zundamon (ずんだもん)",
+    expression: "cooking",
+    text: "Land 5 Perfect hits in a row during cooking minigames to trigger maximum tip multipliers! Cardamon gives +30% wider timing windows if you need extra precision nanoda!",
+    choices: [
+      { text: "📖 Open Cookbook.app Recipe Book", action: "open_cookbook" },
+      { text: "↩️ Back to main menu", target: "start" }
+    ]
+  },
+  topic_companions: {
+    speaker: "Zundamon (ずんだもん)",
+    expression: "happy",
+    text: "We have 8 unique companions nanoda! Zundacat boosts gathering speed, Sakuradamon grants +25% Chef XP, Ankomon boosts Gold revenue, and Cardamon expands timing windows!",
+    choices: [
       { text: "↩️ Back to main menu", target: "start" }
     ]
   },

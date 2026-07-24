@@ -34,16 +34,19 @@ local COMPANION_DIALOGUE = {
 			"Good morning, {player}! The garden is sparkling with dew, and I can smell Zunda Peas blooming~ ☀️🌱",
 			"Ready to cook up something wonderful today? Let us make one dish we are proud of!",
 			"I'll be right here beside you as you explore and gather. What should we cook first?",
+			"The morning breeze carries the sweet scent of crushed edamame! Perfect timing for Zunda Mochi! 🍡",
 		},
 		afternoon = {
 			"You are finding your rhythm, {player}! I can see it in every move~ 🔥",
 			"The guests look hungry — let's get cooking! I will stay close while you work your magic.",
-			"You're doing great! Have you tried any of the new recipes yet?",
+			"You're doing great! Have you tried crafting the Edamame Parfait yet?",
+			"A full kitchen makes my heart leap nanoda! Keep that cooking streak glowing! ✨",
 		},
 		evening = {
 			"The kitchen feels warm after a long day of good work. The sunset is so pretty from here... 🌅",
 			"What was your favorite little moment today, {player}? You worked so hard.",
 			"I'll be right here beside you, always~ The stars are beginning to twinkle.",
+			"Let's count our gold revenue and prepare fresh dough for tomorrow's sunrise rush! 💰",
 		},
 		night = {
 			"Psst — {player}... still awake? 🌙 Quiet kitchens keep the sweetest memories.",
@@ -53,6 +56,10 @@ local COMPANION_DIALOGUE = {
 		level1_10 = { "Welcome to Zunda Village! I believe in you, and I will guide your journey! 🌱" },
 		level11_20 = { "You're getting the hang of this! Your rhythm cooking accuracy is getting sharper! ✨" },
 		level21_50 = { "A true Master Chef! The whole village talks about your amazing food! 👑" },
+		quest_branch = {
+			"Did you know Zunda Mochi has been crafted since the Sengoku era nanoda? Ancient samurai used to crush fresh soybeans for energy! ⚔️🍡",
+			"If you want maximum tips from hungry guests, land 5 Perfect hits in a row during rhythm minigames! 🎯",
+		},
 	},
 
 	zundacat = {
@@ -98,8 +105,8 @@ local COMPANION_DIALOGUE = {
 			"Your cooking makes everyone smile so bright~ 💫",
 		},
 		night = {
-			"The moon looks like a flour-dusted mochi cake! 🌙",
-			"I saved you the softest patch of starlight.",
+			"The night sky looks like crushed star sprinkles! 🌌",
+			"Rest your feet, chef... you hopped so far today.",
 			"Sweet dreams, little chef~ ⭐",
 		},
 		level1_10 = { "Hoppy to meet you! Let's explore together! 🐰" },
