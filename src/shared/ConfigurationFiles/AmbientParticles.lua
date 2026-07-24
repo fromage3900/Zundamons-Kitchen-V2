@@ -21,6 +21,20 @@ if workspace:FindFirstChild("ZundaAmbientFX") then
 	return true
 end
 
+-- DISABLED 2026-07-24: all four particle texture asset ids (dust/firefly,
+-- sakura, bubble, magic sparkle) fail ContentProvider:PreloadAsync with
+-- AssetFetchStatus.Failure -- same broken/inaccessible-asset class as the
+-- InsertService issues fixed elsewhere this session. A failed particle
+-- texture renders as Roblox's default fallback: a plain white square, so
+-- every emitter here was spawning visible white squares floating around the
+-- whole map ("crazy default FX"). This isn't fixable in code -- it needs
+-- real, working asset ids uploaded/owned by this experience before
+-- re-enabling. Remove this early return once that's done.
+do
+	print("[AmbientParticles] Disabled -- all particle texture asset ids are broken (AssetFetchStatus.Failure)")
+	return true
+end
+
 local FX = Instance.new("Folder")
 FX.Name = "ZundaAmbientFX"
 FX.Parent = workspace

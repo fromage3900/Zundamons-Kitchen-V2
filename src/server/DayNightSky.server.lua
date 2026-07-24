@@ -78,11 +78,16 @@ sky.Parent = Lighting
 -- SKYBOX SETS (Brennan's nebula + starfield textures)
 local SKYBOX_SETS = {
 	day = {
-		bk = "rbxassetid://119372168213953", -- BlueNebula_01
+		-- Tuned 2026-07-24: the same faceted nebula texture on all 4 side
+		-- faces reads as a wall of hard-edged white shards ("squares in the
+		-- sky") -- mixing it with the softer purple nebula per-face (as the
+		-- morning set already does) breaks up the uniform repetition so it
+		-- reads as a gentle dreamy backdrop instead of a solid crystal grid.
+		bk = "rbxassetid://129075140128878", -- PurpleNebula_01 (softer)
 		dn = "rbxassetid://119372168213953", -- BlueNebula_01
-		ft = "rbxassetid://119372168213953", -- BlueNebula_01
+		ft = "rbxassetid://129075140128878", -- PurpleNebula_01 (softer)
 		lf = "rbxassetid://119372168213953", -- BlueNebula_01
-		rt = "rbxassetid://119372168213953", -- BlueNebula_01
+		rt = "rbxassetid://129075140128878", -- PurpleNebula_01 (softer)
 		up = "rbxassetid://133511173179472", -- Starfield_05
 	},
 	night = {

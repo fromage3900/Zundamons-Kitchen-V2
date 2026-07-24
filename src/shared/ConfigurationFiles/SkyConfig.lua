@@ -51,8 +51,10 @@ SkyConfig.atmosphere = {
     -- AAA polish: reduced blue decay that was tinting characters.
     -- Old value was RGB(55, 120, 210) — very blue. Now warmer/neutral.
     decay   = Color3.fromRGB(100, 130, 195),
-    glare   = 0.25,
-    haze    = 3.5,
+    glare   = 0.35,
+    -- Bumped 3.5 -> 5 (2026-07-24): softens the faceted nebula skybox into a
+    -- gentler haze instead of a crisp, hard-edged crystal pattern.
+    haze    = 5.0,
 }
 
 -- ============================================================
