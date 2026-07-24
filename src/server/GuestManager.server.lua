@@ -359,9 +359,17 @@ local function createGuest(player)
 		if now - lastDialogueTime >= 60 then
 			_G._lastGuestDialogueTime = now
 			local ok, VNDialogueData = pcall(require, RS.ConfigurationFiles.VNDialogueData)
-			local dialogue = ok and VNDialogueData and VNDialogueData.GUEST_BY_TYPE and VNDialogueData.GUEST_BY_TYPE[selectedMeshType]
-			if dialogue then
-				local text = dialogue.spawn:gsub("{recipe}", recipe)
+			-- Fall back to DEFAULT so every guest type gets spawn dialogue, not
+			-- just ones with a bespoke entry (24 animal meshes have no bespoke
+			-- entry and would otherwise never say anything).
+			local dialogue = ok and VNDialogueData and VNDialogueData.GUEST_BY_TYPE
+				and (VNDialogueData.GUEST_BY_TYPE[selectedMeshType] or VNDialogueData.GUEST_BY_TYPE.DEFAULT)
+			if dialogue and dialogue.spawn then
+				local spawnLine = dialogue.spawn
+				if type(spawnLine) == "table" then
+					spawnLine = spawnLine[math.random(1, #spawnLine)]
+				end
+				local text = spawnLine:gsub("{recipe}", recipe)
 				local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
 				if not VNEvent then
 					VNEvent = Instance.new("RemoteEvent")
@@ -585,7 +593,8 @@ local function removeGuest(guest, reason)
 	if reason == "timeout" then
 		local meshType = guest:GetAttribute("MeshType")
 		local ok2, VNDialogueData = pcall(require, RS.ConfigurationFiles.VNDialogueData)
-		local dialogue = ok2 and VNDialogueData and VNDialogueData.GUEST_BY_TYPE and VNDialogueData.GUEST_BY_TYPE[meshType]
+		local dialogue = ok2 and VNDialogueData and VNDialogueData.GUEST_BY_TYPE
+			and (VNDialogueData.GUEST_BY_TYPE[meshType] or VNDialogueData.GUEST_BY_TYPE.DEFAULT)
 		local servingPlayer = game.Players:FindFirstChild(playerName)
 		if not servingPlayer then
 			local userId = guest:GetAttribute("ServingUserId")
@@ -594,10 +603,14 @@ local function removeGuest(guest, reason)
 			end
 		end
 
-		if dialogue and servingPlayer then
+		if dialogue and dialogue.timeout and servingPlayer then
+			local timeoutLine = dialogue.timeout
+			if type(timeoutLine) == "table" then
+				timeoutLine = timeoutLine[math.random(1, #timeoutLine)]
+			end
 			local VNEvent = RS.RemoteEvents:FindFirstChild("ShowVNDialogue")
 			if VNEvent then
-				VNEvent:FireClient(servingPlayer, "guest", dialogue.timeout)
+				VNEvent:FireClient(servingPlayer, "guest", timeoutLine)
 			end
 		end
 

@@ -306,4 +306,62 @@ function VNDialogueData.getSideDialogue(key: string)
 	return SIDE_DIALOGUES[key]
 end
 
+-- Guest spawn/timeout dialogue, keyed by GuestManager's meshType (e.g.
+-- "male", "animal-fox", "animal-tiger"). This table never existed before --
+-- GuestManager.server.lua has looked up VNDialogueData.GUEST_BY_TYPE[meshType]
+-- since it was written, but the key was always nil, so guests never actually
+-- said anything on spawn/timeout for ANY guest type (Kenney humans included).
+-- DEFAULT covers every guest type without a bespoke entry (all 24 animal
+-- meshes + any future ones) with several random variants so it doesn't feel
+-- repetitive; a few of the original Kenney human types get flavorful
+-- overrides since NPCConfig clearly intended them to have distinct voices.
+VNDialogueData.GUEST_BY_TYPE = {
+	DEFAULT = {
+		spawn = {
+			"Ooh, {recipe} smells amazing from here~ 🌸",
+			"Excuse me, chef! Could I get some {recipe}? 🍽️",
+			"I've been craving {recipe} all day! 💫",
+			"Table for one, please! I'll have the {recipe}~",
+			"Is this the place with the famous {recipe}? 🌟",
+		},
+		timeout = {
+			"Ah, I couldn't wait any longer... maybe next time! 💦",
+			"Sorry chef, I have somewhere to be~ 🥲",
+			"I'll come back when it's less busy!",
+		},
+	},
+	male = {
+		spawn = { "Hey chef! One {recipe}, when you get a chance!" },
+		timeout = { "Guess I'll grab a snack elsewhere. See ya!" },
+	},
+	female = {
+		spawn = { "Hi there~ Could I try your {recipe}? I've heard so much about it! 🌷" },
+		timeout = { "Oh no, I really have to run -- next time for sure!" },
+	},
+	male2 = {
+		spawn = { "{recipe}, please! Make it your best one~" },
+		timeout = { "No worries, I'll swing back around later." },
+	},
+	female2 = {
+		spawn = { "Ehe~ {recipe} sounds perfect right about now! 🎀" },
+		timeout = { "Aw, maybe I was too impatient... sorry chef!" },
+	},
+	parrot = {
+		spawn = { "Squawk! {recipe} for me, please! 🦜" },
+		timeout = { "Squawk! Gotta fly! Byeee!" },
+	},
+	lotus = {
+		spawn = { "Such a peaceful spot~ I'll have the {recipe}, thank you. 🪷" },
+		timeout = { "The patience of a lotus has limits too... farewell." },
+	},
+	cupcake = {
+		spawn = { "Yay, {recipe} time!! I'm SO excited!! 🧁" },
+		timeout = { "Boo, I wanted that {recipe} so bad... maybe later!" },
+	},
+	zundamon = {
+		spawn = { "Fellow Zunda villager here~ {recipe}, if you please! 🌱" },
+		timeout = { "Ah well, back to the village for me!" },
+	},
+}
+
 return VNDialogueData
