@@ -17,6 +17,9 @@ local NPC_LIST = {
 
 local activePatrols = {}
 
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
+local npcChatTimestamps = {}
+
 local function createNPCModel(npcDef)
 	local model = Instance.new("Model")
 	model.Name = npcDef.name
@@ -42,6 +45,28 @@ local function createNPCModel(npcDef)
 	weld.Part1 = head
 	weld.Parent = torso
 	model.PrimaryPart = torso
+
+	-- These NPCs previously had no interaction surface at all -- QuestManager
+	-- tracks "talk to an NPC" objectives via data.npc_chats[name], normally
+	-- incremented from a client-fired RemoteEvent. ClickDetector.MouseClick
+	-- already fires server-side with the clicking player, so we record the
+	-- same data directly here rather than firing a client->server event to
+	-- ourselves (which isn't how RemoteEvents work from the server).
+	local cd = Instance.new("ClickDetector")
+	cd.MaxActivationDistance = 12
+	cd.Parent = torso
+	cd.MouseClick:Connect(function(player)
+		local now = os.clock()
+		local last = npcChatTimestamps[player]
+		if last and now - last < 2 then
+			return
+		end
+		npcChatTimestamps[player] = now
+		local d = PlayerDataService.getOrCreate(player)
+		d.npc_chats = d.npc_chats or {}
+		d.npc_chats[npcDef.name] = (d.npc_chats[npcDef.name] or 0) + 1
+	end)
+
 	return model
 end
 
