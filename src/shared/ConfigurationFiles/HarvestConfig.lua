@@ -26,11 +26,15 @@ local HarvestConfig = {
 	HARVEST_ANIMATION_ID = "rbxassetid://2510798496",
 	HARVEST_ANIMATION_PRIORITY = Enum.AnimationPriority.Action,
 
-	-- Sound
-	HARVEST_SOUND_ID = "rbxassetid://9114369623",
-	HARVEST_SOUND_VOLUME = 0.6,
-	HARVEST_SOUND_PITCH_MIN = 0.9,
-	HARVEST_SOUND_PITCH_MAX = 1.1,
+	-- Sound -- soft cozy "pluck/pop" on gather completion (fires for every
+	-- harvest incl. sickle wheat/mushroom/berry). Was a harsh Roblox stock
+	-- sound (rbxassetid://9114369623) -- the "default rbx sound" the sickle
+	-- harvest kept using. Now the user's cozy Bubbles SFX, quieter, with the
+	-- existing pitch variance so repeated harvests don't feel identical.
+	HARVEST_SOUND_ID = "rbxassetid://136926771045300",
+	HARVEST_SOUND_VOLUME = 0.35,
+	HARVEST_SOUND_PITCH_MIN = 0.85,
+	HARVEST_SOUND_PITCH_MAX = 1.15,
 
 	-- Particles
 	HARVEST_PARTICLE_COLOR = Color3.fromRGB(180, 230, 120),
