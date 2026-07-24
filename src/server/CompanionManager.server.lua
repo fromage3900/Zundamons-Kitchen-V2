@@ -358,10 +358,15 @@ local function buildCompanion(player, compType)
 	activeCompanions[player.Name] = companionModel
 
 	-- ── Smooth follow loop ─────────────────────────────────────
-	-- The authored zundapal mesh is baked upside-down relative to its part axes, so we
-	-- apply a correction and keep it upright + facing the player's direction every step
-	-- (physics never controls rotation, so orientation must be driven explicitly).
-	local ORIENT_CORRECTION = CFrame.Angles(0, 0, math.rad(180)) -- roll 180° to un-flip; keeps facing
+	-- Orientation correction is per-companion-type, not a blanket constant: the
+	-- OLD static zundapal level-mesh was baked upside-down and needed a 180°
+	-- roll, but that mesh is gone now (replaced by a properly Avatar-Imported
+	-- rig, which comes in correctly oriented already) -- applying the old
+	-- correction unconditionally was flipping the new rig upside-down instead
+	-- of fixing it. Defaults to no correction; set per-type in
+	-- CompanionVisualConfig only if a specific mesh actually needs one.
+	local compVisualForOrient = CompanionVisualConfig.get(compType)
+	local ORIENT_CORRECTION = (compVisualForOrient and compVisualForOrient.orientCorrection) or CFrame.identity
 	task.spawn(function()
 		local t = 0
 		local currentAnimState = "idle" -- Track current animation state
