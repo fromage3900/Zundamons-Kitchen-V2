@@ -1,0 +1,19 @@
+{
+  "name": "ZundaWorldDecorator",
+  "tree": {
+    "$className": "Model",
+    "ZundaWorldDecorator": {
+      "$path": "ZundaWorldDecorator.plugin.lua",
+      "DecorationCatalog": { "$path": "DecorationCatalog.lua" },
+      "ZoneProfiles": { "$path": "ZoneProfiles.lua" },
+      "MaterialPalette": { "$path": "MaterialPalette.lua" },
+      "ScatterEngine": { "$path": "ScatterEngine.lua" },
+      "ProceduralGeometry": { "$path": "ProceduralGeometry.lua" },
+      "MaterialVariantSystem": { "$path": "MaterialVariantSystem.lua" },
+      "LODManager": { "$path": "LODManager.lua" },
+      "SetDressingRules": { "$path": "SetDressingRules.lua" },
+      "UndoManager": { "$path": "UndoManager.lua" },
+      "MainWidget": { "$path": "MainWidget.lua" }
+    }
+  }
+}
