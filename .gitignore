@@ -45,3 +45,4 @@ scripts/__pycache__/
 # Scratch / one-off dev junk
 mcp_req.json
 test_terminal_sim.js
+tools/asset-pipeline/upload-results.json
