@@ -6,6 +6,7 @@ local RS         = game:GetService("ReplicatedStorage")
 local InsertService = game:GetService("InsertService")
 local ServerStorage = game:GetService("ServerStorage")
 local CompanionVisualConfig = require(RS.ConfigurationFiles.CompanionVisualConfig)
+local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 
 -- Cache loaded companion models
 local companionModelCache = {}
@@ -354,6 +355,11 @@ local function buildCompanion(player, compType)
 		sparkle.Rate = 60
 		task.delay(0.6, function() if sparkle.Parent then sparkle.Rate = 10 end end)
 		vnEv:FireClient(clicker, compType, def.emoji)
+		-- Per-companion bond XP (distinct from the flat, global
+		-- companion_affection/companion_chats counters QuestManager already
+		-- tracks) -- the start of an Uma-Musume-style "bond with THIS specific
+		-- companion" progression. Same 3s click cooldown as the VN trigger above.
+		PlayerDataService.addCompanionBond(clicker, compType, 1)
 	end)
 
 	activeCompanions[player.Name] = companionModel
@@ -459,8 +465,6 @@ local function buildCompanion(player, compType)
 end
 
 -- ── Player lifecycle ───────────────────────────────────────────
-local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
-
 local function onPlayerAdded(player)
 	player.CharacterAdded:Connect(function()
 		task.wait(2)

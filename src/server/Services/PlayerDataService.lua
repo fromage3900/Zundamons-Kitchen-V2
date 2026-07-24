@@ -217,6 +217,37 @@ function PlayerDataService.getItemCount(player: Player, itemName: string): numbe
 	return type(value) == "number" and math.max(0, value) or 0
 end
 
+-- Bond thresholds mirror VNDialogueData's existing 3-tier dialogue structure
+-- (level1_10/level11_20/level21_50 pools, currently keyed to the player's
+-- global chef level) so a future re-key to per-companion bond can reuse the
+-- same pools without new content.
+local BOND_TIER_2_XP = 10
+local BOND_TIER_3_XP = 25
+
+function PlayerDataService.addCompanionBond(player: Player, compType: string, amount: number?): (boolean, number?)
+	if type(compType) ~= "string" or compType == "" then
+		return false, nil
+	end
+	local ok, result = PlayerDataService.mutate(player, "add_companion_bond", function(data)
+		data.companion_bond = data.companion_bond or {}
+		local newXp = (data.companion_bond[compType] or 0) + (amount or 1)
+		data.companion_bond[compType] = newXp
+		return true, newXp
+	end)
+	return ok, ok and result or nil
+end
+
+function PlayerDataService.getCompanionBondTier(player: Player, compType: string): number
+	local data = PlayerDataService.get(player)
+	local xp = data and data.companion_bond and data.companion_bond[compType] or 0
+	if xp >= BOND_TIER_3_XP then
+		return 3
+	elseif xp >= BOND_TIER_2_XP then
+		return 2
+	end
+	return 1
+end
+
 function PlayerDataService.grantItem(player: Player, itemName: string, amount: number): (boolean, any?)
 	if type(itemName) ~= "string" or itemName == "" or type(amount) ~= "number" or amount <= 0 then
 		return false, "invalid_item_grant"
@@ -274,6 +305,9 @@ createDefaultData = function(): { [string]: any }
 		zundarooms_escapes = 0,
 		gathered_items = {},
 		companions_set = {},
+		companion_bond = {}, -- [compType] = bond XP, per-companion (not the flat
+			-- global companion_affection/companion_chats counters above, which
+			-- don't distinguish which companion you were with)
 		npc_chats = {},
 		zones_visited = {},
 		Apple = 5,
