@@ -6,44 +6,92 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ProceduralLandscape = require(ReplicatedStorage.Shared.Modules.ProceduralLandscape)
 local ArchitectureVariants = require(ReplicatedStorage.Shared.Config.ArchitectureVariants)
 local LandscapeConfig = require(ReplicatedStorage.Shared.Config.LandscapeConfig)
+local ProceduralPropBuilder = require(ReplicatedStorage.Shared.Modules.ProceduralPropBuilder)
 
-local function spawnMesh(placement, zoneCenter)
+-- Every biome's placement plan uses small LOCAL coordinates (roughly -12..12
+-- on each axis, per zone `size` in LandscapeConfig) -- they were never offset
+-- to an actual world position. spawnMesh accepted a `zoneCenter` parameter
+-- for exactly this but no caller ever passed one, so all 10 biomes' props
+-- landed on top of each other in a ~10x10 stud clump near world origin
+-- (confirmed live: 50 procedural props all within a few studs of (0,0,0)).
+-- Spread across the same general playable area AnimalWildlife.server.lua
+-- already scatters its wildlife across (X -140..195, Z -112..98), spaced far
+-- enough apart (biome zone sizes max out around 24 studs) that biomes don't
+-- overlap.
+local BIOME_WORLD_CENTERS: { [string]: Vector3 } = {
+	GardenVillage = Vector3.new(20, 0, -70),
+	ZundaMarket = Vector3.new(90, 0, 60),
+	Promenade = Vector3.new(-60, 0, -10),
+	Forest = Vector3.new(-100, 0, -90),
+	BerryOrchard = Vector3.new(150, 0, -20),
+	MeadowPlaza = Vector3.new(60, 0, -80),
+	SunsetGrove = Vector3.new(-40, 0, 70),
+	WheatField = Vector3.new(130, 0, 30),
+	WheatCrystalGarden = Vector3.new(-110, 0, 20),
+	MoonlitGarden = Vector3.new(10, 0, 90),
+}
+
+local raycastParams = RaycastParams.new()
+raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+local function groundY(x: number, z: number): number
+	local result = Workspace:Raycast(Vector3.new(x, 300, z), Vector3.new(0, -600, 0), raycastParams)
+	return result and result.Position.Y or 0
+end
+
+local function spawnMesh(placement, zoneCenter: Vector3)
 	local category = placement.category or "street_props"
 	local assetName = placement.asset or "Bench"
 	local variantData = ArchitectureVariants[category] and ArchitectureVariants[category][assetName]
-	if not variantData or not variantData.meshes then
-		return nil
-	end
 	local meshId = nil
-	for _, id in pairs(variantData.meshes) do
-		meshId = id
-		break
+	if variantData and variantData.meshes then
+		for _, id in pairs(variantData.meshes) do
+			meshId = id
+			break
+		end
 	end
-	if not meshId or meshId == "" then
-		return nil
+	local numericId = meshId and meshId ~= "" and tonumber(string.match(tostring(meshId), "%d+")) or nil
+
+	local worldX = zoneCenter.X + placement.x
+	local worldZ = zoneCenter.Z + placement.z
+	local pos = Vector3.new(worldX, groundY(worldX, worldZ), worldZ)
+	local parentFolder = Workspace:FindFirstChild("GameplayLoopArea") or Workspace
+
+	if numericId then
+		local mesh = Instance.new("MeshPart")
+		mesh.Name = string.format("%s_%d_%d", placement.asset, placement.x, placement.z)
+		mesh.MeshId = "rbxassetid://" .. numericId
+		mesh.Anchored = true
+		mesh.CanCollide = false
+		mesh.Size = Vector3.new(2, 2, 2)
+		mesh.Position = pos
+		mesh.Parent = parentFolder
+		mesh:SetAttribute("Category", category)
+		mesh:SetAttribute("AssetName", assetName)
+		return mesh
 	end
-	local numericId = tonumber(string.match(tostring(meshId), "%d+"))
-	if not numericId then
-		return nil
+
+	-- No real mesh id available (ArchitectureVariants only ever got 1 real
+	-- entry checked in from the Kenney auto-mapper -- see ProceduralPropBuilder
+	-- comment). Build authored-looking Part geometry instead of silently
+	-- skipping the placement.
+	local procedural = ProceduralPropBuilder.build(assetName, pos)
+	if procedural then
+		procedural:SetAttribute("Category", category)
+		procedural:SetAttribute("AssetName", assetName)
+		procedural:SetAttribute("Procedural", true)
+		procedural.Parent = parentFolder
+		return procedural
 	end
-	local mesh = Instance.new("MeshPart")
-	mesh.Name = string.format("%s_%d_%d", placement.asset, placement.x, placement.z)
-	mesh.MeshId = "rbxassetid://" .. numericId
-	mesh.Anchored = true
-	mesh.CanCollide = false
-	mesh.Size = Vector3.new(2, 2, 2)
-	mesh.Position = Vector3.new(placement.x, 0, placement.z)
-	mesh.Parent = Workspace:FindFirstChild("GameplayLoopArea") or Workspace
-	mesh:SetAttribute("Category", category)
-	mesh:SetAttribute("AssetName", assetName)
-	return mesh
+	return nil
 end
 
 local function spawnBiome(biomeName)
 	local plan = ProceduralLandscape.generateBiomePlan(biomeName)
+	local zoneCenter = BIOME_WORLD_CENTERS[biomeName] or Vector3.new(0, 0, 0)
 	local spawned = 0
 	for _, placement in ipairs(plan.placements) do
-		local mesh = spawnMesh(placement)
+		local mesh = spawnMesh(placement, zoneCenter)
 		if mesh then
 			spawned = spawned + 1
 		end
