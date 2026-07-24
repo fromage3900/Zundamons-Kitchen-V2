@@ -31,6 +31,17 @@ local function getSound(actionName: string): Sound?
     return sound
 end
 
+-- Small per-play pitch wobble so repeated actions never sound mechanically
+-- identical (ASMR-cozy feel). Reward stingers get a touch less wobble so they
+-- stay recognizable as "the" reward sound.
+local function applyWobble(sound: Sound, actionName: string)
+    local spread = 0.05
+    if actionName == "LevelUp" or actionName == "QuestComplete" or actionName == "Success" then
+        spread = 0.02
+    end
+    sound.PlaybackSpeed = 1 + (math.random() * 2 - 1) * spread
+end
+
 -- Play a UI sound by action name
 function ZundaSoundController.play(actionName: string)
     if actionName == "Bubbles" then
@@ -42,6 +53,7 @@ function ZundaSoundController.play(actionName: string)
         return
     end
     sound.Volume = SoundConfig.getVolume(actionName)
+    applyWobble(sound, actionName)
     sound:Play()
 end
 

@@ -21,10 +21,11 @@ local SoundConfig = {
         ButtonConfirm = "e",
         ButtonCancel = "f",
 
-        -- Pea Wheel
+        -- Pea Wheel (variant tables → random pick per play, avoids repetition
+        -- on the high-frequency wheel interactions)
         WheelOpen = "g",
-        WheelClose = "h",
-        WheelSelect = "i",
+        WheelClose = { "h", "h2" },
+        WheelSelect = { "i", "i2" },
         WheelNavigate = "j",
 
         -- Notifications & feedback
@@ -44,7 +45,7 @@ local SoundConfig = {
         -- Progression
         LevelUp = "s",
         QuestComplete = "t",
-        CoinEarn = "u",
+        CoinEarn = { "u", "u2" },
 
         -- Extra variants (random pick from table)
         -- Use {"u", "u2"} for 50/50 random between two variants
