@@ -46,3 +46,4 @@ scripts/__pycache__/
 mcp_req.json
 test_terminal_sim.js
 tools/asset-pipeline/upload-results.json
+tools/asset-pipeline/converted/
