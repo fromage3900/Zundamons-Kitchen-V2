@@ -2,7 +2,7 @@
 
 > **Project**: Zundamon's Kitchen V2 (Roblox Tycoon & Cooking Simulation)  
 > **Repository**: `g:\Zundamons-kItchen-V2`  
-> **Last Updated**: July 23, 2026  
+> **Last Updated**: July 24, 2026  
 
 ---
 
@@ -17,13 +17,13 @@
 
 ---
 
-## 🎨 2. Kenney — 3D Environment, Skybox & NPC Assets (CC0 1.0 Public Domain)
+## 🎨 2. Kenney — 3D Environment, Wildlife, Skybox & NPC Assets (CC0 1.0 Public Domain)
 
 - **Author**: **Kenney (Asset Jesus)** — [https://www.kenney.nl](https://www.kenney.nl)
 - **Asset Category Catalog**: [https://kenney.nl/assets/category:3D/page:3](https://kenney.nl/assets/category:3D/page:3)
 - **License**: **CC0 1.0 Universal (Public Domain)**
 - **Kits & Assets Used**:
-  - **Kenney Mini Characters (3D)**: Guest NPC models, customer avatars, village inhabitants.
+  - **Kenney Animals & Mini Characters (3D)**: 25+ roaming ambient wildlife models (fox, tiger, elephant, penguin, giraffe, bunny, crab, dog, parrot) and guest NPC avatars.
   - **Kenney 3D Nature & Vegetation**: Forest trees, foliage, harvest node base meshes, flowers.
   - **Kenney Furniture & Food Kit**: Cooking appliances, kitchen counters, mochi plates, dining tables.
   - **Kenney Survival Kit**: Wild ingredient gathering nodes, resource chests, fences.
@@ -36,7 +36,7 @@
 - **Author**: **Nomagician**
 - **Audio Asset Packs**:
   - **Cozy Ambience by Nomagician**: *TreeHouse-Short BGM*, Village Ambient Soundscapes.
-  - **Cute, Cozy & Magical UI SFX by Nomagician**: UI button clicks (`a.wav` through `w.wav`), cooking minigame chimes, item pickup chimes, level-up fanfares, menu open/close sound effects.
+  - **Cute, Cozy & Magical UI SFX by Nomagician**: UI button clicks (`a.wav` through `w.wav`), `Bubbles` UI SFX, cooking minigame chimes, item pickup chimes, level-up fanfares, reward stingers, menu open/close sound effects.
 - **License / Terms**: Royalty-free usage for indie game development.
 
 ---
