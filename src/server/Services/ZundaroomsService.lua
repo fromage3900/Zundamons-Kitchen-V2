@@ -178,67 +178,120 @@ local function finish(session: Session, outcome: string)
 	cleanup(session.player.UserId)
 end
 
+-- Studio-authored corridor segment override -- same prefab-first convention
+-- as AssetLibrary.Companions / AssetLibrary.ResourceNodes established
+-- elsewhere. Falls back to the procedural box below when absent, so an empty
+-- catalog never blocks play.
+local function getSegmentPrefab(): Model?
+	local assetLibrary = ServerStorage:FindFirstChild("AssetLibrary")
+	local zundarooms = assetLibrary and assetLibrary:FindFirstChild("Zundarooms")
+	local prefab = zundarooms and zundarooms:FindFirstChild("RoomSegment")
+	if prefab and prefab:IsA("Model") then
+		return prefab
+	end
+	return nil
+end
+
+-- Sparse flickering fixtures instead of even room light -- the unevenness and
+-- buzzing is a core part of the liminal-space read.
+local function addFlickerLight(parent: Instance, position: Vector3)
+	local fixture = Instance.new("Part")
+	fixture.Name = "LightFixture"
+	fixture.Size = Vector3.new(2, 0.3, 2)
+	fixture.Position = position
+	fixture.Anchored = true
+	fixture.CanCollide = false
+	fixture.CanQuery = false
+	fixture.Material = Enum.Material.Neon
+	fixture.Color = Color3.fromRGB(235, 230, 200)
+	fixture.Parent = parent
+
+	local light = Instance.new("PointLight")
+	light.Color = Color3.fromRGB(235, 225, 190)
+	light.Range = 18
+	light.Brightness = Config.fixtureFlickerMax
+	light.Parent = fixture
+
+	task.spawn(function()
+		while fixture.Parent do
+			light.Brightness = Config.fixtureFlickerMin
+				+ math.random() * (Config.fixtureFlickerMax - Config.fixtureFlickerMin)
+			task.wait(math.random() < 0.15 and 0.05 or math.random(1, 3))
+		end
+	end)
+end
+
+-- One corridor segment: floor/ceiling/side walls (procedural, always built as
+-- the collision safety net) plus the authored visual overlay if a
+-- RoomSegment prefab exists. baseZ is this segment's near (start) edge.
+local function buildSegment(folder: Instance, slotX: number, baseZ: number, prefab: Model?)
+	local center = Vector3.new(slotX, Config.roomY, baseZ + Config.roomLength / 2)
+	local wallColor = Color3.fromRGB(90, 88, 78)
+	part(folder, "Floor", Vector3.new(Config.roomWidth, 1, Config.roomLength), CFrame.new(center), Color3.fromRGB(70, 66, 56), 0)
+	part(folder, "Ceiling", Vector3.new(Config.roomWidth, 1, Config.roomLength), CFrame.new(center + Vector3.new(0, 10, 0)), wallColor, 0)
+	part(folder, "LeftWall", Vector3.new(1, 10, Config.roomLength), CFrame.new(center + Vector3.new(-Config.roomWidth / 2, 5, 0)), wallColor, 0)
+	part(folder, "RightWall", Vector3.new(1, 10, Config.roomLength), CFrame.new(center + Vector3.new(Config.roomWidth / 2, 5, 0)), wallColor, 0)
+
+	local fixturesPerSegment = math.max(1, math.floor(Config.roomLength / Config.fixtureSpacing))
+	for i = 1, fixturesPerSegment do
+		local z = baseZ + (i - 0.5) * (Config.roomLength / fixturesPerSegment)
+		addFlickerLight(folder, Vector3.new(slotX, Config.roomY + 9.5, z))
+	end
+
+	if prefab then
+		local visual = prefab:Clone()
+		visual.Name = "SegmentVisual"
+		visual:PivotTo(CFrame.new(center))
+		visual.Parent = folder
+		for _, descendant in visual:GetDescendants() do
+			if descendant:IsA("BasePart") then
+				descendant.Anchored = true
+				descendant.CanCollide = false
+			end
+		end
+	end
+end
+
 local function createRoom(player: Player, origin: CFrame): Session
 	local slot = player.UserId % 1000
-	local center = Vector3.new(slot * 160, Config.roomY, 0)
+	local slotX = slot * (Config.roomWidth * (Config.segmentCount + 2))
 	local folder = Instance.new("Folder")
 	folder.Name = "Room_" .. player.UserId
 	folder.Parent = runtime
-	local wallColor = Color3.fromRGB(129, 142, 94)
-	part(
-		folder,
-		"Floor",
-		Vector3.new(Config.roomWidth, 1, Config.roomLength),
-		CFrame.new(center),
-		Color3.fromRGB(112, 104, 78),
-		0
-	)
-	part(
-		folder,
-		"Ceiling",
-		Vector3.new(Config.roomWidth, 1, Config.roomLength),
-		CFrame.new(center + Vector3.new(0, 10, 0)),
-		wallColor,
-		0
-	)
-	part(
-		folder,
-		"LeftWall",
-		Vector3.new(1, 10, Config.roomLength),
-		CFrame.new(center + Vector3.new(-Config.roomWidth / 2, 5, 0)),
-		wallColor,
-		0
-	)
-	part(
-		folder,
-		"RightWall",
-		Vector3.new(1, 10, Config.roomLength),
-		CFrame.new(center + Vector3.new(Config.roomWidth / 2, 5, 0)),
-		wallColor,
-		0
-	)
-	part(
+
+	local prefab = getSegmentPrefab()
+	local corridorLength = Config.roomLength * Config.segmentCount
+	for segIndex = 0, Config.segmentCount - 1 do
+		buildSegment(folder, slotX, segIndex * Config.roomLength, prefab)
+	end
+
+	local backWall = part(
 		folder,
 		"BackWall",
 		Vector3.new(Config.roomWidth, 10, 1),
-		CFrame.new(center + Vector3.new(0, 5, -Config.roomLength / 2)),
-		wallColor,
+		CFrame.new(Vector3.new(slotX, Config.roomY, 0)),
+		Color3.fromRGB(90, 88, 78),
 		0
 	)
+	backWall.CFrame = backWall.CFrame * CFrame.new(0, 5, 0)
+
 	local exit = part(
 		folder,
 		"Escape",
 		Vector3.new(8, 9, 1),
-		CFrame.new(center + Vector3.new(0, 4.5, Config.roomLength / 2 - 2)),
+		CFrame.new(Vector3.new(slotX, Config.roomY + 4.5, corridorLength - 2)),
 		Color3.fromRGB(210, 225, 170),
 		0.2
 	)
 	exit.CanCollide = false
+	-- Entity starts a fixed handicap behind the player, not deep in a separate
+	-- room -- with a corridor this long, starting it near the far exit again
+	-- would give a trivially long head start.
 	local entity = part(
 		folder,
 		"UnidentifiedEntity",
 		Vector3.new(4, 7, 4),
-		CFrame.new(center + Vector3.new(0, 3.5, -42)),
+		CFrame.new(Vector3.new(slotX, Config.roomY + 3.5, -12)),
 		Color3.fromRGB(8, 8, 8),
 		0.08
 	)
@@ -280,10 +333,9 @@ function ZundaroomsService.enter(player: Player): (boolean, string)
 	end
 	local session = createRoom(player, character:GetPivot())
 	sessions[player.UserId] = session
-	local floor = session.room:FindFirstChild("Floor") :: BasePart
-	-- Begin near the room center, safely separated from the pursuer at the back wall.
-	-- This gives the player a readable first beat before the chase reaches them.
-	character:PivotTo(CFrame.new(floor.Position + Vector3.new(0, 3, 0)))
+	-- Begin a short distance ahead of the entity's handicap spawn (not at a
+	-- named "Floor" part -- segments now share that name across the corridor).
+	character:PivotTo(session.entity.CFrame * CFrame.new(0, 0, 20))
 	statusEvent:FireClient(player, "entered")
 	return true, "entered"
 end

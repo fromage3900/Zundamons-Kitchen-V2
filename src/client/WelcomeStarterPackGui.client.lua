@@ -168,7 +168,9 @@ iCorner.CornerRadius = UIConfig.CORNER_RADIUS.Pill
 iCorner.Parent = inviteBtn
 
 -- Claim Click Handler
+local claimEvent = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("ClaimStarterGift")
 claimBtn.MouseButton1Click:Connect(function()
+	claimEvent:FireServer()
 	mainFrame.Visible = false
 end)
 
