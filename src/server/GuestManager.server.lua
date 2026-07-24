@@ -73,7 +73,83 @@ local ServingService: any = nil
 -- Cache loaded mesh templates
 local meshTemplateCache = {}
 
+-- Animal guest templates: cloned + normalized from the ambient "animal-*" models
+-- already placed in the level, so guests can be cute animals (fox, penguin,
+-- bunny, etc.) asking to be served -- not just Kenney humans (several of which
+-- fail to load and fall back to plain capsules anyway). Built once at startup.
+-- Each template's largest BasePart becomes "Torso", every limb is pre-welded
+-- to it at correct offsets so the whole animal moves as a unit when the guest
+-- is positioned/roams, and PrimaryPart is set so NPCPatrolSystem.moveToWaypoint
+-- can actually tween it.
+local animalTemplates = {} -- [name] = normalized Model
+local ANIMAL_GUEST_SCALE = 1.6
+
+local function buildAnimalTemplates()
+	local seen = {}
+	for _, m in ipairs(workspace:GetDescendants()) do
+		if m:IsA("Model") and string.sub(m.Name, 1, 7) == "animal-" and not seen[m.Name] then
+			seen[m.Name] = true
+			local biggest, biggestVol
+			for _, d in ipairs(m:GetDescendants()) do
+				if d:IsA("BasePart") then
+					local v = d.Size.X * d.Size.Y * d.Size.Z
+					if not biggestVol or v > biggestVol then
+						biggestVol = v
+						biggest = d
+					end
+				end
+			end
+			if biggest then
+				local template = m:Clone()
+				local parts, body = {}, nil
+				for _, d in ipairs(template:GetDescendants()) do
+					if d:IsA("BasePart") then
+						table.insert(parts, d)
+						if d.Name == biggest.Name and not body then
+							body = d
+						end
+					end
+				end
+				body = body or parts[1]
+				body.Name = "Torso"
+				template.PrimaryPart = body
+				pcall(function()
+					template:ScaleTo(ANIMAL_GUEST_SCALE)
+				end)
+				-- Normalize only -- welding + positioning is handled uniformly in
+				-- createGuest (which moves the whole model with PivotTo, then
+				-- welds limbs at correct offsets). Pre-welding here would create
+				-- conflicting double-welds.
+				body.Anchored = false
+				body.CanCollide = false
+				for _, d in ipairs(parts) do
+					if d.Parent ~= template then
+						d.Parent = template
+					end
+					if d ~= body then
+						d.Anchored = false
+						d.CanCollide = false
+						d.Massless = true
+					end
+				end
+				template.Name = m.Name
+				animalTemplates[m.Name] = template
+			end
+		end
+	end
+	local n = 0
+	for _ in pairs(animalTemplates) do
+		n += 1
+	end
+	print("[GuestManager] Built " .. n .. " animal guest templates from level meshes")
+end
+
 local function loadMeshTemplate(meshType)
+	-- Animal guest templates are pre-built, correctly assembled clones -- return
+	-- one directly (no InsertService, no permission wall, already normalized).
+	if animalTemplates[meshType] then
+		return animalTemplates[meshType]:Clone()
+	end
 	if meshTemplateCache[meshType] then
 		return meshTemplateCache[meshType]:Clone()
 	end
@@ -161,10 +237,30 @@ local function createGuest(player)
 	guestIdCounter = guestIdCounter + 1
 	guest.Name = "Guest_" .. guestIdCounter
 
-	-- Select random mesh type
+	-- Select random mesh type. Prefer the cute animal guests (built from level
+	-- meshes) -- they always load cleanly. Mix in the Kenney human types too for
+	-- variety. If no animal templates were built (e.g. none in the level yet),
+	-- fall back to the Kenney pool alone.
 	local meshTypes = {}
-	for meshType in pairs(NPCConfig.guestTemplates) do
-		table.insert(meshTypes, meshType)
+	for name in pairs(animalTemplates) do
+		table.insert(meshTypes, name)
+	end
+	local animalCount = #meshTypes
+	if animalCount == 0 then
+		for meshType in pairs(NPCConfig.guestTemplates) do
+			table.insert(meshTypes, meshType)
+		end
+	else
+		-- ~1 in 4 guests is a Kenney human for variety; the rest are animals.
+		if math.random() < 0.25 then
+			local kenney = {}
+			for meshType in pairs(NPCConfig.guestTemplates) do
+				table.insert(kenney, meshType)
+			end
+			if #kenney > 0 then
+				table.insert(meshTypes, kenney[math.random(1, #kenney)])
+			end
+		end
 	end
 	local selectedMeshType = meshTypes[math.random(1, #meshTypes)]
 
@@ -178,11 +274,18 @@ local function createGuest(player)
 		end
 		meshModel:Destroy()
 
-		-- Apply scale
-		local scale = NPCConfig.guestTemplates[selectedMeshType].scale
+		-- Apply scale (Kenney meshes only -- animal templates are pre-scaled at
+		-- build time and have no NPCConfig entry).
+		local tmpl = NPCConfig.guestTemplates[selectedMeshType]
 		local torso = guest:FindFirstChild("Torso")
+		if torso and tmpl and tmpl.scale then
+			torso.Size = torso.Size * tmpl.scale
+		end
+		-- Set PrimaryPart so NPCPatrolSystem.moveToWaypoint (which tweens
+		-- model.PrimaryPart) can actually move the guest -- without this, every
+		-- mesh guest silently failed to roam.
 		if torso then
-			torso.Size = torso.Size * scale
+			guest.PrimaryPart = torso
 		end
 
 		print("[GuestManager] Using mesh guest:", selectedMeshType)
@@ -303,11 +406,20 @@ local function createGuest(player)
 
 	local torso = guest:FindFirstChild("Torso")
 	if torso then
-		torso.CFrame = CFrame.new(spawnPos)
+		-- Move the WHOLE model to the slot as a unit (PivotTo) so multi-part
+		-- meshes stay coherent -- setting torso.CFrame alone left the limbs
+		-- behind at their template positions, and the weld loop below then
+		-- locked that huge stale offset (animals' legs ended up ~180 studs away).
+		if guest.PrimaryPart then
+			guest:PivotTo(CFrame.new(spawnPos))
+		else
+			torso.CFrame = CFrame.new(spawnPos)
+		end
 		torso.Anchored = true -- Keep guest still so they don't fall
 	end
 
-	-- Weld all limbs to torso so the model moves together
+	-- Weld all limbs to torso so the model moves together (offsets are now
+	-- correct because the whole model was moved coherently above).
 	for _, part in ipairs(guest:GetDescendants()) do
 		if part:IsA("BasePart") and part ~= torso then
 			local w = Instance.new("WeldConstraint")
@@ -399,9 +511,14 @@ local function createGuest(player)
 	payLabel.TextScaled = true
 	payLabel.Font = Enum.Font.Gotham
 	payLabel.Parent = bg
-	-- Assign personality type for roaming behavior
-	local personalityTypes = {"stationary", "roamer", "patrol"}
-	local personalityWeights = {0.4, 0.35, 0.25} -- 40% stationary, 35% roamer, 25% patrol
+	-- Assign personality type for roaming behavior. Guests are mostly roamers now
+	-- (they wander a small radius around their serving slot so they feel alive
+	-- and "milling about" instead of frozen) with a few stationary. Patrol is
+	-- intentionally dropped for guests -- it sends them across the whole map via
+	-- PatrolPoint waypoints, away from the serving area where they need to be
+	-- clickable. (Patrol stays in use for the ambient Traveler/Merchant NPCs.)
+	local personalityTypes = {"stationary", "roamer"}
+	local personalityWeights = {0.2, 0.8} -- 20% stationary, 80% roamer
 	local roll = math.random()
 	local cumulative = 0
 	local personality = "stationary"
@@ -414,7 +531,15 @@ local function createGuest(player)
 	end
 	guest:SetAttribute("Personality", personality)
 
-	-- If roamer or patrol, start roaming behavior
+	-- Parent to Guests folder BEFORE starting roaming -- guestRoamLoop's
+	-- `while guest.Parent do` check runs synchronously the instant task.spawn is
+	-- called (task.spawn runs up to the first yield immediately), so if the
+	-- roam loop was started while guest.Parent was still nil it exited on its
+	-- very first iteration with no error, silently. This was why NO guest ever
+	-- actually roamed despite spawn logs claiming "personality: roamer".
+	guest.Parent = GUEST_SPAWN_FOLDER
+
+	-- If roamer, start roaming behavior
 	if personality ~= "stationary" then
 		task.spawn(function()
 			local NPCPatrolSystem = require(game:GetService("ServerScriptService").NPCPatrolSystem)
@@ -423,9 +548,6 @@ local function createGuest(player)
 			end
 		end)
 	end
-
-	-- Parent to Guests folder
-	guest.Parent = GUEST_SPAWN_FOLDER
 
 	print("[GuestManager] Spawned guest " .. guest.Name .. " for " .. player.Name .. " wanting " .. recipe .. " (personality: " .. personality .. ")")
 
@@ -552,6 +674,10 @@ end
 if GuestService and GuestService.setRemoveGuestCallback then
 	GuestService.setRemoveGuestCallback(removeGuest)
 end
+
+-- Build the animal guest template pool from the level's animal-* meshes before
+-- the first guest spawns (5s spawn delay gives this ample time).
+buildAnimalTemplates()
 
 -- Start loops
 task.spawn(guestSpawnLoop)

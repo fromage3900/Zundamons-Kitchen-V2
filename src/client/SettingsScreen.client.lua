@@ -109,12 +109,18 @@ Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
 
 local function setVolume(val)
 	local clamped = math.clamp(val, 0, 1)
-	local soundService = game:GetService("SoundService")
-	for _, sound in ipairs(soundService:GetDescendants()) do
-		if sound:IsA("Sound") then
-			local baseVolume = sound:GetAttribute("SettingsBaseVolume") or sound.Volume
-			sound:SetAttribute("SettingsBaseVolume", baseVolume)
-			sound.Volume = baseVolume * clamped
+	-- Drive the "Master" SoundGroup that ZundaSoundController routes all game
+	-- audio into. A SoundGroup scales every member sound -- including ones
+	-- created after this call -- so the slider durably controls volume, unlike
+	-- the old approach of poking individual Sound.Volume values that each
+	-- sound player promptly overwrote from SoundConfig on its next play.
+	local controller = _G.ZundaSoundController
+	if controller and controller.setMasterVolume then
+		controller.setMasterVolume(clamped)
+	else
+		local group = game:GetService("SoundService"):FindFirstChild("Master")
+		if group and group:IsA("SoundGroup") then
+			group.Volume = clamped
 		end
 	end
 	volVal.Text = math.floor(clamped * 100) .. "%"

@@ -51,11 +51,27 @@ local function positionOf(instance: Instance): Vector3?
 	return nil
 end
 
-local function inFishingZone(player: Player): boolean
+local function fishingAnchors(): { Instance }
+	-- Primary signal: designer-placed FishingZone tags. Fallback: the pond water
+	-- anchor placed by AmbientZoneAudio.server.lua ("AmbientZone_Pond"), which is
+	-- the only robust water representation in this place. This keeps fishing gated
+	-- to water even before anyone tags a zone.
 	local zones = CollectionService:GetTagged("FishingZone")
-	if #zones == 0 then
-		-- Existing places predate zone tags. Once a designer adds any FishingZone,
-		-- proximity becomes mandatory without requiring another code change.
+	if #zones > 0 then
+		return zones
+	end
+	local pond = workspace:FindFirstChild("AmbientZone_Pond")
+	if pond then
+		return { pond }
+	end
+	return {}
+end
+
+local function inFishingZone(player: Player): boolean
+	local anchors = fishingAnchors()
+	if #anchors == 0 then
+		-- No water representation exists at all (e.g. ambient audio not yet
+		-- initialized). Fail open so fishing is never permanently broken.
 		return true
 	end
 	local character = player.Character
@@ -63,8 +79,8 @@ local function inFishingZone(player: Player): boolean
 	if not root or not root:IsA("BasePart") then
 		return false
 	end
-	for _, zone in ipairs(zones) do
-		local position = positionOf(zone)
+	for _, anchor in ipairs(anchors) do
+		local position = positionOf(anchor)
 		if position and (root.Position - position).Magnitude <= MAX_ZONE_DISTANCE then
 			return true
 		end

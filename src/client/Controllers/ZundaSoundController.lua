@@ -11,6 +11,33 @@ local SoundConfig = require(ReplicatedStorage.ConfigurationFiles.SoundConfig)
 
 local ZundaSoundController = {}
 
+-- Master SoundGroup so the Settings volume slider can scale ALL game audio at
+-- once. Sounds routed into this group have their effective volume multiplied by
+-- group.Volume, and any sound that joins the group later inherits the current
+-- setting automatically -- which is exactly what a master-volume control needs.
+local function getMasterGroup(): SoundGroup
+    local group = SoundService:FindFirstChild("Master")
+    if group and group:IsA("SoundGroup") then
+        return group
+    end
+    local newGroup = Instance.new("SoundGroup")
+    newGroup.Name = "Master"
+    newGroup.Volume = 1
+    newGroup.Parent = SoundService
+    return newGroup
+end
+local masterGroup = getMasterGroup()
+
+-- Set the master volume (0-1). Scales every sound routed into the Master group.
+function ZundaSoundController.setMasterVolume(v: number)
+    masterGroup.Volume = math.clamp(v, 0, 1)
+end
+
+-- Get the current master volume (0-1).
+function ZundaSoundController.getMasterVolume(): number
+    return masterGroup.Volume
+end
+
 -- Cache of played sounds to avoid re-creating
 local soundCache: { [string]: Sound } = {}
 
@@ -27,6 +54,7 @@ local function getSound(actionName: string): Sound?
     end
 
     sound.Volume = SoundConfig.getVolume(actionName)
+    sound.SoundGroup = masterGroup
     soundCache[actionName] = sound
     return sound
 end
@@ -44,7 +72,7 @@ end
 
 -- Play a UI sound by action name
 function ZundaSoundController.play(actionName: string)
-    if actionName == "Bubbles" then
+    if actionName == "Bubbles" or SoundConfig.SoundMap[actionName] == "BUBBLES" then
         ZundaSoundController.playBubbles()
         return
     end
@@ -72,6 +100,7 @@ function ZundaSoundController.playOneShot(actionName: string, duration: number?)
     end
     local clone = sound:Clone()
     clone.Volume = SoundConfig.getVolume(actionName)
+    clone.SoundGroup = masterGroup
     clone.Parent = SoundService
     clone:Play()
     game:GetService("Debris"):AddItem(clone, duration or 2)
@@ -102,6 +131,7 @@ function ZundaSoundController.playAmbient()
     ambient.SoundId = SoundConfig.AmbientLoop
     ambient.Volume = SoundConfig.AmbientLoopVolume or 0.3
     ambient.Looped = true
+    ambient.SoundGroup = masterGroup
     ambient.Parent = SoundService
     ambient:Play()
     print("[ZundaSoundController] Ambient loop started")
@@ -112,6 +142,7 @@ function ZundaSoundController.playBubbles()
     local s = Instance.new("Sound")
     s.SoundId = SoundConfig.Bubbles
     s.Volume = SoundConfig.BubblesVolume or 0.5
+    s.SoundGroup = masterGroup
     s.Parent = SoundService
     s:Play()
     game:GetService("Debris"):AddItem(s, 3)

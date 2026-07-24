@@ -4,8 +4,16 @@ local RS = game:GetService("ReplicatedStorage")
 local FishingCast = RS:WaitForChild("ToolRemotes"):WaitForChild("FishingCast")
 local boundTools = setmetatable({}, { __mode = "k" })
 
+local function isFishingRod(tool)
+	-- Match the server's identity check (FishingService.equippedRod uses the
+	-- "Type" attribute), not the display Name. Baked rods ship as e.g.
+	-- "Driftwood Rod" with Type="FishingRod"; binding on Name alone silently
+	-- never wired Activated, so casting did nothing.
+	return tool:GetAttribute("Type") == "FishingRod" or tool.Name == "FishingRod"
+end
+
 local function bindFishingRod(tool)
-	if tool.Name ~= "FishingRod" or boundTools[tool] then
+	if not tool:IsA("Tool") or not isFishingRod(tool) or boundTools[tool] then
 		return
 	end
 	boundTools[tool] = true
@@ -72,3 +80,39 @@ backpack.ChildAdded:Connect(function(child)
 		bindFishingRod(child)
 	end
 end)
+
+-- Proximity water volume: a subtle bubbling loop that swells as the player nears
+-- the pond and fades out with distance. Anchored to AmbientZone_Pond (the same
+-- water anchor the server gates fishing on) so the audio cue matches where
+-- fishing actually becomes usable.
+do
+	local RunService = game:GetService("RunService")
+
+	local PROX_NEAR = 12 -- fully audible within this many studs of the water
+	local PROX_FAR = 60 -- silent beyond this
+	local PROX_MAX_VOLUME = 0.25 -- keep it ambient, never intrusive
+
+	local waterSound = Instance.new("Sound")
+	waterSound.Name = "FishingWaterProximity"
+	waterSound.SoundId = "rbxassetid://136926771045300" -- Bubbles (SoundConfig.Bubbles)
+	waterSound.Looped = true
+	waterSound.Volume = 0
+	waterSound.Parent = script
+	pcall(function()
+		waterSound:Play()
+	end)
+
+	RunService.Heartbeat:Connect(function()
+		local character = player.Character
+		local root = character and character:FindFirstChild("HumanoidRootPart")
+		local pond = workspace:FindFirstChild("AmbientZone_Pond")
+		if not root or not pond or not pond:IsA("BasePart") then
+			waterSound.Volume = 0
+			return
+		end
+		local distance = (root.Position - pond.Position).Magnitude
+		local proximity = math.clamp((PROX_FAR - distance) / (PROX_FAR - PROX_NEAR), 0, 1)
+		-- Ease toward the target so entering/leaving the zone glides instead of snapping.
+		waterSound.Volume += (proximity * PROX_MAX_VOLUME - waterSound.Volume) * 0.1
+	end)
+end
