@@ -35,7 +35,7 @@ local function makeMistPatch(pos, color)
 	p.Transparency = 1
 	p.Parent = FX
 	local e = Instance.new("ParticleEmitter")
-	e.Texture = "rbxassetid://101237232079937"
+	e.Texture = "rbxassetid://135098817819129" -- FX_Spark_Bokeh (was reusing GodRays' Beam texture -- rendered as flat floating squares)
 	e.Rate = 6
 	e.Lifetime = NumberRange.new(12, 24)
 	e.Speed = NumberRange.new(0.2, 0.8)

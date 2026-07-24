@@ -33,6 +33,10 @@ end
 
 -- Play a UI sound by action name
 function ZundaSoundController.play(actionName: string)
+    if actionName == "Bubbles" then
+        ZundaSoundController.playBubbles()
+        return
+    end
     local sound = getSound(actionName)
     if not sound then
         return
@@ -76,20 +80,35 @@ function ZundaSoundController.preload()
     print("[ZundaSoundController] Preloaded " .. #actionNames .. " sounds")
 end
 
--- Play ambient loop
+-- Play ambient loop (idempotent -- safe to call more than once)
 function ZundaSoundController.playAmbient()
+    if SoundService:FindFirstChild("AmbientLoop") then
+        return
+    end
     local ambient = Instance.new("Sound")
     ambient.Name = "AmbientLoop"
     ambient.SoundId = SoundConfig.AmbientLoop
-    ambient.Volume = 0.3
+    ambient.Volume = SoundConfig.AmbientLoopVolume or 0.3
     ambient.Looped = true
     ambient.Parent = SoundService
     ambient:Play()
     print("[ZundaSoundController] Ambient loop started")
 end
 
+-- One-shot bubbles SFX -- rhythm-cooking hits, fishing catches
+function ZundaSoundController.playBubbles()
+    local s = Instance.new("Sound")
+    s.SoundId = SoundConfig.Bubbles
+    s.Volume = SoundConfig.BubblesVolume or 0.5
+    s.Parent = SoundService
+    s:Play()
+    game:GetService("Debris"):AddItem(s, 3)
+end
+
 -- Expose globally for easy access
 _G.ZundaSoundController = ZundaSoundController
+
+ZundaSoundController.playAmbient()
 
 print("[ZundaSoundController] Ready — Nomagician UI SFX loaded (CC BY 4.0)")
 

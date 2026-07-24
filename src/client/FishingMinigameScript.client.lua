@@ -117,6 +117,9 @@ local function finish(outcome: string, payload: any?)
 	if outcome == "caught" then
 		resultLabel.Text = "Caught " .. tostring(payload and payload.name or "a fish") .. "!"
 		resultLabel.TextColor3 = UIConfig.COLORS.Success
+		if _G.ZundaSoundController then
+			_G.ZundaSoundController.play("Bubbles")
+		end
 	elseif outcome == "settlement_failed" then
 		resultLabel.Text = "Catch could not be saved. Please try again."
 		resultLabel.TextColor3 = UIConfig.COLORS.Danger

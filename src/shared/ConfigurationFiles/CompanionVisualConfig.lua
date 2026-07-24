@@ -8,8 +8,8 @@ CompanionVisualConfig.defaultAssetId = "rbxassetid://84382956251208"
 CompanionVisualConfig.defaultPrefab = "zundapalupdate4"
 
 CompanionVisualConfig.visuals = {
-	zundamon    = { modelAssetId = "rbxassetid://121481310719137", basePrefab = "zundapalupdate4", idleAnimationId = nil, walkAnimationId = nil },
-	zundapal    = { modelAssetId = "rbxassetid://121481310719137", basePrefab = "zundapalupdate4", idleAnimationId = nil, walkAnimationId = nil }, -- Backward compat alias
+	zundamon    = { modelAssetId = "rbxassetid://121481310719137", basePrefab = "zundapalupdate4", idleAnimationId = nil, walkAnimationId = nil, orientCorrection = CFrame.Angles(0, math.rad(180), 0) },
+	zundapal    = { modelAssetId = "rbxassetid://121481310719137", basePrefab = "zundapalupdate4", idleAnimationId = nil, walkAnimationId = nil, orientCorrection = CFrame.Angles(0, math.rad(180), 0) }, -- Backward compat alias
 	dog         = { modelAssetId = "rbxassetid://123070508686616", basePrefab = "dog", idleAnimationId = nil, walkAnimationId = nil },
 	parrot      = { modelAssetId = "rbxassetid://84382956251208",  basePrefab = "parrot", idleAnimationId = nil, walkAnimationId = nil },
 	cat         = { modelAssetId = "rbxassetid://131662379743903", basePrefab = "cat", idleAnimationId = nil, walkAnimationId = nil },

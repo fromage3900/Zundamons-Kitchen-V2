@@ -238,6 +238,9 @@ local function handleHitInput()
 
 		bestPea.instance.BackgroundColor3 = ratingColor
 		spawnFloatingRating(ratingText, ratingColor, mainPanel)
+		if _G.ZundaSoundController then
+			_G.ZundaSoundController.play("Bubbles")
+		end
 
 		-- Quality is presentation-only; server derives it from this note intent.
 		cookingHitEvent:FireServer(currentSessionId, bestPea.noteIndex)

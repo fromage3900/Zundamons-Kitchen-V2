@@ -89,8 +89,13 @@ local SoundConfig = {
         buff      = "rbxassetid://4612374495",
     },
 
-    -- Ambient loop (background music - Nomagician Cozy Ambience)
-    AmbientLoop = "rbxassetid://128983191747430",
+    -- Ambient loop (background music) -- melusinabaseambience98bpm, user-uploaded 2026-07-24
+    AmbientLoop = "rbxassetid://106967719074596",
+    AmbientLoopVolume = 0.35,
+
+    -- Bubbles SFX -- procs on rhythm-cooking hits and fishing catches
+    Bubbles = "rbxassetid://136926771045300",
+    BubblesVolume = 0.5,
 }
 
 -- Helper: get the Sound object for a UI action

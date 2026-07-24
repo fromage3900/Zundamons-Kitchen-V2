@@ -21,19 +21,10 @@ if workspace:FindFirstChild("ZundaAmbientFX") then
 	return true
 end
 
--- DISABLED 2026-07-24: all four particle texture asset ids (dust/firefly,
--- sakura, bubble, magic sparkle) fail ContentProvider:PreloadAsync with
--- AssetFetchStatus.Failure -- same broken/inaccessible-asset class as the
--- InsertService issues fixed elsewhere this session. A failed particle
--- texture renders as Roblox's default fallback: a plain white square, so
--- every emitter here was spawning visible white squares floating around the
--- whole map ("crazy default FX"). This isn't fixable in code -- it needs
--- real, working asset ids uploaded/owned by this experience before
--- re-enabling. Remove this early return once that's done.
-do
-	print("[AmbientParticles] Disabled -- all particle texture asset ids are broken (AssetFetchStatus.Failure)")
-	return true
-end
+-- RE-ENABLED 2026-07-24: replaced the four broken particle texture asset ids
+-- with real glyph/sparkle textures uploaded via tools/asset-pipeline (owned by
+-- this experience's creator, so they actually load -- see
+-- manifest_fx_textures.json for sources).
 
 local FX = Instance.new("Folder")
 FX.Name = "ZundaAmbientFX"
@@ -51,7 +42,7 @@ local function makeDustEmitter(pos)
 	p.Transparency = 1
 	p.Parent = FX
 	local e = Instance.new("ParticleEmitter")
-	e.Texture = "rbxassetid://101237232079937"
+	e.Texture = "rbxassetid://111822379021626" -- FX_Spark_Dot
 	e.Rate = 10
 	e.Lifetime = NumberRange.new(10, 22)
 	e.Speed = NumberRange.new(0.3, 1.8)
@@ -80,7 +71,7 @@ local function makeFireflyEmitter(pos)
 	p.Transparency = 1
 	p.Parent = FX
 	local e = Instance.new("ParticleEmitter")
-	e.Texture = "rbxassetid://101237232079937"
+	e.Texture = "rbxassetid://135367482654784" -- FX_Spark_Glow
 	e.Rate = 5
 	e.Lifetime = NumberRange.new(5, 10)
 	e.Speed = NumberRange.new(0.2, 1.2)
@@ -115,7 +106,7 @@ local function makeSakuraEmitter(pos)
 	p.Transparency = 1
 	p.Parent = FX
 	local e = Instance.new("ParticleEmitter")
-	e.Texture = "rbxassetid://73381643930763"
+	e.Texture = "rbxassetid://118028238287623" -- FX_Spark_Sparkle4
 	e.Rate = 25
 	e.Lifetime = NumberRange.new(7, 16)
 	e.Speed = NumberRange.new(1.5, 5)
@@ -147,7 +138,7 @@ local function makeBubbleMoteEmitter(pos)
 	p.Transparency = 1
 	p.Parent = FX
 	local e = Instance.new("ParticleEmitter")
-	e.Texture = "rbxassetid://75925932500392"
+	e.Texture = "rbxassetid://135098817819129" -- FX_Spark_Bokeh
 	e.Rate = 3
 	e.Lifetime = NumberRange.new(4, 10)
 	e.Speed = NumberRange.new(0.1, 0.5)
@@ -181,7 +172,7 @@ local function makeMagicSparkleEmitter(pos)
 	p.Transparency = 1
 	p.Parent = FX
 	local e = Instance.new("ParticleEmitter")
-	e.Texture = "rbxassetid://123808802176536"
+	e.Texture = "rbxassetid://88654266855280" -- FX_Magic_Star
 	e.Rate = 2
 	e.Lifetime = NumberRange.new(2, 5)
 	e.Speed = NumberRange.new(0.2, 0.8)

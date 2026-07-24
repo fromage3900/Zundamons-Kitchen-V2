@@ -3,8 +3,22 @@ local Tween = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
+local reducedMotion = GuiService.ReducedMotionEnabled
+local function checkReducedMotion()
+	if GuiService.ReducedMotionEnabled then
+		reducedMotion = true
+		return true
+	end
+	return false
+end
+if GuiService.ReducedMotionEnabled ~= nil then
+	GuiService:GetPropertyChangedSignal("ReducedMotionEnabled"):Connect(function()
+		checkReducedMotion()
+	end)
+end
 
 if playerGui:FindFirstChild("ZundaWhimsicalOverlay") then
 	return true
@@ -88,39 +102,42 @@ local function updateGradient(hour, weatherKey)
 	local isNight = hour <= 5 or hour >= 19.5
 
 	local topColor, bottomColor
+	-- AAA polish: reduced purple wash that was tinting characters blue.
+	-- Colors are now warmer and more neutral at the center of the screen.
 	if isDawn then
-		topColor = Color3.fromRGB(255, 195, 210)
-		bottomColor = Color3.fromRGB(255, 215, 225)
+		topColor = Color3.fromRGB(255, 210, 215)
+		bottomColor = Color3.fromRGB(255, 225, 230)
 	elseif isDusk then
-		topColor = Color3.fromRGB(255, 165, 185)
-		bottomColor = Color3.fromRGB(210, 140, 195)
+		topColor = Color3.fromRGB(255, 185, 195)
+		bottomColor = Color3.fromRGB(230, 170, 200)
 	elseif isNight then
-		topColor = Color3.fromRGB(65, 45, 115)
-		bottomColor = Color3.fromRGB(35, 22, 68)
+		topColor = Color3.fromRGB(80, 65, 120)
+		bottomColor = Color3.fromRGB(50, 40, 80)
 	else
-		topColor = Color3.fromRGB(225, 222, 250)
-		bottomColor = Color3.fromRGB(245, 238, 248)
+		topColor = Color3.fromRGB(235, 232, 248)
+		bottomColor = Color3.fromRGB(248, 244, 250)
 	end
 
 	if weatherKey == "cherry_blossom" then
-		topColor = Color3.fromRGB(255, 205, 222)
-		bottomColor = Color3.fromRGB(255, 225, 240)
+		topColor = Color3.fromRGB(255, 215, 228)
+		bottomColor = Color3.fromRGB(255, 232, 242)
 	elseif weatherKey == "rain" or weatherKey == "storm" then
-		topColor = Color3.fromRGB(145, 148, 190)
-		bottomColor = Color3.fromRGB(115, 122, 168)
+		topColor = Color3.fromRGB(165, 168, 200)
+		bottomColor = Color3.fromRGB(140, 145, 180)
 	elseif weatherKey == "fog" then
-		topColor = Color3.fromRGB(175, 172, 205)
-		bottomColor = Color3.fromRGB(195, 195, 220)
+		topColor = Color3.fromRGB(190, 192, 215)
+		bottomColor = Color3.fromRGB(205, 205, 225)
 	elseif weatherKey == "snow" then
-		topColor = Color3.fromRGB(215, 218, 242)
-		bottomColor = Color3.fromRGB(230, 234, 250)
+		topColor = Color3.fromRGB(225, 228, 245)
+		bottomColor = Color3.fromRGB(238, 240, 250)
 	elseif weatherKey == "aurora" then
-		topColor = Color3.fromRGB(130, 95, 192)
-		bottomColor = Color3.fromRGB(65, 45, 130)
+		topColor = Color3.fromRGB(150, 120, 200)
+		bottomColor = Color3.fromRGB(90, 70, 140)
 	end
 
-	local alpha = isNight and 0.38 or 0.28
-	local dawnBoost = (isDawn or isDusk) and 1.3 or 1.0
+	-- Reduced alpha so the gradient doesn't overpower characters
+	local alpha = isNight and 0.28 or 0.18
+	local dawnBoost = (isDawn or isDusk) and 1.2 or 1.0
 	gradientUI.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, topColor),
 		ColorSequenceKeypoint.new(0.5, bottomColor),
@@ -144,12 +161,19 @@ local function updateGradient(hour, weatherKey)
 		flare.Position = pos
 		flareGlow.Position = pos
 		flareIri.Position = pos
-		local pulse = math.sin(os.clock() * 0.3) * 0.04
-		local iriShift = math.sin(os.clock() * 0.15) * 0.5 + 0.5
-		flare.ImageTransparency = 0.82 + pulse
-		flareGlow.ImageTransparency = 0.93 + pulse * 0.5
-		flareIri.ImageTransparency = 0.94 + pulse * 0.3
-		flareIri.Rotation = iriShift * 360
+		if not reducedMotion then
+			local pulse = math.sin(os.clock() * 0.3) * 0.04
+			local iriShift = math.sin(os.clock() * 0.15) * 0.5 + 0.5
+			flare.ImageTransparency = 0.82 + pulse
+			flareGlow.ImageTransparency = 0.93 + pulse * 0.5
+			flareIri.ImageTransparency = 0.94 + pulse * 0.3
+			flareIri.Rotation = iriShift * 360
+		else
+			flare.ImageTransparency = 0.86
+			flareGlow.ImageTransparency = 0.95
+			flareIri.ImageTransparency = 0.96
+			flareIri.Rotation = 0
+		end
 	end
 end
 
@@ -208,7 +232,7 @@ if weatherRE then
 	end)
 end
 
-task.wait(2)
+task.wait(1.2)
 onTimeOrWeatherChange()
 
 -- Ground-level wash: extra dark gradient at bottom for depth
@@ -274,54 +298,64 @@ sheen.ScaleType = Enum.ScaleType.Fit
 sheen.ZIndex = 251
 sheen.Parent = gui
 
-task.spawn(function()
-	local t = 0
-	while gui.Parent do
-		local dt = task.wait(0.05)
-		t = t + dt
+if not reducedMotion then
+	task.spawn(function()
+		local t = 0
+		while gui.Parent do
+			local dt = task.wait(0.05)
+			t = t + dt
 
-		-- Thin-film hue cycling (0.02 Hz = 50s cycle)
-		local tfHue = (t * 0.01) % 1
-		local tfSat = 0.35 + math.sin(t * 0.08) * 0.15
-		local tfVal = 0.85 + math.sin(t * 0.12) * 0.10
-		thinFilm.ImageColor3 = Color3.fromHSV(tfHue, tfSat, tfVal)
-		local tfBreath = 0.5 + 0.5 * math.sin(t * 0.2)
-		thinFilm.ImageTransparency = 0.96 + tfBreath * 0.02
+			-- Thin-film hue cycling (0.02 Hz = 50s cycle)
+			local tfHue = (t * 0.01) % 1
+			local tfSat = 0.35 + math.sin(t * 0.08) * 0.15
+			local tfVal = 0.85 + math.sin(t * 0.12) * 0.10
+			thinFilm.ImageColor3 = Color3.fromHSV(tfHue, tfSat, tfVal)
+			local tfBreath = 0.5 + 0.5 * math.sin(t * 0.2)
+			thinFilm.ImageTransparency = 0.96 + tfBreath * 0.02
 
-		-- Sheen sweep: moves from top to bottom over 25s
-		local sweepY = (t * 0.04) % 1.2 - 0.1
-		sheen.Position = UDim2.new(-0.5, 0, sweepY, 0)
-		sheen.ImageColor3 = Color3.fromHSV((t * 0.005) % 1, 0.3, 1)
-		local sheenVis = (sweepY > -0.1 and sweepY < 1.0)
-		sheen.ImageTransparency = sheenVis and (0.95 + math.sin(t * 1.5) * 0.015) or 1
-	end
-end)
+			-- Sheen sweep: moves from top to bottom over 25s
+			local sweepY = (t * 0.04) % 1.2 - 0.1
+			sheen.Position = UDim2.new(-0.5, 0, sweepY, 0)
+			sheen.ImageColor3 = Color3.fromHSV((t * 0.005) % 1, 0.3, 1)
+			local sheenVis = (sweepY > -0.1 and sweepY < 1.0)
+			sheen.ImageTransparency = sheenVis and (0.95 + math.sin(t * 1.5) * 0.015) or 1
+		end
+	end)
 
--- Gentle breathing for the gradient wash opacity
-task.spawn(function()
-	while gui.Parent do
-		local breath = math.sin(os.clock() * 0.2) * 0.008
-		gradientFrame.BackgroundTransparency = 0.98 + breath
-		task.wait(0.1)
-	end
-end)
+	-- Consolidated breathing loop: gradient + ground wash in one tick
+	task.spawn(function()
+		while gui.Parent do
+			local weather = workspace:GetAttribute("CurrentWeather") or "clear"
+			local isDark = (weather == "rain" or weather == "storm" or weather == "fog" or weather == "snow")
+			local breath = math.sin(os.clock() * 0.2) * 0.008
+			gradientFrame.BackgroundTransparency = 0.98 + breath
 
--- Animate ground wash breathing too
-task.spawn(function()
-	while gui.Parent do
-		local weather = workspace:GetAttribute("CurrentWeather") or "clear"
-		local isDark = (weather == "rain" or weather == "storm" or weather == "fog" or weather == "snow")
-		local base = isDark and 0.35 or 0.25
-		local breath = math.sin(os.clock() * 0.15) * 0.04
-		local a = base + breath
-		groundGradient.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 1),
-			NumberSequenceKeypoint.new(0.3, 1 - a * 0.5),
-			NumberSequenceKeypoint.new(1, 1 - a),
-		})
-		task.wait(0.1)
-	end
-end)
+			local base = isDark and 0.35 or 0.25
+			local gBreath = math.sin(os.clock() * 0.15) * 0.04
+			local a = base + gBreath
+			groundGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 1),
+				NumberSequenceKeypoint.new(0.3, 1 - a * 0.5),
+				NumberSequenceKeypoint.new(1, 1 - a),
+			})
+			task.wait(0.1)
+		end
+	end)
+else
+	-- Static values when reduced motion is enabled
+	thinFilm.ImageTransparency = 0.97
+	sheen.ImageTransparency = 1
+	gradientFrame.BackgroundTransparency = 0.98
+	local weather = workspace:GetAttribute("CurrentWeather") or "clear"
+	local isDark = (weather == "rain" or weather == "storm" or weather == "fog" or weather == "snow")
+	local base = isDark and 0.35 or 0.25
+	groundGradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.3, 1 - base * 0.5),
+		NumberSequenceKeypoint.new(1, 1 - base),
+	})
+	sheen.Visible = false
+end
 
 updateGroundWash("clear")
 workspace:GetAttributeChangedSignal("CurrentWeather"):Connect(function()
