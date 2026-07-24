@@ -1,0 +1,6 @@
+[
+  { "filePath": "G:/ZUNDYMONSKITCHEN/zundapalupdate/ZundaPalUpdate_BaseColor.png", "assetType": "Decal", "displayName": "Zundamon_BaseColor" },
+  { "filePath": "G:/ZUNDYMONSKITCHEN/zundapalupdate/ZundaPalUpdate_Normal.png", "assetType": "Decal", "displayName": "Zundamon_Normal" },
+  { "filePath": "G:/ZUNDYMONSKITCHEN/zundapalupdate/ZundaPalUpdate_Roughness.png", "assetType": "Decal", "displayName": "Zundamon_Roughness" },
+  { "filePath": "G:/ZUNDYMONSKITCHEN/zundapalupdate/ZundaPalUpdate_Metallic.png", "assetType": "Decal", "displayName": "Zundamon_Metallic" }
+]
