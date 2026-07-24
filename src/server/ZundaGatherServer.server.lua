@@ -75,14 +75,21 @@ local function applyExtraDropBuff(player, baseItems)
 	notify(player, "🍀 Antimon found a bonus " .. bonus[1] .. "!")
 end
 
--- Respawn timing (seconds)
-local RESPAWN_FLOWER = 25
-local RESPAWN_BOUQUET = 45
-local RESPAWN_PEA = 35
-local RESPAWN_MUSHROOM = 25
-local RESPAWN_BERRY = 20
-local RESPAWN_ROOT = 22
+-- Respawn timing (seconds) — Mystery + Carrot keep bespoke values; simple
+-- click resources now read respawnSeconds straight from GatherConfig.
 local RESPAWN_MYSTERY = 90
+
+-- The live world was authored with a generic ResourceType="flower" on ~8
+-- harvestable flower nodes, but GatherConfig/the grant handler speak canonical
+-- names ("ZundaFlower" etc). Without this alias every flower click validated,
+-- passed distance/availability checks, then fell through the grant branch and
+-- granted nothing — the "flowers not pickable" bug. Map legacy generic tokens
+-- to their canonical GatherConfig key here.
+local RESOURCE_ALIASES = {
+	flower = "ZundaFlower",
+	pea = "ZundaPea",
+	leaf = "ZundaLeaf",
+}
 
 local function grantItems(player, items)
 	local char = player.Character
@@ -183,38 +190,14 @@ if RE_Harvest then
 		if not node:GetAttribute("Available") then
 			return
 		end
-		local rtype = node:GetAttribute("ResourceType")
+		local rawType = node:GetAttribute("ResourceType")
+		local rtype = RESOURCE_ALIASES[rawType] or rawType
 
 		-- Check first-time gather for side dialogue
 		local d = PlayerDataService.get(player)
 		local had_before = d and d.gathered_items or {}
 
-		if rtype == "ZundaFlower" then
-			local yield = node:GetAttribute("Yield") or 3
-			local items = {}
-			for i = 1, yield do
-				table.insert(items, "Zunda Flower")
-			end
-			grantItems(player, items)
-			applyExtraDropBuff(player, items)
-			notify(player, "🌼 +" .. yield .. " Zunda Flower")
-			if not had_before["Zunda Flower"] and RE_SideDlg then
-				pcall(function()
-					RE_SideDlg:FireClient(player, "zunda_flower")
-				end)
-			end
-			consumeNode(node, RESPAWN_FLOWER)
-		elseif rtype == "ZundaPea" then
-			local yield = node:GetAttribute("Yield") or 2
-			local items = {}
-			for i = 1, yield do
-				table.insert(items, "Zunda Pea")
-			end
-			grantItems(player, items)
-			applyExtraDropBuff(player, items)
-			notify(player, "🝒 +" .. yield .. " Zunda Pea")
-			consumeNode(node, RESPAWN_PEA)
-		elseif rtype == "MysteryLoot" then
+		if rtype == "MysteryLoot" then
 			local items = {}
 			local n = math.random(2, 3)
 			for i = 1, n do
@@ -224,16 +207,24 @@ if RE_Harvest then
 			applyExtraDropBuff(player, items)
 			notify(player, "✨ Mystery loot found!")
 			consumeNode(node, RESPAWN_MYSTERY)
-		elseif rtype == "SaltedPeaBouquet" then
-			local yield = node:GetAttribute("Yield") or 1
+		elseif GatherConfig.getClickResource(rtype) then
+			-- Data-driven grant for every simple click resource (ZundaFlower,
+			-- ZundaPea, PeaFlower, SweetPea, EdamamePod, ZundaLeaf, SaltedPeaBouquet…).
+			local res = GatherConfig.getClickResource(rtype)
+			local yield = node:GetAttribute("Yield") or res.defaultYield
 			local items = {}
 			for i = 1, yield do
-				table.insert(items, "Salted Pea Bouquet")
+				table.insert(items, res.itemName)
 			end
 			grantItems(player, items)
 			applyExtraDropBuff(player, items)
-			notify(player, "💐 +" .. yield .. " Salted Pea Bouquet")
-			consumeNode(node, RESPAWN_BOUQUET)
+			notify(player, res.notifyEmoji .. " +" .. yield .. " " .. res.itemName)
+			if rtype == "ZundaFlower" and not had_before[res.itemName] and RE_SideDlg then
+				pcall(function()
+					RE_SideDlg:FireClient(player, "zunda_flower")
+				end)
+			end
+			consumeNode(node, res.respawnSeconds)
 		elseif rtype == "CarrotPlot" then
 			-- CarrotPlot uses growth stages
 			local currentStage = node:GetAttribute("GrowthStage") or 1
@@ -265,36 +256,34 @@ if RE_Harvest then
 	end)
 end
 
--- Bind every gathering node in the GameplayLoopArea
-local function scanFolder(folder)
-	for _, node in ipairs(folder:GetDescendants()) do
-		if
-			node:IsA("BasePart")
-			and node:GetAttribute("ResourceType")
-			and node:FindFirstChildOfClass("ClickDetector")
-		then
-			bindNode(node)
-		end
+-- Bind every gathering node in the workspace. Nodes are NOT confined to one
+-- folder — the live world has them scattered across `Loop.GameplayLoopArea`,
+-- `Folder.house 2`, and elsewhere, while the (empty) top-level
+-- `GameplayLoopArea.GatheringNodes` is what the old scan watched, so nothing
+-- was ever bound (no _origSize for respawn, no CarrotPlot growth init). A
+-- one-time workspace-wide scan is correct here since these are baked instances.
+local function isGatherNode(inst)
+	return inst:IsA("BasePart")
+		and inst:GetAttribute("ResourceType") ~= nil
+		and inst:FindFirstChildOfClass("ClickDetector") ~= nil
+end
+
+for _, node in ipairs(workspace:GetDescendants()) do
+	if isGatherNode(node) then
+		bindNode(node)
 	end
 end
 
-local loopArea = workspace:WaitForChild("GameplayLoopArea", 10)
-if loopArea then
-	local loopGather = loopArea:WaitForChild("GatheringNodes", 5)
-	if loopGather then
-		scanFolder(loopGather)
-		-- Bind new nodes that get added (e.g. SceneSetup rebuilds)
-		loopGather.ChildAdded:Connect(function(child)
-			task.wait(0.1)
-			if
-				child:IsA("BasePart")
-				and child:GetAttribute("ResourceType")
-				and child:FindFirstChildOfClass("ClickDetector")
-			then
-				bindNode(child)
+-- Catch nodes added later (e.g. SceneSetup rebuilds). Cheap attribute guard,
+-- early-returns on the vast majority of descendant additions.
+workspace.DescendantAdded:Connect(function(desc)
+	if desc:IsA("BasePart") then
+		task.defer(function()
+			if desc.Parent and isGatherNode(desc) then
+				bindNode(desc)
 			end
 		end)
 	end
-end
+end)
 
 print("[ZundaGatherServer] Ready - click-to-gather active (with HarvestValidator)")
