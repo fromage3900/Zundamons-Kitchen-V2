@@ -20,6 +20,12 @@ local activePatrols = {}
 local PlayerDataService = require(game:GetService("ServerScriptService").Services.PlayerDataService)
 local npcChatTimestamps = {}
 
+local openMerchantShopEv
+do
+	local remotes = ReplicatedStorage:FindFirstChild("RemoteEvents")
+	openMerchantShopEv = remotes and remotes:FindFirstChild("OpenMerchantShop")
+end
+
 local function createNPCModel(npcDef)
 	local model = Instance.new("Model")
 	model.Name = npcDef.name
@@ -65,6 +71,12 @@ local function createNPCModel(npcDef)
 		local d = PlayerDataService.getOrCreate(player)
 		d.npc_chats = d.npc_chats or {}
 		d.npc_chats[npcDef.name] = (d.npc_chats[npcDef.name] or 0) + 1
+
+		-- Merchant_01 opens the existing Furniture Shop (FurniturePlacement.client.lua,
+		-- normally toggled with H) rather than a new shop UI.
+		if npcDef.name == "Merchant_01" and openMerchantShopEv then
+			openMerchantShopEv:FireClient(player)
+		end
 	end)
 
 	return model

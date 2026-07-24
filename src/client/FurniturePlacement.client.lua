@@ -1,4 +1,4 @@
--- Furniture shop + placement mode. Press P to toggle.
+-- Furniture shop + placement mode. Press H to toggle.
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")
@@ -359,6 +359,16 @@ UIS.InputBegan:Connect(function(input, gpe)
 	end
 end)
 
+-- Merchant_01 (NPCPatrolSystem) opens this same shop on click -- it's a
+-- server-side ClickDetector, so it signals the client via remote rather
+-- than touching this LocalScript's GUI state directly.
+local openMerchantShopEv = RS:WaitForChild("RemoteEvents"):WaitForChild("OpenMerchantShop")
+openMerchantShopEv.OnClientEvent:Connect(function()
+	gui.Enabled = true
+	refreshGold()
+	renderTab(activeTab)
+end)
+
 mouse.Button1Down:Connect(function()
 	if not manageMode then
 		return
@@ -417,4 +427,4 @@ local function restorePlacedFurniture()
 end
 task.spawn(restorePlacedFurniture)
 
-print("[FurniturePlacement] Ready — press P for shop, G for manage mode")
+print("[FurniturePlacement] Ready — press H for shop, G for manage mode")
