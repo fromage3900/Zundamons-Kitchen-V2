@@ -1,7 +1,9 @@
 # Phase 3 — Finalization Handoff & Parallel Work Streams
 
-Owner: fromage3900 · Last verified live in Studio: 2026-07-23
+Owner: fromage3900 · Last verified live in Studio: 2026-07-24
 Entry point for any agent picking up work. Pairs with [PLAYTEST_NOTES.md](PLAYTEST_NOTES.md) (live issue tracker) and [PHASE3_FINALIZATION_PLAN.md](PHASE3_FINALIZATION_PLAN.md).
+
+> **⭐ Read [PHASE3_CORE_SCAFFOLDING.md](PHASE3_CORE_SCAFFOLDING.md) first** — it is the authoritative, live-verified (2026-07-24) map of the core loop and close-out state. The "Done & verified live" / "publishing criteria" sections lower in *this* file are older and partly stale (they describe the pre-replacement companion mesh, etc.). Where they disagree, the core-scaffolding doc wins.
 
 ## Session close-out (2026-07-24, later — companion mesh fixed, Zundarooms geometry live)
 - **Companion mesh finally resolved.** User imported `zundapalupdate4` as a proper skinned-mesh avatar (via Studio's Avatar Importer — confirmed live: single skinned `MeshPart` + `AnimationController`, no `Humanoid`, same shape as the parrot rig). It was sitting loose in `Workspace` after import; moved into `ServerStorage.CompanionVisualCatalog.Prefabs.zundamon` (and `.zundapal` as a transitional-fallback copy), replacing the old broken empty-`MeshId` placeholder. Verified live: companion spawns, animates via the `Animator`, upright, human-sized. **Remaining, separate gap: renders fully white/untextured** (no material/`SurfaceAppearance` applied) — this is the pre-existing Stream C2 item, not a new regression.
