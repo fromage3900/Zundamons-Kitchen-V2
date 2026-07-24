@@ -167,10 +167,25 @@ local function setupWaterDebris()
 	end
 end
 
+-- Was: one independent task.spawn+task.wait(0.016) coroutine PER water body
+-- (Kitchen/Garden/Pond, etc), each separately re-computing getTimeColor()
+-- every ~frame -- exactly the "consolidate into one Heartbeat-driven updater
+-- over a cached list" perf debt already flagged in
+-- docs/FX_UI_LAYERING_PLAN.md item 5, apparently never actually done. Now a
+-- single Heartbeat connection updates every tracked glow, computing the time
+-- color once per frame instead of once per frame per water body.
+local activeGlows: { Part } = {}
+local fresnelFadeT = 0
+local fresnelConnection: RBXScriptConnection? = nil
+
 local function setupFresnelGlow()
 	for _, part in ipairs(trackedWater) do
 		if not part.Parent then continue end
-		if part:FindFirstChild("ZundaFresnelGlow") then continue end
+		local existing = part:FindFirstChild("ZundaFresnelGlow")
+		if existing then
+			table.insert(activeGlows, existing)
+			continue
+		end
 
 		local glow = Instance.new("Part")
 		glow.Name = "ZundaFresnelGlow"
@@ -182,15 +197,22 @@ local function setupFresnelGlow()
 		glow.Color = C_tealLight
 		glow.Transparency = 0.85
 		glow.Parent = part
+		table.insert(activeGlows, glow)
+	end
 
-		task.spawn(function()
-			local fadeT = 0
-			while glow and glow.Parent do
-				fadeT = fadeT + 0.016
-				local hourColor = getTimeColor()
-				glow.Color = hourColor
-				glow.Transparency = 0.85 + math.sin(fadeT * 0.4) * 0.08
-				task.wait(0.016)
+	if not fresnelConnection then
+		fresnelConnection = RunService.Heartbeat:Connect(function(dt)
+			fresnelFadeT = fresnelFadeT + dt
+			local hourColor = getTimeColor()
+			local transparency = 0.85 + math.sin(fresnelFadeT * 0.4) * 0.08
+			for i = #activeGlows, 1, -1 do
+				local glow = activeGlows[i]
+				if glow and glow.Parent then
+					glow.Color = hourColor
+					glow.Transparency = transparency
+				else
+					table.remove(activeGlows, i)
+				end
 			end
 		end)
 	end
