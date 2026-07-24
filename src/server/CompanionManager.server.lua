@@ -354,12 +354,13 @@ local function buildCompanion(player, compType)
 		lastClick = now
 		sparkle.Rate = 60
 		task.delay(0.6, function() if sparkle.Parent then sparkle.Rate = 10 end end)
-		vnEv:FireClient(clicker, compType, def.emoji)
 		-- Per-companion bond XP (distinct from the flat, global
 		-- companion_affection/companion_chats counters QuestManager already
 		-- tracks) -- the start of an Uma-Musume-style "bond with THIS specific
 		-- companion" progression. Same 3s click cooldown as the VN trigger above.
 		PlayerDataService.addCompanionBond(clicker, compType, 1)
+		local bondTier = PlayerDataService.getCompanionBondTier(clicker, compType)
+		vnEv:FireClient(clicker, compType, def.emoji, bondTier)
 	end)
 
 	activeCompanions[player.Name] = companionModel

@@ -550,7 +550,13 @@ end)
 local RE = RS:WaitForChild("RemoteEvents")
 
 -- ── BRANCHING ZUNDAMON DIALOGUE TREE ─────────────────────────────
-local function buildCompanionTree(compType)
+-- Bond tier (1/2/3, see PlayerDataService.getCompanionBondTier) -> a
+-- representative "level" so VNDialogueData.getCompanionDialogue's existing
+-- level1_10/level11_20/level21_50 pools double as bond-flavor tiers, reusing
+-- already-written dialogue instead of new content.
+local BOND_TIER_LEVEL = {5, 15, 30}
+
+local function buildCompanionTree(compType, bondTier)
     local speakerKey = SPEAKERS[compType] and compType or "zundamon"
     local companionDialogue = COMPANION_DIALOGUE[speakerKey] or COMPANION_DIALOGUE.zundamon
     local hour = tonumber(Lighting:GetAttribute("CurrentHour")) or 12
@@ -559,6 +565,9 @@ local function buildCompanionTree(compType)
               or hour>=18 and hour<21 and "evening"
               or "night"
     local greeting = companionDialogue[slot] or companionDialogue.afternoon or companionDialogue.morning or {}
+    local bondLine = bondTier and bondTier > 1
+        and VNDialogueData.getCompanionDialogue(compType, slot, BOND_TIER_LEVEL[bondTier])
+        or nil
 
     -- LEAVES
     local leafEnd = {
@@ -636,6 +645,9 @@ local function buildCompanionTree(compType)
     for _, l in ipairs(greeting) do
         table.insert(greetingLines, {speaker=speakerKey, text=l})
     end
+    if bondLine then
+        table.insert(greetingLines, {speaker=speakerKey, text=bondLine})
+    end
 
     return {
         speaker = speakerKey,
@@ -657,9 +669,9 @@ local function buildCompanionTree(compType)
 end
 
 -- Companion click → branching tree
-RE:WaitForChild("OpenCompanionVN").OnClientEvent:Connect(function(compType, emoji)
+RE:WaitForChild("OpenCompanionVN").OnClientEvent:Connect(function(compType, emoji, bondTier)
     if isOpen then closePanel(true); return end
-    _G.ZundaVN.showBranching(buildCompanionTree(compType))
+    _G.ZundaVN.showBranching(buildCompanionTree(compType, bondTier))
 end)
 
 -- Quest completed
