@@ -1,6 +1,7 @@
 -- CompanionManager v4: loads full companion models with textures, sparkle VFX, VN click interaction
 local Players    = game:GetService("Players")
 local Tween      = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local RS         = game:GetService("ReplicatedStorage")
 local InsertService = game:GetService("InsertService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -367,7 +368,7 @@ local function buildCompanion(player, compType)
 	-- CompanionVisualConfig only if a specific mesh actually needs one.
 	local compVisualForOrient = CompanionVisualConfig.get(compType)
 	local ORIENT_CORRECTION = (compVisualForOrient and compVisualForOrient.orientCorrection) or CFrame.identity
-	task.spawn(function()
+	do
 		local t = 0
 		local currentAnimState = "idle" -- Track current animation state
 		local idleTrack = nil
@@ -396,8 +397,18 @@ local function buildCompanion(player, compType)
 			print("[CompanionManager.buildCompanion] Animation tracks loaded for", compType, "- idle:", idleTrack ~= nil, "walk:", walkTrack ~= nil)
 		end
 
-		while body and body.Parent and companionModel.Parent do
-			t = t + 0.05
+		-- Runs on Heartbeat (matches render rate, ~60Hz) instead of a 20Hz
+		-- task.wait loop -- the old low tick rate combined with a hard .CFrame
+		-- write each tick (which forces a physics "snap" on an unanchored part)
+		-- read as visible stutter, especially noticeable since the player moves
+		-- at full frame rate. Same follow/orientation logic, just smoother cadence.
+		local followConn
+		followConn = RunService.Heartbeat:Connect(function(dt)
+			if not (body and body.Parent and companionModel.Parent) then
+				if followConn then followConn:Disconnect() end
+				return
+			end
+			t = t + dt
 			local char2 = player.Character
 			local hrp2  = char2 and char2:FindFirstChild("HumanoidRootPart")
 			if hrp2 then
@@ -441,9 +452,8 @@ local function buildCompanion(player, compType)
 					body.CFrame = CFrame.new(body.Position) * facing * ORIENT_CORRECTION
 				end
 			end
-			task.wait(0.05)
-		end
-	end)
+		end)
+	end
 
 	return companionModel
 end

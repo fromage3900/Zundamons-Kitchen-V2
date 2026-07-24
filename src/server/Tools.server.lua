@@ -13,13 +13,40 @@ local toolList = toolsConfig.tools
 local HIT_RADIUS = 8       -- studs within which a swing connects
 local SWING_DURATION = 0.5
 
-function playHitSound(handle)
+-- Soft, cozy-ASMR hit sounds keyed by ToolsConfig's HitSound name (AxeHit/
+-- Smash/Splash). Fixes a real dead-config bug: ToolsConfig has always
+-- specified a HitSound name per tool, but this function only ever checked
+-- for a literal "HitSound" child on the handle (never present) and fell
+-- through to one hardcoded generic impact sound at Volume 0.5 for every
+-- swing -- axe, pickaxe, and sickle all played the same harsh, un-cozy hit.
+-- SoundService letters are the same Nomagician bank ZundaSoundController uses
+-- client-side; this runs server-side so it reads SoundService directly
+-- instead of going through the client-only _G.ZundaSoundController.
+local SoundConfig = require(RS.ConfigurationFiles.SoundConfig)
+local HIT_SOUND_LETTER = {
+	AxeHit = "p",  -- CookingTick: soft tick -- chop/harvest feel
+	Smash = "k",   -- Notification: slightly firmer tone -- rock/pickaxe feel
+	Splash = nil,  -- uses SoundConfig.Bubbles directly (water/fishing feel)
+}
+
+function playHitSound(handle, hitSoundName: string?)
 	if not handle then return end
 	local preloaded = handle:FindFirstChild("HitSound")
 	if preloaded then preloaded:Play(); return end
+
+	local soundId
+	if hitSoundName == "Splash" then
+		soundId = SoundConfig.Bubbles
+	else
+		local letter = HIT_SOUND_LETTER[hitSoundName or ""] or "p"
+		local sourceSound = game:GetService("SoundService"):FindFirstChild(letter)
+		soundId = (sourceSound and sourceSound.SoundId) or "rbxassetid://73558635732798" -- CookingTick fallback
+	end
+
 	local s = Instance.new("Sound")
-	s.SoundId = "rbxassetid://14133663945"
-	s.Volume = 0.5
+	s.SoundId = soundId
+	s.Volume = 0.4
+	s.PlaybackSpeed = 1 + (math.random() * 2 - 1) * 0.05
 	s.Parent = handle
 	s:Play()
 	Debris:AddItem(s, 2)
@@ -135,7 +162,7 @@ function Activated(player, toolName)
 				if health then
 					node:SetAttribute("Health", math.max(health - damage, 0))
 				end
-				playHitSound(handle)
+				playHitSound(handle, usedTool.HitSound)
 				-- Small visual nudge for BasePart
 				if node:IsA("BasePart") then
 					local originCFrame = node.CFrame

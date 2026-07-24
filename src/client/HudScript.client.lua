@@ -131,7 +131,24 @@ local ComboUpdate = rewardEvents:WaitForChild("ComboUpdate")
 local LevelUpEvent = rewardEvents:WaitForChild("LevelUpEvent")
 local RequestRewardSync = rewardEvents:WaitForChild("RequestRewardSync")
 
+-- Reward-moment stingers (A2): every popup kind gets a distinct, recognizable
+-- sound so gold/XP/bonus/item pickups feel earned instead of landing silent.
+local POPUP_SOUND_BY_KIND = {
+	gold = "CoinEarn",
+	xp = "Sparkle",
+	bonus = "Success",
+	item = "Notification",
+}
+
+local function playRewardSound(actionName: string)
+	local zsc = _G.ZundaSoundController
+	if zsc then
+		zsc.play(actionName)
+	end
+end
+
 local function spawnPopup(kind, text, color)
+	playRewardSound(POPUP_SOUND_BY_KIND[kind] or "Notification")
 	local lbl = Instance.new("TextLabel")
 	lbl.Size = UDim2.new(0, 200, 0, 40)
 	lbl.Position = UDim2.new(0, math.random(-30, 30), 0, math.random(150, 250))
@@ -219,6 +236,7 @@ ComboUpdate.OnClientEvent:Connect(function(count, multiplier)
 end)
 
 LevelUpEvent.OnClientEvent:Connect(function(level, tierName, tierColor, tierBadge)
+	playRewardSound("LevelUp")
 	-- Big level-up banner
 	local banner = Instance.new("Frame")
 	banner.Size = UDim2.new(0, 460, 0, 120)
@@ -363,6 +381,7 @@ end
 -- Achievement toast stack
 local toastY = 0
 AchievementUnlocked.OnClientEvent:Connect(function(name, desc, icon)
+	playRewardSound("QuestComplete")
 	local toast = Instance.new("Frame")
 	toast.Size = UDim2.new(0, 340, 0, 70)
 	toast.Position = UDim2.new(1, 360, 0, 200 + toastY)

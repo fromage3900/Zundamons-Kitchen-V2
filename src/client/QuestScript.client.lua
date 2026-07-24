@@ -234,6 +234,9 @@ local qcBatch = RE:FindFirstChild("QuestCompletedBatch")
 if qcBatch then
 	qcBatch.OnClientEvent:Connect(function(completions)
 		for _, q in ipairs(completions) do
+			if _G.ZundaSoundController then
+				_G.ZundaSoundController.play("QuestComplete")
+			end
 			spawnPopup("quest_complete", q.title, Color3.fromRGB(160, 210, 150))
 			UIHelper.spawnSparkles(
 				panel,

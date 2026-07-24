@@ -239,7 +239,9 @@ local function handleHitInput()
 		bestPea.instance.BackgroundColor3 = ratingColor
 		spawnFloatingRating(ratingText, ratingColor, mainPanel)
 		if _G.ZundaSoundController then
-			_G.ZundaSoundController.play("Bubbles")
+			-- Perfect hits get their own brighter stinger; great/ok share the
+			-- softer Bubbles sound so only the top-tier hit stands out.
+			_G.ZundaSoundController.play(quality == "perfect" and "CookingPerfect" or "Bubbles")
 		end
 
 		-- Quality is presentation-only; server derives it from this note intent.

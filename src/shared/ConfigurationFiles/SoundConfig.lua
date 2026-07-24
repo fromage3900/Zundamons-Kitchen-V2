@@ -17,7 +17,10 @@ local SoundConfig = {
 
         -- Button interactions
         ButtonHover = "c",
-        ButtonClick = "d",
+        ButtonClick = "BUBBLES", -- sentinel: gamewide default click SFX is the
+            -- Bubbles sound (see SoundConfig.Bubbles / ZundaSoundController.play),
+            -- not a Nomagician letter. UIPolishScript.hookButton wires this to
+            -- every button in the game.
         ButtonConfirm = "e",
         ButtonCancel = "f",
 
@@ -102,7 +105,7 @@ local SoundConfig = {
 -- Helper: get the Sound object for a UI action
 function SoundConfig.getSound(actionName: string): Sound?
     local letter = SoundConfig.SoundMap[actionName]
-    if not letter then
+    if not letter or letter == "BUBBLES" then
         return nil
     end
 
