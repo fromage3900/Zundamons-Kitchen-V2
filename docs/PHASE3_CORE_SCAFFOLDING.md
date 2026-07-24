@@ -77,17 +77,22 @@ Quest-gated liminal-corridor escape encounter, server chase, atomic escape settl
 
 | Criterion | State | Note |
 | --- | --- | --- |
-| Zero load-time script errors | ⚠️ **1 remains** | `japanese shrine lantern` baked `require(assetId)` — needs the live instance re-fixed + published, OR the baked Script neutralized |
-| Core loop Gather→Cook→Serve→Reward works single-player | ✅ | Harvest fixed tonight; rest verified |
+| Zero load-time script errors | ✅ **fixed** (needs publish) | Both `japanese shrine lantern` CoreSystem scripts neutralized — one had `require(...:GetAttribute("Version"))` (numeric attr → asset-id → uncatchable `LoadUnownedAsset` capability error). Verified live: gone. **Baked instance → File→Publish to persist.** |
+| Core loop Gather→Cook→Serve→Reward works single-player | ✅ | Harvest fixed (`b65eb50`); rest verified |
 | Guests render as characters | ✅ | Live-confirmed |
-| Companion: mesh/upright/human-sized/textured | ⚠️ **texture render pending** | Wiring correct; awaiting Roblox moderation |
-| PeaWheel + 8 slices + hotkeys single-toggle | ✅ | All callbacks verify live |
+| Companion: mesh/upright/human-sized/textured | ⚠️ **texture render pending** | Wiring correct; awaiting Roblox moderation of tonight's uploads (external, not actionable) |
+| PeaWheel + 8 slices + hotkeys single-toggle | ✅ | All 8 callbacks verify live |
 | No tofu/empty-box glyphs | ✅ (prior sweeps) | Spot-recheck recommended |
-| Progression panel has new-UI equivalent | 🔴 **open** | `UpdateScript` still skips — last UI-parity gap (task #12) |
-| Multi-player + production DataStore rejoin | ⛔ **untestable in Studio** | Needs a published session |
-| Clean tree; Rojo build + focused Selene/StyLua | ⚠️ | Tree clean; repo-wide StyLua still drifts (inherited) |
+| Progression panel has new-UI equivalent | ✅ **resolved** (`d90e2e8`) | ChefPill (tier/level/XP) + StatBar (gold/guests) cover it; dead `UpdateScript` legacy driver deleted |
+| Multi-player + production DataStore rejoin | ⛔ **untestable in Studio** | Needs a published session — external gate |
+| Clean tree; Rojo build + focused Selene/StyLua | ✅ | Tree clean; repo-wide StyLua drift is inherited/pre-existing |
 
-**Phase 3 is ~85% closed.** The genuine blockers are: (a) Progression panel, (b) shrine-lantern baked crash, (c) production-rejoin test (external). Everything else is done or cosmetic.
+**Phase 3 is functionally FINALIZED.** Every in-session-actionable criterion is closed. The only remaining items are external and not actionable from Studio:
+1. **Publish** — persist the baked shrine-lantern fix (File→Publish).
+2. **Companion texture render** — awaiting Roblox asset moderation (auto-resolves).
+3. **Production DataStore rejoin test** — requires a published/private-server session with API access enabled; the ProfileService mock already passes.
+
+Once (1) is published and (3) is verified on a live server, Phase 3 is fully done and the project moves to Phase 4 (content depth, ASMR audio, NPC life, replayability).
 
 ---
 
