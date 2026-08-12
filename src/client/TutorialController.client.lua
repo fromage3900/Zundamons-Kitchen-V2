@@ -31,6 +31,22 @@ local STEPS = {
 		auto = 5,
 	},
 	{
+		id = "serve",
+		title = "🍽️  Serve Guests!",
+		desc = "Guests will arrive at your kitchen and ask for a dish. Walk up to them (look for the golden ! beacon) and click to serve them. They pay gold and XP!",
+		target = nil,
+		waitFor = nil,
+		auto = 5,
+	},
+	{
+		id = "challenge",
+		title = "🏆  Challenge & Daily",
+		desc = "Open the Challenge panel to take on endless guest waves and claim daily rewards. Complete all 3 daily challenges to grow your streak!",
+		target = nil,
+		waitFor = nil,
+		auto = 5,
+	},
+	{
 		id = "quests",
 		title = "📋  Complete Quests (J)",
 		desc = "Press J to check your quests. Completing quests earns gold and unlocks new recipes and zones!",
@@ -327,5 +343,5 @@ task.spawn(function()
 	task.wait(1.5)
 	print("[Tutorial] Showing step 1")
 	showStep(1)
-	print("[TutorialController] Onboarding sequence ready — 7 steps")
+	print("[TutorialController] Onboarding sequence ready — " .. #STEPS .. " steps")
 end)

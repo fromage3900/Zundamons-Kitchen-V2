@@ -4,15 +4,16 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
+local ClientGuiBootstrap = require(RS.ConfigurationFiles.ClientGuiBootstrap)
 local serveGuestRF = RS.RemoteFunctions:WaitForChild("ServeGuest")
-local requestData = RS.RemoteFunctions:WaitForChild("RequestData")
 
-local gui = Instance.new("ScreenGui")
-gui.Name = "GuestServingUI"
-gui.ResetOnSpawn = false
-gui.DisplayOrder = 85
+-- Reactive player data: subscribe to the projection remote so the dish list
+-- is always current (cooking a dish after opening the UI now shows it).
+local playerStateChanged = RS.RemoteEvents:WaitForChild("PlayerStateChanged")
+local latestData = {}
+
+local gui = ClientGuiBootstrap.createScreenGui(player, "GuestServingUI", 85)
 gui.Enabled = false
-gui.Parent = playerGui
 
 local backdrop = Instance.new("TextButton", gui)
 backdrop.Size = UDim2.new(1, 0, 1, 0)
@@ -107,49 +108,8 @@ listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 listFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
 local currentGuest = nil
-local currentPlayer = nil
 
-local function filterFoods(data)
-	local foods = {}
-	if not data then
-		return foods
-	end
-	local exclude = {
-		gold = true,
-		Apple = true,
-		Wheat = true,
-		Wood = true,
-		Rock = true,
-		["Iron Ore"] = true,
-		guests_served = true,
-		chef = true,
-		total_gold_earned = true,
-		tier = true,
-		cooking_streak = true,
-		max_cooking_streak = true,
-		perfect_cooks = true,
-		great_cooks = true,
-		companion_chats = true,
-		companion_affection = true,
-		npc_chats = true,
-		zones_visited = true,
-		gathered_items = true,
-		quests_completed = true,
-		recipes_unlocked = true,
-		cosmetics_unlocked = true,
-		furniture_unlocked = true,
-		locations_unlocked = true,
-	}
-	for k, v in pairs(data) do
-		if type(k) == "string" and type(v) == "number" and not exclude[k] and not k:match("_") then
-			if k ~= "Gold" and k ~= "Marble Rock" and k ~= "Wood Log" and k ~= "Pine Cone" then
-				table.insert(foods, k)
-			end
-		end
-	end
-	return foods
-end
-
+-- Filter to only the dish the guest wants, using the reactive projection.
 local function buildDishList(guest, playerData)
 	for _, child in ipairs(listFrame:GetChildren()) do
 		child:Destroy()
@@ -157,33 +117,40 @@ local function buildDishList(guest, playerData)
 	local dish = guest:GetAttribute("PreferredRecipe") or ""
 	title.Text = "Serve: " .. dish
 	payLabel.Text = "Pay: " .. (guest:GetAttribute("PayAmount") or 10) .. " Gold"
-	local foods = filterFoods(playerData)
-	local y = 0
-	for _, foodName in ipairs(foods) do
-		if foodName == dish then
-			local btn = Instance.new("TextButton", listFrame)
-			btn.Size = UDim2.new(1, 0, 0, 32)
-			btn.Position = UDim2.new(0, 0, 0, y)
-			btn.BackgroundColor3 = UIConfig.COLORS.Success
-			btn.Text = foodName .. " x" .. tostring(playerData[dish])
-			btn.FontFace = UIConfig.FONTS.Body
-			btn.TextSize = UIConfig.FONT_SIZES.Body
-			btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
-			btn.BorderSizePixel = 0
-			btn.AutoButtonColor = true
-			Instance.new("UICorner", btn).CornerRadius = UIConfig.CORNER_RADIUS.Small
-			btn.MouseButton1Click:Connect(function()
-				serveButton.Visible = true
-				serveButton.Text = "Serve " .. foodName
-			end)
-			y = y + 36
+	guestLabel.Text = "Guest: " .. (guest:GetAttribute("GuestName") or "Customer")
+
+	-- The projection has cookedDishes keyed by recipe -> quality -> count.
+	-- Show the total count of the requested dish across all qualities.
+	local cooked = playerData and playerData.cookedDishes and playerData.cookedDishes[dish]
+	local total = 0
+	if type(cooked) == "table" then
+		for _, count in pairs(cooked) do
+			if type(count) == "number" then
+				total += count
+			end
 		end
 	end
-	if y == 0 then
+
+	if total > 0 then
+		local btn = Instance.new("TextButton", listFrame)
+		btn.Size = UDim2.new(1, 0, 0, 32)
+		btn.BackgroundColor3 = UIConfig.COLORS.Success
+		btn.Text = dish .. " x" .. tostring(total)
+		btn.FontFace = UIConfig.FONTS.Body
+		btn.TextSize = UIConfig.FONT_SIZES.Body
+		btn.TextColor3 = UIConfig.COLORS.TextOnPrimary
+		btn.BorderSizePixel = 0
+		btn.AutoButtonColor = true
+		Instance.new("UICorner", btn).CornerRadius = UIConfig.CORNER_RADIUS.Small
+		btn.MouseButton1Click:Connect(function()
+			serveButton.Visible = true
+			serveButton.Text = "Serve " .. dish
+		end)
+	else
 		local lbl = Instance.new("TextLabel", listFrame)
 		lbl.Size = UDim2.new(1, 0, 0, 40)
 		lbl.BackgroundTransparency = 1
-		lbl.Text = "No matching dishes in inventory"
+		lbl.Text = "No " .. dish .. " in inventory — cook it first!"
 		lbl.FontFace = UIConfig.FONTS.Body
 		lbl.TextSize = UIConfig.FONT_SIZES.Body
 		lbl.TextColor3 = UIConfig.COLORS.TextDisabled
@@ -191,27 +158,34 @@ local function buildDishList(guest, playerData)
 	end
 end
 
-local function show(data)
+local function show()
 	if not currentGuest then
 		return
 	end
 	backdrop.Visible = true
 	panel.Visible = true
 	gui.Enabled = true
-	buildDishList(currentGuest, data)
+	buildDishList(currentGuest, latestData)
 end
 
-_G.ZundaShowServeUI = function(guest, data)
-	currentGuest = guest
-	show(data)
-end
-
-cancelButton.MouseButton1Click:Connect(function()
+local function hide()
 	gui.Enabled = false
 	backdrop.Visible = false
 	panel.Visible = false
 	serveButton.Visible = false
-end)
+	currentGuest = nil
+end
+
+_G.ZundaShowServeUI = function(guest, _data)
+	currentGuest = guest
+	-- Prefer the reactive projection; fall back to whatever was passed.
+	if _data and next(_data) then
+		latestData = _data
+	end
+	show()
+end
+
+cancelButton.MouseButton1Click:Connect(hide)
 
 serveButton.MouseButton1Click:Connect(function()
 	if not currentGuest then
@@ -221,12 +195,17 @@ serveButton.MouseButton1Click:Connect(function()
 	local ok, result = pcall(function()
 		return serveGuestRF:InvokeServer(currentGuest, dish)
 	end)
-	if ok and result then
-		gui.Enabled = false
-		backdrop.Visible = false
-		panel.Visible = false
-		serveButton.Visible = false
+	-- Always close the UI, even if the serve fails, so the black
+	-- backdrop never gets stuck on screen.
+	hide()
+end)
+
+-- Keep the dish list fresh while the panel is open.
+playerStateChanged.OnClientEvent:Connect(function(projection)
+	latestData = projection
+	if panel.Visible and currentGuest then
+		buildDishList(currentGuest, latestData)
 	end
 end)
 
-print("[GuestServingUI] Ready")
+print("[GuestServingUI] Ready (reactive)")
