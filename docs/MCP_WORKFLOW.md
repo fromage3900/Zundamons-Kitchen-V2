@@ -195,8 +195,9 @@ for asset_id in assets:
 # Get list from Studio
 mcp__roblox-studio_list_assets > assets.json
 
-# Parse and format for AssetRegistry.lua
-python scripts/populate_registry.py assets.json
+# Parse and format for AssetRegistry.lua (or use scripts/extract_asset_ids.py
+# against a saved place file)
+python scripts/extract_asset_ids.py place.rbxlx assets_with_ids.lua
 ```
 
 ### Step 2: Update AssetRegistry.lua
@@ -405,16 +406,14 @@ end
 ### Synchronization with External Tools
 
 ```bash
-# Sync with Roblox Creator Dashboard assets
-python scripts/sync_assets.py \
-  --collection "ZundamonsKitchenAssets" \
-  --output src/shared/AssetRegistry.lua \
-  --format lua
+# Upload new assets via the Open Cloud pipeline (tools/asset-pipeline/upload-asset.js)
+node tools/asset-pipeline/upload-asset.js --file model.glb --type Model --name "Zunda X"
 
-# Validate against live place
-python scripts/validate_assets.py \
-  --registry src/shared/AssetRegistry.lua \
-  --place "place.rbxlx"
+# Note: a one-shot sync/validate helper (populate_registry.py / sync_assets.py /
+# validate_assets.py) is not implemented yet. Until then:
+#  - extract IDs from a saved place:  python scripts/extract_asset_ids.py place.rbxlx out.lua
+#  - validate in Studio via MCP:      roblox-studio_execute_luau (walk AssetRegistry and
+#    check each rbxassetid resolves via game:GetObjects / InsertService)
 ```
 
 ---

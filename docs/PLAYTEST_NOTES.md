@@ -39,3 +39,15 @@ Legend: 🔍 investigating · 🔧 fixing · ✅ fixed (code) · 🎮 needs Stud
 - HUD doesn't have proper keybinds
 - settings panel doesn't close
 - extreme lag
+
+### 2026-08-12 (stability audit batch — systems triage, from code audit)
+- DailyChallengeService.updateProgress could nil-index `daily_challenge_claimed` (precedence bug) → fixed; claimed flag now set inside settlement mutation
+- ChallengeModeService.selectChallengeRecipes could `math.random(1, 0)` on empty tier pool → guarded; wave 15+ would have crashed
+- Challenge mode double-counted: cooking incremented guestsServed (wave completable without serving) → split `onCookComplete` vs `onGuestServed`
+- Style points double-credited in challenge mode (ChallengeModeService + syncPlayerWardrobe) → wardobe sync is the single grant path, routed through PlayerDataService.mutate
+- EndlessLoopWiring listened for `IngredientGathered`/`GoldEarned` remotes that do not exist → dead listener removed
+- EndlessLoopWiring duplicated daily init (double-grant window) → DailyChallengeService.PlayerAdded is sole owner
+- ServingService trusted client-mutable guest attributes: PayAmount/BonusGold clamped (≤500/≤200) at serve
+- GuestManager capped guests globally, starving late joiners → cap is per player now
+- Mineable respawn used `task.wait` inside an attribute-changed handler (blocked signal dispatch; destroyed-node error) → `task.delay` + pcall
+- Matter loop had no error isolation → systems wrapped in pcall in ServerMain; one failing system can no longer kill the heartbeat
