@@ -227,10 +227,38 @@ end
 local function buildSegment(folder: Instance, slotX: number, baseZ: number, prefab: Model?)
 	local center = Vector3.new(slotX, Config.roomY, baseZ + Config.roomLength / 2)
 	local wallColor = Color3.fromRGB(90, 88, 78)
-	part(folder, "Floor", Vector3.new(Config.roomWidth, 1, Config.roomLength), CFrame.new(center), Color3.fromRGB(70, 66, 56), 0)
-	part(folder, "Ceiling", Vector3.new(Config.roomWidth, 1, Config.roomLength), CFrame.new(center + Vector3.new(0, 10, 0)), wallColor, 0)
-	part(folder, "LeftWall", Vector3.new(1, 10, Config.roomLength), CFrame.new(center + Vector3.new(-Config.roomWidth / 2, 5, 0)), wallColor, 0)
-	part(folder, "RightWall", Vector3.new(1, 10, Config.roomLength), CFrame.new(center + Vector3.new(Config.roomWidth / 2, 5, 0)), wallColor, 0)
+	part(
+		folder,
+		"Floor",
+		Vector3.new(Config.roomWidth, 1, Config.roomLength),
+		CFrame.new(center),
+		Color3.fromRGB(70, 66, 56),
+		0
+	)
+	part(
+		folder,
+		"Ceiling",
+		Vector3.new(Config.roomWidth, 1, Config.roomLength),
+		CFrame.new(center + Vector3.new(0, 10, 0)),
+		wallColor,
+		0
+	)
+	part(
+		folder,
+		"LeftWall",
+		Vector3.new(1, 10, Config.roomLength),
+		CFrame.new(center + Vector3.new(-Config.roomWidth / 2, 5, 0)),
+		wallColor,
+		0
+	)
+	part(
+		folder,
+		"RightWall",
+		Vector3.new(1, 10, Config.roomLength),
+		CFrame.new(center + Vector3.new(Config.roomWidth / 2, 5, 0)),
+		wallColor,
+		0
+	)
 
 	local fixturesPerSegment = math.max(1, math.floor(Config.roomLength / Config.fixtureSpacing))
 	for i = 1, fixturesPerSegment do

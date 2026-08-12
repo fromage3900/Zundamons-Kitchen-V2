@@ -1,7 +1,9 @@
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local Terrain = workspace:FindFirstChild("Terrain")
-if not Terrain then return end
+if not Terrain then
+	return
+end
 
 local C_day = Color3.fromRGB(110, 190, 215)
 local C_dawn = Color3.fromRGB(160, 150, 215)
@@ -31,7 +33,6 @@ local function applyWater(hour)
 
 	pcall(function()
 		Terrain.MaterialColors[Enum.Material.Water] = color
-		Terrain.MaterialColors[Enum.Material.DeepWater] = color:Lerp(Color3.fromRGB(40, 35, 80), 0.3)
 	end)
 end
 
@@ -41,7 +42,9 @@ applyWater(startHour)
 local t = 0
 RunService.Heartbeat:Connect(function(dt)
 	t = t + dt
-	if not Terrain then return end
+	if not Terrain then
+		return
+	end
 
 	local hour = Lighting:GetAttribute("CurrentHour") or 12
 	local wavePulse = 0.28 + math.sin(t * 0.12) * 0.12

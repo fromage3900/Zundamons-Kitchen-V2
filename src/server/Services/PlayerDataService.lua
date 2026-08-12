@@ -119,20 +119,34 @@ local function emitProjection(player: Player, data: { [string]: any })
 	end
 end
 
-function PlayerDataService.get(player: Player): { [string]: any }?
-	local key = tostring(player.UserId)
+function PlayerDataService.get(player: any): { [string]: any }?
+	if not player or typeof(player) ~= "Instance" then
+		return nil
+	end
+	local realPlayer: Player? = if player:IsA("Player") then player else Players:GetPlayerFromCharacter(player)
+	if not realPlayer then
+		return nil
+	end
+	local key = tostring(realPlayer.UserId)
 	return store[key]
 end
 
-function PlayerDataService.getOrCreate(player: Player): { [string]: any }
-	local key = tostring(player.UserId)
-	if not store[key] and player:IsDescendantOf(Players) and not intentionalReleases[player] then
-		PlayerDataService.loadPlayer(player)
+function PlayerDataService.getOrCreate(player: any): { [string]: any }
+	if not player or typeof(player) ~= "Instance" then
+		error("Invalid player argument passed to PlayerDataService.getOrCreate")
+	end
+	local realPlayer: Player? = if player:IsA("Player") then player else Players:GetPlayerFromCharacter(player)
+	if not realPlayer then
+		error("Could not resolve Player instance for PlayerDataService.getOrCreate")
+	end
+	local key = tostring(realPlayer.UserId)
+	if not store[key] and realPlayer:IsDescendantOf(Players) and not intentionalReleases[realPlayer] then
+		PlayerDataService.loadPlayer(realPlayer)
 	end
 	if store[key] then
 		return store[key]
 	end
-	error("Player data is unavailable for " .. player.Name)
+	error("Player data is unavailable for " .. realPlayer.Name)
 end
 
 function PlayerDataService.set(player: Player, data: { [string]: any })
@@ -306,8 +320,8 @@ createDefaultData = function(): { [string]: any }
 		gathered_items = {},
 		companions_set = {},
 		companion_bond = {}, -- [compType] = bond XP, per-companion (not the flat
-			-- global companion_affection/companion_chats counters above, which
-			-- don't distinguish which companion you were with)
+		-- global companion_affection/companion_chats counters above, which
+		-- don't distinguish which companion you were with)
 		npc_chats = {},
 		zones_visited = {},
 		Apple = 5,

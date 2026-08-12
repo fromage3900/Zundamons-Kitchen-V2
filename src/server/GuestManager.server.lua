@@ -212,14 +212,21 @@ local function loadMeshTemplate(meshType)
 end
 
 -- Create a guest for a specific player
-local function createGuest(player)
-	-- Respect max concurrent guests
-	local guestCount = 0
-	for _ in pairs(activeGuests) do
-		guestCount = guestCount + 1
-		if guestCount >= CONFIG.guest_settings.max_guests_at_once then
-			return nil
+-- Guest cap is PER PLAYER, not global: with the old global count a full queue
+-- for one player starved everyone else on the server.
+local function countGuestsForPlayer(player)
+	local count = 0
+	for _, guestData in pairs(activeGuests) do
+		if guestData[2] == player then
+			count = count + 1
 		end
+	end
+	return count
+end
+
+local function createGuest(player)
+	if countGuestsForPlayer(player) >= CONFIG.guest_settings.max_guests_at_once then
+		return nil
 	end
 
 	-- Clone template
@@ -362,7 +369,9 @@ local function createGuest(player)
 			-- Fall back to DEFAULT so every guest type gets spawn dialogue, not
 			-- just ones with a bespoke entry (24 animal meshes have no bespoke
 			-- entry and would otherwise never say anything).
-			local dialogue = ok and VNDialogueData and VNDialogueData.GUEST_BY_TYPE
+			local dialogue = ok
+				and VNDialogueData
+				and VNDialogueData.GUEST_BY_TYPE
 				and (VNDialogueData.GUEST_BY_TYPE[selectedMeshType] or VNDialogueData.GUEST_BY_TYPE.DEFAULT)
 			if dialogue and dialogue.spawn then
 				local spawnLine = dialogue.spawn
@@ -525,8 +534,8 @@ local function createGuest(player)
 	-- intentionally dropped for guests -- it sends them across the whole map via
 	-- PatrolPoint waypoints, away from the serving area where they need to be
 	-- clickable. (Patrol stays in use for the ambient Traveler/Merchant NPCs.)
-	local personalityTypes = {"stationary", "roamer"}
-	local personalityWeights = {0.2, 0.8} -- 20% stationary, 80% roamer
+	local personalityTypes = { "stationary", "roamer" }
+	local personalityWeights = { 0.2, 0.8 } -- 20% stationary, 80% roamer
 	local roll = math.random()
 	local cumulative = 0
 	local personality = "stationary"
@@ -557,7 +566,17 @@ local function createGuest(player)
 		end)
 	end
 
-	print("[GuestManager] Spawned guest " .. guest.Name .. " for " .. player.Name .. " wanting " .. recipe .. " (personality: " .. personality .. ")")
+	print(
+		"[GuestManager] Spawned guest "
+			.. guest.Name
+			.. " for "
+			.. player.Name
+			.. " wanting "
+			.. recipe
+			.. " (personality: "
+			.. personality
+			.. ")"
+	)
 
 	return guest
 end
@@ -593,7 +612,9 @@ local function removeGuest(guest, reason)
 	if reason == "timeout" then
 		local meshType = guest:GetAttribute("MeshType")
 		local ok2, VNDialogueData = pcall(require, RS.ConfigurationFiles.VNDialogueData)
-		local dialogue = ok2 and VNDialogueData and VNDialogueData.GUEST_BY_TYPE
+		local dialogue = ok2
+			and VNDialogueData
+			and VNDialogueData.GUEST_BY_TYPE
 			and (VNDialogueData.GUEST_BY_TYPE[meshType] or VNDialogueData.GUEST_BY_TYPE.DEFAULT)
 		local servingPlayer = game.Players:FindFirstChild(playerName)
 		if not servingPlayer then

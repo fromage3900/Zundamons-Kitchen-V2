@@ -5,7 +5,9 @@ local LAMP_TAG = "LampManager_Active"
 
 local function findOrCreateSpotLight(part)
 	local existing = part:FindFirstChildOfClass("SpotLight")
-	if existing then return existing end
+	if existing then
+		return existing
+	end
 	local light = Instance.new("SpotLight")
 	light.Brightness = 1
 	light.Face = Enum.NormalId.Bottom

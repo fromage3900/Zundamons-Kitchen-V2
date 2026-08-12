@@ -54,23 +54,53 @@ local function syncPlayerWardrobe(player: Player, styleGain: number?, statGains:
 		return
 	end
 
-	if styleGain and styleGain > 0 then
-		data.style_points = (data.style_points or 0) + styleGain
-	end
+	-- All durable writes go through PlayerDataService.mutate so they get the
+	-- same revision bump, projection emit, and rollback as every other system.
+	-- Firing remotes happens after the mutation succeeds.
+	local newlyUnlocked = {}
+	local ok = PlayerDataService.mutate(player, "wardrobe_sync", function(d)
+		if styleGain and styleGain > 0 then
+			d.style_points = (d.style_points or 0) + styleGain
+		end
 
-	data.chef_stats = data.chef_stats or {
-		speed = 0,
-		precision = 0,
-		charisma = 0,
-		stamina = 0,
-	}
+		d.chef_stats = d.chef_stats or {
+			speed = 0,
+			precision = 0,
+			charisma = 0,
+			stamina = 0,
+		}
 
-	if statGains then
-		for statKey, amount in pairs(statGains) do
-			if data.chef_stats[statKey] ~= nil then
-				data.chef_stats[statKey] += amount
+		if statGains then
+			for statKey, amount in pairs(statGains) do
+				if d.chef_stats[statKey] ~= nil then
+					d.chef_stats[statKey] += amount
+				end
 			end
 		end
+
+		d.unlocked_outfits = d.unlocked_outfits or {}
+		local currentPoints = d.style_points or 0
+		for _, unlockCategory in ipairs(ChefStatsConfig.stylePoints.outfitUnlocks) do
+			local reqMinPoints = 0
+			for _, tData in ipairs(ChefStatsConfig.stylePoints.tiers) do
+				if tData.name == unlockCategory.tier then
+					reqMinPoints = tData.minPoints
+					break
+				end
+			end
+			if currentPoints >= reqMinPoints then
+				for _, outfitName in ipairs(unlockCategory.outfits) do
+					if not d.unlocked_outfits[outfitName] then
+						d.unlocked_outfits[outfitName] = true
+						table.insert(newlyUnlocked, outfitName)
+					end
+				end
+			end
+		end
+		return true
+	end)
+	if not ok then
+		return
 	end
 
 	local currentPoints = data.style_points or 0
@@ -79,7 +109,7 @@ local function syncPlayerWardrobe(player: Player, styleGain: number?, statGains:
 	stylePointsRE:FireClient(player, currentPoints, tier.name)
 
 	local statsPayload = {}
-	for statKey, points in pairs(data.chef_stats) do
+	for statKey, points in pairs(data.chef_stats or {}) do
 		local bonusMult = ChefStatsConfig.getStatBonus(statKey, points)
 		statsPayload[statKey] = {
 			level = math.floor(points / 10) + 1,
@@ -89,24 +119,8 @@ local function syncPlayerWardrobe(player: Player, styleGain: number?, statGains:
 	end
 	chefStatsRE:FireClient(player, statsPayload)
 
-	data.unlocked_outfits = data.unlocked_outfits or {}
-	for _, unlockCategory in ipairs(ChefStatsConfig.stylePoints.outfitUnlocks) do
-		local reqTier = unlockCategory.tier
-		local reqMinPoints = 0
-		for _, tData in ipairs(ChefStatsConfig.stylePoints.tiers) do
-			if tData.name == reqTier then
-				reqMinPoints = tData.minPoints
-				break
-			end
-		end
-		if currentPoints >= reqMinPoints then
-			for _, outfitName in ipairs(unlockCategory.outfits) do
-				if not data.unlocked_outfits[outfitName] then
-					data.unlocked_outfits[outfitName] = true
-					outfitUnlockRE:FireClient(player, outfitName)
-				end
-			end
-		end
+	for _, outfitName in ipairs(newlyUnlocked) do
+		outfitUnlockRE:FireClient(player, outfitName)
 	end
 end
 
@@ -114,9 +128,7 @@ end
 -- When a dish is cooked with quality, notify the challenge mode and update stats
 if CookingService and CookingService.CookCompleted then
 	CookingService.CookCompleted.Event:Connect(function(player, recipeName, quality)
-		if ChallengeModeService.isInChallenge(player) then
-			ChallengeModeService.onGuestServed(player, quality, recipeName)
-		end
+		ChallengeModeService.onCookComplete(player, quality)
 		-- Update daily challenge progress
 		DailyChallengeService.updateProgress(player, "cook", 1)
 
@@ -140,7 +152,7 @@ end
 if ServingService and ServingService.GuestServed then
 	ServingService.GuestServed.Event:Connect(function(player, guestType, recipe, quality)
 		if ChallengeModeService.isInChallenge(player) then
-			ChallengeModeService.onGuestServed(player, quality, guestType)
+			ChallengeModeService.onGuestServed(player, quality)
 		end
 		DailyChallengeService.updateProgress(player, "serve", 1)
 
@@ -164,33 +176,11 @@ if ServingService and ServingService.GuestTimedOut then
 	end)
 end
 
--- ─── Connect Gathering to Daily Challenges ───────────────────────────────────
--- Listen for ingredient collection events
-local function setupGatheringListener()
-	local remotes = ReplicatedStorage:FindFirstChild("RemoteEvents")
-	if not remotes then
-		return
-	end
-
-	local gatherEvent = remotes:FindFirstChild("IngredientGathered")
-	if gatherEvent then
-		gatherEvent.Event:Connect(function(player, itemName)
-			DailyChallengeService.updateProgress(player, "gather", 1)
-		end)
-	end
-
-	local goldEvent = remotes:FindFirstChild("GoldEarned")
-	if goldEvent then
-		goldEvent.Event:Connect(function(player, amount)
-			DailyChallengeService.updateProgress(player, "earn_gold", amount)
-		end)
-	end
-end
-
-setupGatheringListener()
-
 -- ─── Initialize Player Data for New Systems ──────────────────────────────────
--- Ensure new data fields exist when player joins and sync wardrobe remotes
+-- Ensure new data fields exist when player joins and sync wardrobe remotes.
+-- Daily challenge initialization (initializeDay / spawnDailyVisitor /
+-- spawnDailyResources) is owned by DailyChallengeService.PlayerAdded alone —
+-- duplicating it here caused double-grant windows and doubly-fired updates.
 Players.PlayerAdded:Connect(function(player)
 	player.CharacterAdded:Connect(function()
 		-- Initialize challenge mode data
@@ -199,27 +189,9 @@ Players.PlayerAdded:Connect(function(player)
 			data.challenge_best_score = data.challenge_best_score or 0
 			data.challenge_best_wave = data.challenge_best_wave or 0
 			data.challenge_total_played = data.challenge_total_played or 0
-			data.style_points = data.style_points or 0
-			data.chef_stats = data.chef_stats or {
-				speed = 0,
-				precision = 0,
-				charisma = 0,
-				stamina = 0,
-			}
 			syncPlayerWardrobe(player, 0, nil)
 		end
 	end)
 
-	-- Initialize daily challenges
-	task.wait(3)
-	DailyChallengeService.initializeDay(player)
-	DailyChallengeService.spawnDailyVisitor(player)
-	DailyChallengeService.spawnDailyResources(player)
 	syncPlayerWardrobe(player, 0, nil)
 end)
-
-print("[EndlessLoopWiring] All systems connected!")
-print("  - ChallengeModeService: Endless wave system")
-print("  - DailyChallengeService: Daily challenge system")
-print("  - ChefStatsConfig: Infinity Nikki style stats & wardrobe remotes")
-print("  - VNDialogueData: Dialogue system")

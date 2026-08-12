@@ -68,13 +68,14 @@ function WebInfoSyncService.exportGameStateJson(): string
 	end
 
 	local activeCodesList = {}
-	local codesPool = (PromoCodeService and PromoCodeService.activeCodes) or {
-		ZUNDAMOCHI2026 = { gold = 500, gems = 50, item = "10x Fresh Zunda Mochi" },
-		SOUPSEASON     = { gold = 1000, gems = 100, item = "5x Wild Mushroom Pack" },
-		KAWAIIZUNDA    = { gold = 750, gems = 75, item = "Sakura Chef Apron" },
-		NIKKIFASHION   = { gold = 1500, gems = 150, item = "3x Whim Gacha Tickets" },
-		HYBRIDECS      = { gold = 2000, gems = 200, item = "5x Whim Gacha Tickets" },
-	}
+	local codesPool = (PromoCodeService and PromoCodeService.activeCodes)
+		or {
+			ZUNDAMOCHI2026 = { gold = 500, gems = 50, item = "10x Fresh Zunda Mochi" },
+			SOUPSEASON = { gold = 1000, gems = 100, item = "5x Wild Mushroom Pack" },
+			KAWAIIZUNDA = { gold = 750, gems = 75, item = "Sakura Chef Apron" },
+			NIKKIFASHION = { gold = 1500, gems = 150, item = "3x Whim Gacha Tickets" },
+			HYBRIDECS = { gold = 2000, gems = 200, item = "5x Whim Gacha Tickets" },
+		}
 
 	local codeOrder = { "ZUNDAMOCHI2026", "SOUPSEASON", "KAWAIIZUNDA", "NIKKIFASHION", "HYBRIDECS" }
 	for _, codeKey in ipairs(codeOrder) do

@@ -1,8 +1,8 @@
 -- CompanionManager v4: loads full companion models with textures, sparkle VFX, VN click interaction
-local Players    = game:GetService("Players")
-local Tween      = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Tween = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local RS         = game:GetService("ReplicatedStorage")
+local RS = game:GetService("ReplicatedStorage")
 local InsertService = game:GetService("InsertService")
 local ServerStorage = game:GetService("ServerStorage")
 local CompanionVisualConfig = require(RS.ConfigurationFiles.CompanionVisualConfig)
@@ -53,8 +53,7 @@ local function loadCompanionModel(compType)
 		end
 		if not clone.PrimaryPart then
 			local inner = clone:FindFirstChildWhichIsA("Model")
-			clone.PrimaryPart = (inner and inner.PrimaryPart)
-				or clone:FindFirstChildWhichIsA("BasePart", true)
+			clone.PrimaryPart = (inner and inner.PrimaryPart) or clone:FindFirstChildWhichIsA("BasePart", true)
 		end
 		if not clone.PrimaryPart then
 			clone:Destroy()
@@ -78,7 +77,9 @@ local function loadCompanionModel(compType)
 		if levelMesh then
 			print("[CompanionManager.loadCompanionModel] Using level mesh", levelMesh:GetFullName(), "for", compType)
 			local result = cacheClone(levelMesh)
-			if result then return result end
+			if result then
+				return result
+			end
 		end
 	end
 
@@ -107,14 +108,20 @@ local function loadCompanionModel(compType)
 		if success and insertedModel and insertedModel:IsA("Model") then
 			print("[CompanionManager.loadCompanionModel] Loaded", compType, "from assetId:", assetId)
 			local result = cacheClone(insertedModel)
-			if result then return result end
+			if result then
+				return result
+			end
 		end
 	end
 
 	-- HARD RULE: a companion is NEVER a cube. If no source resolved yet, wait for the
 	-- authored catalog to be present/replicated and try it again, then give up with a
 	-- loud error rather than ever spawning a placeholder.
-	warn("[CompanionManager.loadCompanionModel] No companion mesh resolved on first pass for", compType, "- waiting for authored prefab…")
+	warn(
+		"[CompanionManager.loadCompanionModel] No companion mesh resolved on first pass for",
+		compType,
+		"- waiting for authored prefab…"
+	)
 	local waited = catalog
 	if not waited then
 		waited = ServerStorage:WaitForChild("CompanionVisualCatalog", 10)
@@ -123,11 +130,16 @@ local function loadCompanionModel(compType)
 	local retry = waitedPrefabs and (waitedPrefabs:FindFirstChild(compType) or waitedPrefabs:FindFirstChild("zundapal"))
 	if retry and retry:IsA("Model") then
 		local result = cacheClone(retry)
-		if result then return result end
+		if result then
+			return result
+		end
 	end
 
-	error("[CompanionManager] FATAL: could not resolve a real companion mesh for '" .. tostring(compType)
-		.. "'. Expected ServerStorage.CompanionVisualCatalog.Prefabs.zundapal (or a valid asset). Refusing to spawn a placeholder.")
+	error(
+		"[CompanionManager] FATAL: could not resolve a real companion mesh for '"
+			.. tostring(compType)
+			.. "'. Expected ServerStorage.CompanionVisualCatalog.Prefabs.zundapal (or a valid asset). Refusing to spawn a placeholder."
+	)
 end
 
 -- Companion catalog sourced from Canonical CompanionConfig
@@ -135,11 +147,13 @@ local CompanionConfig = require(RS.ConfigurationFiles.CompanionConfig)
 local COMPANIONS = CompanionConfig.companions
 
 -- ── RemoteEvents ───────────────────────────────────────────────
-local RE      = RS:WaitForChild("RemoteEvents")
+local RE = RS:WaitForChild("RemoteEvents")
 local setCompEv = RE:WaitForChild("SetCompanion")
-local vnEv    = RE:FindFirstChild("OpenCompanionVN")
+local vnEv = RE:FindFirstChild("OpenCompanionVN")
 if not vnEv then
-	vnEv = Instance.new("RemoteEvent"); vnEv.Name="OpenCompanionVN"; vnEv.Parent=RE
+	vnEv = Instance.new("RemoteEvent")
+	vnEv.Name = "OpenCompanionVN"
+	vnEv.Parent = RE
 end
 
 local activeCompanions = {}
@@ -157,7 +171,11 @@ local function buildCompanion(player, compType)
 		existing:Destroy()
 	end
 	local prev = activeCompanions[player.Name]
-	if prev then pcall(function() prev:Destroy() end) end
+	if prev then
+		pcall(function()
+			prev:Destroy()
+		end)
+	end
 
 	-- Load the full companion model. NEVER a cube: retry a few times, then abort
 	-- (no companion this spawn) rather than fabricate a placeholder.
@@ -168,13 +186,23 @@ local function buildCompanion(player, compType)
 			companionModel = result
 			break
 		end
-		warn("[CompanionManager.buildCompanion] mesh load attempt", attempt, "failed for", compType, "-", tostring(result))
+		warn(
+			"[CompanionManager.buildCompanion] mesh load attempt",
+			attempt,
+			"failed for",
+			compType,
+			"-",
+			tostring(result)
+		)
 		task.wait(1)
 	end
 
 	if not companionModel then
-		warn("[CompanionManager.buildCompanion] Could not load a real companion mesh for", player.Name,
-			"- refusing to spawn a placeholder. No companion this spawn.")
+		warn(
+			"[CompanionManager.buildCompanion] Could not load a real companion mesh for",
+			player.Name,
+			"- refusing to spawn a placeholder. No companion this spawn."
+		)
 		return
 	end
 
@@ -228,15 +256,23 @@ local function buildCompanion(player, compType)
 
 	-- Start near player
 	local char = player.Character
-	local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
 	body.CFrame = hrp and (hrp.CFrame * CFrame.new(4, 1, 0)) or CFrame.new(47, 8, -74)
 
-	-- Make all parts non-collidable and massless
+	-- Make all parts non-collidable and massless, with color fallback for untextured meshes
 	for _, part in ipairs(companionModel:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.CanCollide = false
 			part.Massless = true
 			part.CastShadow = false
+			if
+				part:IsA("MeshPart")
+				and part.TextureID == ""
+				and not part:FindFirstChildOfClass("SurfaceAppearance")
+			then
+				part.Color = Color3.fromRGB(160, 210, 150)
+				part.Material = Enum.Material.SmoothPlastic
+			end
 		end
 	end
 
@@ -254,28 +290,29 @@ local function buildCompanion(player, compType)
 	sparkle.Rotation = NumberRange.new(0, 360)
 	local sc = def.sparkleColors
 	sparkle.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0,   sc[1]),
+		ColorSequenceKeypoint.new(0, sc[1]),
 		ColorSequenceKeypoint.new(0.5, sc[2]),
-		ColorSequenceKeypoint.new(1,   sc[3]),
+		ColorSequenceKeypoint.new(1, sc[3]),
 	})
 	sparkle.Size = NumberSequence.new({
-		NumberSequenceKeypoint.new(0,   0.25),
+		NumberSequenceKeypoint.new(0, 0.25),
 		NumberSequenceKeypoint.new(0.4, 0.45),
-		NumberSequenceKeypoint.new(1,   0),
+		NumberSequenceKeypoint.new(1, 0),
 	})
 	sparkle.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0,   0),
+		NumberSequenceKeypoint.new(0, 0),
 		NumberSequenceKeypoint.new(0.7, 0.3),
-		NumberSequenceKeypoint.new(1,   1),
+		NumberSequenceKeypoint.new(1, 1),
 	})
 
 	-- ── Point light glow ──────────────────────────────────────
 	local pl = Instance.new("PointLight", body)
 	pl.Brightness = 0.6
-	pl.Range      = def.glowRange
-	pl.Color      = def.glow
-	Tween:Create(pl, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
-		{Brightness = 1.0}):Play()
+	pl.Range = def.glowRange
+	pl.Color = def.glow
+	Tween
+		:Create(pl, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), { Brightness = 1.0 })
+		:Play()
 
 	-- ── Fairy dust Beam trail ────────────────────────────────
 	local att0 = Instance.new("Attachment")
@@ -316,7 +353,7 @@ local function buildCompanion(player, compType)
 	faceBg.AlwaysOnTop = false
 	faceBg.LightInfluence = 0.25
 	local faceLabel = Instance.new("TextLabel", faceBg)
-	faceLabel.Size = UDim2.new(1,0,1,0)
+	faceLabel.Size = UDim2.new(1, 0, 1, 0)
 	faceLabel.BackgroundTransparency = 1
 	faceLabel.Text = def.emoji
 	faceLabel.Font = Enum.Font.GothamBold
@@ -330,18 +367,19 @@ local function buildCompanion(player, compType)
 	nameBg.StudsOffset = Vector3.new(0, halfH, 0)
 	nameBg.AlwaysOnTop = false
 	local pill = Instance.new("Frame", nameBg)
-	pill.Size = UDim2.new(1,0,1,0)
-	pill.BackgroundColor3 = Color3.fromRGB(30,24,40)
+	pill.Size = UDim2.new(1, 0, 1, 0)
+	pill.BackgroundColor3 = Color3.fromRGB(30, 24, 40)
 	pill.BackgroundTransparency = 0.15
 	pill.BorderSizePixel = 0
 	Instance.new("UICorner", pill).CornerRadius = UDim.new(0.5, 0)
 	local nLbl = Instance.new("TextLabel", pill)
-	nLbl.Size = UDim2.new(1,-8,1,0); nLbl.Position = UDim2.new(0,4,0,0)
+	nLbl.Size = UDim2.new(1, -8, 1, 0)
+	nLbl.Position = UDim2.new(0, 4, 0, 0)
 	nLbl.BackgroundTransparency = 1
 	nLbl.Text = player.Name .. "'s " .. (def.displayName or "Companion") .. " ✨"
 	nLbl.Font = Enum.Font.FredokaOne
 	nLbl.TextSize = 12
-	nLbl.TextColor3 = Color3.fromRGB(240,230,255)
+	nLbl.TextColor3 = Color3.fromRGB(240, 230, 255)
 	nLbl.TextXAlignment = Enum.TextXAlignment.Center
 
 	-- ── ClickDetector for VN dialogue ─────────────────────────
@@ -350,10 +388,16 @@ local function buildCompanion(player, compType)
 	local lastClick = 0
 	cd.MouseClick:Connect(function(clicker)
 		local now = os.clock()
-		if now - lastClick < 3 then return end
+		if now - lastClick < 3 then
+			return
+		end
 		lastClick = now
 		sparkle.Rate = 60
-		task.delay(0.6, function() if sparkle.Parent then sparkle.Rate = 10 end end)
+		task.delay(0.6, function()
+			if sparkle.Parent then
+				sparkle.Rate = 10
+			end
+		end)
 		-- Per-companion bond XP (distinct from the flat, global
 		-- companion_affection/companion_chats counters QuestManager already
 		-- tracks) -- the start of an Uma-Musume-style "bond with THIS specific
@@ -401,7 +445,14 @@ local function buildCompanion(player, compType)
 				walkTrack.Priority = Enum.AnimationPriority.Core
 			end
 
-			print("[CompanionManager.buildCompanion] Animation tracks loaded for", compType, "- idle:", idleTrack ~= nil, "walk:", walkTrack ~= nil)
+			print(
+				"[CompanionManager.buildCompanion] Animation tracks loaded for",
+				compType,
+				"- idle:",
+				idleTrack ~= nil,
+				"walk:",
+				walkTrack ~= nil
+			)
 		end
 
 		-- Runs on Heartbeat (matches render rate, ~60Hz) instead of a 20Hz
@@ -412,17 +463,19 @@ local function buildCompanion(player, compType)
 		local followConn
 		followConn = RunService.Heartbeat:Connect(function(dt)
 			if not (body and body.Parent and companionModel.Parent) then
-				if followConn then followConn:Disconnect() end
+				if followConn then
+					followConn:Disconnect()
+				end
 				return
 			end
 			t = t + dt
 			local char2 = player.Character
-			local hrp2  = char2 and char2:FindFirstChild("HumanoidRootPart")
+			local hrp2 = char2 and char2:FindFirstChild("HumanoidRootPart")
 			if hrp2 then
-				local floatY  = math.sin(t * 1.1) * 0.7 + 1.8
+				local floatY = math.sin(t * 1.1) * 0.7 + 1.8
 				local sideOff = hrp2.CFrame.RightVector * (3.5 + math.sin(t * 0.3) * 0.4)
-				local target  = hrp2.Position + sideOff + Vector3.new(0, floatY, 0)
-				local dist    = (body.Position - target).Magnitude
+				local target = hrp2.Position + sideOff + Vector3.new(0, floatY, 0)
+				local dist = (body.Position - target).Magnitude
 
 				-- ── Animation state management ────────────────────────
 				-- Determine if companion is moving or idle based on distance to target
@@ -497,18 +550,25 @@ setCompEv.OnServerEvent:Connect(function(player, compType)
 	if not isFree and not data["companion_owned_" .. compType] then
 		return
 	end
-	if not data.companions_set then data.companions_set = {} end
+	if not data.companions_set then
+		data.companions_set = {}
+	end
 	data.companions_set[compType] = true
 	data.active_companion = compType
 	buildCompanion(player, compType)
 end)
 
 Players.PlayerAdded:Connect(onPlayerAdded)
-for _, p in ipairs(Players:GetPlayers()) do onPlayerAdded(p) end
+for _, p in ipairs(Players:GetPlayers()) do
+	onPlayerAdded(p)
+end
 
 Players.PlayerRemoving:Connect(function(player)
 	local m = activeCompanions[player.Name]
-	if m then m:Destroy(); activeCompanions[player.Name] = nil end
+	if m then
+		m:Destroy()
+		activeCompanions[player.Name] = nil
+	end
 end)
 
 print("[CompanionManager v4] Full model loading with textures + sparkles + VN click ready")

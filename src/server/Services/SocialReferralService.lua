@@ -3,15 +3,15 @@
 -- Server service handling SocialService game invite rewards and Roblox Group membership perks.
 
 local SocialService = game:GetService("SocialService")
-local Players       = game:GetService("Players")
-local RS            = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
 
 local SocialReferralService = {}
 
 local REWARD_TIERS = {
-	[1]  = { name = "Pea Pal", gold = 500, gems = 50 },
-	[3]  = { name = "Zunda Ambassador", gold = 1500, gems = 150, item = "Zunda Sparkle Apron" },
-	[5]  = { name = "Zunda Legend", gold = 3000, gems = 300, item = "Golden Zunda Bow" },
+	[1] = { name = "Pea Pal", gold = 500, gems = 50 },
+	[3] = { name = "Zunda Ambassador", gold = 1500, gems = 150, item = "Zunda Sparkle Apron" },
+	[5] = { name = "Zunda Legend", gold = 3000, gems = 300, item = "Golden Zunda Bow" },
 }
 
 local function grantReferralReward(player: Player, reward: { [string]: any })

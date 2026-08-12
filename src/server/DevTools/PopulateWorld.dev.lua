@@ -63,10 +63,18 @@ local function populate()
 	-- Scatter gathering nodes in a grid around origin
 	local center = Vector3.new(200, -515, -410)
 	local resourceTypes = {
-		{ "ZundaFlower", 3 }, { "ZundaPea", 3 }, { "Zunda Mushroom", 2 },
-		{ "Zunda Berry", 3 }, { "Zunda Root", 2 }, { "Wheat", 3 },
-		{ "Rock", 2 }, { "Gold Ore", 1 }, { "EdamamePod", 2 },
-		{ "ZundaLeaf", 3 }, { "SweetPea", 2 }, { "PeaFlower", 2 },
+		{ "ZundaFlower", 3 },
+		{ "ZundaPea", 3 },
+		{ "Zunda Mushroom", 2 },
+		{ "Zunda Berry", 3 },
+		{ "Zunda Root", 2 },
+		{ "Wheat", 3 },
+		{ "Rock", 2 },
+		{ "Gold Ore", 1 },
+		{ "EdamamePod", 2 },
+		{ "ZundaLeaf", 3 },
+		{ "SweetPea", 2 },
+		{ "PeaFlower", 2 },
 	}
 
 	local total = 0
@@ -77,7 +85,8 @@ local function populate()
 				local rType = resourceTypes[ri]
 				local pos = center + Vector3.new(x * 10 + math.random(-3, 3), 0, z * 10 + math.random(-3, 3))
 				local surfacePos = Vector3.new(pos.X, center.Y, pos.Z) -- flat ground
-				local node = spawnNode(rType[1], rType[1] .. "_" .. string.format("%02d", math.random(1, rType[2])), surfacePos)
+				local node =
+					spawnNode(rType[1], rType[1] .. "_" .. string.format("%02d", math.random(1, rType[2])), surfacePos)
 				node.Parent = gatherFolder
 				total = total + 1
 			end

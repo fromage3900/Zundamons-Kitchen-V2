@@ -41,7 +41,9 @@ end
 
 function DailyChallengeService.initializeDay(player: Player)
 	local data = PlayerDataService.get(player)
-	if not data then return end
+	if not data then
+		return
+	end
 
 	local today = getTodayKey()
 	if data.daily_challenge_date ~= today then
@@ -67,18 +69,23 @@ end
 
 function DailyChallengeService.updateProgress(player: Player, metric: string, amount: number)
 	local data = PlayerDataService.get(player)
-	if not data or not data.daily_challenges then return end
+	if not data or not data.daily_challenges then
+		return
+	end
 
 	local today = getTodayKey()
-	if data.daily_challenge_date ~= today then return end
+	if data.daily_challenge_date ~= today then
+		return
+	end
 
 	local progress = data.daily_challenge_progress or {}
+	local claimed = data.daily_challenge_claimed or {}
 	for i, challenge in ipairs(data.daily_challenges) do
 		if challenge.metric == metric then
 			local current = progress[i] or 0
 			local newProgress = math.min(current + amount, challenge.goal)
 			progress[i] = newProgress
-			if newProgress >= challenge.goal and not data.daily_challenge_claimed or not data.daily_challenge_claimed[i] then
+			if newProgress >= challenge.goal and not claimed[i] then
 				-- Challenge complete!
 				PlayerDataService.mutate(player, "daily_challenge_complete", function(d)
 					local p = d.daily_challenge_progress or {}
@@ -99,41 +106,59 @@ end
 
 function DailyChallengeService.claimReward(player: Player, challengeIndex: number)
 	local data = PlayerDataService.get(player)
-	if not data or not data.daily_challenges then return false end
+	if not data or not data.daily_challenges then
+		return false
+	end
 
 	local today = getTodayKey()
-	if data.daily_challenge_date ~= today then return false end
+	if data.daily_challenge_date ~= today then
+		return false
+	end
 
 	local challenge = data.daily_challenges[challengeIndex]
-	if not challenge then return false end
+	if not challenge then
+		return false
+	end
 
 	local progress = data.daily_challenge_progress or {}
-	if (progress[challengeIndex] or 0) < challenge.goal then return false end
+	if (progress[challengeIndex] or 0) < challenge.goal then
+		return false
+	end
 
 	local claimed = data.daily_challenge_claimed or {}
-	if claimed[challengeIndex] then return false end
+	if claimed[challengeIndex] then
+		return false
+	end
 
-	claimed[challengeIndex] = true
-	data.daily_challenge_claimed = claimed
-
-	-- Grant rewards
+	-- Grant rewards. The claimed flag is set inside the settlement mutation so
+	-- a failed/returned settle can never leave a flag set without a reward.
 	local reward = challenge.reward
-	RewardCore.settle(player, {
+	local result = RewardCore.settle(player, {
 		gold = reward.gold or 0,
 		xp = reward.xp or 0,
 		reason = "daily_challenge",
 	}, function(d)
+		d.daily_challenge_claimed = d.daily_challenge_claimed or {}
+		d.daily_challenge_claimed[challengeIndex] = true
 		d.style_points = (d.style_points or 0) + (reward.style or 0)
 		for _, item in ipairs(reward.items or {}) do
 			PlayerDataService.grantItem(player, item, 1)
 		end
 		return true
 	end)
+	if not result.ok then
+		return false
+	end
+	claimed[challengeIndex] = true
+	data.daily_challenge_claimed = claimed
 
 	-- Check if all 3 challenges are complete for streak bonus
 	local allComplete = true
 	for i = 1, 3 do
-		if not claimed[i] then allComplete = false break end
+		if not claimed[i] then
+			allComplete = false
+			break
+		end
 	end
 
 	if allComplete then
@@ -161,7 +186,9 @@ end
 
 function DailyChallengeService.spawnDailyVisitor(player: Player)
 	local data = PlayerDataService.get(player)
-	if not data then return end
+	if not data then
+		return
+	end
 
 	local today = getTodayKey()
 	if data.daily_visitor_visited and data.daily_visitor_date == today then
@@ -192,7 +219,9 @@ end
 
 function DailyChallengeService.spawnDailyResources(player: Player)
 	local data = PlayerDataService.get(player)
-	if not data then return end
+	if not data then
+		return
+	end
 
 	local today = getTodayKey()
 	if data.daily_resources_spawned and data.daily_resources_date == today then
@@ -217,7 +246,9 @@ end
 
 function DailyChallengeService.checkAndUnlockWeeklyBoss(player: Player)
 	local data = PlayerDataService.get(player)
-	if not data then return false end
+	if not data then
+		return false
+	end
 
 	local today = getTodayKey()
 	local boss = DailyChallengeConfig.getWeeklyBoss()
@@ -234,7 +265,9 @@ end
 
 function DailyChallengeService.updateWeeklyProgress(player: Player, metric: string, amount: number)
 	local data = PlayerDataService.get(player)
-	if not data then return end
+	if not data then
+		return
+	end
 
 	local boss = DailyChallengeConfig.getWeeklyBoss()
 	if data.weekly_boss_id ~= boss.id then
@@ -258,12 +291,20 @@ end
 
 function DailyChallengeService.claimWeeklyReward(player: Player)
 	local data = PlayerDataService.get(player)
-	if not data then return false end
+	if not data then
+		return false
+	end
 
 	local boss = DailyChallengeConfig.getWeeklyBoss()
-	if data.weekly_boss_id ~= boss.id then return false end
-	if (data.weekly_boss_progress or 0) < boss.goal then return false end
-	if data.weekly_boss_claimed then return false end
+	if data.weekly_boss_id ~= boss.id then
+		return false
+	end
+	if (data.weekly_boss_progress or 0) < boss.goal then
+		return false
+	end
+	if data.weekly_boss_claimed then
+		return false
+	end
 
 	data.weekly_boss_claimed = true
 

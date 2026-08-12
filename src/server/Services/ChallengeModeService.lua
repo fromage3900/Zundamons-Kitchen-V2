@@ -19,26 +19,26 @@ local ChallengeModeService = {}
 -- ── Challenge Tiers ─────────────────────────────────────────────────────────
 -- Like Uma Musume's race grades: C → B → A → S → Zunda
 ChallengeModeService.tiers = {
-	{ name = "Bronze",  minScore = 0,     color = Color3.fromRGB(205, 127, 50),  icon = "🥉", requiredWave = 5  },
-	{ name = "Silver",  minScore = 500,   color = Color3.fromRGB(192, 192, 192),  icon = "🥈", requiredWave = 10 },
-	{ name = "Gold",    minScore = 2000,  color = Color3.fromRGB(255, 215, 0),    icon = "🥇", requiredWave = 20 },
-	{ name = "Platinum", minScore = 8000, color = Color3.fromRGB(140, 200, 255),  icon = "💎", requiredWave = 35 },
-	{ name = "Zunda",   minScore = 30000, color = Color3.fromRGB(160, 210, 150), icon = "🌱", requiredWave = 50 },
+	{ name = "Bronze", minScore = 0, color = Color3.fromRGB(205, 127, 50), icon = "🥉", requiredWave = 5 },
+	{ name = "Silver", minScore = 500, color = Color3.fromRGB(192, 192, 192), icon = "🥈", requiredWave = 10 },
+	{ name = "Gold", minScore = 2000, color = Color3.fromRGB(255, 215, 0), icon = "🥇", requiredWave = 20 },
+	{ name = "Platinum", minScore = 8000, color = Color3.fromRGB(140, 200, 255), icon = "💎", requiredWave = 35 },
+	{ name = "Zunda", minScore = 30000, color = Color3.fromRGB(160, 210, 150), icon = "🌱", requiredWave = 50 },
 }
 
 -- ── Wave Configuration ──────────────────────────────────────────────────────
 -- Each wave increases difficulty
 ChallengeModeService.waveConfig = {
 	-- wave = { guestCount, patienceMultiplier, recipeDifficulty, goldMultiplier }
-	[1]  = { guests = 2, patience = 1.0,  minTier = 1, goldMult = 1.0 },
-	[2]  = { guests = 2, patience = 0.95, minTier = 1, goldMult = 1.1 },
-	[3]  = { guests = 3, patience = 0.90, minTier = 1, goldMult = 1.2 },
-	[4]  = { guests = 3, patience = 0.85, minTier = 2, goldMult = 1.3 },
-	[5]  = { guests = 3, patience = 0.80, minTier = 2, goldMult = 1.5 },
-	[6]  = { guests = 4, patience = 0.75, minTier = 2, goldMult = 1.7 },
-	[7]  = { guests = 4, patience = 0.70, minTier = 3, goldMult = 2.0 },
-	[8]  = { guests = 4, patience = 0.65, minTier = 3, goldMult = 2.2 },
-	[9]  = { guests = 5, patience = 0.60, minTier = 3, goldMult = 2.5 },
+	[1] = { guests = 2, patience = 1.0, minTier = 1, goldMult = 1.0 },
+	[2] = { guests = 2, patience = 0.95, minTier = 1, goldMult = 1.1 },
+	[3] = { guests = 3, patience = 0.90, minTier = 1, goldMult = 1.2 },
+	[4] = { guests = 3, patience = 0.85, minTier = 2, goldMult = 1.3 },
+	[5] = { guests = 3, patience = 0.80, minTier = 2, goldMult = 1.5 },
+	[6] = { guests = 4, patience = 0.75, minTier = 2, goldMult = 1.7 },
+	[7] = { guests = 4, patience = 0.70, minTier = 3, goldMult = 2.0 },
+	[8] = { guests = 4, patience = 0.65, minTier = 3, goldMult = 2.2 },
+	[9] = { guests = 5, patience = 0.60, minTier = 3, goldMult = 2.5 },
 	[10] = { guests = 5, patience = 0.55, minTier = 4, goldMult = 3.0 },
 	-- Beyond 10: scales procedurally
 }
@@ -55,18 +55,21 @@ ChallengeModeService.scoreValues = {
 }
 
 -- ── Session State ───────────────────────────────────────────────────────────
-local sessions: { [number]: {
-	wave: number,
-	score: number,
-	goldEarned: number,
-	guestsServed: number,
-	perfectCooks: number,
-	currentCombo: number,
-	maxCombo: number,
-	startTime: number,
-	activeGuests: { any },
-	tier: string,
-} } = {}
+local sessions: {
+	[number]: {
+		wave: number,
+		score: number,
+		goldEarned: number,
+		guestsServed: number,
+		perfectCooks: number,
+		currentCombo: number,
+		maxCombo: number,
+		startTime: number,
+		activeGuests: { any },
+		tier: string,
+	},
+} =
+	{}
 
 -- RemoteEvents
 local challengeEvent = nil
@@ -93,7 +96,9 @@ end
 
 -- ── Wave Configuration Helpers ──────────────────────────────────────────────
 
-function ChallengeModeService.getWaveConfig(wave: number): { guests: number, patience: number, minTier: number, goldMult: number }
+function ChallengeModeService.getWaveConfig(
+	wave: number
+): { guests: number, patience: number, minTier: number, goldMult: number }
 	local config = ChallengeModeService.waveConfig[wave]
 	if config then
 		return config
@@ -147,7 +152,11 @@ function ChallengeModeService.selectChallengeRecipes(wave: number): { string }
 
 	-- Return a weighted selection
 	local selected = {}
-	for i = 1, math.min(5, #allRecipes) do
+	if #allRecipes == 0 then
+		warn(string.format("[ChallengeModeService] No recipes at tier %d for wave %d", minTier, wave))
+		return selected
+	end
+	for _ = 1, math.min(5, #allRecipes) do
 		local recipe = allRecipes[math.random(1, #allRecipes)]
 		if recipe and not table.find(selected, recipe) then
 			table.insert(selected, recipe)
@@ -306,7 +315,7 @@ end
 
 -- ── Event Handlers ──────────────────────────────────────────────────────────
 
-function ChallengeModeService.onGuestServed(player: Player, quality: string, recipe: string)
+function ChallengeModeService.onGuestServed(player: Player, quality: string)
 	local playerId = player.UserId
 	local session = sessions[playerId]
 	if not session then
@@ -334,12 +343,8 @@ function ChallengeModeService.onGuestServed(player: Player, quality: string, rec
 		session.score = session.score + ChallengeModeService.scoreValues.combo_5
 	end
 
-	-- Style points
-	local styleGain = quality == "perfect" and 10 or quality == "great" and 5 or 2
-	PlayerDataService.mutate(player, "challenge_style_gain", function(data)
-		data.style_points = (data.style_points or 0) + styleGain
-		return true
-	end)
+	-- Style points are granted by EndlessLoopWiring.syncPlayerWardrobe when the
+	-- serve is settled — never here, or perfect serves double-credit.
 
 	local _, status = getRemotes()
 	status:FireClient(player, {
@@ -348,6 +353,29 @@ function ChallengeModeService.onGuestServed(player: Player, quality: string, rec
 		wave = session.wave,
 		combo = session.currentCombo,
 		maxCombo = session.maxCombo,
+	})
+end
+
+function ChallengeModeService.onCookComplete(player: Player, quality: string)
+	-- Cooking awards quality score but must NEVER count as a guest served
+	-- (previously a wave could be "completed" by cooking alone).
+	local session = sessions[player.UserId]
+	if not session then
+		return
+	end
+
+	if quality == "perfect" then
+		session.score = session.score + ChallengeModeService.scoreValues.perfect_cook
+		session.perfectCooks = session.perfectCooks + 1
+	elseif quality == "great" then
+		session.score = session.score + ChallengeModeService.scoreValues.great_cook
+	end
+
+	local _, status = getRemotes()
+	status:FireClient(player, {
+		type = "cook_scored",
+		score = session.score,
+		wave = session.wave,
 	})
 end
 

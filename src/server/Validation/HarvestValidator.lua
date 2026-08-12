@@ -31,11 +31,9 @@ local function getNodePosition(node: Instance): Vector3
 	end
 	return if node:IsA("BasePart")
 		then node.Position
-		else (
-			if node:IsA("Model")
-				then (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position)
-				else Vector3.zero
-		)
+		else (if node:IsA("Model")
+			then (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position)
+			else Vector3.zero)
 end
 
 --- Validate that the player is close enough to the target node

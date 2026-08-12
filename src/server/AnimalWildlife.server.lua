@@ -8,11 +8,11 @@
 
 local RunService = game:GetService("RunService")
 
-local WANDER_RADIUS = 22       -- studs from each animal's home point
-local WALK_SPEED = 4           -- studs/sec while moving between wander points
+local WANDER_RADIUS = 22 -- studs from each animal's home point
+local WALK_SPEED = 4 -- studs/sec while moving between wander points
 local IDLE_MIN, IDLE_MAX = 3, 9 -- seconds paused between wanders
 local SCATTER_CENTER = Vector3.new(28, 0, -7)
-local SCATTER_RADIUS = 170     -- spreads the stacked cluster across the map
+local SCATTER_RADIUS = 170 -- spreads the stacked cluster across the map
 
 local raycastParams = RaycastParams.new()
 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
@@ -49,7 +49,9 @@ end
 local function wander(model: Model, homeCFrame: CFrame)
 	local parts = {}
 	for _, d in ipairs(model:GetDescendants()) do
-		if d:IsA("BasePart") then table.insert(parts, d) end
+		if d:IsA("BasePart") then
+			table.insert(parts, d)
+		end
 	end
 
 	task.spawn(function()
@@ -66,17 +68,22 @@ local function wander(model: Model, homeCFrame: CFrame)
 				local goalPos = Vector3.new(tx, groundY, tz)
 				local flatDir = goalPos - startCFrame.Position
 				flatDir = Vector3.new(flatDir.X, 0, flatDir.Z)
-				local goalCFrame = (flatDir.Magnitude > 0.5)
-					and CFrame.lookAt(goalPos, goalPos + flatDir.Unit)
+				local goalCFrame = (flatDir.Magnitude > 0.5) and CFrame.lookAt(goalPos, goalPos + flatDir.Unit)
 					or CFrame.new(goalPos) * (startCFrame - startCFrame.Position)
 
-				local travelDist = (Vector3.new(startCFrame.Position.X, 0, startCFrame.Position.Z) - Vector3.new(goalPos.X, 0, goalPos.Z)).Magnitude
+				local travelDist = (Vector3.new(startCFrame.Position.X, 0, startCFrame.Position.Z) - Vector3.new(
+					goalPos.X,
+					0,
+					goalPos.Z
+				)).Magnitude
 				local duration = math.max(0.6, travelDist / WALK_SPEED)
 				local t0 = os.clock()
 				local conn
 				conn = RunService.Heartbeat:Connect(function()
 					if not model.Parent then
-						if conn then conn:Disconnect() end
+						if conn then
+							conn:Disconnect()
+						end
 						return
 					end
 					local alpha = math.clamp((os.clock() - t0) / duration, 0, 1)
@@ -96,8 +103,12 @@ local function setup()
 	local models = collectAnimalModels()
 	local pivots: { [Model]: Vector3 } = {}
 	for _, m in ipairs(models) do
-		local ok, piv = pcall(function() return m:GetPivot() end)
-		if ok then pivots[m] = piv.Position end
+		local ok, piv = pcall(function()
+			return m:GetPivot()
+		end)
+		if ok then
+			pivots[m] = piv.Position
+		end
 	end
 
 	local scattered, kept = 0, 0
@@ -112,7 +123,9 @@ local function setup()
 				local z = SCATTER_CENTER.Z + math.sin(angle) * dist
 				local parts = {}
 				for _, d in ipairs(m:GetDescendants()) do
-					if d:IsA("BasePart") then table.insert(parts, d) end
+					if d:IsA("BasePart") then
+						table.insert(parts, d)
+					end
 				end
 				local groundY = findGroundY(x, z, parts)
 				if groundY then
@@ -131,7 +144,12 @@ local function setup()
 		end
 	end
 
-	print(("[AnimalWildlife] %d animals dispersed from the stacked spawn point, %d already-placed animals kept in position -- all now roaming"):format(scattered, kept))
+	print(
+		("[AnimalWildlife] %d animals dispersed from the stacked spawn point, %d already-placed animals kept in position -- all now roaming"):format(
+			scattered,
+			kept
+		)
+	)
 end
 
 task.spawn(setup)

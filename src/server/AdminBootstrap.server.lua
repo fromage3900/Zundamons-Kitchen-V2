@@ -40,7 +40,9 @@ AdminService.registerCommand("plugins", function(player)
 	for name, info in pairs(plugins) do
 		lines[#lines + 1] = string.format("  %s (v%s)", info.name, info.version)
 	end
-	if #lines == 1 then lines[#lines + 1] = "  No plugins loaded" end
+	if #lines == 1 then
+		lines[#lines + 1] = "  No plugins loaded"
+	end
 	return table.concat(lines, "\n")
 end, "List loaded plugins")
 

@@ -17,7 +17,7 @@
 --             roblox_rot = (rx_deg, -rz_deg, ry_deg)
 
 local DEFAULT_ORIGIN = Vector3.new(0, -519, -440)
-local DEFAULT_SCALE  = 4
+local DEFAULT_SCALE = 4
 
 -- All synced parts live here so we can diff/cleanup orphans
 local folder = workspace:FindFirstChild("BlenderSync")
@@ -30,27 +30,43 @@ end
 -- Map blender object name -> Roblox Part
 local liveParts = {}
 for _, p in ipairs(folder:GetChildren()) do
-	if p:IsA("BasePart") then liveParts[p.Name] = p end
+	if p:IsA("BasePart") then
+		liveParts[p.Name] = p
+	end
 end
 
 local function shapeFromString(s)
-	if s == "Ball" or s == "Sphere" then return Enum.PartType.Ball
-	elseif s == "Cylinder" then return Enum.PartType.Cylinder
-	elseif s == "Wedge" then return Enum.PartType.Wedge
-	else return Enum.PartType.Block end
+	if s == "Ball" or s == "Sphere" then
+		return Enum.PartType.Ball
+	elseif s == "Cylinder" then
+		return Enum.PartType.Cylinder
+	elseif s == "Wedge" then
+		return Enum.PartType.Wedge
+	else
+		return Enum.PartType.Block
+	end
 end
 
 local function materialFromString(s)
-	if not s then return Enum.Material.SmoothPlastic end
-	local ok, m = pcall(function() return Enum.Material[s] end)
-	if ok and m then return m end
+	if not s then
+		return Enum.Material.SmoothPlastic
+	end
+	local ok, m = pcall(function()
+		return Enum.Material[s]
+	end)
+	if ok and m then
+		return m
+	end
 	return Enum.Material.SmoothPlastic
 end
 
 function _G.applyBlenderSync(snapshot)
-	if type(snapshot) ~= "table" then return "snapshot not a table" end
+	if type(snapshot) ~= "table" then
+		return "snapshot not a table"
+	end
 	local scale = snapshot.scale or DEFAULT_SCALE
-	local origin = snapshot.origin and Vector3.new(snapshot.origin[1], snapshot.origin[2], snapshot.origin[3]) or DEFAULT_ORIGIN
+	local origin = snapshot.origin and Vector3.new(snapshot.origin[1], snapshot.origin[2], snapshot.origin[3])
+		or DEFAULT_ORIGIN
 	local seen = {}
 	local created, updated, removed = 0, 0, 0
 
@@ -78,8 +94,8 @@ function _G.applyBlenderSync(snapshot)
 
 		-- Size: Blender dimensions in meters -> studs
 		local sx = math.max(0.05, (obj.size[1] or 1) * scale)
-		local sy = math.max(0.05, (obj.size[3] or 1) * scale)  -- height = blender Z
-		local sz = math.max(0.05, (obj.size[2] or 1) * scale)  -- depth = blender Y
+		local sy = math.max(0.05, (obj.size[3] or 1) * scale) -- height = blender Z
+		local sz = math.max(0.05, (obj.size[2] or 1) * scale) -- depth = blender Y
 		part.Size = Vector3.new(sx, sy, sz)
 
 		-- Rotation: Blender (rx,ry,rz) radians -> Roblox CFrame.Angles with axis remap
@@ -106,8 +122,13 @@ function _G.applyBlenderSync(snapshot)
 		end
 	end
 
-	return string.format("BlenderSync: +%d new, ~%d updated, -%d removed (%d total)",
-		created, updated, removed, #folder:GetChildren())
+	return string.format(
+		"BlenderSync: +%d new, ~%d updated, -%d removed (%d total)",
+		created,
+		updated,
+		removed,
+		#folder:GetChildren()
+	)
 end
 
 print("[BlenderSync] Ready - call _G.applyBlenderSync(snapshot)")

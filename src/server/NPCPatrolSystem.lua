@@ -120,9 +120,13 @@ end
 
 local function moveToWaypoint(model, targetPos, speed)
 	local torso = model.PrimaryPart
-	if not torso then return end
+	if not torso then
+		return
+	end
 	local dist = (targetPos - torso.Position).Magnitude
-	if dist < 2 then return end
+	if dist < 2 then
+		return
+	end
 	local duration = dist / (speed or 6)
 	local goal = { Position = targetPos }
 	local tween = TweenS:Create(torso, TweenInfo.new(duration, Enum.EasingStyle.Linear), goal)
@@ -134,7 +138,9 @@ local function moveToWaypoint(model, targetPos, speed)
 end
 
 local function patrolLoop(model, waypoints)
-	if #waypoints == 0 then return end
+	if #waypoints == 0 then
+		return
+	end
 	local wpIdx = 1
 	while model and model.Parent do
 		local target = waypoints[wpIdx]
@@ -148,10 +154,12 @@ end
 -- Guest roaming: move a guest NPC within a radius or between waypoints
 local function guestRoamLoop(guest, personality)
 	local torso = guest:FindFirstChild("Torso")
-	if not torso then return end
+	if not torso then
+		return
+	end
 	local spawnPos = torso.Position
 	local waypoints = getWaypoints()
-	
+
 	while guest and guest.Parent and torso.Parent do
 		if personality == "roamer" then
 			-- Wander within a 12-stud radius of spawn

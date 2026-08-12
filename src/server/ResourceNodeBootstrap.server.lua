@@ -5,6 +5,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Workspace = game:GetService("Workspace")
 
 local Registry = require(ReplicatedStorage.ConfigurationFiles.ResourceNodeRegistry)
 local ResourceVisualService = require(ServerScriptService.Services.ResourceVisualService)
@@ -131,5 +132,30 @@ for _, tag in { "ResourceNode", "Mineable", "GatheringNode" } do
 	end
 	CollectionService:GetInstanceAddedSignal(tag):Connect(watch)
 end
+
+local function adoptAuthoredNodes()
+	local loopArea = Workspace:FindFirstChild("GameplayLoopArea")
+	local nodes = loopArea and loopArea:FindFirstChild("GatheringNodes")
+	if not nodes then
+		return
+	end
+	local adopted = 0
+	local function visit(container: Instance)
+		for _, child in ipairs(container:GetChildren()) do
+			if not seen[child] and Registry.infer(child) then
+				seen[child] = true
+				watch(child)
+				adopted += 1
+			end
+			visit(child)
+		end
+	end
+	visit(nodes)
+	if adopted > 0 then
+		print("[ResourceNodeBootstrap] Adopted " .. adopted .. " authored node(s) from GatheringNodes")
+	end
+end
+
+adoptAuthoredNodes()
 
 print("[ResourceNodeBootstrap] Canonical resource visual service ready")

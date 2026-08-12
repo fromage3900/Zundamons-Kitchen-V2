@@ -12,13 +12,19 @@ local mineableList = mineableConfig.Mineables
 -- HarvestValidator for distance + rate check
 local validateHarvest
 local ok, hvMod = pcall(require, SSS.Validation.HarvestValidator)
-if ok and hvMod then validateHarvest = hvMod.validateHarvest end
+if ok and hvMod then
+	validateHarvest = hvMod.validateHarvest
+end
 
 local function getItemPos(item: Instance): Vector3
-	if not item then return Vector3.zero end
+	if not item then
+		return Vector3.zero
+	end
 	return if item:IsA("BasePart")
 		then item.Position
-		else (if item:IsA("Model") then (item.PrimaryPart and item.PrimaryPart.Position or item:GetPivot().Position) else Vector3.zero)
+		else (if item:IsA("Model")
+			then (item.PrimaryPart and item.PrimaryPart.Position or item:GetPivot().Position)
+			else Vector3.zero)
 end
 
 function hasWildcardTag(instance, prefix)
@@ -45,10 +51,18 @@ function itemAttributes(item)
 		end
 	end
 	if not found then
-		if item:GetAttribute("Health") == nil then item:SetAttribute("Health", 30) end
-		if item:GetAttribute("MaxHealth") == nil then item:SetAttribute("MaxHealth", 30) end
-		if item:GetAttribute("Respawn") == nil then item:SetAttribute("Respawn", 10) end
-		if item:GetAttribute("Type") == nil then item:SetAttribute("Type", "Rock") end
+		if item:GetAttribute("Health") == nil then
+			item:SetAttribute("Health", 30)
+		end
+		if item:GetAttribute("MaxHealth") == nil then
+			item:SetAttribute("MaxHealth", 30)
+		end
+		if item:GetAttribute("Respawn") == nil then
+			item:SetAttribute("Respawn", 10)
+		end
+		if item:GetAttribute("Type") == nil then
+			item:SetAttribute("Type", "Rock")
+		end
 	end
 end
 
@@ -119,19 +133,35 @@ function itemEvent(item)
 			local obj = model or item
 
 			if item:HasTag("Destroy") then
-				if item.Parent then item.Parent:SetAttribute("Seeded", false) end
+				if item.Parent then
+					item.Parent:SetAttribute("Seeded", false)
+				end
 				item:Destroy()
 			elseif model and model:HasTag("Destroy") then
-				if model.Parent then model.Parent:SetAttribute("Seeded", false) end
+				if model.Parent then
+					model.Parent:SetAttribute("Seeded", false)
+				end
 				model:Destroy()
 			else
 				local parent = obj.Parent
 				obj.Parent = nil
 				local respawnTime = item:GetAttribute("Respawn") or 10
-				task.wait(respawnTime)
-				item:SetAttribute("Health", item:GetAttribute("MaxHealth") or 30)
-				item:SetAttribute("Mined", false)
-				obj.Parent = parent
+				-- Respawn on a timer, NOT by yielding inside the
+				-- GetAttributeChangedSignal handler (yielding there blocks the
+				-- signal dispatch for the whole server and can error with
+				-- "Parent is not an instance" if the node was destroyed).
+				task.delay(respawnTime, function()
+					local ok = pcall(function()
+						if obj.Parent == nil then
+							item:SetAttribute("Health", item:GetAttribute("MaxHealth") or 30)
+							item:SetAttribute("Mined", false)
+							obj.Parent = parent
+						end
+					end)
+					if not ok then
+						warn("[Mineable] respawn skipped — node was destroyed while waiting")
+					end
+				end)
 			end
 		end
 	end)
@@ -140,7 +170,9 @@ end
 local boundItems = setmetatable({}, { __mode = "k" })
 
 local function setupMineableItem(item)
-	if not item or boundItems[item] then return end
+	if not item or boundItems[item] then
+		return
+	end
 	boundItems[item] = true
 	itemAttributes(item)
 	itemEvent(item)

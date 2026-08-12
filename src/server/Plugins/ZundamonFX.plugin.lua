@@ -13,13 +13,21 @@ local companionModifiers = {}
 
 function plugin.init()
 	ZundamonSync.onChange(function(player, key, value)
-		if key ~= "companionType" and key ~= "emotion" and key ~= "meshModifiers" then return end
+		if key ~= "companionType" and key ~= "emotion" and key ~= "meshModifiers" then
+			return
+		end
 		local char = player.Character
-		if not char then return end
+		if not char then
+			return
+		end
 		local companion = char:FindFirstChild("ZundaCompanion_" .. player.Name)
-		if not companion then return end
+		if not companion then
+			return
+		end
 		local body = companion:FindFirstChild("Body")
-		if not body then return end
+		if not body then
+			return
+		end
 
 		local state = ZundamonSync.getState(player)
 

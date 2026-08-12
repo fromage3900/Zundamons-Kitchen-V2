@@ -9,9 +9,13 @@ local plugin = {
 }
 
 local function applyNodeFX(part)
-	if not part:IsA("BasePart") then return end
+	if not part:IsA("BasePart") then
+		return
+	end
 	local rType = part:GetAttribute("ResourceType")
-	if not rType then return end
+	if not rType then
+		return
+	end
 	if rType == "ZundaFlower" or rType == "PeaFlower" then
 		ModifierStack.apply(part, "Bob", { height = 0.3, speed = 0.8 + math.random() * 0.4 })
 		ModifierStack.apply(part, "Glow", { color = Color3.fromRGB(200, 220, 255), brightness = 0.8, range = 4 })
@@ -28,7 +32,9 @@ end
 
 function plugin.init()
 	for _, part in ipairs(CollectionService:GetTagged("GatheringNode")) do
-		task.spawn(function() applyNodeFX(part) end)
+		task.spawn(function()
+			applyNodeFX(part)
+		end)
 	end
 	CollectionService:GetInstanceAddedSignal("GatheringNode"):Connect(function(part)
 		task.wait(0.5)

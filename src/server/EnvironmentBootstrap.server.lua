@@ -13,14 +13,14 @@ local ScatterService
 local servicesFolder = ServerScriptService:FindFirstChild("Services")
 if servicesFolder then
 	local scatterModule = servicesFolder:FindFirstChild("ScatterService")
-    if scatterModule and scatterModule:IsA("ModuleScript") then
+	if scatterModule and scatterModule:IsA("ModuleScript") then
 		ScatterService = require(scatterModule)
 	end
 end
 -- Fallback: use a stub if ScatterService is unavailable
 if not ScatterService then
-    ScatterService = { scatterBiome = function() end, clearBiome = function() end, clearAll = function() end }
-    warn("[EnvironmentBootstrap] Module-based ScatterService unavailable; standalone service remains authoritative")
+	ScatterService = { scatterBiome = function() end, clearBiome = function() end, clearAll = function() end }
+	warn("[EnvironmentBootstrap] Module-based ScatterService unavailable; standalone service remains authoritative")
 end
 -- Tag regions in Studio with "ScatterRegion" and a "Biome" attribute
 -- to auto-scatter them on game load.
@@ -42,11 +42,14 @@ local function bootstrapEnvironment()
 	-- If no ScatterRegion tags exist, scatter default biomes in gameplay area
 	local gameplayArea = Workspace:FindFirstChild("GameplayLoopArea")
 	if gameplayArea and #CollectionService:GetTagged("ScatterRegion") == 0 then
-		task.delay(2, function()
-			if ScatterService and ScatterService.scatterBiome then
-				ScatterService.scatterBiome("zunda_forest", gameplayArea)
-			end
-		end)
+		local defaultBiomes = { "zunda_forest", "mineable_foothills", "kitchen_garden" }
+		for i, biomeName in ipairs(defaultBiomes) do
+			task.delay(2 + i * 1.5, function()
+				if ScatterService and ScatterService.scatterBiome then
+					ScatterService.scatterBiome(biomeName, gameplayArea)
+				end
+			end)
+		end
 	end
 
 	-- Connect to CollectionService for new regions added at runtime
@@ -102,8 +105,7 @@ local function ensureWorkspaceStructure()
 end
 
 ensureWorkspaceStructure()
--- DISABLED: bootstrapEnvironment() — manual scatter only
--- DISABLED: landscape spawner auto-run
+bootstrapEnvironment()
 bootstrapNPC()
 
 return ScatterService

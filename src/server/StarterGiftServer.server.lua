@@ -1,42 +1,47 @@
---!strict
--- Grants the FTUE starter-pack gold shown in WelcomeStarterPackGui.client.lua.
--- The claim button previously only closed the panel client-side -- no server
--- grant existed, so "500 Zunda Gold" was purely cosmetic. Server-validated,
--- one-time-per-player via a persisted flag.
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
-
 local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
-local RewardCore = require(ServerScriptService.Services.RewardCore)
 
-local STARTER_GOLD = 500
+local STARTER_KIT = {
+	gold_bonus = 50,
+	items = {
+		Apple = 10,
+		Wheat = 10,
+	},
+}
 
-local RE = ReplicatedStorage:WaitForChild("RemoteEvents")
-local claimEvent = RE:FindFirstChild("ClaimStarterGift")
-if not claimEvent then
-	claimEvent = Instance.new("RemoteEvent")
-	claimEvent.Name = "ClaimStarterGift"
-	claimEvent.Parent = RE
-end
-
-claimEvent.OnServerEvent:Connect(function(player)
-	local data = PlayerDataService.getOrCreate(player)
-	if data.starter_gift_claimed then
-		return
-	end
-	RewardCore.settle(player, {
-		gold = STARTER_GOLD,
-		xp = 0,
-		reason = "starter_gift",
-		popupItem = "Chef Starter Gift",
-	}, function(d)
-		if d.starter_gift_claimed then
-			return false, "already_claimed"
+local function giveStarterKit(player)
+	local ok = PlayerDataService.mutate(player, "starter_gift", function(data)
+		if data.starter_kit_claimed then
+			return false
 		end
-		d.starter_gift_claimed = true
+		data.starter_kit_claimed = true
+		data.gold = (data.gold or 0) + STARTER_KIT.gold_bonus
+		for item, amount in pairs(STARTER_KIT.items) do
+			data[item] = (data[item] or 0) + amount
+		end
 		return true
 	end)
-end)
+	if ok then
+		print(string.format("[StarterGiftServer] Starter kit granted to %s", player.Name))
+	end
+end
 
-print("[StarterGiftServer] Ready — one-time starter gold grant wired")
+local function onPlayerJoined(player)
+	local data = PlayerDataService.get(player)
+	if not data then
+		local loaded = PlayerDataService.getOrCreate(player)
+		task.wait(2)
+		giveStarterKit(player)
+	else
+		giveStarterKit(player)
+	end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+	task.spawn(function()
+		onPlayerJoined(player)
+	end)
+end
+
+Players.PlayerAdded:Connect(onPlayerJoined)

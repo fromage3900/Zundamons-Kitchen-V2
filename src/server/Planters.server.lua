@@ -22,7 +22,7 @@ local function clonePlant(item, plant)
 	newPlant:SetAttribute("Planted_at", os.clock())
 	newPlant.Parent = item
 	newPlant.Anchored = true
-	newPlant.Position = Vector3.new(item.Position.X, item.Position.Y + newPlant.Size.Y/2, item.Position.Z)
+	newPlant.Position = Vector3.new(item.Position.X, item.Position.Y + newPlant.Size.Y / 2, item.Position.Z)
 end
 
 local function activvateClickDetector()
@@ -31,7 +31,9 @@ local function activvateClickDetector()
 		if clickDetector then
 			clickDetector.MouseClick:Connect(function(player)
 				local data = PlayerDataService.get(player)
-				if not data then return end
+				if not data then
+					return
+				end
 				local myplantables = {}
 				for _, plant in ipairs(plantable) do
 					if data[plant.Name] then
@@ -49,16 +51,28 @@ end
 -- Plant seed via RemoteEvent (player selects seed from menu)
 plantingEvent.OnServerEvent:Connect(function(player, seedName, planter)
 	local data = PlayerDataService.get(player)
-	if not data then return end
-	if not planter or planter:GetAttribute("Seeded") == true then return end
-	if not data[seedName] or data[seedName] <= 0 then return end
+	if not data then
+		return
+	end
+	if not planter or planter:GetAttribute("Seeded") == true then
+		return
+	end
+	if not data[seedName] or data[seedName] <= 0 then
+		return
+	end
 
 	-- Server-authoritative distance check
 	local char = player.Character
-	if not char then return end
+	if not char then
+		return
+	end
 	local root = char:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-	if (root.Position - planter.Position).Magnitude > 16 then return end
+	if not root then
+		return
+	end
+	if (root.Position - planter.Position).Magnitude > 16 then
+		return
+	end
 
 	PlayerDataService.update(player, function(d)
 		d[seedName] = d[seedName] - 1
@@ -80,9 +94,11 @@ end)
 local function growPlants()
 	task.spawn(function()
 		while true do
-			task.wait(1)  -- Check once per second instead of every frame
+			task.wait(1) -- Check once per second instead of every frame
 			for _, item in ipairs(myplanters) do
-				if not item.Parent then continue end
+				if not item.Parent then
+					continue
+				end
 				local children = item:GetChildren()
 				for _, val in ipairs(children) do
 					if plantsList[val.Name] then

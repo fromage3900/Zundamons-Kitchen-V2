@@ -66,6 +66,8 @@ local function onPlayerAdded(player)
 			if not existing then
 				-- New audio API instances aren't enabled in every place; fail soft.
 				pcall(function()
+					-- AudioReceiver is a valid, current Roblox class; selene 0.27's bundled std is stale.
+					-- selene: allow(incorrect_standard_library_use)
 					local receiver = Instance.new("AudioReceiver")
 					receiver.Name = "ZoneAudioReceiver"
 					receiver.Parent = hrp
@@ -75,6 +77,8 @@ local function onPlayerAdded(player)
 	end)
 end
 Players.PlayerAdded:Connect(onPlayerAdded)
-for _, p in ipairs(Players:GetPlayers()) do onPlayerAdded(p) end
+for _, p in ipairs(Players:GetPlayers()) do
+	onPlayerAdded(p)
+end
 
 print("[AmbientZoneAudio] 3 zone audio emitters placed (Kitchen/Garden/Pond)")

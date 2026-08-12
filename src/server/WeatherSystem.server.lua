@@ -61,13 +61,13 @@ local function applyWeather(weatherKey, transitionSec)
 	local targetHaze = w.atmosphere_haze
 	local targetDensityMult = w.atmosphere_density_mult or 1
 	local targetFogMult = w.fog_mult or 1
-	local targetWind = w.wind or Vector3.new(0,0,0)
+	local targetWind = w.wind or Vector3.new(0, 0, 0)
 
 	-- Tween the workspace attributes that DayNightSky reads
 	local startHaze = workspace:GetAttribute("WeatherHaze") or CONFIG.atmosphere.haze
 	local startDensity = workspace:GetAttribute("WeatherDensityMult") or 1
 	local startFog = workspace:GetAttribute("WeatherFogMult") or 1
-	local startWind = workspace.GlobalWind or Vector3.new(0,0,0)
+	local startWind = workspace.GlobalWind or Vector3.new(0, 0, 0)
 
 	if _tweenObj then
 		_tweenObj:Cancel()

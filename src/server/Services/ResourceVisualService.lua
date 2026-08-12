@@ -6,6 +6,7 @@ local ContentProvider = game:GetService("ContentProvider")
 local InsertService = game:GetService("InsertService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local CollectionService = game:GetService("CollectionService")
 
 local Catalog = require(ReplicatedStorage.ConfigurationFiles.ResourceVisualCatalog)
 
@@ -79,6 +80,22 @@ local function createPart(
 	return part
 end
 
+local PASTEL = {
+	GREEN = Color3.fromRGB(160, 210, 150),
+	GOLD = Color3.fromRGB(255, 200, 80),
+	PINK = Color3.fromRGB(255, 150, 200),
+	MINT = Color3.fromRGB(145, 215, 195),
+	BROWN = Color3.fromRGB(133, 91, 62),
+	DARK_GREEN = Color3.fromRGB(100, 170, 90),
+	LIGHT_GREEN = Color3.fromRGB(180, 230, 170),
+	WHITE = Color3.fromRGB(245, 245, 245),
+	GRAY = Color3.fromRGB(127, 133, 145),
+	LIGHT_GRAY = Color3.fromRGB(180, 185, 190),
+	BRIGHT_GOLD = Color3.fromRGB(255, 215, 0),
+	RED = Color3.fromRGB(220, 80, 80),
+	PURPLE = Color3.fromRGB(180, 120, 200),
+}
+
 local function buildFallback(root: BasePart, archetypeId: string): Folder
 	local managed = managedFolder(root)
 	local old = managed:FindFirstChild(FALLBACK_NAME)
@@ -89,13 +106,15 @@ local function buildFallback(root: BasePart, archetypeId: string): Folder
 	fallback.Name = FALLBACK_NAME
 	fallback.Parent = managed
 
-	if archetypeId == "AppleTree" or archetypeId == "PineTree" then
+	local lo = string.lower
+
+	if archetypeId == "AppleTree" then
 		createPart(
 			root,
 			fallback,
 			"Trunk",
 			Vector3.new(5, 1.1, 1.1),
-			Color3.fromRGB(133, 91, 62),
+			PASTEL.BROWN,
 			CFrame.new(0, 2, 0) * CFrame.Angles(0, 0, math.rad(90)),
 			Enum.PartType.Cylinder
 		)
@@ -103,78 +122,349 @@ local function buildFallback(root: BasePart, archetypeId: string): Folder
 			root,
 			fallback,
 			"Canopy",
-			Vector3.new(5.5, 5.5, 5.5),
-			Color3.fromRGB(126, 196, 108),
+			Vector3.new(5, 5, 5),
+			PASTEL.GREEN,
 			CFrame.new(0, 5, 0),
 			Enum.PartType.Ball
 		)
 		createPart(
 			root,
 			fallback,
-			"CanopyAccent",
-			Vector3.new(3.8, 3.8, 3.8),
-			Color3.fromRGB(167, 218, 127),
-			CFrame.new(1.5, 5.8, 0.4),
+			"CanopyLight",
+			Vector3.new(3.5, 3.5, 3.5),
+			PASTEL.LIGHT_GREEN,
+			CFrame.new(1.2, 5.8, 0.6),
 			Enum.PartType.Ball
 		)
+		createPart(
+			root,
+			fallback,
+			"Blossom1",
+			Vector3.new(0.8, 0.8, 0.8),
+			PASTEL.PINK,
+			CFrame.new(2, 6.5, 1),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Blossom2",
+			Vector3.new(0.7, 0.7, 0.7),
+			PASTEL.PINK,
+			CFrame.new(-1.5, 6.2, -1.8),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Blossom3",
+			Vector3.new(0.9, 0.9, 0.9),
+			PASTEL.PINK,
+			CFrame.new(0.5, 7, -2),
+			Enum.PartType.Ball
+		)
+	elseif archetypeId == "PineTree" then
+		createPart(
+			root,
+			fallback,
+			"Trunk",
+			Vector3.new(4, 1, 1),
+			PASTEL.BROWN,
+			CFrame.new(0, 1.5, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Enum.PartType.Cylinder
+		)
+		createPart(
+			root,
+			fallback,
+			"Lower",
+			Vector3.new(4.5, 4.5, 4.5),
+			PASTEL.DARK_GREEN,
+			CFrame.new(0, 4, 0),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Upper",
+			Vector3.new(3, 3, 3),
+			PASTEL.GREEN,
+			CFrame.new(0, 6.5, 0),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Tip",
+			Vector3.new(1.5, 1.5, 1.5),
+			PASTEL.LIGHT_GREEN,
+			CFrame.new(0, 8, 0),
+			Enum.PartType.Ball
+		)
+	elseif lo(archetypeId):find("rock") then
+		local gold = archetypeId == "GoldRock"
+		local marble = archetypeId == "MarbleRock"
+		local baseColor = if gold then PASTEL.BRIGHT_GOLD elseif marble then PASTEL.WHITE else PASTEL.GRAY
+		createPart(root, fallback, "StoneA", Vector3.new(2.8, 2.2, 2.5), baseColor, CFrame.identity, Enum.PartType.Ball)
+		createPart(
+			root,
+			fallback,
+			"StoneB",
+			Vector3.new(2, 1.6, 1.8),
+			baseColor:Lerp(Color3.new(1, 1, 1), 0.15),
+			CFrame.new(0.9, 0.45, 0.25),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"StoneC",
+			Vector3.new(1.6, 1.4, 1.5),
+			baseColor:Lerp(Color3.new(0, 0, 0), 0.06),
+			CFrame.new(-0.7, 0.3, -0.6),
+			Enum.PartType.Ball
+		)
+		if gold then
+			createPart(
+				root,
+				fallback,
+				"Sparkle",
+				Vector3.new(0.5, 0.5, 0.5),
+				Color3.fromRGB(255, 255, 200),
+				CFrame.new(0.5, 1.2, 0.3),
+				Enum.PartType.Ball
+			)
+		end
 	elseif archetypeId == "Wheat" or archetypeId == "CarrotPlot" then
 		for index = -2, 2 do
 			local x = index * 0.38
 			createPart(
 				root,
 				fallback,
-				"Stem",
+				"Stem" .. index,
 				Vector3.new(3.2, 0.16, 0.16),
-				Color3.fromRGB(112, 166, 75),
+				PASTEL.GREEN,
 				CFrame.new(x, 1.25, (index % 2) * 0.3) * CFrame.Angles(0, 0, math.rad(90)),
 				Enum.PartType.Cylinder
 			)
 			createPart(
 				root,
 				fallback,
-				"Grain",
+				"Grain" .. index,
 				Vector3.new(0.5, 0.85, 0.5),
-				Color3.fromRGB(244, 207, 91),
+				PASTEL.GOLD,
 				CFrame.new(x, 2.9, (index % 2) * 0.3),
 				Enum.PartType.Ball
 			)
 		end
-	elseif string.find(string.lower(archetypeId), "rock", 1, true) then
-		local gold = archetypeId == "GoldRock"
-		local color = if gold then Color3.fromRGB(244, 190, 55) else Color3.fromRGB(127, 133, 145)
-		createPart(root, fallback, "StoneA", Vector3.new(2.8, 2.2, 2.5), color, CFrame.identity, Enum.PartType.Ball)
-		createPart(
-			root,
-			fallback,
-			"StoneB",
-			Vector3.new(1.8, 1.8, 1.7),
-			color:Lerp(Color3.new(1, 1, 1), 0.12),
-			CFrame.new(0.9, 0.45, 0.25),
-			Enum.PartType.Ball
-		)
-	else
-		local color = if string.find(archetypeId, "Flower", 1, true)
-			then Color3.fromRGB(255, 150, 200)
-			else Color3.fromRGB(160, 210, 150)
+	elseif archetypeId == "ZundaFlower" then
 		createPart(
 			root,
 			fallback,
 			"Stem",
-			Vector3.new(2.2, 0.18, 0.18),
-			Color3.fromRGB(112, 166, 75),
-			CFrame.new(0, 0.9, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Vector3.new(2.5, 0.18, 0.18),
+			PASTEL.GREEN,
+			CFrame.new(0, 1, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Enum.PartType.Cylinder
+		)
+		for i = 0, 4 do
+			local a = math.rad(i * 72)
+			createPart(
+				root,
+				fallback,
+				"Petal" .. i,
+				Vector3.new(0.6, 0.6, 0.3),
+				PASTEL.PINK,
+				CFrame.new(math.cos(a) * 0.6, 2.2, math.sin(a) * 0.6),
+				Enum.PartType.Ball
+			)
+		end
+		createPart(
+			root,
+			fallback,
+			"Center",
+			Vector3.new(0.4, 0.4, 0.4),
+			PASTEL.GOLD,
+			CFrame.new(0, 2.2, 0),
+			Enum.PartType.Ball
+		)
+	elseif archetypeId == "ZundaPea" then
+		createPart(
+			root,
+			fallback,
+			"Stem",
+			Vector3.new(2, 0.16, 0.16),
+			PASTEL.GREEN,
+			CFrame.new(0, 0.8, 0) * CFrame.Angles(0, 0, math.rad(90)),
 			Enum.PartType.Cylinder
 		)
 		createPart(
 			root,
 			fallback,
-			"Gatherable",
-			Vector3.new(1.4, 1.4, 1.4),
-			color,
-			CFrame.new(0, 2.1, 0),
+			"Pod1",
+			Vector3.new(1.2, 0.5, 0.5),
+			PASTEL.GREEN,
+			CFrame.new(0.4, 1.8, 0),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Pod2",
+			Vector3.new(1.1, 0.45, 0.45),
+			PASTEL.LIGHT_GREEN,
+			CFrame.new(-0.4, 2, 0),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Pod3",
+			Vector3.new(1, 0.4, 0.4),
+			PASTEL.MINT,
+			CFrame.new(0, 2.2, 0.4),
+			Enum.PartType.Ball
+		)
+	elseif archetypeId == "ZundaMushroom" or archetypeId == "Zunda Mushroom" then
+		createPart(
+			root,
+			fallback,
+			"Stem",
+			Vector3.new(1.8, 0.35, 0.35),
+			PASTEL.WHITE,
+			CFrame.new(0, 1, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Enum.PartType.Cylinder
+		)
+		createPart(
+			root,
+			fallback,
+			"Cap",
+			Vector3.new(2.5, 1.2, 2.5),
+			PASTEL.RED,
+			CFrame.new(0, 2.2, 0),
+			Enum.PartType.Ball
+		)
+		for i = 1, 3 do
+			local a = math.rad(i * 120)
+			createPart(
+				root,
+				fallback,
+				"Spot" .. i,
+				Vector3.new(0.3, 0.3, 0.3),
+				PASTEL.WHITE,
+				CFrame.new(math.cos(a) * 0.6, 2.6, math.sin(a) * 0.6),
+				Enum.PartType.Ball
+			)
+		end
+	elseif archetypeId == "ZundaBerry" or archetypeId == "Zunda Berry" then
+		createPart(
+			root,
+			fallback,
+			"Stem",
+			Vector3.new(1.5, 0.14, 0.14),
+			PASTEL.BROWN,
+			CFrame.new(0, 0.6, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Enum.PartType.Cylinder
+		)
+		for i = 0, 5 do
+			local a = math.rad(i * 60)
+			createPart(
+				root,
+				fallback,
+				"Berry" .. i,
+				Vector3.new(0.5, 0.5, 0.5),
+				i % 2 == 0 and PASTEL.RED or PASTEL.PURPLE,
+				CFrame.new(math.cos(a) * 0.5, 1.6 + math.sin(a) * 0.15, math.sin(a) * 0.5),
+				Enum.PartType.Ball
+			)
+		end
+	elseif archetypeId == "ZundaRoot" or archetypeId == "Zunda Root" then
+		createPart(
+			root,
+			fallback,
+			"RootA",
+			Vector3.new(2.5, 0.4, 0.4),
+			PASTEL.BROWN,
+			CFrame.new(0.3, 0.8, 0) * CFrame.Angles(0.3, 0, math.rad(70)),
+			Enum.PartType.Cylinder
+		)
+		createPart(
+			root,
+			fallback,
+			"RootB",
+			Vector3.new(2, 0.35, 0.35),
+			Color3.fromRGB(160, 120, 80),
+			CFrame.new(-0.2, 0.6, 0.3) * CFrame.Angles(-0.2, 0, math.rad(-60)),
+			Enum.PartType.Cylinder
+		)
+		createPart(
+			root,
+			fallback,
+			"RootC",
+			Vector3.new(1.8, 0.3, 0.3),
+			PASTEL.BROWN:Lerp(Color3.new(0, 0, 0), 0.1),
+			CFrame.new(0.1, 1.4, -0.2) * CFrame.Angles(0.5, 0, math.rad(-40)),
+			Enum.PartType.Cylinder
+		)
+	elseif archetypeId == "EdamamePod" then
+		createPart(
+			root,
+			fallback,
+			"Stem",
+			Vector3.new(1.5, 0.14, 0.14),
+			PASTEL.GREEN,
+			CFrame.new(0, 0.7, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Enum.PartType.Cylinder
+		)
+		createPart(
+			root,
+			fallback,
+			"Pod",
+			Vector3.new(1.5, 0.7, 0.7),
+			PASTEL.GREEN,
+			CFrame.new(0, 1.6, 0),
+			Enum.PartType.Ball
+		)
+		for i = 1, 3 do
+			createPart(
+				root,
+				fallback,
+				"Seed" .. i,
+				Vector3.new(0.35, 0.35, 0.35),
+				PASTEL.LIGHT_GREEN,
+				CFrame.new((i - 2) * 0.3, 1.6, 0.4),
+				Enum.PartType.Ball
+			)
+		end
+	else
+		createPart(
+			root,
+			fallback,
+			"Glow",
+			Vector3.new(1.6, 1.6, 1.6),
+			PASTEL.GREEN,
+			CFrame.new(0, 1.5, 0),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Core",
+			Vector3.new(0.8, 0.8, 0.8),
+			PASTEL.PINK,
+			CFrame.new(0.3, 1.7, 0.3),
+			Enum.PartType.Ball
+		)
+		createPart(
+			root,
+			fallback,
+			"Sparkle",
+			Vector3.new(0.3, 0.3, 0.3),
+			PASTEL.GOLD,
+			CFrame.new(0.6, 2.1, 0.1),
 			Enum.PartType.Ball
 		)
 	end
+
 	return fallback
 end
 
@@ -436,7 +726,16 @@ function ResourceVisualService.apply(node: Instance, descriptor: any?): (boolean
 	if root:GetAttribute("ResourceRootTransparency") == nil then
 		root:SetAttribute("ResourceRootTransparency", root.Transparency)
 	end
-	local archetypeId = node:GetAttribute("ResourceArchetype") or root:GetAttribute("ResourceArchetype") or "Unknown"
+	local archetypeId = node:GetAttribute("ResourceArchetype") or root:GetAttribute("ResourceArchetype")
+	if not archetypeId then
+		for _, tag in ipairs(CollectionService:GetTags(node)) do
+			if Catalog.getDefaultVariant(tag) then
+				archetypeId = tag
+				break
+			end
+		end
+	end
+	archetypeId = archetypeId or "Unknown"
 	local managed = managedFolder(root)
 	local oldCandidate = managed:FindFirstChild(CANDIDATE_NAME)
 	if oldCandidate then

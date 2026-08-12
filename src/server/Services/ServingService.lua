@@ -14,6 +14,12 @@ local GuestService = require(ServerScriptService.Services.GuestService)
 
 local MAX_SERVE_DISTANCE = 20
 local RATE_LIMIT = 0.25
+-- Guest attributes replicate to clients, so PayAmount/BonusGold are
+-- client-mutable. Legit spawn values are config-bounded (ProgressionConfig
+-- pay ranges top out at 120); these caps neutralize attribute-edit gold prints
+-- while keeping every legit guest payout untouched.
+local MAX_PAY_AMOUNT = 500
+local MAX_CHALLENGE_BONUS = 200
 local lastServeAt: { [number]: number } = {}
 local ServingService = {}
 ServingService.GuestServed = Instance.new("BindableEvent")
@@ -118,11 +124,15 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	local basePay = guest:GetAttribute("PayAmount")
 	if type(basePay) ~= "number" or basePay <= 0 then
 		basePay = 10
+	else
+		basePay = math.min(basePay, MAX_PAY_AMOUNT)
 	end
 	local qualityPay = math.floor(basePay * NPCConfig.getQualityMultiplier(quality))
 	local challengeBonus = guest:GetAttribute("IsChallenge") and guest:GetAttribute("BonusGold") or 0
 	if type(challengeBonus) ~= "number" or challengeBonus < 0 then
 		challengeBonus = 0
+	else
+		challengeBonus = math.min(challengeBonus, MAX_CHALLENGE_BONUS)
 	end
 	local result = RewardCore.settle(player, {
 		gold = qualityPay + challengeBonus,

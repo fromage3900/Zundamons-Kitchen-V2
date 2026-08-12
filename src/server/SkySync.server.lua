@@ -26,19 +26,32 @@ local function ensureFlowerLight(part)
 end
 
 local function registerFlower(part)
-	if not part:IsA("BasePart") then return end
-	if not part:GetAttribute("ResourceType") then return end
+	if not part:IsA("BasePart") then
+		return
+	end
+	if not part:GetAttribute("ResourceType") then
+		return
+	end
 	trackedFlowers[part] = true
 	ensureFlowerLight(part)
 end
 
 local function scanForFlowers()
 	local area = workspace:FindFirstChild("GameplayLoopArea")
-	if not area then return end
+	if not area then
+		return
+	end
 	local g = area:FindFirstChild("GatheringNodes")
-	if not g then return end
-	for _, c in ipairs(g:GetChildren()) do registerFlower(c) end
-	g.ChildAdded:Connect(function(c) task.wait(0.2) registerFlower(c) end)
+	if not g then
+		return
+	end
+	for _, c in ipairs(g:GetChildren()) do
+		registerFlower(c)
+	end
+	g.ChildAdded:Connect(function(c)
+		task.wait(0.2)
+		registerFlower(c)
+	end)
 end
 
 -- Smooth ambient brightness pulse: brighter at night (3-10x)
@@ -46,7 +59,7 @@ local function getNightFactor(hour)
 	local t = hour % 24
 	-- 0 at noon, peaks at midnight
 	local cos = math.cos(math.rad((t - 12) * 15))
-	return math.max(0, -cos)  -- 0..1
+	return math.max(0, -cos) -- 0..1
 end
 
 local function updateFlowers()
@@ -84,18 +97,25 @@ end
 -- WelcomeSign greeting changes by time of day
 local function updateSigns()
 	local area = workspace:FindFirstChild("GameplayLoopArea")
-	if not area then return end
+	if not area then
+		return
+	end
 	local signs = area:FindFirstChild("InfoSigns")
-	if not signs then return end
+	if not signs then
+		return
+	end
 	local welcome = signs:FindFirstChild("WelcomeSign")
-	if not welcome then return end
+	if not welcome then
+		return
+	end
 	local hour = Lighting:GetAttribute("CurrentHour") or 12
 	local greeting = SkyConfig.welcomeGreeting(hour)
 	for _, sg in ipairs(welcome:GetChildren()) do
 		if sg:IsA("SurfaceGui") then
 			local lbl = sg:FindFirstChildOfClass("TextLabel")
 			if lbl then
-				lbl.Text = greeting .. "\nZundymon's Kitchen\n\n1) Gather (N)\n2) Plant (E)\n3) Cook [K]\n4) Serve (S)\n5) Buy Plot (W)"
+				lbl.Text = greeting
+					.. "\nZundymon's Kitchen\n\n1) Gather (N)\n2) Plant (E)\n3) Cook [K]\n4) Serve (S)\n5) Buy Plot (W)"
 			end
 		end
 	end
@@ -112,7 +132,7 @@ workspace:GetAttributeChangedSignal("WeatherFogMult"):Connect(function()
 end)
 
 -- Initial setup
-task.wait(2)  -- Let SceneSetup build the area first
+task.wait(2) -- Let SceneSetup build the area first
 scanForFlowers()
 updateFlowers()
 updatePlanters()

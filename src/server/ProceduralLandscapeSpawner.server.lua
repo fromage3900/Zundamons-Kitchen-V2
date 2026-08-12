@@ -100,7 +100,18 @@ local function spawnBiome(biomeName)
 	return spawned
 end
 
+-- Set to true if procedural fallback props should spawn on startup.
+-- Defaults to false to preserve hand-placed Studio level geometry.
+local ENABLE_PROCEDURAL_LANDSCAPE_SPAWN = false
+
 local function spawnAllBiomes()
+	if not ENABLE_PROCEDURAL_LANDSCAPE_SPAWN and not Workspace:GetAttribute("EnableProceduralLandscapeSpawner") then
+		print(
+			"[LandscapeSpawner] Procedural landscape spawner disabled — preserving hand-placed Studio level geometry"
+		)
+		return
+	end
+
 	local gameArea = Workspace:FindFirstChild("GameplayLoopArea")
 	for biomeName in pairs(LandscapeConfig.biomes) do
 		task.spawn(function()

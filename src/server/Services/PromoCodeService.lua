@@ -10,16 +10,19 @@ local PromoCodeService = {}
 -- Valid Active Codes Pool
 PromoCodeService.activeCodes = {
 	ZUNDAMOCHI2026 = { gold = 500, gems = 50, item = "10x Fresh Zunda Mochi" },
-	SOUPSEASON     = { gold = 1000, gems = 100, item = "5x Wild Mushroom Pack" },
-	KAWAIIZUNDA    = { gold = 750, gems = 75, item = "Sakura Chef Apron" },
-	NIKKIFASHION   = { gold = 1500, gems = 150, item = "3x Whim Gacha Tickets" },
-	HYBRIDECS      = { gold = 2000, gems = 200, item = "5x Whim Gacha Tickets" },
+	SOUPSEASON = { gold = 1000, gems = 100, item = "5x Wild Mushroom Pack" },
+	KAWAIIZUNDA = { gold = 750, gems = 75, item = "Sakura Chef Apron" },
+	NIKKIFASHION = { gold = 1500, gems = 150, item = "3x Whim Gacha Tickets" },
+	HYBRIDECS = { gold = 2000, gems = 200, item = "5x Whim Gacha Tickets" },
 }
 
 -- Per-player claimed codes tracker
 local claimedCodes: { [number]: { [string]: boolean } } = {}
 
-function PromoCodeService.redeemCode(player: Player, rawCode: string): { success: boolean, message: string, reward: any? }
+function PromoCodeService.redeemCode(
+	player: Player,
+	rawCode: string
+): { success: boolean, message: string, reward: any? }
 	local code = string.upper(string.gsub(rawCode, "%s+", ""))
 	local userId = player.UserId
 
@@ -41,7 +44,12 @@ function PromoCodeService.redeemCode(player: Player, rawCode: string): { success
 
 	return {
 		success = true,
-		message = string.format("Code Redeemed! Received +%d Gold, +%d Gems, and %s! ✨", rewardData.gold, rewardData.gems, rewardData.item),
+		message = string.format(
+			"Code Redeemed! Received +%d Gold, +%d Gems, and %s! ✨",
+			rewardData.gold,
+			rewardData.gems,
+			rewardData.item
+		),
 		reward = rewardData,
 	}
 end

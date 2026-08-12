@@ -19,7 +19,9 @@ local function ItemGatherSystem(world)
 				local currentQty = profile.Data.Inventory[drop.itemName] or 0
 				profile.Data.Inventory[drop.itemName] = currentQty + drop.quantity
 
-				print(string.format("[ItemGatherSystem] Granted %d %s to %s", drop.quantity, drop.itemName, player.Name))
+				print(
+					string.format("[ItemGatherSystem] Granted %d %s to %s", drop.quantity, drop.itemName, player.Name)
+				)
 
 				-- Destory the physical item
 				world:despawn(id)

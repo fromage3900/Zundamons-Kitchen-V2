@@ -30,7 +30,9 @@ function PluginLoader.loadAll()
 				if initOk then
 					loadedPlugins[child.Name] = plugin
 					count = count + 1
-					print(string.format("[PluginLoader] Loaded: %s v%s", plugin.name or child.Name, plugin.version or "?"))
+					print(
+						string.format("[PluginLoader] Loaded: %s v%s", plugin.name or child.Name, plugin.version or "?")
+					)
 				else
 					warn(string.format("[PluginLoader] Plugin '%s' init failed: %s", child.Name, initErr))
 				end
@@ -46,7 +48,9 @@ end
 function PluginLoader.unloadAll()
 	for name, plugin in pairs(loadedPlugins) do
 		local ok, err = pcall(plugin.cleanup or function() end)
-		if not ok then warn(string.format("[PluginLoader] Cleanup failed for '%s': %s", name, err)) end
+		if not ok then
+			warn(string.format("[PluginLoader] Cleanup failed for '%s': %s", name, err))
+		end
 	end
 	loadedPlugins = {}
 	print("[PluginLoader] All plugins unloaded")
@@ -56,11 +60,15 @@ function PluginLoader.reload(name)
 	local folder = PluginLoader.getPluginsFolder()
 	if name then
 		local plugin = loadedPlugins[name]
-		if plugin and plugin.cleanup then pcall(plugin.cleanup) end
+		if plugin and plugin.cleanup then
+			pcall(plugin.cleanup)
+		end
 		loadedPlugins[name] = nil
 		local module = folder:FindFirstChild(name)
 		if module and module:IsA("ModuleScript") then
-			pcall(function() module:ClearAllChildren() end)
+			pcall(function()
+				module:ClearAllChildren()
+			end)
 			local ok, newPlugin = pcall(require, module)
 			if ok and newPlugin and newPlugin.init then
 				pcall(newPlugin.init)

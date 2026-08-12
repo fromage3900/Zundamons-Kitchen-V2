@@ -8,10 +8,19 @@ local PlayerDataService = require(SSS.Services.PlayerDataService)
 local RewardCore = require(SSS.Services.RewardCore)
 
 local RE = RS:WaitForChild("RemoteEvents")
-local DailyDataEvent = RE:FindFirstChild("DailyDataEvent") or Instance.new("RemoteEvent", RE)
-DailyDataEvent.Name = "DailyDataEvent"
-local ClaimDailyVisitor = RE:FindFirstChild("ClaimDailyVisitor") or Instance.new("RemoteEvent", RE)
-ClaimDailyVisitor.Name = "ClaimDailyVisitor"
+local DailyDataEvent = RE:FindFirstChild("DailyDataEvent")
+if not DailyDataEvent then
+	DailyDataEvent = Instance.new("RemoteEvent")
+	DailyDataEvent.Name = "DailyDataEvent"
+	DailyDataEvent.Parent = RE
+end
+
+local ClaimDailyVisitor = RE:FindFirstChild("ClaimDailyVisitor")
+if not ClaimDailyVisitor then
+	ClaimDailyVisitor = Instance.new("RemoteEvent")
+	ClaimDailyVisitor.Name = "ClaimDailyVisitor"
+	ClaimDailyVisitor.Parent = RE
+end
 
 local function dayNumber()
 	return math.floor(os.time() / 86400)
@@ -26,7 +35,9 @@ end
 
 local function sendDailyData(player)
 	local d = PlayerDataService.get(player)
-	if not d then return end
+	if not d then
+		return
+	end
 	ensureDailyData(d)
 	local today = dayNumber()
 	if d.daily.lastCheckDay ~= today then
@@ -42,17 +53,25 @@ local function sendDailyData(player)
 	})
 end
 
-local RequestDailyData = RE:FindFirstChild("RequestDailyData") or Instance.new("RemoteEvent", RE)
-RequestDailyData.Name = "RequestDailyData"
+local RequestDailyData = RE:FindFirstChild("RequestDailyData")
+if not RequestDailyData then
+	RequestDailyData = Instance.new("RemoteEvent")
+	RequestDailyData.Name = "RequestDailyData"
+	RequestDailyData.Parent = RE
+end
 RequestDailyData.OnServerEvent:Connect(function(player)
 	sendDailyData(player)
 end)
 
 ClaimDailyVisitor.OnServerEvent:Connect(function(player)
 	local d = PlayerDataService.get(player)
-	if not d then return end
+	if not d then
+		return
+	end
 	ensureDailyData(d)
-	if d.daily.visitorClaimed then return end
+	if d.daily.visitorClaimed then
+		return
+	end
 	local today = dayNumber()
 	if d.daily.lastCheckDay ~= today then
 		d.daily.visitorClaimed = false

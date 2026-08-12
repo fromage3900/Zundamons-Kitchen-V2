@@ -157,7 +157,9 @@ end
 
 local function giveStarterTools(player: Player, character: Model)
 	local backpack = player:FindFirstChildOfClass("Backpack") or player:WaitForChild("Backpack", 5)
-	if not backpack then return end
+	if not backpack then
+		return
+	end
 
 	local defaultTools = { "Axe", "PickAxe", "Sickle" }
 	for _, toolName in ipairs(defaultTools) do
