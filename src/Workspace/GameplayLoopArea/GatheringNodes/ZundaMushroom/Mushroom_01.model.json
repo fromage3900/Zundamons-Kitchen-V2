@@ -10,22 +10,29 @@
  },
  "children": [
   {
-   "className": "MeshPart",
-   "name": "Mesh",
+   "className": "Part",
+   "name": "Stem",
    "properties": {
-    "MeshId": "rbxassetid://77467866039933",
-    "Size": [
-     1.0,
-     1.2,
-     1.0
-    ],
-    "Position": [
-     60,
-     3.15,
-     30
-    ],
+    "Shape": "Cylinder",
+    "Size": [0.55, 0.8, 0.55],
+    "Position": [60, 2.4, 30],
     "Anchored": true,
-    "CanCollide": false
+    "CanCollide": false,
+    "Color": [1.0, 0.95, 0.88],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Cap",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [1.35, 0.85, 1.35],
+    "Position": [60, 2.85, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.55, 0.75],
+    "Material": "SmoothPlastic"
    }
   }
  ]

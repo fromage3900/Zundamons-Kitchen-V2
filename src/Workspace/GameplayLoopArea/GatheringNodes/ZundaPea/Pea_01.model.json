@@ -1,0 +1,75 @@
+{
+ "className": "Model",
+ "attributes": {
+  "ResourceArchetype": "ZundaPea",
+  "ResourceType": "ZundaPea",
+  "Available": true
+ },
+ "children": [
+  {
+   "className": "Part",
+   "name": "Stem",
+   "properties": {
+    "Shape": "Cylinder",
+    "Size": [0.1, 0.55, 0.1],
+    "Position": [54, 1.95, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.627, 0.824, 0.588],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Pickup",
+   "attributes": {
+    "ResourceArchetype": "ZundaPea",
+    "ResourceType": "ZundaPea",
+    "Available": true
+   },
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.4, 0.4, 0.4],
+    "Position": [54, 2.5, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.569, 0.843, 0.765],
+    "Material": "SmoothPlastic"
+   },
+   "children": [
+    {
+     "className": "ClickDetector",
+     "properties": {
+      "MaxActivationDistance": 16
+     }
+    }
+   ]
+  },
+  {
+   "className": "Part",
+   "name": "Cluster",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.3, 0.3],
+    "Position": [53.75, 2.55, 29.8],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.569, 0.843, 0.765],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Cluster",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.3, 0.3],
+    "Position": [54.3, 2.55, 30.2],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.569, 0.843, 0.765],
+    "Material": "SmoothPlastic"
+   }
+  }
+ ]
+}

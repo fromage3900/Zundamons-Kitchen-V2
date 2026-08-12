@@ -1,0 +1,75 @@
+{
+ "className": "Model",
+ "attributes": {
+  "ResourceArchetype": "EdamamePod",
+  "ResourceType": "EdamamePod",
+  "Available": true
+ },
+ "children": [
+  {
+   "className": "Part",
+   "name": "Vine",
+   "properties": {
+    "Shape": "Cylinder",
+    "Size": [0.1, 0.5, 0.1],
+    "Position": [62, 1.95, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.627, 0.824, 0.588],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Pickup",
+   "attributes": {
+    "ResourceArchetype": "EdamamePod",
+    "ResourceType": "EdamamePod",
+    "Available": true
+   },
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.5, 0.42, 0.42],
+    "Position": [62, 2.45, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.569, 0.843, 0.765],
+    "Material": "SmoothPlastic"
+   },
+   "children": [
+    {
+     "className": "ClickDetector",
+     "properties": {
+      "MaxActivationDistance": 16
+     }
+    }
+   ]
+  },
+  {
+   "className": "Part",
+   "name": "Seed",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.14, 0.14, 0.14],
+    "Position": [61.82, 2.45, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.51, 0.78, 0.62],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Seed",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.14, 0.14, 0.14],
+    "Position": [62.18, 2.45, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.51, 0.78, 0.62],
+    "Material": "SmoothPlastic"
+   }
+  }
+ ]
+}

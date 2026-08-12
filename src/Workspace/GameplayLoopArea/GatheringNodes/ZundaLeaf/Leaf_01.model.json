@@ -1,0 +1,75 @@
+{
+ "className": "Model",
+ "attributes": {
+  "ResourceArchetype": "ZundaLeaf",
+  "ResourceType": "ZundaLeaf",
+  "Available": true
+ },
+ "children": [
+  {
+   "className": "Part",
+   "name": "Stem",
+   "properties": {
+    "Shape": "Cylinder",
+    "Size": [0.1, 0.5, 0.1],
+    "Position": [70, 1.95, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.627, 0.824, 0.588],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Pickup",
+   "attributes": {
+    "ResourceArchetype": "ZundaLeaf",
+    "ResourceType": "ZundaLeaf",
+    "Available": true
+   },
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.22, 0.46],
+    "Position": [70, 2.42, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.51, 0.78, 0.62],
+    "Material": "SmoothPlastic"
+   },
+   "children": [
+    {
+     "className": "ClickDetector",
+     "properties": {
+      "MaxActivationDistance": 16
+     }
+    }
+   ]
+  },
+  {
+   "className": "Part",
+   "name": "Foliage",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.28, 0.2, 0.44],
+    "Position": [69.75, 2.5, 30.12],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.55, 0.82, 0.65],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Foliage",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.28, 0.2, 0.44],
+    "Position": [70.25, 2.5, 29.9],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.55, 0.82, 0.65],
+    "Material": "SmoothPlastic"
+   }
+  }
+ ]
+}

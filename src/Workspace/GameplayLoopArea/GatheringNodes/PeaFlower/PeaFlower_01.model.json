@@ -1,0 +1,88 @@
+{
+ "className": "Model",
+ "attributes": {
+  "ResourceArchetype": "PeaFlower",
+  "ResourceType": "PeaFlower",
+  "Available": true
+ },
+ "children": [
+  {
+   "className": "Part",
+   "name": "Stem",
+   "properties": {
+    "Shape": "Cylinder",
+    "Size": [0.1, 0.55, 0.1],
+    "Position": [84, 1.95, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.627, 0.824, 0.588],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Pickup",
+   "attributes": {
+    "ResourceArchetype": "PeaFlower",
+    "ResourceType": "PeaFlower",
+    "Available": true
+   },
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.34, 0.34, 0.34],
+    "Position": [84, 2.5, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   },
+   "children": [
+    {
+     "className": "ClickDetector",
+     "properties": {
+      "MaxActivationDistance": 16
+     }
+    }
+   ]
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.24, 0.24, 0.24],
+    "Position": [83.7, 2.56, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.24, 0.24, 0.24],
+    "Position": [84.3, 2.56, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.24, 0.24, 0.24],
+    "Position": [84, 2.62, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  }
+ ]
+}

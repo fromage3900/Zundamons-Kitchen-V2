@@ -1,0 +1,88 @@
+{
+ "className": "Model",
+ "attributes": {
+  "ResourceArchetype": "SweetPea",
+  "ResourceType": "SweetPea",
+  "Available": true
+ },
+ "children": [
+  {
+   "className": "Part",
+   "name": "Vine",
+   "properties": {
+    "Shape": "Cylinder",
+    "Size": [0.1, 0.55, 0.1],
+    "Position": [78, 1.95, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.627, 0.824, 0.588],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Pickup",
+   "attributes": {
+    "ResourceArchetype": "SweetPea",
+    "ResourceType": "SweetPea",
+    "Available": true
+   },
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.36, 0.36, 0.36],
+    "Position": [78, 2.5, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.784, 0.314],
+    "Material": "SmoothPlastic"
+   },
+   "children": [
+    {
+     "className": "ClickDetector",
+     "properties": {
+      "MaxActivationDistance": 16
+     }
+    }
+   ]
+  },
+  {
+   "className": "Part",
+   "name": "Blossom",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.26, 0.26, 0.26],
+    "Position": [77.72, 2.56, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.784, 0.784, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Blossom",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.26, 0.26, 0.26],
+    "Position": [78.28, 2.56, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.784, 0.784, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Blossom",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.26, 0.26, 0.26],
+    "Position": [78, 2.56, 29.72],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.784, 0.784, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  }
+ ]
+}

@@ -1,0 +1,101 @@
+{
+ "className": "Model",
+ "attributes": {
+  "ResourceArchetype": "ZundaFlower",
+  "ResourceType": "ZundaFlower",
+  "Available": true
+ },
+ "children": [
+  {
+   "className": "Part",
+   "name": "Stem",
+   "properties": {
+    "Shape": "Cylinder",
+    "Size": [0.1, 0.7, 0.1],
+    "Position": [46, 2.0, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [0.627, 0.824, 0.588],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Pickup",
+   "attributes": {
+    "ResourceArchetype": "ZundaFlower",
+    "ResourceType": "ZundaFlower",
+    "Available": true
+   },
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.34, 0.34, 0.34],
+    "Position": [46, 2.55, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   },
+   "children": [
+    {
+     "className": "ClickDetector",
+     "properties": {
+      "MaxActivationDistance": 16
+     }
+    }
+   ]
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.3, 0.3],
+    "Position": [45.7, 2.68, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.3, 0.3],
+    "Position": [46.3, 2.68, 30],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.3, 0.3],
+    "Position": [46, 2.68, 29.7],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  },
+  {
+   "className": "Part",
+   "name": "Petal",
+   "properties": {
+    "Shape": "Ball",
+    "Size": [0.3, 0.3, 0.3],
+    "Position": [46, 2.68, 30.3],
+    "Anchored": true,
+    "CanCollide": false,
+    "Color": [1.0, 0.588, 0.784],
+    "Material": "SmoothPlastic"
+   }
+  }
+ ]
+}
