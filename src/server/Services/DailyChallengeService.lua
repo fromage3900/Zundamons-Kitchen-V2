@@ -2,6 +2,8 @@
 -- [[ModuleScript] DailyChallengeService]]
 -- Daily challenge system inspired by Uma Musume's daily races.
 -- 3 rotating daily challenges + weekly boss challenge + streak rewards.
+-- All durable writes go through PlayerDataService.mutate so they get the
+-- same revision bump, projection emit, and rollback as every other system.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -47,13 +49,17 @@ function DailyChallengeService.initializeDay(player: Player)
 
 	local today = getTodayKey()
 	if data.daily_challenge_date ~= today then
-		-- New day — generate fresh challenges
-		local challenges = DailyChallengeConfig.selectDailyChallenges()
-		data.daily_challenge_date = today
-		data.daily_challenges = challenges
-		data.daily_challenge_progress = {}
-		data.daily_challenge_claimed = {}
-		data.daily_streak = data.daily_streak or 0
+		-- New day — generate fresh challenges inside a mutation so the
+		-- revision bumps and the client projection updates.
+		PlayerDataService.mutate(player, "daily_challenge_init", function(d)
+			local challenges = DailyChallengeConfig.selectDailyChallenges()
+			d.daily_challenge_date = today
+			d.daily_challenges = challenges
+			d.daily_challenge_progress = {}
+			d.daily_challenge_claimed = {}
+			d.daily_streak = d.daily_streak or 0
+			return true
+		end)
 	end
 
 	local _, status = getRemotes()
@@ -80,13 +86,15 @@ function DailyChallengeService.updateProgress(player: Player, metric: string, am
 
 	local progress = data.daily_challenge_progress or {}
 	local claimed = data.daily_challenge_claimed or {}
+	local changed = false
 	for i, challenge in ipairs(data.daily_challenges) do
 		if challenge.metric == metric then
 			local current = progress[i] or 0
 			local newProgress = math.min(current + amount, challenge.goal)
 			progress[i] = newProgress
+			changed = true
 			if newProgress >= challenge.goal and not claimed[i] then
-				-- Challenge complete!
+				-- Challenge complete! Persist the progress atomically.
 				PlayerDataService.mutate(player, "daily_challenge_complete", function(d)
 					local p = d.daily_challenge_progress or {}
 					p[i] = newProgress
@@ -97,11 +105,13 @@ function DailyChallengeService.updateProgress(player: Player, metric: string, am
 		end
 	end
 
-	local _, status = getRemotes()
-	status:FireClient(player, {
-		type = "progress_update",
-		progress = progress,
-	})
+	if changed then
+		local _, status = getRemotes()
+		status:FireClient(player, {
+			type = "progress_update",
+			progress = progress,
+		})
+	end
 end
 
 function DailyChallengeService.claimReward(player: Player, challengeIndex: number)
@@ -149,21 +159,23 @@ function DailyChallengeService.claimReward(player: Player, challengeIndex: numbe
 	if not result.ok then
 		return false
 	end
-	claimed[challengeIndex] = true
-	data.daily_challenge_claimed = claimed
 
-	-- Check if all 3 challenges are complete for streak bonus
+	-- Check if all 3 challenges are complete for streak bonus (inside a mutate
+	-- so the streak increment + reward are atomic with the claimed flag).
 	local allComplete = true
 	for i = 1, 3 do
-		if not claimed[i] then
+		if not (data.daily_challenge_claimed or {})[i] then
 			allComplete = false
 			break
 		end
 	end
 
 	if allComplete then
-		data.daily_streak = (data.daily_streak or 0) + 1
-		local streakReward = DailyChallengeConfig.getStreakReward(data.daily_streak)
+		PlayerDataService.mutate(player, "daily_streak_bump", function(d)
+			d.daily_streak = (d.daily_streak or 0) + 1
+			return true
+		end)
+		local streakReward = DailyChallengeConfig.getStreakReward(data.daily_streak or 0)
 		RewardCore.settle(player, {
 			gold = streakReward.gold or 0,
 			xp = streakReward.xp or 0,
@@ -195,18 +207,20 @@ function DailyChallengeService.spawnDailyVisitor(player: Player)
 		return false
 	end
 
-	data.daily_visitor_date = today
-	data.daily_visitor_visited = true
-
 	local visitor = DailyChallengeConfig.dailyVisitor
-	RewardCore.settle(player, {
+	local result = RewardCore.settle(player, {
 		gold = visitor.reward.gold or 100,
 		xp = visitor.reward.xp or 80,
 		reason = "daily_visitor",
 	}, function(d)
+		d.daily_visitor_date = today
+		d.daily_visitor_visited = true
 		PlayerDataService.grantItem(player, visitor.reward.item or "Zunda Flower", 1)
 		return true
 	end)
+	if not result.ok then
+		return false
+	end
 
 	local _, status = getRemotes()
 	status:FireClient(player, {
@@ -228,11 +242,17 @@ function DailyChallengeService.spawnDailyResources(player: Player)
 		return false
 	end
 
-	data.daily_resources_date = today
-	data.daily_resources_spawned = true
-
-	for _, resource in ipairs(DailyChallengeConfig.dailyResources) do
-		PlayerDataService.grantItem(player, resource.resourceType, resource.count)
+	-- Grant all resources atomically inside one mutation.
+	local ok = PlayerDataService.mutate(player, "daily_resources", function(d)
+		d.daily_resources_date = today
+		d.daily_resources_spawned = true
+		for _, resource in ipairs(DailyChallengeConfig.dailyResources) do
+			d[resource.resourceType] = (d[resource.resourceType] or 0) + resource.count
+		end
+		return true
+	end)
+	if not ok then
+		return false
 	end
 
 	local _, status = getRemotes()
@@ -253,11 +273,14 @@ function DailyChallengeService.checkAndUnlockWeeklyBoss(player: Player)
 	local today = getTodayKey()
 	local boss = DailyChallengeConfig.getWeeklyBoss()
 
-	-- Check if weekly boss progress is tracked
+	-- Check if weekly boss progress is tracked (inside a mutate).
 	if not data.weekly_boss_id or data.weekly_boss_id ~= boss.id then
-		data.weekly_boss_id = boss.id
-		data.weekly_boss_progress = 0
-		data.weekly_boss_claimed = false
+		PlayerDataService.mutate(player, "weekly_boss_init", function(d)
+			d.weekly_boss_id = boss.id
+			d.weekly_boss_progress = 0
+			d.weekly_boss_claimed = false
+			return true
+		end)
 	end
 
 	return data.weekly_boss_progress or 0, boss
@@ -271,14 +294,20 @@ function DailyChallengeService.updateWeeklyProgress(player: Player, metric: stri
 
 	local boss = DailyChallengeConfig.getWeeklyBoss()
 	if data.weekly_boss_id ~= boss.id then
-		data.weekly_boss_id = boss.id
-		data.weekly_boss_progress = 0
-		data.weekly_boss_claimed = false
+		PlayerDataService.mutate(player, "weekly_boss_init", function(d)
+			d.weekly_boss_id = boss.id
+			d.weekly_boss_progress = 0
+			d.weekly_boss_claimed = false
+			return true
+		end)
 	end
 
 	if boss.metric == metric then
-		local current = data.weekly_boss_progress or 0
-		data.weekly_boss_progress = math.min(current + amount, boss.goal)
+		PlayerDataService.mutate(player, "weekly_boss_progress", function(d)
+			local current = d.weekly_boss_progress or 0
+			d.weekly_boss_progress = math.min(current + amount, boss.goal)
+			return true
+		end)
 	end
 
 	local _, status = getRemotes()
@@ -306,20 +335,22 @@ function DailyChallengeService.claimWeeklyReward(player: Player)
 		return false
 	end
 
-	data.weekly_boss_claimed = true
-
 	local reward = boss.reward
-	RewardCore.settle(player, {
+	local result = RewardCore.settle(player, {
 		gold = reward.gold or 0,
 		xp = reward.xp or 0,
 		reason = "weekly_boss",
 	}, function(d)
+		d.weekly_boss_claimed = true
 		d.style_points = (d.style_points or 0) + (reward.style or 0)
 		for _, item in ipairs(reward.items or {}) do
 			PlayerDataService.grantItem(player, item, 1)
 		end
 		return true
 	end)
+	if not result.ok then
+		return false
+	end
 
 	local _, status = getRemotes()
 	status:FireClient(player, {

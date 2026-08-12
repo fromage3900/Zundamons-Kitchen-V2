@@ -47,6 +47,58 @@ ensureRemote("ChallengeModeStatus")
 ensureRemote("DailyChallenge")
 ensureRemote("DailyChallengeStatus")
 
+-- ─── Client-invokable RemoteFunctions ───────────────────────────────────────
+-- The client UI needs a way to start/abandon challenge mode and claim daily
+-- rewards. These are the only entry points; all state changes go through the
+-- services (which route writes through PlayerDataService.mutate).
+local remoteFunctions = ReplicatedStorage:FindFirstChild("RemoteFunctions")
+if not remoteFunctions then
+	remoteFunctions = Instance.new("Folder")
+	remoteFunctions.Name = "RemoteFunctions"
+	remoteFunctions.Parent = ReplicatedStorage
+end
+
+local function ensureRemoteFunction(name: string): RemoteFunction
+	local rf = remoteFunctions:FindFirstChild(name)
+	if not rf then
+		rf = Instance.new("RemoteFunction")
+		rf.Name = name
+		rf.Parent = remoteFunctions
+	end
+	return rf :: RemoteFunction
+end
+
+local challengeStartRF = ensureRemoteFunction("ChallengeStart")
+local challengeAbandonRF = ensureRemoteFunction("ChallengeAbandon")
+local challengeCompleteWaveRF = ensureRemoteFunction("ChallengeCompleteWave")
+local dailyClaimRF = ensureRemoteFunction("DailyClaimReward")
+local dailyClaimWeeklyRF = ensureRemoteFunction("DailyClaimWeekly")
+
+challengeStartRF.OnServerInvoke = function(player)
+	return ChallengeModeService.startSession(player)
+end
+
+challengeAbandonRF.OnServerInvoke = function(player)
+	ChallengeModeService.abandonSession(player)
+	return true
+end
+
+challengeCompleteWaveRF.OnServerInvoke = function(player)
+	ChallengeModeService.completeWave(player)
+	return true
+end
+
+dailyClaimRF.OnServerInvoke = function(player, challengeIndex)
+	if type(challengeIndex) ~= "number" then
+		return false
+	end
+	return DailyChallengeService.claimReward(player, challengeIndex)
+end
+
+dailyClaimWeeklyRF.OnServerInvoke = function(player)
+	return DailyChallengeService.claimWeeklyReward(player)
+end
+
 -- Helper to sync stats, style points, and outfit unlocks to client UI
 local function syncPlayerWardrobe(player: Player, styleGain: number?, statGains: { [string]: number }?)
 	local data = PlayerDataService.get(player)

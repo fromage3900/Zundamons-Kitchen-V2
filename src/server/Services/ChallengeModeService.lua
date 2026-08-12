@@ -231,8 +231,11 @@ function ChallengeModeService.endSession(player: Player, abandoned: boolean?)
 	local charismaMult = ChefStatsConfig.getGoldMultiplier(speedPoints)
 	totalGold = math.floor(totalGold * charismaMult)
 
-	-- Grant rewards
+	-- Grant rewards + style points + legendary unlock in ONE settlement so the
+	-- revision bumps once and the client projection updates once.
 	local tier = ChallengeModeService.getTierForScore(session.score)
+	local stylePoints = math.floor(session.score / 5)
+	local legendaryUnlocked = session.score >= ChallengeModeService.tiers[#ChallengeModeService.tiers].minScore
 	RewardCore.settle(player, {
 		gold = totalGold,
 		xp = session.wave * 20,
@@ -242,23 +245,12 @@ function ChallengeModeService.endSession(player: Player, abandoned: boolean?)
 		data.challenge_best_score = math.max(data.challenge_best_score or 0, session.score)
 		data.challenge_best_wave = math.max(data.challenge_best_wave or 0, session.wave)
 		data.challenge_total_played = (data.challenge_total_played or 0) + 1
-		return true
-	end)
-
-	-- Grant style points
-	local stylePoints = math.floor(session.score / 5)
-	PlayerDataService.mutate(player, "challenge_style_points", function(data)
 		data.style_points = (data.style_points or 0) + stylePoints
+		if legendaryUnlocked then
+			data.challenge_legendary_unlocked = true
+		end
 		return true
 	end)
-
-	-- Unlock tier if achieved
-	if session.score >= ChallengeModeService.tiers[#ChallengeModeService.tiers].minScore then
-		PlayerDataService.mutate(player, "challenge_legendary", function(data)
-			data.challenge_legendary_unlocked = true
-			return true
-		end)
-	end
 
 	local _, status = getRemotes()
 	status:FireClient(player, {
