@@ -1,0 +1,21 @@
+{
+	"className": "Model",
+	"attributes": {
+		"ResourceArchetype": "Rock",
+		"Type": "Rock"
+	},
+	"children": [
+		{
+			"className": "MeshPart",
+			"name": "Mesh",
+			"properties": {
+				"MeshId": "rbxassetid://81332711510127",
+				"Size": [3, 3, 3],
+				"Position": [50, 4, 30],
+				"Anchored": true,
+				"CanCollide": true,
+				"CastShadow": true
+			}
+		}
+	]
+}
