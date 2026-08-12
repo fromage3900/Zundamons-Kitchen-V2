@@ -57,6 +57,12 @@ GatherConfig.clickResources = {
 		respawnSeconds = 45,
 		notifyEmoji = "💐",
 	},
+	Lotus = {
+		itemName = "Zunda Flower",
+		defaultYield = 2,
+		respawnSeconds = 25,
+		notifyEmoji = "🌸",
+	},
 }
 
 GatherConfig.mysteryLoot = {

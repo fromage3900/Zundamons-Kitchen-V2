@@ -63,6 +63,7 @@ register("ZundaLeaf_Default", "rbxassetid://2778147390", "Mesh", true)
 register("SweetPea_Default", "rbxassetid://431221914", "Mesh", true)
 register("PeaFlower_Default", "rbxassetid://7444202618", "Mesh", true)
 register("SaltedPeaBouquet_Default", "rbxassetid://7444202618", "Mesh", true)
+register("Lotus_Default", "rbxassetid://7444202618", "Mesh", true)
 
 local defaultsByArchetype: { [string]: string } = {
 	AppleTree = "Variant1",
@@ -85,6 +86,7 @@ local defaultsByArchetype: { [string]: string } = {
 	SweetPea = "SweetPea_Default",
 	PeaFlower = "PeaFlower_Default",
 	SaltedPeaBouquet = "SaltedPeaBouquet_Default",
+	Lotus = "Lotus_Default",
 }
 
 function Catalog.normalizeAssetId(value: any): string
