@@ -1,0 +1,11 @@
+{
+  "name": "ZundaMaterialAuthoring",
+  "tree": {
+    "$className": "Model",
+    "ZundaMaterialAuthoring": {
+      "$path": "ZundaMaterialAuthoring.plugin.lua",
+      "ZundaPalette": { "$path": "ZundaPalette.lua" },
+      "ZundaMaterialUtils": { "$path": "ZundaMaterialUtils.lua" }
+    }
+  }
+}

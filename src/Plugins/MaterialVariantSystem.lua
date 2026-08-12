@@ -38,9 +38,13 @@ function MaterialVariantSystem.createVariant(palette)
 end
 
 function MaterialVariantSystem.getTerrainBounds()
-	if not Terrain then return nil end
+	if not Terrain then
+		return nil
+	end
 	local region = Terrain:ReadVoxels(4, Vector3.new(0, 0, 0))
-	if not region then return nil end
+	if not region then
+		return nil
+	end
 	local min = Vector3.new(-500, -100, -500)
 	local max = Vector3.new(500, 200, 500)
 	return { min = min, max = max }

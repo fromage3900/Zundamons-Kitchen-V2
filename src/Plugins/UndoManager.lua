@@ -10,7 +10,9 @@ UndoManager._batches = {}
 UndoManager._allPlaced = {}
 
 function UndoManager.registerBatch(instances, zoneName)
-	if not instances or #instances == 0 then return end
+	if not instances or #instances == 0 then
+		return
+	end
 
 	local batchId = zoneName .. "_" .. tick()
 	local batch = {
@@ -77,7 +79,9 @@ end
 
 function UndoManager.getBatchInfo(zoneName)
 	local batch = UndoManager._batches[zoneName]
-	if not batch then return nil end
+	if not batch then
+		return nil
+	end
 	return {
 		zone = batch.zone,
 		count = #batch.instances,

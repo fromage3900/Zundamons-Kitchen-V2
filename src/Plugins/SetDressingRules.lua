@@ -15,7 +15,8 @@ SetDressingRules.vistaTemplates = {
 			for i = 1, 12 do
 				local hill = Instance.new("Part")
 				hill.Size = Vector3.new(30, 8, 30)
-				hill.CFrame = CFrame.new(position.X + i * 20 - 120, position.Y + math.sin(i * 0.5) * 3, position.Z + distance)
+				hill.CFrame =
+					CFrame.new(position.X + i * 20 - 120, position.Y + math.sin(i * 0.5) * 3, position.Z + distance)
 				hill.Color = Color3.fromRGB(160, 210, 150)
 				hill.Anchored = true
 				hill.CanCollide = false
@@ -51,9 +52,10 @@ SetDressingRules.vistaTemplates = {
 			local model = Instance.new("Model")
 			model.Name = "Vista_FloatingCrystals"
 			for i = 1, 8 do
-				local crystal = Instance.new("Wedge")
+				local crystal = Instance.new("WedgePart")
 				crystal.Size = Vector3.new(1, 3, 1)
-				crystal.CFrame = CFrame.new(position.X + (i - 4) * 5, position.Y + math.sin(i * 0.7) * 4, position.Z + distance)
+				crystal.CFrame =
+					CFrame.new(position.X + (i - 4) * 5, position.Y + math.sin(i * 0.7) * 4, position.Z + distance)
 				crystal.Color = Color3.fromRGB(200, 182, 255)
 				crystal.Anchored = true
 				crystal.CanCollide = false
@@ -74,7 +76,7 @@ SetDressingRules.vistaTemplates = {
 			local model = Instance.new("Model")
 			model.Name = "Vista_SnowPeaks"
 			for i = 1, 6 do
-				local peak = Instance.new("Wedge")
+				local peak = Instance.new("WedgePart")
 				peak.Size = Vector3.new(2, 20, 2)
 				peak.CFrame = CFrame.new(position.X + (i - 3) * 15, position.Y + 10, position.Z + distance)
 				peak.Color = Color3.fromRGB(255, 255, 255)
@@ -92,7 +94,8 @@ SetDressingRules.vistaTemplates = {
 			local model = Instance.new("Model")
 			model.Name = "Vista_Ruins"
 			for i = 1, 4 do
-				local column = Instance.new("Cylinder")
+				local column = Instance.new("Part")
+				column.Shape = Enum.PartType.Cylinder
 				column.Size = Vector3.new(2, 15, 2)
 				column.CFrame = CFrame.new(position.X + (i - 2) * 8, position.Y + 7.5, position.Z + distance)
 				column.Color = Color3.fromRGB(200, 200, 200)
@@ -110,7 +113,8 @@ SetDressingRules.vistaTemplates = {
 			local model = Instance.new("Model")
 			model.Name = "Vista_KitchenGarden"
 			for i = 1, 6 do
-				local plant = Instance.new("Cylinder")
+				local plant = Instance.new("Part")
+				plant.Shape = Enum.PartType.Cylinder
 				plant.Size = Vector3.new(0.5, 1.5, 0.5)
 				plant.CFrame = CFrame.new(position.X + (i - 3) * 3, position.Y + 0.75, position.Z + distance)
 				plant.Color = Color3.fromRGB(255, 150, 200)
@@ -152,7 +156,9 @@ function SetDressingRules.applyWeatherReactions(zoneName, reactions)
 
 	local ZoneProfiles = require(script:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("ZoneProfiles"))
 	local zone = ZoneProfiles.getZone(zoneName)
-	if not zone then return end
+	if not zone then
+		return
+	end
 
 	for weatherType, decorationTypes in pairs(reactions) do
 		print("[SetDressingRules] Weather reaction for " .. weatherType .. " in " .. zoneName)

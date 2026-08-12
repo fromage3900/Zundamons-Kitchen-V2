@@ -58,7 +58,9 @@ function MaterialPalette.registerAll()
 end
 
 function MaterialPalette.register(palette)
-	if not MaterialService then return end
+	if not MaterialService then
+		return
+	end
 	local variant = Instance.new("MaterialVariant")
 	variant.Name = palette.name
 	variant.BaseMaterial = palette.baseMaterial

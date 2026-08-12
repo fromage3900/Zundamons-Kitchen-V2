@@ -34,7 +34,8 @@ local function createLight(lightDef, parent)
 end
 
 function ProceduralGeometry.build(decoType, position, normal, styleVariant)
-	local DecorationCatalog = require(script:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("DecorationCatalog"))
+	local DecorationCatalog =
+		require(script:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("DecorationCatalog"))
 	local blueprint = DecorationCatalog.getBlueprint(decoType)
 	if not blueprint then
 		warn("[ProceduralGeometry] Unknown decoration type: " .. tostring(decoType))
@@ -59,11 +60,8 @@ function ProceduralGeometry.build(decoType, position, normal, styleVariant)
 		part.Size = partDef.size * scale
 		part.CFrame = baseCFrame * CFrame.new(partDef.position * scale)
 		if blueprint.rotationJitter then
-			local jitter = Vector3.new(
-				(math.random() - 0.5) * 20,
-				(math.random() - 0.5) * 360,
-				(math.random() - 0.5) * 20
-			)
+			local jitter =
+				Vector3.new((math.random() - 0.5) * 20, (math.random() - 0.5) * 360, (math.random() - 0.5) * 20)
 			part.CFrame = part.CFrame * CFrame.Angles(math.rad(jitter.X), math.rad(jitter.Y), math.rad(jitter.Z))
 		end
 		part.Parent = model
@@ -80,7 +78,7 @@ function ProceduralGeometry.build(decoType, position, normal, styleVariant)
 		end
 	end
 
-	return {model}
+	return { model }
 end
 
 ProceduralGeometry.customBuilds = {

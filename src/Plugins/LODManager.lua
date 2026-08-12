@@ -37,12 +37,18 @@ function LODManager.registerDecorations(instances)
 end
 
 function LODManager._update()
-	if not LODManager._enabled then return end
+	if not LODManager._enabled then
+		return
+	end
 
 	local player = Players.LocalPlayer
-	if not player then return end
+	if not player then
+		return
+	end
 	local camera = Workspace.CurrentCamera
-	if not camera then return end
+	if not camera then
+		return
+	end
 	local camPos = camera.CFrame.Position
 
 	for inst, data in pairs(LODManager._registered) do

@@ -1,4 +1,12 @@
-# Zunda World Decorator
+# Zunda Studio Plugins
+
+Two Studio-only authoring plugins for the Infinity Nikki aesthetic: **Zunda World
+Decorator** (procedural zone dressing) and **Zunda Material Authoring** (canonical
+pastel material pipeline).
+
+---
+
+# 1. Zunda World Decorator
 
 A Studio-only authoring plugin for procedurally decorating game zones with an
 Infinity Nikki aesthetic. Think of it as **dressing up your world like an outfit** —
@@ -83,3 +91,57 @@ src/Plugins/
 ├── SetDressingRules.lua              # Distant vistas + weather reactions
 └── LODManager.lua                    # Distance-based LOD (sparkle scaling)
 ```
+
+---
+
+# 2. Zunda Material Authoring
+
+Authoring tool for the canonical Zunda pastel material pipeline. Keeps parts on
+palette (AGENTS.md §7), creates persistent `MaterialVariant`s in `MaterialService`
+(the Studio-owned shared hub), and exports Rojo-owned config snippets for git.
+
+## Install
+
+1. From the repository root run:
+   `.\node_modules\.bin\rojo.cmd build src/Plugins/material-plugin.project.json -o build/ZundaMaterialAuthoring.rbxm`
+2. Drop `build/ZundaMaterialAuthoring.rbxm` into the Studio **Plugins Folder**
+   (Plugins tab → Plugins Folder). Restart Studio.
+3. Open **Plugins > Zunda Material > Zunda Material**.
+
+> ⚠️ Same rule as the decorator: never leave the plugin Model inside the place
+> — use the Plugins Folder install flow, not "drag into place".
+
+## Palette (MaterialService is the source of truth)
+
+| Variant | Color | Base material | Roughness | Metallic |
+|---|---|---|---|---|
+| ZundaGreen | RGB(160, 210, 150) | SmoothPlastic | 0.6 | 0.1 |
+| ZundaGold | RGB(255, 200, 80) | SmoothPlastic | 0.4 | 0.2 |
+| ZundaPink | RGB(255, 150, 200) | SmoothPlastic | 0.5 | 0.1 |
+| ZundaMint | RGB(145, 215, 195) | SmoothPlastic | 0.6 | 0.1 |
+| MochiCream | RGB(255, 245, 235) | SmoothPlastic | 0.7 | 0.05 |
+| EdamameDeep | RGB(90, 140, 90) | SmoothPlastic | 0.65 | 0.1 |
+
+## Workflow
+
+1. Select parts/models in the viewport
+2. Pick a palette entry (swatch grid)
+3. Toggle **MaterialVariant** (persistent variant, recommended) vs direct paint
+4. Toggle **Suggested attributes** (e.g. `Reflectance`)
+5. Click **Apply to Selection**
+6. Click **Export Config** and paste the snippet into `src/Plugins/ZundaPalette.lua`
+   (or any Rojo-owned shared config) to make it durable in git
+
+## Architecture
+
+```
+src/Plugins/
+├── ZundaMaterialAuthoring.plugin.lua  # Entry point + dock widget UI
+├── material-plugin.project.json       # Rojo build config
+├── ZundaPalette.lua                   # Canonical palette data + MaterialVariant hub
+└── ZundaMaterialUtils.lua             # Apply / export / selection utilities
+```
+
+Variants live in `MaterialService` (persists with the place, survives Rojo sync
+through `$ignoreUnknownInstances`); the palette table lives in git. Both point
+at the same canonical hex values in `ZundaPalette.lua`.

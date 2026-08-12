@@ -92,7 +92,7 @@ function ScatterEngine.pickDecoration(decorationList, weights)
 	for _, deco in ipairs(decorationList) do
 		local weight = (weights and weights[deco]) or 1
 		totalWeight += weight
-		table.insert(weighted, {deco = deco, weight = weight})
+		table.insert(weighted, { deco = deco, weight = weight })
 	end
 
 	if totalWeight == 0 then
@@ -114,11 +114,16 @@ end
 function ScatterEngine.calculateStyleScore(zoneName, decorationName)
 	local ZoneProfiles = require(script:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("ZoneProfiles"))
 	local zone = ZoneProfiles.getZone(zoneName)
-	if not zone then return 0 end
+	if not zone then
+		return 0
+	end
 
-	local DecorationCatalog = require(script:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("DecorationCatalog"))
+	local DecorationCatalog =
+		require(script:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("DecorationCatalog"))
 	local blueprint = DecorationCatalog.getBlueprint(decorationName)
-	if not blueprint or not blueprint.tags then return 0 end
+	if not blueprint or not blueprint.tags then
+		return 0
+	end
 
 	local matchCount = 0
 	for _, tag in ipairs(blueprint.tags) do

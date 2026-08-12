@@ -55,7 +55,8 @@ function MainWidget:_buildUI()
 	self:_addLabel("Zone", 16, true)
 	self._zoneDropdown = self:_addDropdown(self.zones, self.state.selectedZone, function(zone)
 		self.state.selectedZone = zone
-		local ZoneProfiles = require(self.widget:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("ZoneProfiles"))
+		local ZoneProfiles =
+			require(self.widget:FindFirstAncestorWhichIsA("ModuleScript"):FindFirstChild("ZoneProfiles"))
 		local identity = ZoneProfiles.getStyleIdentity(zone)
 		self._styleLabel.Text = "Style Identity: " .. identity
 	end)
@@ -96,7 +97,7 @@ function MainWidget:_buildUI()
 		end
 		self._config.onDecorate(zoneName, {
 			density = self.state.density,
-			selectedDecorations = {deco},
+			selectedDecorations = { deco },
 			applyMaterials = self.state.applyMaterials,
 			applyVistas = self.state.applyVistas,
 			dryRun = self.state.dryRun,
@@ -269,7 +270,9 @@ function MainWidget:_addButton(text, color, callback)
 end
 
 function MainWidget:_report(message, level)
-	if not self._status then return end
+	if not self._status then
+		return
+	end
 	self._status.Text = message
 	if level == "error" then
 		self._status.BackgroundColor3 = Color3.fromRGB(255, 190, 205)
