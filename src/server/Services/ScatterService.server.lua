@@ -163,8 +163,16 @@ local function spawnNode(nodeType: string, variantId: string, position: Vector3,
 	return part
 end
 
+-- Resources are placed by hand in Studio at real scale; the runtime spawner
+-- is disabled so no floating grey/colored cubes ever appear. clearBiome /
+-- clearAll remain available to clean up any legacy scattered nodes.
+local SCATTER_ENABLED = false
+
 -- Scatter a biome's nodes within a volume region
 function ScatterService.scatterBiome(biomeName: string, region: Instance)
+	if not SCATTER_ENABLED then
+		return
+	end
 	if spawnedRegions[biomeName .. "_" .. region.Name] then
 		return
 	end

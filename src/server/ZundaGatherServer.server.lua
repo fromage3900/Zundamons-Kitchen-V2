@@ -6,7 +6,6 @@ local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local Debris = game:GetService("Debris")
-local TweenS = game:GetService("TweenService")
 
 local lootMod = require(RS.ConfigurationFiles.LootModule)
 if not lootMod then
@@ -123,31 +122,24 @@ local function updateNodeMesh(node, stageIndex)
 	node:SetAttribute("GrowthStageName", stage.name)
 end
 
--- Hide the node visually + re-enable after respawn
+-- The visual IS the authored part: harvest only flips availability and the
+-- click range. No transparency/size tweens on the node, so placed props
+-- never flicker or resize.
 local function consumeNode(node, respawnSec)
 	if node:GetAttribute("Available") == false then
 		return
 	end
 	node:SetAttribute("Available", false)
-	ResourceVisualService.setVisible(node, false)
 	local cd = node:FindFirstChildOfClass("ClickDetector")
 	if cd then
 		cd.MaxActivationDistance = 0
 	end
-	-- Fade out
-	local origTransparency = node.Transparency
-	local tween = TweenS:Create(node, TweenInfo.new(0.4), { Transparency = 1, Size = node.Size * 0.4 })
-	tween:Play()
-	-- Schedule respawn
+	-- Schedule respawn without touching the visual
 	task.delay(respawnSec, function()
 		if not node.Parent then
 			return
 		end
 		node:SetAttribute("Available", true)
-		ResourceVisualService.setVisible(node, true)
-		node.Size = node:GetAttribute("_origSize") or node.Size
-		local back = TweenS:Create(node, TweenInfo.new(0.4), { Transparency = origTransparency })
-		back:Play()
 		if cd then
 			cd.MaxActivationDistance = 16
 		end

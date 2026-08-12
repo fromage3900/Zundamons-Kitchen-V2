@@ -1,6 +1,11 @@
 --!strict
--- Owns every runtime-created resource visual. Gameplay remains attached to a
--- stable interaction root; this service only mutates the _ResourceVisual child.
+-- Resource visuals are Studio-authored props placed directly in the level at
+-- real scale. Runtime cloning/tinting/replacement is disabled (AUTHORED_VISUALS):
+-- this service only records status so gameplay bindings keep working.
+
+-- Authoring mode: never spawn, clone, tint, or swap visuals. The placed part
+-- IS the visual and persists through harvest/respawn (no flicker).
+local AUTHORED_VISUALS = true
 
 local ContentProvider = game:GetService("ContentProvider")
 local InsertService = game:GetService("InsertService")
@@ -59,38 +64,13 @@ local function preparePart(part: BasePart, root: BasePart)
 	weld.Parent = part
 end
 
--- Fallback visuals are real in-level meshes (no procedural construction): the
--- boulder that decorates the authored level, tinted per archetype. Remains a
--- Folder so the status code paths (setDescendantsVisible visibility toggles)
--- keep working unchanged.
-local FALLBACK_MESH = "rbxassetid://5003626535"
-local FALLBACK_COLORS = {
-	AppleTree = Color3.fromRGB(150, 200, 140),
-	PineTree = Color3.fromRGB(120, 170, 120),
-	GoldRock = Color3.fromRGB(255, 215, 0),
-	MarbleRock = Color3.fromRGB(245, 245, 245),
-}
-
+-- Fallback placeholder folder. Unreachable in authored mode (apply returns
+-- early) but kept so the non-authored code path below stays table-complete.
 local function buildFallback(root: BasePart, archetypeId: string): Folder
 	local managed = managedFolder(root)
-	local old = managed:FindFirstChild(FALLBACK_NAME)
-	if old then
-		old:Destroy()
-	end
 	local fallback = Instance.new("Folder")
 	fallback.Name = FALLBACK_NAME
 	fallback.Parent = managed
-
-	local mesh = Instance.new("MeshPart")
-	mesh.Name = "FallbackMesh"
-	mesh.MeshId = FALLBACK_MESH
-	mesh.Size = Vector3.new(2.4, 2.4, 2.4)
-	mesh.Color = FALLBACK_COLORS[archetypeId] or Color3.fromRGB(200, 205, 210)
-	mesh.CFrame = root.CFrame * CFrame.new(0, root.Size.Y / 2 + 1.4, 0)
-	mesh.Anchored = true
-	mesh.CanCollide = false
-	mesh.CastShadow = true
-	mesh.Parent = fallback
 	return fallback
 end
 
@@ -213,6 +193,9 @@ function ResourceVisualService.clear(node: Instance)
 end
 
 function ResourceVisualService.setVisible(node: Instance, visible: boolean)
+	if AUTHORED_VISUALS then
+		return
+	end
 	local root = rootPart(node)
 	local managed = root and root:FindFirstChild(MANAGED_NAME)
 	if managed then
@@ -348,6 +331,10 @@ function ResourceVisualService.apply(node: Instance, descriptor: any?): (boolean
 	if not root then
 		setStatus(node, "error", "visual_root_missing")
 		return false, "visual_root_missing"
+	end
+	if AUTHORED_VISUALS then
+		setStatus(node, "authored", "static level visual")
+		return true, "authored"
 	end
 	if root:GetAttribute("ResourceRootTransparency") == nil then
 		root:SetAttribute("ResourceRootTransparency", root.Transparency)
