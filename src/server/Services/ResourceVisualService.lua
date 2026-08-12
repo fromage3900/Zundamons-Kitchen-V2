@@ -754,6 +754,7 @@ function ResourceVisualService.apply(node: Instance, descriptor: any?): (boolean
 		setStatus(node, "fallback", reason)
 		return false, reason
 	end
+	resolved = table.clone(resolved)
 	resolved.assetId = normalized
 	resolved.scale = if typeof(resolved.scale) == "Vector3" then resolved.scale else Vector3.new(1, 1, 1)
 	resolved.offset = if typeof(resolved.offset) == "CFrame" then resolved.offset else CFrame.identity
