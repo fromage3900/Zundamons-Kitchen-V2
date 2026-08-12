@@ -197,6 +197,19 @@ local DEFAULTS: {
 			end,
 			callback = nil :: (() -> ())?,
 		},
+		{
+			id = "challenge",
+			label = "Challenge",
+			icon = "🏆",
+			description = "Open Challenge Mode & Daily Challenges",
+			-- No default key: every obvious letter is already claimed. Button-only.
+			defaultKey = nil :: Enum.KeyCode?,
+			category = "Progression",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
 	}
 
 -- ── Initialization ───────────────────────────────────────────
