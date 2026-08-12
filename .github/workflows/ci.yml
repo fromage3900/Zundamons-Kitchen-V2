@@ -33,6 +33,9 @@ jobs:
       - name: Verify Rojo Build
         run: rojo build default.project.json --output build/ZundamonsKitchen.rbxl
 
+      - name: Cross-check Config References (catalog ↔ scatter ↔ registry ↔ remotes)
+        run: python3 scripts/check_config_crossrefs.py
+
       - name: Generate Sourcemap (Luau-LSP tooling)
         run: rojo sourcemap default.project.json -o build/sourcemap.json
 
