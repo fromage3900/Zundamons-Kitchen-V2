@@ -1,23 +1,32 @@
 {
-	"className": "Model",
-	"attributes": {
-		"ResourceArchetype": "Zunda Mushroom",
-		"ResourceType": "Zunda Mushroom",
-		"VisualVariant": "Mushroom_01",
-		"Type": "ZundaMushroom"
-	},
-	"children": [
-		{
-			"className": "MeshPart",
-			"name": "Mesh",
-			"properties": {
-				"MeshId": "rbxassetid://77467866039933",
-				"Size": [2.5, 2.9, 2.4],
-				"Position": [60, 4, 30],
-				"Anchored": true,
-				"CanCollide": true,
-				"CastShadow": true
-			}
-		}
-	]
+ "className": "Model",
+ "attributes": {
+  "Available": true,
+  "Respawn": 6,
+  "ResourceArchetype": "Zunda Mushroom",
+  "ResourceType": "Zunda Mushroom",
+  "VisualVariant": "Mushroom_01",
+  "Yield": 3
+ },
+ "children": [
+  {
+   "className": "MeshPart",
+   "name": "Mesh",
+   "properties": {
+    "MeshId": "rbxassetid://77467866039933",
+    "Size": [
+     1.0,
+     1.2,
+     1.0
+    ],
+    "Position": [
+     60,
+     3.15,
+     30
+    ],
+    "Anchored": true,
+    "CanCollide": false
+   }
+  }
+ ]
 }

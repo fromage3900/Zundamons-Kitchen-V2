@@ -6,13 +6,13 @@
  "properties": {
   "MeshId": "rbxassetid://107610038515229",
   "Size": [
-   3.6,
-   1.6,
-   3.5
+   1.5,
+   0.67,
+   1.46
   ],
   "Position": [
-   67.2,
-   2.5,
+   58.0,
+   2.04,
    30.0
   ],
   "Anchored": true,
