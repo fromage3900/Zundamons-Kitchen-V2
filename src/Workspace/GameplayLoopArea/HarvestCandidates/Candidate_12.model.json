@@ -1,0 +1,22 @@
+{
+ "className": "MeshPart",
+ "attributes": {
+  "CandidateMesh": "100915991512477"
+ },
+ "properties": {
+  "MeshId": "rbxassetid://100915991512477",
+  "Size": [
+   2.4,
+   2.4,
+   2.4
+  ],
+  "Position": [
+   95,
+   2.9,
+   30
+  ],
+  "Anchored": true,
+  "CanCollide": false,
+  "CastShadow": true
+ }
+}
