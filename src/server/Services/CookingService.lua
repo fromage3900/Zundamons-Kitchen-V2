@@ -250,6 +250,13 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 		totalNotes = totalNotes,
 		firstTargetAt = firstTargetAt,
 		noteInterval = NOTE_INTERVAL,
+		-- Send the authoritative timing windows so the client can never drift
+		-- from the server's hit detection. The client uses these to compute
+		-- its own hit quality and to know when a note is a miss.
+		perfectWindow = perfectWindow,
+		greatWindow = GREAT_WINDOW,
+		okWindow = OK_WINDOW,
+		startDelay = START_DELAY,
 	}
 end
 

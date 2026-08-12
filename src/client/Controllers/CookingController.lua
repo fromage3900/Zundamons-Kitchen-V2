@@ -28,11 +28,14 @@ if not cookingHitEvent then
 	cookingHitEvent.Parent = remotes
 end
 
+-- Timing windows are now sent by the server in the session payload so the
+-- client can never drift from the server's authoritative hit detection.
+-- These are fallbacks only (used if the server doesn't send them).
 local PEA_CONFIG = {
 	fallDuration = 2.0,
-	hitWindow = 0.15, -- Perfect <= 0.15s
-	greatWindow = 0.35, -- Great <= 0.35s
-	okWindow = 0.60, -- OK <= 0.60s
+	hitWindow = 0.2, -- Perfect <= 0.2s (matches server BASE_PERFECT_WINDOW)
+	greatWindow = 0.42, -- Great <= 0.42s (matches server GREAT_WINDOW)
+	okWindow = 0.72, -- OK <= 0.72s (matches server OK_WINDOW)
 	totalNotes = 10, -- Server default total note count
 }
 
@@ -43,6 +46,13 @@ local currentScore = { perfect = 0, great = 0, ok = 0, miss = 0 }
 local comboCount = 0
 local maxComboCount = 0
 local currentSessionId: string? = nil
+-- Authoritative timing windows from the server (set in start()).
+-- Fall back to PEA_CONFIG if the server didn't send them.
+local currentWindows = {
+	hitWindow = PEA_CONFIG.hitWindow,
+	greatWindow = PEA_CONFIG.greatWindow,
+	okWindow = PEA_CONFIG.okWindow,
+}
 
 -- UI Elements
 local screenGui: ScreenGui? = nil
@@ -54,11 +64,11 @@ local tapButton: TextButton? = nil
 
 local function getHitQuality(timeDiff: number): string
 	local absDiff = math.abs(timeDiff)
-	if absDiff <= PEA_CONFIG.hitWindow then
+	if absDiff <= currentWindows.hitWindow then
 		return "perfect"
-	elseif absDiff <= PEA_CONFIG.greatWindow then
+	elseif absDiff <= currentWindows.greatWindow then
 		return "great"
-	elseif absDiff <= PEA_CONFIG.okWindow then
+	elseif absDiff <= currentWindows.okWindow then
 		return "ok"
 	end
 	return "miss"
@@ -212,7 +222,7 @@ local function handleHitInput()
 		if not pea.hit and not pea.missed then
 			local elapsed = now - pea.spawnTime
 			local diff = math.abs(elapsed - PEA_CONFIG.fallDuration)
-			if diff < bestDiff and diff <= PEA_CONFIG.okWindow then
+			if diff < bestDiff and diff <= currentWindows.okWindow then
 				bestDiff = diff
 				bestPea = pea
 			end
@@ -293,6 +303,12 @@ function CookingController.start(
 	currentScore = { perfect = 0, great = 0, ok = 0, miss = 0 }
 	comboCount = 0
 	maxComboCount = 0
+
+	-- Use the server's authoritative timing windows so the client can never
+	-- drift from the server's hit detection (e.g. companion perfect_window buff).
+	currentWindows.hitWindow = tonumber(session.perfectWindow) or PEA_CONFIG.hitWindow
+	currentWindows.greatWindow = tonumber(session.greatWindow) or PEA_CONFIG.greatWindow
+	currentWindows.okWindow = tonumber(session.okWindow) or PEA_CONFIG.okWindow
 
 	-- Configure total notes & difficulty for recipe
 	local totalNotesToSpawn = tonumber(session.totalNotes) or PEA_CONFIG.totalNotes
