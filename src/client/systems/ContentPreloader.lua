@@ -12,7 +12,7 @@ function ContentPreloader.PreloadCore()
 		local coreAssets = {
 			-- Example: Loading Screen Background, Core Icons
 		}
-		
+
 		ContentProvider:PreloadAsync(coreAssets)
 		resolve()
 	end)
@@ -22,7 +22,7 @@ end
 function ContentPreloader.LazyLoadCategory(categoryFolder)
 	return Promise.new(function(resolve, reject)
 		print("Lazy loading category:", categoryFolder.Name)
-		
+
 		-- In a real scenario, this would yield until the specific folder's assets are loaded
 		ContentProvider:PreloadAsync(categoryFolder:GetDescendants())
 		resolve()

@@ -46,10 +46,14 @@ local particleEmitter = nil
 local activeHeartbeatConn: RBXScriptConnection? = nil
 
 local function getNodePosition(node: Instance): Vector3
-	if not node then return Vector3.zero end
+	if not node then
+		return Vector3.zero
+	end
 	return if node:IsA("BasePart")
 		then node.Position
-		else (if node:IsA("Model") then (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position) else Vector3.zero)
+		else (if node:IsA("Model")
+			then (node.PrimaryPart and node.PrimaryPart.Position or node:GetPivot().Position)
+			else Vector3.zero)
 end
 
 -- Create progress bar UI
@@ -129,7 +133,9 @@ local function createHarvestParticles(position: Vector3)
 	task.delay(PARTICLE_LIFETIME + 0.5, function()
 		emitter.Enabled = false
 		task.delay(2, function()
-			if part and part.Parent then part:Destroy() end
+			if part and part.Parent then
+				part:Destroy()
+			end
 		end)
 	end)
 
@@ -157,9 +163,13 @@ end
 -- Play harvest animation on character
 local function playHarvestAnimation()
 	local character = player.Character
-	if not character then return end
+	if not character then
+		return
+	end
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
-	if not humanoid then return end
+	if not humanoid then
+		return
+	end
 
 	local animator = humanoid:FindFirstChildOfClass("Animator")
 	if not animator then
@@ -189,14 +199,18 @@ end
 
 -- Show progress bar
 local function showProgressBar()
-	if not progressContainer then createProgressBar() end
+	if not progressContainer then
+		createProgressBar()
+	end
 	progressContainer.Visible = true
 	progressFill.Size = UDim2.new(0, 0, 1, -4)
 end
 
 -- Update progress bar
 local function updateProgressBar(progress: number)
-	if not progressFill then return end
+	if not progressFill then
+		return
+	end
 	local clampedProgress = math.clamp(progress, 0, 1)
 	local width = (progressContainer.AbsoluteSize.X - 4) * clampedProgress
 	progressFill.Size = UDim2.new(0, width, 1, -4)
@@ -212,11 +226,17 @@ end
 
 -- Check if player moved too far from start position
 local function hasMovedTooFar(): boolean
-	if not harvestStartPosition then return false end
+	if not harvestStartPosition then
+		return false
+	end
 	local character = player.Character
-	if not character then return true end
+	if not character then
+		return true
+	end
 	local rootPart = character:FindFirstChild("HumanoidRootPart")
-	if not rootPart then return true end
+	if not rootPart then
+		return true
+	end
 	local distance = (rootPart.Position - harvestStartPosition).Magnitude
 	return distance > MOVE_THRESHOLD
 end
@@ -224,9 +244,13 @@ end
 -- Check distance to target node
 local function isInRange(node: Instance): boolean
 	local character = player.Character
-	if not character then return false end
+	if not character then
+		return false
+	end
 	local rootPart = character:FindFirstChild("HumanoidRootPart")
-	if not rootPart then return false end
+	if not rootPart then
+		return false
+	end
 	local nodePos = getNodePosition(node)
 	local distance = (rootPart.Position - nodePos).Magnitude
 	return distance <= MAX_DISTANCE
@@ -238,7 +262,9 @@ local function cancelHarvest(reason: string?)
 		activeHeartbeatConn:Disconnect()
 		activeHeartbeatConn = nil
 	end
-	if not isHarvesting then return end
+	if not isHarvesting then
+		return
+	end
 	isHarvesting = false
 	harvestTargetNode = nil
 	harvestStartPosition = nil
@@ -262,7 +288,9 @@ local function completeHarvest()
 		activeHeartbeatConn:Disconnect()
 		activeHeartbeatConn = nil
 	end
-	if not isHarvesting or not harvestTargetNode then return end
+	if not isHarvesting or not harvestTargetNode then
+		return
+	end
 	isHarvesting = false
 
 	hideProgressBar()
@@ -303,7 +331,10 @@ local function startHarvest(node: Instance)
 
 	isHarvesting = true
 	harvestTargetNode = node
-	harvestStartPosition = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position or nil
+	harvestStartPosition = player.Character
+			and player.Character:FindFirstChild("HumanoidRootPart")
+			and player.Character.HumanoidRootPart.Position
+		or nil
 
 	local nodePos = getNodePosition(node)
 	showProgressBar()
@@ -363,10 +394,14 @@ end
 -- Wire up ClickDetectors to use the harvest controller
 local function bindNode(node: Instance)
 	local clickDetector = node:FindFirstChildOfClass("ClickDetector")
-	if not clickDetector then return end
+	if not clickDetector then
+		return
+	end
 
 	clickDetector.MouseClick:Connect(function(clickingPlayer)
-		if clickingPlayer ~= player then return end
+		if clickingPlayer ~= player then
+			return
+		end
 		if isHarvesting then
 			cancelHarvest("Re-clicked")
 			return
@@ -377,8 +412,12 @@ end
 
 -- Helper to create 3D BillboardGui for Mineable resource nodes
 local function getOrAttachBillboardGui(node: Instance): BillboardGui?
-	local targetPart = if node:IsA("BasePart") then node else (node.PrimaryPart or node:FindFirstChildWhichIsA("BasePart"))
-	if not targetPart then return nil end
+	local targetPart = if node:IsA("BasePart")
+		then node
+		else (node.PrimaryPart or node:FindFirstChildWhichIsA("BasePart"))
+	if not targetPart then
+		return nil
+	end
 
 	local existing = targetPart:FindFirstChild("NodeHealthGui")
 	if existing and existing:IsA("BillboardGui") then
@@ -458,23 +497,33 @@ local function createToolHitFX(position: Vector3, nodeType: string?)
 	emitter.Transparency = NumberSequence.new(0.1, 1)
 
 	local nType = string.lower(nodeType or "")
-	if string.find(nType, "rock") or string.find(nType, "ore") or string.find(nType, "gold") or string.find(nType, "marble") then
+	if
+		string.find(nType, "rock")
+		or string.find(nType, "ore")
+		or string.find(nType, "gold")
+		or string.find(nType, "marble")
+	then
 		emitter.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 200, 80)),
 			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(180, 180, 190)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 100, 110))
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 100, 110)),
 		})
 		emitter.Texture = "rbxassetid://2846894023"
-	elseif string.find(nType, "tree") or string.find(nType, "wood") or string.find(nType, "apple") or string.find(nType, "pine") then
+	elseif
+		string.find(nType, "tree")
+		or string.find(nType, "wood")
+		or string.find(nType, "apple")
+		or string.find(nType, "pine")
+	then
 		emitter.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 110, 60)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 65, 30))
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 65, 30)),
 		})
 		emitter.Texture = "rbxassetid://2846894023"
 	else
 		emitter.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(120, 210, 90)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 140, 50))
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 140, 50)),
 		})
 		emitter.Texture = "rbxassetid://2846894023"
 	end
@@ -483,13 +532,17 @@ local function createToolHitFX(position: Vector3, nodeType: string?)
 	emitter:Emit(12)
 
 	task.delay(1.0, function()
-		if part and part.Parent then part:Destroy() end
+		if part and part.Parent then
+			part:Destroy()
+		end
 	end)
 end
 
 -- Bind health listener and 3D BillboardGui to Mineable nodes
 local function bindMineableNode(node: Instance)
-	local pos = if node:IsA("BasePart") then node.Position else (node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)
+	local pos = if node:IsA("BasePart")
+		then node.Position
+		else (node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)
 
 	node:GetAttributeChangedSignal("Health"):Connect(function()
 		local health = node:GetAttribute("Health")
@@ -518,7 +571,9 @@ local function bindMineableNode(node: Instance)
 			if health <= 0 then
 				task.delay(0.5, function()
 					local gui = getOrAttachBillboardGui(node)
-					if gui then gui.Enabled = false end
+					if gui then
+						gui.Enabled = false
+					end
 				end)
 			end
 		end
@@ -576,7 +631,9 @@ end)
 
 -- Cancel on key press (movement keys)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
+	if gameProcessed then
+		return
+	end
 	if isHarvesting then
 		local moveKeys = {
 			[Enum.KeyCode.W] = true,

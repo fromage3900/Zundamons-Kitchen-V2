@@ -68,7 +68,12 @@ end)
 
 local ZONES_INFO = {
 	{ emoji = "🏘", name = "Zunda Village", desc = "Spawn area with town shops & NPC guests.", pos = "(47, 4, -74)" },
-	{ emoji = "🍳", name = "Kitchen Garden", desc = "Farming, cooking & the main gameplay loop.", pos = "(9, 4, -41)" },
+	{
+		emoji = "🍳",
+		name = "Kitchen Garden",
+		desc = "Farming, cooking & the main gameplay loop.",
+		pos = "(9, 4, -41)",
+	},
 	{
 		emoji = "🗻",
 		name = "Eastern Peaks",

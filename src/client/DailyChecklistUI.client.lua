@@ -185,7 +185,11 @@ local function refreshPanel(data)
 		local harvestLabel = Instance.new("TextLabel", scroll)
 		harvestLabel.Size = UDim2.new(1, 0, 0, 30)
 		harvestLabel.BackgroundTransparency = 1
-		harvestLabel.Text = "🌱 Daily Resources: " .. (data.resourcesHarvested or 0) .. " / " .. (data.maxResources or 0) .. " gathered"
+		harvestLabel.Text = "🌱 Daily Resources: "
+			.. (data.resourcesHarvested or 0)
+			.. " / "
+			.. (data.maxResources or 0)
+			.. " gathered"
 		harvestLabel.Font = Enum.Font.Gotham
 		harvestLabel.TextSize = 14
 		harvestLabel.TextColor3 = (data.resourcesHarvested or 0) >= (data.maxResources or 1) and C.done or C.sub
@@ -204,11 +208,15 @@ if DailyDataEvent then
 end
 
 _G.DailyChecklist = {
-	isOpen = function() return panel.Visible end,
+	isOpen = function()
+		return panel.Visible
+	end,
 	open = function()
 		panel.Visible = true
 	end,
-	close = function() panel.Visible = false end,
+	close = function()
+		panel.Visible = false
+	end,
 	toggle = function()
 		if _G.DailyChecklist.isOpen() then
 			_G.DailyChecklist.close()
@@ -223,12 +231,17 @@ _G.DailyChecklist = {
 -- module reload racing this call). Retry until getAction() actually reflects it
 -- rather than trusting a single call.
 task.spawn(function()
-	local ActionRegistry = require(game:GetService("Players").LocalPlayer.PlayerScripts
-		:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+	local ActionRegistry = require(
+		game:GetService("Players").LocalPlayer.PlayerScripts
+			:WaitForChild("ConfigurationFiles")
+			:WaitForChild("UIActionRegistry")
+	)
 	for _ = 1, 10 do
 		ActionRegistry.registerCallback("daily", _G.DailyChecklist.toggle)
 		local def = ActionRegistry.getAction("daily")
-		if def and def.callback then break end
+		if def and def.callback then
+			break
+		end
 		task.wait(0.5)
 	end
 end)

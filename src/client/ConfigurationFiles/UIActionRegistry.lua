@@ -13,13 +13,17 @@ local PENDING_TTL = 8
 
 -- ── Helpers ──────────────────────────────────────────────────
 local function bindKey(actionId, keyCode)
-	if keyCode == nil then return end
+	if keyCode == nil then
+		return
+	end
 	if keyToAction[keyCode] and keyToAction[keyCode] ~= actionId then
-		warn(("[UI_ActionRegistry] Key %s rebound from %s to %s"):format(
-			tostring(keyCode):gsub("Enum.KeyCode.", ""),
-			keyToAction[keyCode],
-			actionId
-		))
+		warn(
+			("[UI_ActionRegistry] Key %s rebound from %s to %s"):format(
+				tostring(keyCode):gsub("Enum.KeyCode.", ""),
+				keyToAction[keyCode],
+				actionId
+			)
+		)
 	end
 	keyToAction[keyCode] = actionId
 	currentBindings[actionId] = keyCode
@@ -27,7 +31,9 @@ end
 
 local function isActionAvailable(actionId): boolean
 	local def = actions[actionId]
-	if not def then return false end
+	if not def then
+		return false
+	end
 	if type(def.isAvailable) == "function" then
 		return def.isAvailable()
 	end
@@ -37,127 +43,161 @@ end
 -- ── Canonical Action Definitions ─────────────────────────────
 -- 8 Pea Wheel slices per UI_UX_OVERHAUL_PLAN.md
 -- @type { { id: string, label: string, icon: string, description: string, defaultKey: Enum.KeyCode?, category: string, isAvailable: () -> boolean, callback: (() -> ())? } }
-local DEFAULTS: { { id: string, label: string, icon: string, description: string, defaultKey: Enum.KeyCode?, category: string, isAvailable: () -> boolean, callback: (() -> ())? } } = {
+local DEFAULTS: {
 	{
-		id = "inventory",
-		label = "Pouch",
-		icon = "🎒",
-		description = "Open your item pouch",
-		defaultKey = Enum.KeyCode.I,
-		category = "Inventory",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
+		id: string,
+		label: string,
+		icon: string,
+		description: string,
+		defaultKey: Enum.KeyCode?,
+		category: string,
+		isAvailable: () -> boolean,
+		callback: (() -> ())?,
+	}
+} =
 	{
-		id = "cook",
-		label = "Cook",
-		icon = "🍳",
-		description = "Open cooking station",
-		defaultKey = Enum.KeyCode.K,
-		category = "Gameplay",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "quests",
-		label = "Quests",
-		icon = "📜",
-		description = "View active quests",
-		defaultKey = Enum.KeyCode.J,
-		category = "Exploration",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "compendium",
-		label = "Collection",
-		icon = "📖",
-		description = "Open recipe & item compendium",
-		defaultKey = Enum.KeyCode.C,
-		category = "Reference",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "materials",
-		label = "Materials",
-		icon = "🧺",
-		description = "View gathered materials",
-		defaultKey = nil :: Enum.KeyCode?,
-		category = "Inventory",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "map",
-		label = "Map",
-		icon = "🗺️",
-		description = "Toggle world map",
-		defaultKey = Enum.KeyCode.M,
-		category = "Exploration",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "companions",
-		label = "Companions",
-		icon = "🌸",
-		description = "Manage your Zunda companions",
-		defaultKey = nil :: Enum.KeyCode?,
-		category = "Progression",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "settings",
-		label = "Settings",
-		icon = "⚙",
-		description = "Open settings & keybinds",
-		-- Settings opens via the Pea Wheel slice and HUD button (both dispatch()).
-		-- F1 is reserved for the Keybinds help panel to avoid a double-bind.
-		defaultKey = nil :: Enum.KeyCode?,
-		category = "System",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "peawheel",
-		label = "Pea Wheel",
-		icon = "🌱",
-		description = "Toggle the radial quick-action wheel",
-		-- Not a Pea Wheel slice itself — this is the wheel's own open/close toggle,
-		-- previously a rogue listener inside PeaWheelController bypassing this registry.
-		defaultKey = Enum.KeyCode.Tab,
-		category = "System",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "daily",
-		label = "Daily",
-		icon = "📅",
-		description = "Open your daily planner/checklist",
-		-- The old bottom-right HUD button row was the only way to reach this;
-		-- give it a real keybind now that the row is gone.
-		defaultKey = Enum.KeyCode.N,
-		category = "Progression",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-	{
-		id = "wardrobe",
-		label = "Wardrobe",
-		icon = "👗",
-		description = "Open your outfit wardrobe",
-		-- No default key: every obvious letter is already claimed by another
-		-- action. Button-only for now (was a rogue K listener that double-fired
-		-- alongside "cook").
-		defaultKey = nil :: Enum.KeyCode?,
-		category = "Inventory",
-		isAvailable = function() return true end,
-		callback = nil :: (() -> ())?,
-	},
-}
+		{
+			id = "inventory",
+			label = "Pouch",
+			icon = "🎒",
+			description = "Open your item pouch",
+			defaultKey = Enum.KeyCode.I,
+			category = "Inventory",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "cook",
+			label = "Cook",
+			icon = "🍳",
+			description = "Open cooking station",
+			defaultKey = Enum.KeyCode.K,
+			category = "Gameplay",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "quests",
+			label = "Quests",
+			icon = "📜",
+			description = "View active quests",
+			defaultKey = Enum.KeyCode.J,
+			category = "Exploration",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "compendium",
+			label = "Collection",
+			icon = "📖",
+			description = "Open recipe & item compendium",
+			defaultKey = Enum.KeyCode.C,
+			category = "Reference",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "materials",
+			label = "Materials",
+			icon = "🧺",
+			description = "View gathered materials",
+			defaultKey = nil :: Enum.KeyCode?,
+			category = "Inventory",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "map",
+			label = "Map",
+			icon = "🗺️",
+			description = "Toggle world map",
+			defaultKey = Enum.KeyCode.M,
+			category = "Exploration",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "companions",
+			label = "Companions",
+			icon = "🌸",
+			description = "Manage your Zunda companions",
+			defaultKey = nil :: Enum.KeyCode?,
+			category = "Progression",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "settings",
+			label = "Settings",
+			icon = "⚙",
+			description = "Open settings & keybinds",
+			-- Settings opens via the Pea Wheel slice and HUD button (both dispatch()).
+			-- F1 is reserved for the Keybinds help panel to avoid a double-bind.
+			defaultKey = nil :: Enum.KeyCode?,
+			category = "System",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "peawheel",
+			label = "Pea Wheel",
+			icon = "🌱",
+			description = "Toggle the radial quick-action wheel",
+			-- Not a Pea Wheel slice itself — this is the wheel's own open/close toggle,
+			-- previously a rogue listener inside PeaWheelController bypassing this registry.
+			defaultKey = Enum.KeyCode.Tab,
+			category = "System",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "daily",
+			label = "Daily",
+			icon = "📅",
+			description = "Open your daily planner/checklist",
+			-- The old bottom-right HUD button row was the only way to reach this;
+			-- give it a real keybind now that the row is gone.
+			defaultKey = Enum.KeyCode.N,
+			category = "Progression",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "wardrobe",
+			label = "Wardrobe",
+			icon = "👗",
+			description = "Open your outfit wardrobe",
+			-- No default key: every obvious letter is already claimed by another
+			-- action. Button-only for now (was a rogue K listener that double-fired
+			-- alongside "cook").
+			defaultKey = nil :: Enum.KeyCode?,
+			category = "Inventory",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+	}
 
 -- ── Initialization ───────────────────────────────────────────
 for _, def in ipairs(DEFAULTS) do
@@ -171,8 +211,12 @@ end
 -- This module is a cached ModuleScript, so this connects exactly once.
 local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
-	if UserInputService:GetFocusedTextBox() ~= nil then return end
+	if input.UserInputType ~= Enum.UserInputType.Keyboard then
+		return
+	end
+	if UserInputService:GetFocusedTextBox() ~= nil then
+		return
+	end
 	local actionId = keyToAction[input.KeyCode]
 	if actionId then
 		-- Dispatch even when gameProcessed: the core Backpack CoreScript sinks
@@ -201,7 +245,9 @@ end
 
 function UI_ActionRegistry.setBinding(actionId: string, keyCode: Enum.KeyCode?)
 	local def = actions[actionId]
-	if not def then return end
+	if not def then
+		return
+	end
 	bindKey(actionId, keyCode)
 end
 
@@ -236,7 +282,13 @@ function UI_ActionRegistry.dispatch(actionId: string): boolean
 	task.delay(PENDING_TTL, function()
 		if pendingDispatches[actionId] then
 			pendingDispatches[actionId] = nil
-			warn("[UI_ActionRegistry] Dispatch for " .. actionId .. " expired after " .. PENDING_TTL .. "s — panel never registered a callback")
+			warn(
+				"[UI_ActionRegistry] Dispatch for "
+					.. actionId
+					.. " expired after "
+					.. PENDING_TTL
+					.. "s — panel never registered a callback"
+			)
 		end
 	end)
 	return false
@@ -255,7 +307,7 @@ function UI_ActionRegistry.registerCallback(actionId: string, fn: () -> ())
 	end
 end
 
-function UI_ActionRegistry.getOrderedSliceList(): {string}
+function UI_ActionRegistry.getOrderedSliceList(): { string }
 	return {
 		"inventory",
 		"cook",

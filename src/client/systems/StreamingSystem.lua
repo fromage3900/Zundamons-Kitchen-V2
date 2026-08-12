@@ -15,7 +15,7 @@ local function StreamingSystem(world)
 	for _, instance in Matter.useEvent(CollectionService, "GetInstanceRemovedSignal", "Interactive") do
 		-- The server removed this model from the client's memory to save RAM.
 		-- We must find its corresponding Entity ID and remove it from the Matter World!
-		
+
 		-- for id in world:query(...) do
 		-- 	world:despawn(id)
 		-- end

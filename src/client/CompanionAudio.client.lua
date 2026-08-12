@@ -15,9 +15,13 @@ local function playSound(id, vol)
 	s.Volume = vol or 0.6
 	s.Parent = player:FindFirstChild("PlayerGui") or player
 	s:Play()
-	s.Ended:Connect(function() s:Destroy() end)
+	s.Ended:Connect(function()
+		s:Destroy()
+	end)
 	task.delay(3, function()
-		if s.Parent then s:Destroy() end
+		if s.Parent then
+			s:Destroy()
+		end
 	end)
 end
 
@@ -31,13 +35,19 @@ local CHIME_COOLDOWN = 30
 RunService.Heartbeat:Connect(function()
 	local char = player.Character
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
+	if not hrp then
+		return
+	end
 
 	local companionModel = workspace:FindFirstChild("ZundaCompanion_" .. player.Name)
-	if not companionModel then return end
+	if not companionModel then
+		return
+	end
 
 	local primary = companionModel.PrimaryPart or companionModel:FindFirstChildWhichIsA("BasePart")
-	if not primary then return end
+	if not primary then
+		return
+	end
 
 	local dist = (hrp.Position - primary.Position).Magnitude
 	local isNear = dist < COMPANION_DISTANCE
@@ -47,7 +57,9 @@ RunService.Heartbeat:Connect(function()
 		if sparkle and sparkle:IsA("ParticleEmitter") then
 			sparkle.Rate = 25
 			task.delay(1, function()
-				if sparkle.Parent then sparkle.Rate = 12 end
+				if sparkle.Parent then
+					sparkle.Rate = 12
+				end
 			end)
 		end
 		playSound(UIAssets.sounds.companion_pet, 0.3)

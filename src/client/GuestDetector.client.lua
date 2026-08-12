@@ -10,7 +10,9 @@ local isDetectingNearbyGuestChanged = Instance.new("BindableEvent")
 
 -- Handle mouse click on a guest — open serve confirmation UI
 local function onMouseClick()
-	if not nearbyGuest or not nearbyGuest.Parent then return end
+	if not nearbyGuest or not nearbyGuest.Parent then
+		return
+	end
 	if _G.ZundaShowServeUI then
 		_G.ZundaShowServeUI(nearbyGuest, _G.data or {})
 	end

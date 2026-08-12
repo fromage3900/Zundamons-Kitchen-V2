@@ -60,12 +60,17 @@ end
 -- and the broken tiling became visible ("squares in the sky"). Confirmed live
 -- via screenshot. Only the radial glow (a Fit-scaled single image, not tiled)
 -- looked fine and is kept.
-local glowLayer = makeLayer("RadialGlow", TX.radialPattern, 1, {scale=Enum.ScaleType.Fit, size=UDim2.new(1,0,1,0), pos=UDim2.new(0,0,0,0), alpha=0.93})
+local glowLayer = makeLayer(
+	"RadialGlow",
+	TX.radialPattern,
+	1,
+	{ scale = Enum.ScaleType.Fit, size = UDim2.new(1, 0, 1, 0), pos = UDim2.new(0, 0, 0, 0), alpha = 0.93 }
+)
 
 if not reducedMotion then
 	RunService.RenderStepped:Connect(function(dt)
 		local t = os.clock()
-		glowLayer.ImageTransparency = 0.92 + math.sin(t*0.2)*0.03
+		glowLayer.ImageTransparency = 0.92 + math.sin(t * 0.2) * 0.03
 	end)
 else
 	glowLayer.ImageTransparency = 0.93

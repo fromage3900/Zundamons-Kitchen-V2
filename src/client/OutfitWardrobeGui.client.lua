@@ -267,7 +267,9 @@ end
 -- Wire RemoteEvents for dynamic updates from server
 task.spawn(function()
 	local remotesFolder = ReplicatedStorage:WaitForChild("RemoteEvents", 10)
-	if not remotesFolder then return end
+	if not remotesFolder then
+		return
+	end
 
 	local chefStatsRE = remotesFolder:WaitForChild("ChefStatsUpdate", 5) :: RemoteEvent?
 	if chefStatsRE then
@@ -332,8 +334,11 @@ end
 
 -- Hotkey handling is centralized in UIActionRegistry (see "wardrobe" action) —
 -- this used to have its own raw K listener that fired alongside "cook".
-local ActionRegistry = require(game:GetService("Players").LocalPlayer.PlayerScripts
-	:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+local ActionRegistry = require(
+	game:GetService("Players").LocalPlayer.PlayerScripts
+		:WaitForChild("ConfigurationFiles")
+		:WaitForChild("UIActionRegistry")
+)
 ActionRegistry.registerCallback("wardrobe", OutfitWardrobe.toggle)
 
 return OutfitWardrobe

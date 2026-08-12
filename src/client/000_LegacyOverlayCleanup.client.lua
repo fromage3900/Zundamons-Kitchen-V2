@@ -92,7 +92,11 @@ local function destroyHeuristicVignettes(root: Instance)
 			continue
 		end
 		local lower = string.lower(inst.Name)
-		if string.find(lower, "vignette", 1, true) or string.find(lower, "bleed", 1, true) or string.find(lower, "grain", 1, true) then
+		if
+			string.find(lower, "vignette", 1, true)
+			or string.find(lower, "bleed", 1, true)
+			or string.find(lower, "grain", 1, true)
+		then
 			inst:Destroy()
 			logRemoved(inst:GetFullName())
 		end

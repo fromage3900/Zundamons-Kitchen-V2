@@ -5,7 +5,7 @@ local CookingHUD = require(script.Parent.Parent.components.CookingHUD)
 return {
 	story = function(target)
 		local root = ReactRoblox.createRoot(target)
-		
+
 		-- Mock the state for UI Designers to visualize without starting the ECS loop!
 		local mockProps = {
 			recipeName = "Zunda Apple Pie",

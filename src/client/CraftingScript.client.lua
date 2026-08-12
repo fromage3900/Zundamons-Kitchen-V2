@@ -271,8 +271,8 @@ end)
 
 -- Register with the central action registry so the Pea Wheel "Cook" slice and the
 -- K key (both dispatched by UIActionRegistry) actually open/close this panel.
-local ActionRegistry = require(player:WaitForChild("PlayerScripts")
-	:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+local ActionRegistry =
+	require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 ActionRegistry.registerCallback("cook", function()
 	setOpen(not panel.Visible)
 end)

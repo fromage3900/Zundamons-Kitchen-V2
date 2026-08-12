@@ -68,7 +68,7 @@ Instance.new("UICorner", dismissBtn).CornerRadius = UDim.new(0, 8)
 
 dismissBtn.MouseButton1Click:Connect(function()
 	TweenService:Create(card, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-		Position = UDim2.new(0.5, -150, -0.2, 0)
+		Position = UDim2.new(0.5, -150, -0.2, 0),
 	}):Play()
 	task.wait(0.3)
 	gui.Enabled = false
@@ -78,7 +78,9 @@ local RE = RS:WaitForChild("RemoteEvents")
 local unlockEv = RE:FindFirstChild("RecipeUnlocked")
 if unlockEv then
 	unlockEv.OnClientEvent:Connect(function(data)
-		if not data or not data.recipes or #data.recipes == 0 then return end
+		if not data or not data.recipes or #data.recipes == 0 then
+			return
+		end
 		tierLbl.Text = "Tier " .. (data.tier or "?") .. ": " .. (data.tierName or "")
 		local lines = {}
 		for _, r in ipairs(data.recipes) do
@@ -88,7 +90,7 @@ if unlockEv then
 		gui.Enabled = true
 		card.Position = UDim2.new(0.5, -150, -0.2, 0)
 		TweenService:Create(card, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-			Position = UDim2.new(0.5, -150, 0.1, 0)
+			Position = UDim2.new(0.5, -150, 0.1, 0),
 		}):Play()
 	end)
 end

@@ -18,7 +18,7 @@ local function CookingHUD(props)
 			Visible = props.visible == true, -- AGENTS.md Rule 2d compliance
 		}, {
 			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 16)
+				CornerRadius = UDim.new(0, 16),
 			}),
 			Stroke = React.createElement("UIStroke", {
 				Color = Color3.fromRGB(255, 215, 0), -- Gold accent (Infinity Nikki vibe)
@@ -45,9 +45,9 @@ local function CookingHUD(props)
 					BackgroundColor3 = Color3.fromRGB(255, 215, 0),
 				}, {
 					Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
-				})
-			})
-		})
+				}),
+			}),
+		}),
 	})
 end
 

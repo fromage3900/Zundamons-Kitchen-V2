@@ -7,7 +7,9 @@ local Lighting = game:GetService("Lighting")
 local adorns = {}
 
 local function applyWireframe(part)
-	if part:FindFirstChildOfClass("WireframeHandleAdornment") then return end
+	if part:FindFirstChildOfClass("WireframeHandleAdornment") then
+		return
+	end
 
 	local adorn = Instance.new("WireframeHandleAdornment")
 	adorn.Color3 = Color3.fromRGB(40, 35, 55)
@@ -44,7 +46,9 @@ local t = 0
 RunService.Heartbeat:Connect(function(dt)
 	t = t + dt
 	accum += dt
-	if accum < UPDATE_INTERVAL then return end
+	if accum < UPDATE_INTERVAL then
+		return
+	end
 	accum = 0
 
 	local weather = workspace:GetAttribute("CurrentWeather") or "clear"
@@ -52,15 +56,24 @@ RunService.Heartbeat:Connect(function(dt)
 	local isNight = hour <= 5 or hour >= 19.5
 
 	local weight = 1
-	if weather == "storm" then weight = 3
-	elseif weather == "rain" then weight = 2.5
-	elseif weather == "fog" then weight = 2
-	elseif weather == "snow" then weight = 1.8
-	elseif weather == "cloudy" then weight = 1.3
-	elseif weather == "aurora" then weight = 1.6
-	elseif weather == "cherry_blossom" then weight = 0.7
+	if weather == "storm" then
+		weight = 3
+	elseif weather == "rain" then
+		weight = 2.5
+	elseif weather == "fog" then
+		weight = 2
+	elseif weather == "snow" then
+		weight = 1.8
+	elseif weather == "cloudy" then
+		weight = 1.3
+	elseif weather == "aurora" then
+		weight = 1.6
+	elseif weather == "cherry_blossom" then
+		weight = 0.7
 	end
-	if isNight then weight = weight * 1.2 end
+	if isNight then
+		weight = weight * 1.2
+	end
 
 	local breath = 0.85 + 0.05 * math.sin(t * 0.3)
 	local trans = math.clamp(breath - (weight - 1) * 0.04, 0.75, 0.95)

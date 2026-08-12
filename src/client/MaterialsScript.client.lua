@@ -102,7 +102,8 @@ local UIHelper = require(RS.Shared.Modules.UIHelper)
 local UIConfig = require(RS.ConfigurationFiles.UIConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
-local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+local ActionRegistry =
+	require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 local C = {
 	bg = UIConfig.COLORS.MochiCream,
@@ -275,7 +276,7 @@ end)
 closeBtn.MouseButton1Click:Connect(function()
 	setOpen(false)
 	local pos = closeBtn.AbsolutePosition
-	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
+	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255, 255, 255), 5)
 end)
 
 -- ---- LISTEN FOR NOTIFICATIONS ----
@@ -304,11 +305,19 @@ local function updateSkyColors()
 	local t = hour % 24
 	local isNight = t < 6 or t > 19
 	if isNight then
-		if title then title.TextColor3 = Color3.fromRGB(160, 140, 200) end
-		if toggleBtn then toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 150) end
+		if title then
+			title.TextColor3 = Color3.fromRGB(160, 140, 200)
+		end
+		if toggleBtn then
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 150)
+		end
 	else
-		if title then title.TextColor3 = Color3.fromRGB(200, 240, 230) end
-		if toggleBtn then toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50) end
+		if title then
+			title.TextColor3 = Color3.fromRGB(200, 240, 230)
+		end
+		if toggleBtn then
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 100, 50)
+		end
 	end
 end
 Lighting:GetAttributeChangedSignal("CurrentHour"):Connect(updateSkyColors)

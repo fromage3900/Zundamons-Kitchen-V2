@@ -80,7 +80,7 @@ auroraGui.Parent = sg
 local lightningFrame = Instance.new("Frame", auroraGui)
 lightningFrame.Name = "LightningFlash"
 lightningFrame.Size = UDim2.new(1, 0, 1, 0)
-		lightningFrame.BackgroundColor3 = Color3.fromRGB(235, 225, 255)
+lightningFrame.BackgroundColor3 = Color3.fromRGB(235, 225, 255)
 lightningFrame.BackgroundTransparency = 1
 lightningFrame.BorderSizePixel = 0
 lightningFrame.ZIndex = -8
@@ -232,7 +232,8 @@ applyWeather = function(weatherKey, weatherData, transitionSec)
 			ambient.SoundId = newSound
 			ambient:Play()
 		end
-		Tween:Create(ambient, TweenInfo.new(transitionSec or 0.5), { Volume = (weatherKey == "storm") and 0.15 or 0.08 })
+		Tween
+			:Create(ambient, TweenInfo.new(transitionSec or 0.5), { Volume = (weatherKey == "storm") and 0.15 or 0.08 })
 			:Play()
 	else
 		Tween:Create(ambient, TweenInfo.new(transitionSec or 0.5), { Volume = 0 }):Play()

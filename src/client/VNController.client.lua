@@ -4,10 +4,10 @@
 -- Speakers: companion, quest system, zone entry, NPC, welcome
 -- API exposed via _G.ZundaVN = { show, hide, isOpen }
 -- ══════════════════════════════════════════════════════════════
-local Players  = game:GetService("Players")
-local TweenS   = game:GetService("TweenService")
-local UIS      = game:GetService("UserInputService")
-local RS       = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local TweenS = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local RS = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 
 local VNDialogueData = require(RS.ConfigurationFiles:WaitForChild("VNDialogueData"))
@@ -33,7 +33,7 @@ _G.ZundaSideDialogues = SIDE_DIALOGUES
 -- ── Build UI (Animal Crossing inspired) ─────────────────────────
 local PANEL_W = 780
 local PANEL_H = 185
-local PORT_W  = 110
+local PORT_W = 110
 
 local C_cream = UIConfig.COLORS.PanelBg
 local C_border = UIConfig.COLORS.PanelBorder
@@ -64,7 +64,8 @@ panel.Active = true
 panel.Visible = false
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 24)
 local pStroke = Instance.new("UIStroke", panel)
-pStroke.Color = C_border; pStroke.Thickness = 3
+pStroke.Color = C_border
+pStroke.Thickness = 3
 
 -- Portrait box
 local portrait = Instance.new("Frame", panel)
@@ -182,20 +183,21 @@ advBtn.Name = "AdvBtn"
 advBtn.Size = UDim2.new(1, -(PORT_W + 50), 1, -42)
 advBtn.Position = UDim2.new(0, PORT_W + 4, 0, 36)
 advBtn.BackgroundTransparency = 1
-advBtn.Text = ""; advBtn.BorderSizePixel = 0
+advBtn.Text = ""
+advBtn.BorderSizePixel = 0
 advBtn.ZIndex = 12
 
 -- ── State ─────────────────────────────────────────────────────
-local isOpen     = false
-local typing     = false
+local isOpen = false
+local typing = false
 local typeThread = nil
-local seqQueue   = {}   -- pending sequences to play after current
-local seqLines   = {}
-local seqIdx     = 0
+local seqQueue = {} -- pending sequences to play after current
+local seqLines = {}
+local seqIdx = 0
 local completeCb = nil
 
 local SHOW_POS = UDim2.new(0.5, 0, 1, -(PANEL_H + 18))
-local HIDE_POS = UDim2.new(0.5, 0, 1,  PANEL_H + 80)  -- push well below screen
+local HIDE_POS = UDim2.new(0.5, 0, 1, PANEL_H + 80) -- push well below screen
 
 -- ── BRANCHING CHOICE UI (built once, reused per choice prompt) ───────────
 local choiceFrame = Instance.new("Frame", panel)
@@ -211,150 +213,173 @@ choiceLayout.FillDirection = Enum.FillDirection.Vertical
 choiceLayout.Padding = UDim.new(0, 6)
 choiceLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 
-local function setSpeaker(key)
-    local sp = SPEAKERS[key] or SPEAKERS.zundamon
-    pEmoji.Text = sp.emoji
-    portrait.BackgroundColor3 = sp.portrait
-    nameBanner.BackgroundColor3 = sp.accent
-    pStroke.Color = C_border
+local DEFAULT_SPEAKER = {
+	name = "Zundamon",
+	emoji = "🌱",
+	accent = Color3.fromRGB(160, 210, 150),
+	portrait = Color3.fromRGB(180, 220, 170),
+}
 
-    -- Prefer an uploaded Zundamon character image when one is configured;
-    -- otherwise fall back to the emoji portrait. (Roblox can't play the source
-    -- GIFs directly — upload frames as image assets into VNPortraitConfig.)
-    local img = VNPortraitConfig.getSpeakerImage(key)
-    if img ~= "" then
-        pImage.Image = img
-        pImage.Visible = true
-        pEmoji.Visible = false
-    else
-        pImage.Visible = false
-        pEmoji.Visible = true
-    end
-    if sp.name == "" then
-        nameBanner.Visible = false
-    else
-        nameBanner.Visible = true
-        nameLabel.Text = sp.name
-    end
-    dlgText.TextColor3 = C_text
+local function setSpeaker(key)
+	local sp = (SPEAKERS and (SPEAKERS[key] or SPEAKERS.zundamon or SPEAKERS.zundapal)) or DEFAULT_SPEAKER
+	pEmoji.Text = sp.emoji or "🌱"
+	portrait.BackgroundColor3 = sp.portrait or DEFAULT_SPEAKER.portrait
+	nameBanner.BackgroundColor3 = sp.accent or DEFAULT_SPEAKER.accent
+	pStroke.Color = C_border
+
+	-- Prefer an uploaded Zundamon character image when one is configured;
+	-- otherwise fall back to the emoji portrait. (Roblox can't play the source
+	-- GIFs directly — upload frames as image assets into VNPortraitConfig.)
+	local img = VNPortraitConfig.getSpeakerImage(key)
+	if img ~= "" then
+		pImage.Image = img
+		pImage.Visible = true
+		pEmoji.Visible = false
+	else
+		pImage.Visible = false
+		pEmoji.Visible = true
+	end
+	if sp.name == "" then
+		nameBanner.Visible = false
+	else
+		nameBanner.Visible = true
+		nameLabel.Text = sp.name
+	end
+	dlgText.TextColor3 = C_text
 end
 
 local function openPanel()
-    print("[VN.openPanel] Opening panel")
-    isOpen = true
-    panel.Visible = true
-    dimmer.Visible = true
-    print("[VN.openPanel] Panel visible:", panel.Visible)
-    TweenS:Create(dimmer, TweenInfo.new(0.25), {BackgroundTransparency = 0.85}):Play()
-    panel.Position = HIDE_POS
-    TweenS:Create(panel, TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-        {Position = SHOW_POS}):Play()
-    print("[VN.openPanel] Panel opened")
+	print("[VN.openPanel] Opening panel")
+	isOpen = true
+	panel.Visible = true
+	dimmer.Visible = true
+	print("[VN.openPanel] Panel visible:", panel.Visible)
+	TweenS:Create(dimmer, TweenInfo.new(0.25), { BackgroundTransparency = 0.85 }):Play()
+	panel.Position = HIDE_POS
+	TweenS:Create(panel, TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = SHOW_POS })
+		:Play()
+	print("[VN.openPanel] Panel opened")
 end
 
 -- closePanel(force): when called from a user dismiss action (close X or Escape),
 --   pass force=true to ALSO drop any queued sequences so the panel really stays
 --   closed. Otherwise the next queued sequence will play after the close tween.
 local function closePanel(force)
-    isOpen = false
-    typing = false
-    if typeThread then
-        pcall(task.cancel, typeThread)
-        typeThread = nil
-    end
-    advArrow.Visible = false
-    for _, c in ipairs(choiceFrame:GetChildren()) do
-        if c:IsA("TextButton") then c:Destroy() end
-    end
-    choiceFrame.Visible = false
-    if force then
-        seqQueue = {}
-    end
-    TweenS:Create(dimmer, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
-    TweenS:Create(panel, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-        {Position = HIDE_POS}):Play()
-    task.delay(0.25, function()
-        if isOpen then return end
-        dimmer.Visible = false
-        panel.Visible = false
-        dlgText.Text = ""
-        if completeCb then pcall(completeCb); completeCb = nil end
-        if #seqQueue > 0 then
-            local nxt = table.remove(seqQueue, 1)
-            _G.ZundaVN.show(nxt.speaker, nxt.lines, nxt.onComplete)
-        end
-    end)
+	isOpen = false
+	typing = false
+	if typeThread then
+		pcall(task.cancel, typeThread)
+		typeThread = nil
+	end
+	advArrow.Visible = false
+	for _, c in ipairs(choiceFrame:GetChildren()) do
+		if c:IsA("TextButton") then
+			c:Destroy()
+		end
+	end
+	choiceFrame.Visible = false
+	if force then
+		seqQueue = {}
+	end
+	TweenS:Create(dimmer, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
+	TweenS:Create(panel, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { Position = HIDE_POS })
+		:Play()
+	task.delay(0.25, function()
+		if isOpen then
+			return
+		end
+		dimmer.Visible = false
+		panel.Visible = false
+		dlgText.Text = ""
+		if completeCb then
+			pcall(completeCb)
+			completeCb = nil
+		end
+		if #seqQueue > 0 then
+			local nxt = table.remove(seqQueue, 1)
+			_G.ZundaVN.show(nxt.speaker, nxt.lines, nxt.onComplete)
+		end
+	end)
 end
 
 -- Typewriter effect
 local function typeWrite(text)
-    print("[VN.typeWrite] Starting with text:", text)
-    text = text:gsub("{player}", Players.LocalPlayer and Players.LocalPlayer.Name or "Chef")
-    typing = true
-    advArrow.Visible = false
-    dlgText.Text = ""
-    for i = 1, #text do
-        if not typing then break end
-        dlgText.Text = text:sub(1, i)
-        local ch = text:sub(i, i)
-        local delay = ch == "," and 0.07 or (ch == "." or ch == "!" or ch == "?") and 0.1 or 0.028
-        task.wait(delay)
-    end
-    dlgText.Text = text
-    print("[VN.typeWrite] Complete, final text:", dlgText.Text)
-    typing = false
-    advArrow.Visible = true
-    -- Blink arrow
-    task.spawn(function()
-        while advArrow.Visible do
-            TweenS:Create(advArrow, TweenInfo.new(0.45), {TextTransparency = 0.85}):Play()
-            task.wait(0.45)
-            if not advArrow.Visible then break end
-            TweenS:Create(advArrow, TweenInfo.new(0.45), {TextTransparency = 0}):Play()
-            task.wait(0.45)
-        end
-    end)
+	print("[VN.typeWrite] Starting with text:", text)
+	text = text:gsub("{player}", Players.LocalPlayer and Players.LocalPlayer.Name or "Chef")
+	typing = true
+	advArrow.Visible = false
+	dlgText.Text = ""
+	for i = 1, #text do
+		if not typing then
+			break
+		end
+		dlgText.Text = text:sub(1, i)
+		local ch = text:sub(i, i)
+		local delay = ch == "," and 0.07 or (ch == "." or ch == "!" or ch == "?") and 0.1 or 0.028
+		task.wait(delay)
+	end
+	dlgText.Text = text
+	print("[VN.typeWrite] Complete, final text:", dlgText.Text)
+	typing = false
+	advArrow.Visible = true
+	-- Blink arrow
+	task.spawn(function()
+		while advArrow.Visible do
+			TweenS:Create(advArrow, TweenInfo.new(0.45), { TextTransparency = 0.85 }):Play()
+			task.wait(0.45)
+			if not advArrow.Visible then
+				break
+			end
+			TweenS:Create(advArrow, TweenInfo.new(0.45), { TextTransparency = 0 }):Play()
+			task.wait(0.45)
+		end
+	end)
 end
 
 local function skipTyping()
-    if typing and seqLines[seqIdx] then
-        typing = false
-        if typeThread then task.cancel(typeThread); typeThread = nil end
-        local entry = seqLines[seqIdx]
-        dlgText.Text = type(entry) == "string" and entry or (entry.text or "")
-        advArrow.Visible = true
-    end
+	if typing and seqLines[seqIdx] then
+		typing = false
+		if typeThread then
+			task.cancel(typeThread)
+			typeThread = nil
+		end
+		local entry = seqLines[seqIdx]
+		dlgText.Text = type(entry) == "string" and entry or (entry.text or "")
+		advArrow.Visible = true
+	end
 end
 
 local function showLine(idx)
-    print("[VN.showLine] Showing line", idx, "of", #seqLines)
-    if idx > #seqLines then
-        print("[VN.showLine] No more lines, closing panel")
-        closePanel()
-        return
-    end
-    local entry = seqLines[idx]
-    local speakerKey, text
-    if type(entry) == "string" then
-        text = entry
-        speakerKey = seqLines._defaultSpeaker or "zundamon"
-    else
-        speakerKey = entry.speaker or "zundamon"
-        text = entry.text or ""
-    end
-    print("[VN.showLine] Speaker:", speakerKey, "Text:", text)
-    setSpeaker(speakerKey)
-    typeThread = task.spawn(function() typeWrite(text) end)
-    print("[VN.showLine] TypeWrite spawned")
+	print("[VN.showLine] Showing line", idx, "of", #seqLines)
+	if idx > #seqLines then
+		print("[VN.showLine] No more lines, closing panel")
+		closePanel()
+		return
+	end
+	local entry = seqLines[idx]
+	local speakerKey, text
+	if type(entry) == "string" then
+		text = entry
+		speakerKey = seqLines._defaultSpeaker or "zundamon"
+	else
+		speakerKey = entry.speaker or "zundamon"
+		text = entry.text or ""
+	end
+	print("[VN.showLine] Speaker:", speakerKey, "Text:", text)
+	setSpeaker(speakerKey)
+	typeThread = task.spawn(function()
+		typeWrite(text)
+	end)
+	print("[VN.showLine] TypeWrite spawned")
 end
 
 local function advanceLine()
-    if typing then
-        skipTyping()
-    else
-        seqIdx = seqIdx + 1
-        showLine(seqIdx)
-    end
+	if typing then
+		skipTyping()
+	else
+		seqIdx = seqIdx + 1
+		showLine(seqIdx)
+	end
 end
 
 -- Idle auto-advance: dialogue left unattended used to sit open forever (the
@@ -363,16 +388,16 @@ end
 -- but never while a branching choice is waiting for a real decision.
 local AUTO_ADVANCE_AFTER = 9
 task.spawn(function()
-    local idleSince = os.clock()
-    while true do
-        task.wait(0.5)
-        if not isOpen or typing or choiceFrame.Visible then
-            idleSince = os.clock()
-        elseif os.clock() - idleSince >= AUTO_ADVANCE_AFTER then
-            idleSince = os.clock()
-            advanceLine()
-        end
-    end
+	local idleSince = os.clock()
+	while true do
+		task.wait(0.5)
+		if not isOpen or typing or choiceFrame.Visible then
+			idleSince = os.clock()
+		elseif os.clock() - idleSince >= AUTO_ADVANCE_AFTER then
+			idleSince = os.clock()
+			advanceLine()
+		end
+	end
 end)
 
 -- ── Public API ────────────────────────────────────────────────
@@ -382,168 +407,198 @@ end)
 --   {{speaker="key",text="..."}, ...}  (multi-speaker)
 --
 -- ── BRANCHING CHOICES helpers ───────────────────────────────────────
-local clearChoices, showChoicesUI, playNode  -- forward decls
+local clearChoices, showChoicesUI, playNode -- forward decls
 
 clearChoices = function()
-    for _, c in ipairs(choiceFrame:GetChildren()) do
-        if c:IsA("TextButton") then c:Destroy() end
-    end
-    choiceFrame.Visible = false
-    choiceFrame.Size = UDim2.new(1, -(PORT_W + 50), 0, 0)
+	for _, c in ipairs(choiceFrame:GetChildren()) do
+		if c:IsA("TextButton") then
+			c:Destroy()
+		end
+	end
+	choiceFrame.Visible = false
+	choiceFrame.Size = UDim2.new(1, -(PORT_W + 50), 0, 0)
 end
 
 showChoicesUI = function(choices, onPick)
-    if type(choices) ~= "table" or #choices == 0 then return end
-    clearChoices()
-    advArrow.Visible = false
-    local h = 0
-    for i, c in ipairs(choices) do
-        local btn = Instance.new("TextButton", choiceFrame)
-        btn.Name = "Choice" .. i
-        btn.Size = UDim2.new(1, -6, 0, 30)
-        btn.BackgroundColor3 = Color3.fromRGB(245, 235, 215)
-        btn.BorderSizePixel = 0
-        btn.Text = "  \u{276F} " .. (c.text or "...")
-        btn.Font = Enum.Font.GothamBold
-        btn.TextSize = 14
-        btn.TextColor3 = C_text
-        btn.TextXAlignment = Enum.TextXAlignment.Left
-        btn.ZIndex = 16
-        btn.AutoButtonColor = false
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-        local stk = Instance.new("UIStroke", btn)
-        stk.Color = C_border; stk.Thickness = 1.5
-        btn.MouseEnter:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(235, 210, 180)
-        end)
-        btn.MouseLeave:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(245, 235, 215)
-        end)
-        btn.MouseButton1Click:Connect(function()
-            clearChoices()
-            if onPick then pcall(onPick, i, c) end
-        end)
-        h = h + 34
-    end
-    choiceFrame.Size = UDim2.new(1, -(PORT_W + 50), 0, h)
-    choiceFrame.Visible = true
+	if type(choices) ~= "table" or #choices == 0 then
+		return
+	end
+	clearChoices()
+	advArrow.Visible = false
+	local h = 0
+	for i, c in ipairs(choices) do
+		local btn = Instance.new("TextButton", choiceFrame)
+		btn.Name = "Choice" .. i
+		btn.Size = UDim2.new(1, -6, 0, 30)
+		btn.BackgroundColor3 = Color3.fromRGB(245, 235, 215)
+		btn.BorderSizePixel = 0
+		btn.Text = "  \u{276F} " .. (c.text or "...")
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 14
+		btn.TextColor3 = C_text
+		btn.TextXAlignment = Enum.TextXAlignment.Left
+		btn.ZIndex = 16
+		btn.AutoButtonColor = false
+		Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+		local stk = Instance.new("UIStroke", btn)
+		stk.Color = C_border
+		stk.Thickness = 1.5
+		btn.MouseEnter:Connect(function()
+			btn.BackgroundColor3 = Color3.fromRGB(235, 210, 180)
+		end)
+		btn.MouseLeave:Connect(function()
+			btn.BackgroundColor3 = Color3.fromRGB(245, 235, 215)
+		end)
+		btn.MouseButton1Click:Connect(function()
+			clearChoices()
+			if onPick then
+				pcall(onPick, i, c)
+			end
+		end)
+		h = h + 34
+	end
+	choiceFrame.Size = UDim2.new(1, -(PORT_W + 50), 0, h)
+	choiceFrame.Visible = true
 end
 
 -- Walk a dialogue node:
 --   node = { speaker="key", lines={...}, prompt="?", choices={{text,next},..} }
 playNode = function(node)
-    if type(node) == "function" then node = node() end
-    if type(node) ~= "table" then return end
-    local speakerKey = node.speaker or "zundamon"
+	if type(node) == "function" then
+		node = node()
+	end
+	if type(node) ~= "table" then
+		return
+	end
+	local speakerKey = node.speaker or "zundamon"
 
-    local function presentChoices()
-        if not node.choices then return end
-        if not isOpen then openPanel() end
-        setSpeaker(speakerKey)
-        if node.prompt then
-            -- Type the prompt as a final line, then show choices
-            seqLines = {{speaker=speakerKey, text=node.prompt}}
-            seqIdx = 1
-            showLine(1)
-            task.spawn(function()
-                while typing do task.wait(0.05) end
-                showChoicesUI(node.choices, function(_, choice)
-                    if choice.next then playNode(choice.next) end
-                end)
-            end)
-        else
-            showChoicesUI(node.choices, function(_, choice)
-                if choice.next then playNode(choice.next) end
-            end)
-        end
-    end
+	local function presentChoices()
+		if not node.choices then
+			return
+		end
+		if not isOpen then
+			openPanel()
+		end
+		setSpeaker(speakerKey)
+		if node.prompt then
+			-- Type the prompt as a final line, then show choices
+			seqLines = { { speaker = speakerKey, text = node.prompt } }
+			seqIdx = 1
+			showLine(1)
+			task.spawn(function()
+				while typing do
+					task.wait(0.05)
+				end
+				showChoicesUI(node.choices, function(_, choice)
+					if choice.next then
+						playNode(choice.next)
+					end
+				end)
+			end)
+		else
+			showChoicesUI(node.choices, function(_, choice)
+				if choice.next then
+					playNode(choice.next)
+				end
+			end)
+		end
+	end
 
-    if type(node.lines) == "table" and #node.lines > 0 then
-        _G.ZundaVN.show(speakerKey, node.lines, function()
-            presentChoices()
-        end)
-    else
-        presentChoices()
-    end
+	if type(node.lines) == "table" and #node.lines > 0 then
+		_G.ZundaVN.show(speakerKey, node.lines, function()
+			presentChoices()
+		end)
+	else
+		presentChoices()
+	end
 end
 
 -- ── Public API ───────────────────────────────────────────────
 _G.ZundaVN = {
-    show = function(speakerKey, lines, onComplete)
-        print("[VN.show] Called with speaker:", speakerKey, "lines count:", #lines)
-        if type(lines) ~= "table" or #lines == 0 then
-            warn("[VN.show] Invalid lines parameter")
-            return
-        end
-        if isOpen then
-            print("[VN.show] Panel already open, queuing")
-            table.insert(seqQueue, {speaker=speakerKey, lines=lines, onComplete=onComplete})
-            return
-        end
-        seqLines = lines
-        seqLines._defaultSpeaker = speakerKey
-        seqIdx = 1
-        completeCb = onComplete
-        print("[VN.show] Opening panel")
-        openPanel()
-        print("[VN.show] Setting speaker")
-        setSpeaker(speakerKey)
-        print("[VN.show] Showing line 1")
-        showLine(1)
-        print("[VN.show] Complete")
-    end,
-    showBranching = function(rootNode)
-        playNode(rootNode)
-    end,
-    hide = function()
-        if isOpen then closePanel(true) end
-    end,
-    isOpen = function() return isOpen end,
-    showCompanionLine = function(text)
-        if not isOpen then
-            openPanel()
-        end
-        setSpeaker("zundamon")
-        seqIdx = 1
-        seqLines = { text }
-        seqLines._defaultSpeaker = "zundamon"
-        if typeThread then
-            pcall(task.cancel, typeThread)
-        end
-        typeThread = task.spawn(function()
-            typeWrite(text)
-        end)
-    end,
-    setThinking = function(thinking)
-        if thinking then
-            typing = false
-            dlgText.Text = "Zundamon is thinking… ✨"
-            advArrow.Visible = false
-        end
-    end,
+	show = function(speakerKey, lines, onComplete)
+		print("[VN.show] Called with speaker:", speakerKey, "lines count:", #lines)
+		if type(lines) ~= "table" or #lines == 0 then
+			warn("[VN.show] Invalid lines parameter")
+			return
+		end
+		if isOpen then
+			print("[VN.show] Panel already open, queuing")
+			table.insert(seqQueue, { speaker = speakerKey, lines = lines, onComplete = onComplete })
+			return
+		end
+		seqLines = lines
+		seqLines._defaultSpeaker = speakerKey
+		seqIdx = 1
+		completeCb = onComplete
+		print("[VN.show] Opening panel")
+		openPanel()
+		print("[VN.show] Setting speaker")
+		setSpeaker(speakerKey)
+		print("[VN.show] Showing line 1")
+		showLine(1)
+		print("[VN.show] Complete")
+	end,
+	showBranching = function(rootNode)
+		playNode(rootNode)
+	end,
+	hide = function()
+		if isOpen then
+			closePanel(true)
+		end
+	end,
+	isOpen = function()
+		return isOpen
+	end,
+	showCompanionLine = function(text)
+		if not isOpen then
+			openPanel()
+		end
+		setSpeaker("zundamon")
+		seqIdx = 1
+		seqLines = { text }
+		seqLines._defaultSpeaker = "zundamon"
+		if typeThread then
+			pcall(task.cancel, typeThread)
+		end
+		typeThread = task.spawn(function()
+			typeWrite(text)
+		end)
+	end,
+	setThinking = function(thinking)
+		if thinking then
+			typing = false
+			dlgText.Text = "Zundamon is thinking… ✨"
+			advArrow.Visible = false
+		end
+	end,
 }
 
 -- ── Input handlers ────────────────────────────────────────────
 advBtn.MouseButton1Click:Connect(function()
-    advanceLine()
-    local pos = advBtn.AbsolutePosition
-    local sz = advBtn.AbsoluteSize
-    UIHelper.spawnSparkles(panel, pos.X + sz.X / 2, pos.Y + sz.Y / 2, Color3.fromRGB(180, 150, 110), 3)
+	advanceLine()
+	local pos = advBtn.AbsolutePosition
+	local sz = advBtn.AbsoluteSize
+	UIHelper.spawnSparkles(panel, pos.X + sz.X / 2, pos.Y + sz.Y / 2, Color3.fromRGB(180, 150, 110), 3)
 end)
 closeBtn.MouseButton1Click:Connect(function()
-    if isOpen then closePanel(true) end
-    local pos = closeBtn.AbsolutePosition
-    UIHelper.spawnSparkles(panel, pos.X + 15, pos.Y + 15, Color3.fromRGB(200, 140, 120), 4)
+	if isOpen then
+		closePanel(true)
+	end
+	local pos = closeBtn.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 15, pos.Y + 15, Color3.fromRGB(200, 140, 120), 4)
 end)
 UIS.InputBegan:Connect(function(inp, gpe)
-    if gpe then return end
-    if not isOpen then return end
-    if inp.KeyCode == Enum.KeyCode.Space or inp.KeyCode == Enum.KeyCode.Return
-       or inp.KeyCode == Enum.KeyCode.E then
-        advanceLine()
-    elseif inp.KeyCode == Enum.KeyCode.Escape then
-        closePanel(true)
-    end
+	if gpe then
+		return
+	end
+	if not isOpen then
+		return
+	end
+	if inp.KeyCode == Enum.KeyCode.Space or inp.KeyCode == Enum.KeyCode.Return or inp.KeyCode == Enum.KeyCode.E then
+		advanceLine()
+	elseif inp.KeyCode == Enum.KeyCode.Escape then
+		closePanel(true)
+	end
 end)
 
 -- ── Event listeners ───────────────────────────────────────────
@@ -554,202 +609,246 @@ local RE = RS:WaitForChild("RemoteEvents")
 -- representative "level" so VNDialogueData.getCompanionDialogue's existing
 -- level1_10/level11_20/level21_50 pools double as bond-flavor tiers, reusing
 -- already-written dialogue instead of new content.
-local BOND_TIER_LEVEL = {5, 15, 30}
+local BOND_TIER_LEVEL = { 5, 15, 30 }
 
 local function buildCompanionTree(compType, bondTier)
-    local speakerKey = SPEAKERS[compType] and compType or "zundamon"
-    local companionDialogue = COMPANION_DIALOGUE[speakerKey] or COMPANION_DIALOGUE.zundamon
-    local hour = tonumber(Lighting:GetAttribute("CurrentHour")) or 12
-    local slot = hour>=5 and hour<12 and "morning"
-              or hour>=12 and hour<18 and "afternoon"
-              or hour>=18 and hour<21 and "evening"
-              or "night"
-    local greeting = companionDialogue[slot] or companionDialogue.afternoon or companionDialogue.morning or {}
-    local bondLine = bondTier and bondTier > 1
-        and VNDialogueData.getCompanionDialogue(compType, slot, BOND_TIER_LEVEL[bondTier])
-        or nil
+	local speakerKey = SPEAKERS[compType] and compType or "zundamon"
+	local companionDialogue = COMPANION_DIALOGUE[speakerKey] or COMPANION_DIALOGUE.zundamon
+	local hour = tonumber(Lighting:GetAttribute("CurrentHour")) or 12
+	local slot = hour >= 5 and hour < 12 and "morning"
+		or hour >= 12 and hour < 18 and "afternoon"
+		or hour >= 18 and hour < 21 and "evening"
+		or "night"
+	local greeting = companionDialogue[slot] or companionDialogue.afternoon or companionDialogue.morning or {}
+	local bondLine = bondTier
+			and bondTier > 1
+			and VNDialogueData.getCompanionDialogue(compType, slot, BOND_TIER_LEVEL[bondTier])
+		or nil
 
-    -- LEAVES
-    local leafEnd = {
-        speaker = speakerKey,
-        lines = {
-            {speaker=speakerKey, text="Talk to me anytime, "..player.Name.."~ \u{1F49B}"},
-        },
-    }
+	-- LEAVES
+	local leafEnd = {
+		speaker = speakerKey,
+		lines = {
+			{ speaker = speakerKey, text = "Talk to me anytime, " .. player.Name .. "~ \u{1F49B}" },
+		},
+	}
 
-    local cookingTipsNode = {
-        speaker = speakerKey,
-        lines = {
-            {speaker=speakerKey, text="Cooking tip time! \u{1F468}\u{200D}\u{1F373}"},
-            {speaker=speakerKey, text="Watch the timing bar carefully. When the indicator hits the bright-green middle…"},
-            {speaker=speakerKey, text="…that’s a PERFECT cook — you get bonus gold AND a chance at a free extra dish! ✨"},
-        },
-        prompt = "Want to hear more?",
-        choices = {
-            {text="What about Zunda Mochi?", next={
-                speaker=speakerKey,
-                lines={
-                    {speaker=speakerKey, text="Zunda Mochi needs 5 Zunda Peas and 8 Wheat \u{1F361}"},
-                    {speaker=speakerKey, text="Pick the peas in the Kitchen Garden — they sparkle pink!"},
-                },
-            }},
-            {text="And the legendary Zunda Paradise?", next={
-                speaker=speakerKey,
-                lines={
-                    {speaker=speakerKey, text="Oooh you ambitious chef! \u{2728}"},
-                    {speaker=speakerKey, text="Zunda Paradise wants 15 Zunda Peas, 10 Edamame Pods, 5 Sweet Peas and 3 Pea Flowers."},
-                    {speaker=speakerKey, text="Only true masters can pull it off!"},
-                },
-            }},
-            {text="Thanks, that’s all.", next=leafEnd},
-        },
-    }
+	local cookingTipsNode = {
+		speaker = speakerKey,
+		lines = {
+			{ speaker = speakerKey, text = "Cooking tip time! \u{1F468}\u{200D}\u{1F373}" },
+			{
+				speaker = speakerKey,
+				text = "Watch the timing bar carefully. When the indicator hits the bright-green middle…",
+			},
+			{
+				speaker = speakerKey,
+				text = "…that’s a PERFECT cook — you get bonus gold AND a chance at a free extra dish! ✨",
+			},
+		},
+		prompt = "Want to hear more?",
+		choices = {
+			{
+				text = "What about Zunda Mochi?",
+				next = {
+					speaker = speakerKey,
+					lines = {
+						{ speaker = speakerKey, text = "Zunda Mochi needs 5 Zunda Peas and 8 Wheat \u{1F361}" },
+						{ speaker = speakerKey, text = "Pick the peas in the Kitchen Garden — they sparkle pink!" },
+					},
+				},
+			},
+			{
+				text = "And the legendary Zunda Paradise?",
+				next = {
+					speaker = speakerKey,
+					lines = {
+						{ speaker = speakerKey, text = "Oooh you ambitious chef! \u{2728}" },
+						{
+							speaker = speakerKey,
+							text = "Zunda Paradise wants 15 Zunda Peas, 10 Edamame Pods, 5 Sweet Peas and 3 Pea Flowers.",
+						},
+						{ speaker = speakerKey, text = "Only true masters can pull it off!" },
+					},
+				},
+			},
+			{ text = "Thanks, that’s all.", next = leafEnd },
+		},
+	}
 
-    local questHintsNode = {
-        speaker = speakerKey,
-        lines = {
-            {speaker=speakerKey, text="Let me check the quest board… \u{1F4DC}"},
-        },
-        prompt = "What are you curious about?",
-        choices = {
-            {text="Where do I find Zunda Peas?", next={
-                speaker=speakerKey,
-                lines={
-                    {speaker=speakerKey, text="In the Kitchen Garden, behind the bakery!"},
-                    {speaker=speakerKey, text="They sparkle pink — you can’t miss them \u{1F495}"},
-                },
-            }},
-            {text="How do I serve guests?", next={
-                speaker=speakerKey,
-                lines={
-                    {speaker=speakerKey, text="Cook the dish they want, then walk over with it in your pouch."},
-                    {speaker=speakerKey, text="Click the guest — they’ll pay in gold and a smile~"},
-                },
-            }},
-            {text="Tell me about the village.", next={
-                speaker="elder",
-                lines={
-                    {speaker="elder", text="Ah, Zunda Village… founded long ago by chef-monks."},
-                    {speaker="elder", text="Every dish here carries a little of their patience."},
-                },
-            }},
-            {text="Never mind.", next=leafEnd},
-        },
-    }
+	local questHintsNode = {
+		speaker = speakerKey,
+		lines = {
+			{ speaker = speakerKey, text = "Let me check the quest board… \u{1F4DC}" },
+		},
+		prompt = "What are you curious about?",
+		choices = {
+			{
+				text = "Where do I find Zunda Peas?",
+				next = {
+					speaker = speakerKey,
+					lines = {
+						{ speaker = speakerKey, text = "In the Kitchen Garden, behind the bakery!" },
+						{ speaker = speakerKey, text = "They sparkle pink — you can’t miss them \u{1F495}" },
+					},
+				},
+			},
+			{
+				text = "How do I serve guests?",
+				next = {
+					speaker = speakerKey,
+					lines = {
+						{
+							speaker = speakerKey,
+							text = "Cook the dish they want, then walk over with it in your pouch.",
+						},
+						{ speaker = speakerKey, text = "Click the guest — they’ll pay in gold and a smile~" },
+					},
+				},
+			},
+			{
+				text = "Tell me about the village.",
+				next = {
+					speaker = "elder",
+					lines = {
+						{ speaker = "elder", text = "Ah, Zunda Village… founded long ago by chef-monks." },
+						{ speaker = "elder", text = "Every dish here carries a little of their patience." },
+					},
+				},
+			},
+			{ text = "Never mind.", next = leafEnd },
+		},
+	}
 
-    -- ROOT
-    local greetingLines = {}
-    if math.random() < 0.5 then
-        table.insert(greetingLines, {speaker="narrator", text="[ Your companion looks up with sparkling eyes. ]"})
-    end
-    for _, l in ipairs(greeting) do
-        table.insert(greetingLines, {speaker=speakerKey, text=l})
-    end
-    if bondLine then
-        table.insert(greetingLines, {speaker=speakerKey, text=bondLine})
-    end
+	-- ROOT
+	local greetingLines = {}
+	if math.random() < 0.5 then
+		table.insert(greetingLines, { speaker = "narrator", text = "[ Your companion looks up with sparkling eyes. ]" })
+	end
+	for _, l in ipairs(greeting) do
+		table.insert(greetingLines, { speaker = speakerKey, text = l })
+	end
+	if bondLine then
+		table.insert(greetingLines, { speaker = speakerKey, text = bondLine })
+	end
 
-    return {
-        speaker = speakerKey,
-        lines   = greetingLines,
-        prompt  = "What would you like to talk about?",
-        choices = {
-            {text="Give me a cooking tip \u{1F373}",   next=cookingTipsNode},
-            {text="I need quest help \u{1F4DC}",      next=questHintsNode},
-            {text="Just saying hi \u{1F495}",          next={
-                speaker=speakerKey,
-                lines={
-                    {speaker=speakerKey, text="Hehe — hi! \u{1F49A}"},
-                    {speaker=speakerKey, text="It’s really nice to see your face today, "..player.Name.."."},
-                },
-            }},
-            {text="Bye for now",                       next=leafEnd},
-        },
-    }
+	return {
+		speaker = speakerKey,
+		lines = greetingLines,
+		prompt = "What would you like to talk about?",
+		choices = {
+			{ text = "Give me a cooking tip \u{1F373}", next = cookingTipsNode },
+			{ text = "I need quest help \u{1F4DC}", next = questHintsNode },
+			{
+				text = "Just saying hi \u{1F495}",
+				next = {
+					speaker = speakerKey,
+					lines = {
+						{ speaker = speakerKey, text = "Hehe — hi! \u{1F49A}" },
+						{
+							speaker = speakerKey,
+							text = "It’s really nice to see your face today, " .. player.Name .. ".",
+						},
+					},
+				},
+			},
+			{ text = "Bye for now", next = leafEnd },
+		},
+	}
 end
 
 -- Companion click → branching tree
 RE:WaitForChild("OpenCompanionVN").OnClientEvent:Connect(function(compType, emoji, bondTier)
-    if isOpen then closePanel(true); return end
-    _G.ZundaVN.showBranching(buildCompanionTree(compType, bondTier))
+	if isOpen then
+		closePanel(true)
+		return
+	end
+	_G.ZundaVN.showBranching(buildCompanionTree(compType, bondTier))
 end)
 
 -- Quest completed
 local qcRE = RE:FindFirstChild("QuestCompleted")
 if qcRE then
-    qcRE.OnClientEvent:Connect(function(quest)
-        local lines = {
-            {speaker="zundamon", text="Quest complete! 🎉  \""..quest.title.."\""},
-            {speaker="zundamon", text="You did it, "..player.Name.."! ✨ +"..(quest.reward or 0).." gold~"},
-            {speaker="zundamon", text=quest.unlock_hint or "Keep exploring — new surprises await!"},
-        }
-        _G.ZundaVN.show("zundamon", lines)
-    end)
+	qcRE.OnClientEvent:Connect(function(quest)
+		local lines = {
+			{ speaker = "zundamon", text = 'Quest complete! 🎉  "' .. quest.title .. '"' },
+			{
+				speaker = "zundamon",
+				text = "You did it, " .. player.Name .. "! ✨ +" .. (quest.reward or 0) .. " gold~",
+			},
+			{ speaker = "zundamon", text = quest.unlock_hint or "Keep exploring — new surprises await!" },
+		}
+		_G.ZundaVN.show("zundamon", lines)
+	end)
 end
 
 -- Server-triggered guest dialogues (ShowVNDialogue)
 task.spawn(function()
-    local showVNEv = RE:WaitForChild("ShowVNDialogue", 10) :: RemoteEvent?
-    if showVNEv then
-        showVNEv.OnClientEvent:Connect(function(speakerTag, message)
-            if type(message) == "string" and message ~= "" then
-                local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
-                _G.ZundaVN.show(speaker, { message })
-            elseif type(message) == "table" then
-                local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
-                _G.ZundaVN.show(speaker, message)
-            end
-        end)
-    end
+	local showVNEv = RE:WaitForChild("ShowVNDialogue", 10) :: RemoteEvent?
+	if showVNEv then
+		showVNEv.OnClientEvent:Connect(function(speakerTag, message)
+			if type(message) == "string" and message ~= "" then
+				local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
+				_G.ZundaVN.show(speaker, { message })
+			elseif type(message) == "table" then
+				local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
+				_G.ZundaVN.show(speaker, message)
+			end
+		end)
+	end
 end)
 
 -- Zone entry lore (BindableEvent fired by client zone ClickDetector handler)
 local showZoneVNBindable = playerGui:FindFirstChild("ShowZoneVN")
 if not showZoneVNBindable then
-    showZoneVNBindable = Instance.new("BindableEvent")
-    showZoneVNBindable.Name = "ShowZoneVN"
-    showZoneVNBindable.Parent = player.PlayerGui
+	showZoneVNBindable = Instance.new("BindableEvent")
+	showZoneVNBindable.Name = "ShowZoneVN"
+	showZoneVNBindable.Parent = player.PlayerGui
 end
 showZoneVNBindable.Event:Connect(function(zoneKey)
-    local ok, loreCfg = pcall(function()
-        return require(RS.ConfigurationFiles.ZoneLoreConfig)
-    end)
-    if not ok or not loreCfg then return end
-    local lore = loreCfg[zoneKey]
-    if not lore then return end
-    local lines = {}
-    for _, l in ipairs(lore.lines) do
-        table.insert(lines, {speaker=lore.speaker, text=l})
-    end
-    _G.ZundaVN.show(lore.speaker, lines)
+	local ok, loreCfg = pcall(function()
+		return require(RS.ConfigurationFiles.ZoneLoreConfig)
+	end)
+	if not ok or not loreCfg then
+		return
+	end
+	local lore = loreCfg[zoneKey]
+	if not lore then
+		return
+	end
+	local lines = {}
+	for _, l in ipairs(lore.lines) do
+		table.insert(lines, { speaker = lore.speaker, text = l })
+	end
+	_G.ZundaVN.show(lore.speaker, lines)
 end)
 
 -- Wait for _G.ZundaVN to be ready then fire welcome dialogue
 -- FIX: Use a flag to prevent welcome dialogue on respawn/rejoin.
 -- The welcome should only play ONCE per session, not on every character respawn.
 task.spawn(function()
-    if _G.ZundaVN_welcomeShown then
-        print("[VN] Welcome already shown this session, skipping")
-        return
-    end
-    local maxWait = 10.0
-    local start = os.clock()
-    while not (_G.ZundaVN and _G.ZundaVN.show) and (os.clock() - start) < maxWait do
-        task.wait(0.2)
-    end
-    if _G.ZundaVN and _G.ZundaVN.show then
-        print("[VN] Calling show with welcome text")
-        _G.ZundaVN_welcomeShown = true
-        _G.ZundaVN.show("zundamon", {
-            "Welcome to Zunda Village, "..player.Name.."! 🌸",
-            "I'm Zundamon — I'll guide you through your culinary adventure!",
-            "Press M for the map  •  I for your pouch  •  J for quests~",
-            "I'm right beside you! Click me to chat whenever you like~ 🍡",
-        })
-        print("[VN] Welcome dialogue triggered")
-    else
-        warn("[VN] _G.ZundaVN.show not available after " .. maxWait .. "s timeout!")
-    end
+	if _G.ZundaVN_welcomeShown then
+		print("[VN] Welcome already shown this session, skipping")
+		return
+	end
+	local maxWait = 10.0
+	local start = os.clock()
+	while not (_G.ZundaVN and _G.ZundaVN.show) and (os.clock() - start) < maxWait do
+		task.wait(0.2)
+	end
+	if _G.ZundaVN and _G.ZundaVN.show then
+		print("[VN] Calling show with welcome text")
+		_G.ZundaVN_welcomeShown = true
+		_G.ZundaVN.show("zundamon", {
+			"Welcome to Zunda Village, " .. player.Name .. "! 🌸",
+			"I'm Zundamon — I'll guide you through your culinary adventure!",
+			"Press M for the map  •  I for your pouch  •  J for quests~",
+			"I'm right beside you! Click me to chat whenever you like~ 🍡",
+		})
+		print("[VN] Welcome dialogue triggered")
+	else
+		warn("[VN] _G.ZundaVN.show not available after " .. maxWait .. "s timeout!")
+	end
 end)
 
 print("[ZundaVN] Unified VN controller ready — all triggers wired")

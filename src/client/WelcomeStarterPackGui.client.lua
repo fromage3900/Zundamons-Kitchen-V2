@@ -74,7 +74,8 @@ subText.FontFace = UIConfig.FONTS.Heading
 subText.TextSize = 16
 subText.TextColor3 = UIConfig.COLORS.TextDark
 subText.TextWrapped = true
-subText.Text = "Welcome to Zundamon's Kitchen! Here are your exclusive starter gifts to begin your culinary fashion journey!"
+subText.Text =
+	"Welcome to Zundamon's Kitchen! Here are your exclusive starter gifts to begin your culinary fashion journey!"
 subText.Parent = content
 
 -- Reward Items Showcase
@@ -188,7 +189,9 @@ end)
 task.spawn(function()
 	local deadline = os.clock() + 300
 	while os.clock() < deadline do
-		if LocalPlayer:GetAttribute("OnboardingActive") == false then break end
+		if LocalPlayer:GetAttribute("OnboardingActive") == false then
+			break
+		end
 		task.wait(0.5)
 	end
 	-- Never stack on top of an open VN dialogue either (welcome VN auto-advances,
@@ -196,7 +199,9 @@ task.spawn(function()
 	local vnDeadline = os.clock() + 60
 	while os.clock() < vnDeadline do
 		local vn = _G.ZundaVN
-		if not (vn and vn.isOpen and vn.isOpen()) then break end
+		if not (vn and vn.isOpen and vn.isOpen()) then
+			break
+		end
 		task.wait(0.5)
 	end
 	mainFrame.Visible = true

@@ -130,22 +130,32 @@ if cookResultEv then
 		masteryLbl.Text = "Mastery: " .. mastery .. "%"
 		gui.Enabled = true
 		-- Animate in
-		card.Visible = true; backdrop.Visible = true
-		card.BackgroundTransparency = 1; cStroke.Transparency = 1
-		titleLbl.TextTransparency = 1; starsLbl.TextTransparency = 1; goldLbl.TextTransparency = 1
-		streakLbl.TextTransparency = 1; masteryLbl.TextTransparency = 1
-		dismissBtn.BackgroundTransparency = 1; dismissBtn.TextTransparency = 1
+		card.Visible = true
+		backdrop.Visible = true
+		card.BackgroundTransparency = 1
+		cStroke.Transparency = 1
+		titleLbl.TextTransparency = 1
+		starsLbl.TextTransparency = 1
+		goldLbl.TextTransparency = 1
+		streakLbl.TextTransparency = 1
+		masteryLbl.TextTransparency = 1
+		dismissBtn.BackgroundTransparency = 1
+		dismissBtn.TextTransparency = 1
 		card.Size = UDim2.new(0, 0, 0, 0)
 		card.Position = UDim2.new(0.5, 0, 0.5, 0)
 		TweenService:Create(card, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 340, 0, 240), Position = UDim2.new(0.5, -170, 0.5, -120)
+			Size = UDim2.new(0, 340, 0, 240),
+			Position = UDim2.new(0.5, -170, 0.5, -120),
 		}):Play()
 		task.wait(0.2)
 		TweenService:Create(card, TweenInfo.new(0.2), { BackgroundTransparency = 0 }):Play()
 		TweenService:Create(cStroke, TweenInfo.new(0.2), { Transparency = 0 }):Play()
 		task.wait(0.15)
-		titleLbl.TextTransparency = 0; starsLbl.TextTransparency = 0; goldLbl.TextTransparency = 0
-		streakLbl.TextTransparency = 0; masteryLbl.TextTransparency = 0
+		titleLbl.TextTransparency = 0
+		starsLbl.TextTransparency = 0
+		goldLbl.TextTransparency = 0
+		streakLbl.TextTransparency = 0
+		masteryLbl.TextTransparency = 0
 		task.wait(0.1)
 		TweenService:Create(dismissBtn, TweenInfo.new(0.2), { BackgroundTransparency = 0, TextTransparency = 0 }):Play()
 	end)

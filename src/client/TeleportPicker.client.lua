@@ -20,7 +20,9 @@ backdrop.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 backdrop.Text = ""
 backdrop.BorderSizePixel = 0
 backdrop.AutoButtonColor = false
-backdrop.MouseButton1Click:Connect(function() gui.Enabled = false end)
+backdrop.MouseButton1Click:Connect(function()
+	gui.Enabled = false
+end)
 
 local panel = Instance.new("Frame", gui)
 panel.Name = "Panel"
@@ -71,18 +73,24 @@ closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 14
 closeBtn.BorderSizePixel = 0
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
-closeBtn.MouseButton1Click:Connect(function() gui.Enabled = false end)
+closeBtn.MouseButton1Click:Connect(function()
+	gui.Enabled = false
+end)
 
 local currentPadName = ""
 local RE = RS:WaitForChild("RemoteEvents")
 
 local function showPicker(data)
-	if not data or not data.destinations then return end
+	if not data or not data.destinations then
+		return
+	end
 	currentPadName = data.padName or ""
 	currentPadLbl.Text = "📍 " .. (data.displayName or "Teleporter")
 	-- Clear old entries
 	for _, c in ipairs(destList:GetChildren()) do
-		if c:IsA("TextButton") then c:Destroy() end
+		if c:IsA("TextButton") then
+			c:Destroy()
+		end
 	end
 	local y = 0
 	for _, zoneKey in ipairs(data.destinations) do

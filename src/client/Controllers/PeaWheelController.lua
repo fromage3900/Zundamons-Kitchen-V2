@@ -36,18 +36,24 @@ local wheelScale: UIScale? = nil
 local currentTargetScale = 1.0
 
 local function updateWheelScale()
-	if not wheelFrame then return end
+	if not wheelFrame then
+		return
+	end
 	if not wheelScale then
 		wheelScale = wheelFrame:FindFirstChildOfClass("UIScale")
 	end
-	if not wheelScale then return end
+	if not wheelScale then
+		return
+	end
 
 	local camera = workspace.CurrentCamera
 	local viewportSize = camera and camera.ViewportSize or Vector2.new(1920, 1080)
 	local viewW = viewportSize.X
 	local viewH = viewportSize.Y
 
-	if viewW <= 0 or viewH <= 0 then return end
+	if viewW <= 0 or viewH <= 0 then
+		return
+	end
 
 	-- Wheel total footprint: 386px vertical height, 332px horizontal width.
 	-- Scale factor ensures wheel bounds never clip off screen edges (88% viewport margin factor).
@@ -204,7 +210,9 @@ local function buildWheelGui()
 
 	for i, actionId in ipairs(sliceList) do
 		local def = ActionRegistry.getAction(actionId)
-		if not def then continue end
+		if not def then
+			continue
+		end
 
 		local btn = Instance.new("TextButton")
 		btn.Name = "Slice_" .. actionId
@@ -251,7 +259,9 @@ end
 
 -- ── Visual Updates ───────────────────────────────────────────
 function PeaWheelController.updateSelectionVisual()
-	if not wheelFrame or not tooltipLabel then return end
+	if not wheelFrame or not tooltipLabel then
+		return
+	end
 	local sliceList = ActionRegistry.getOrderedSliceList()
 	local actionId = sliceList[selectedIndex]
 	local def = ActionRegistry.getAction(actionId)
@@ -277,10 +287,14 @@ end
 
 -- ── Open / Close / Toggle ────────────────────────────────────
 function PeaWheelController.open()
-	if isOpen then return end
+	if isOpen then
+		return
+	end
 
 	local gui = buildWheelGui()
-	if not gui or not wheelFrame or not backdropFrame then return end
+	if not gui or not wheelFrame or not backdropFrame then
+		return
+	end
 
 	isOpen = true
 	selectedIndex = 1
@@ -306,7 +320,9 @@ function PeaWheelController.open()
 end
 
 function PeaWheelController.close()
-	if not isOpen then return end
+	if not isOpen then
+		return
+	end
 	isOpen = false
 
 	if wheelFrame and backdropFrame then
@@ -315,14 +331,26 @@ function PeaWheelController.close()
 				Scale = currentTargetScale * 0.15,
 			}):Play()
 			task.delay(0.16, function()
-				if wheelFrame then wheelFrame.Visible = false end
-				if backdropFrame then backdropFrame.Visible = false end
-				if wheelScale then wheelScale.Scale = currentTargetScale end
+				if wheelFrame then
+					wheelFrame.Visible = false
+				end
+				if backdropFrame then
+					backdropFrame.Visible = false
+				end
+				if wheelScale then
+					wheelScale.Scale = currentTargetScale
+				end
 			end)
 		else
-			if wheelFrame then wheelFrame.Visible = false end
-			if backdropFrame then backdropFrame.Visible = false end
-			if wheelScale then wheelScale.Scale = currentTargetScale end
+			if wheelFrame then
+				wheelFrame.Visible = false
+			end
+			if backdropFrame then
+				backdropFrame.Visible = false
+			end
+			if wheelScale then
+				wheelScale.Scale = currentTargetScale
+			end
 		end
 	end
 
@@ -337,12 +365,16 @@ local function canTogglePeaWheel(): boolean
 	-- guard used to silently crash every toggle attempt. A LocalScript only
 	-- ever runs in an actual game/Play context, so the guard was never doing
 	-- anything useful even before it started erroring.
-	if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then return false end
+	if _G.TimedCooking and _G.TimedCooking.isCooking and _G.TimedCooking.isCooking() then
+		return false
+	end
 	return true
 end
 
 function PeaWheelController.toggle()
-	if not canTogglePeaWheel() then return end
+	if not canTogglePeaWheel() then
+		return
+	end
 	if isOpen then
 		PeaWheelController.close()
 	else
@@ -351,7 +383,9 @@ function PeaWheelController.toggle()
 end
 
 function PeaWheelController.select(actionId: string)
-	if not isOpen then return false end
+	if not isOpen then
+		return false
+	end
 	local ok = ActionRegistry.dispatch(actionId)
 	PeaWheelController.close()
 	return ok
@@ -361,7 +395,9 @@ end
 -- The Tab/Q global toggle is owned by UIActionRegistry ("peawheel" action) —
 -- this listener only handles in-wheel navigation while it's already open.
 local function onInputBegan(input, processed)
-	if processed then return end
+	if processed then
+		return
+	end
 
 	-- Slice Navigation when Open
 	if isOpen then

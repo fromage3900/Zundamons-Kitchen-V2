@@ -59,7 +59,9 @@ buffLbl.TextColor3 = UIConfig.COLORS.TextSecondary
 buffLbl.TextXAlignment = Enum.TextXAlignment.Left
 
 local function updateDisplay(compType)
-	if not COMPANIONS then return end
+	if not COMPANIONS then
+		return
+	end
 	local def = COMPANIONS[compType] or COMPANIONS.zundamon
 	emojiLbl.Text = def.emoji or "🍡"
 	nameLbl.Text = def.displayName or "Zundamon"

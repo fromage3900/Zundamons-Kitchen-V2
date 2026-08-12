@@ -337,7 +337,6 @@ task.spawn(function()
 	end
 end)
 
-
 -- Auto-refresh while open
 task.spawn(function()
 	while true do

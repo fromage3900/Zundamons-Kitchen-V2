@@ -62,7 +62,9 @@ local function addOutput(text, color)
 end
 
 local function processCommand(input)
-	if not input or input == "" then return end
+	if not input or input == "" then
+		return
+	end
 	addOutput("> " .. input, UIConfig.COLORS.Warning)
 	local ok, result = pcall(function()
 		return executeCmd:InvokeServer(input)
@@ -82,8 +84,13 @@ inputBox.FocusLost:Connect(function(enterPressed)
 end)
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.F2 or (input.KeyCode == Enum.KeyCode.Backquote and UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)) then
+	if gameProcessed then
+		return
+	end
+	if
+		input.KeyCode == Enum.KeyCode.F2
+		or (input.KeyCode == Enum.KeyCode.Backquote and UserInputService:IsKeyDown(Enum.KeyCode.LeftShift))
+	then
 		screenGui.Enabled = not screenGui.Enabled
 		if screenGui.Enabled then
 			inputBox:CaptureFocus()

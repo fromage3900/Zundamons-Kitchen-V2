@@ -12,7 +12,8 @@ local ClientGuiBootstrap = require(RS.ConfigurationFiles.ClientGuiBootstrap)
 local MarketplaceConfig = require(RS.ConfigurationFiles.MarketplaceConfig)
 local CozyModalShell = require(RS.ConfigurationFiles.CozyModalShell)
 local UIRouter = require(RS.ConfigurationFiles.UIRouter)
-local ActionRegistry = require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
+local ActionRegistry =
+	require(player:WaitForChild("PlayerScripts"):WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
 local gui = ClientGuiBootstrap.createScreenGui(player, "CompanionShopGui", 28)
 
@@ -44,7 +45,9 @@ panel.BorderSizePixel = 0
 panel.Visible = false
 panel.ZIndex = 2
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 22)
-local pStroke = Instance.new("UIStroke", panel); pStroke.Color = Color3.fromRGB(220, 160, 230); pStroke.Thickness = 3
+local pStroke = Instance.new("UIStroke", panel)
+pStroke.Color = Color3.fromRGB(220, 160, 230)
+pStroke.Thickness = 3
 
 -- Title
 local title = Instance.new("TextLabel", panel)
@@ -65,7 +68,7 @@ closeBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 100)
 closeBtn.Text = "×"
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 30
-closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.BorderSizePixel = 0
 closeBtn.ZIndex = 4
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 10)
@@ -91,7 +94,9 @@ detail.BackgroundColor3 = Color3.fromRGB(246, 231, 225)
 detail.BorderSizePixel = 0
 detail.ZIndex = 3
 Instance.new("UICorner", detail).CornerRadius = UDim.new(0, 16)
-local dStroke = Instance.new("UIStroke", detail); dStroke.Color = Color3.fromRGB(150, 110, 180); dStroke.Thickness = 2
+local dStroke = Instance.new("UIStroke", detail)
+dStroke.Color = Color3.fromRGB(150, 110, 180)
+dStroke.Thickness = 2
 
 -- Big portrait emoji
 local portrait = Instance.new("TextLabel", detail)
@@ -101,11 +106,13 @@ portrait.BackgroundColor3 = Color3.fromRGB(70, 50, 100)
 portrait.Text = "🍡"
 portrait.Font = Enum.Font.GothamBold
 portrait.TextScaled = true
-portrait.TextColor3 = Color3.fromRGB(255,255,255)
+portrait.TextColor3 = Color3.fromRGB(255, 255, 255)
 portrait.BorderSizePixel = 0
 portrait.ZIndex = 4
 Instance.new("UICorner", portrait).CornerRadius = UDim.new(0, 20)
-local portraitStroke = Instance.new("UIStroke", portrait); portraitStroke.Color = Color3.fromRGB(255,220,200); portraitStroke.Thickness = 3
+local portraitStroke = Instance.new("UIStroke", portrait)
+portraitStroke.Color = Color3.fromRGB(255, 220, 200)
+portraitStroke.Thickness = 3
 
 -- Name + flavor + buff text
 local detailRight = Instance.new("Frame", detail)
@@ -143,7 +150,9 @@ buffBadge.BackgroundColor3 = Color3.fromRGB(70, 100, 80)
 buffBadge.BorderSizePixel = 0
 buffBadge.ZIndex = 5
 Instance.new("UICorner", buffBadge).CornerRadius = UDim.new(0, 12)
-local bStroke = Instance.new("UIStroke", buffBadge); bStroke.Color = Color3.fromRGB(160, 240, 180); bStroke.Thickness = 2
+local bStroke = Instance.new("UIStroke", buffBadge)
+bStroke.Color = Color3.fromRGB(160, 240, 180)
+bStroke.Thickness = 2
 
 local buffTitle = Instance.new("TextLabel", buffBadge)
 buffTitle.Size = UDim2.new(1, -16, 0, 26)
@@ -179,7 +188,9 @@ actionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 actionBtn.BorderSizePixel = 0
 actionBtn.ZIndex = 5
 Instance.new("UICorner", actionBtn).CornerRadius = UDim.new(0, 14)
-local aStroke = Instance.new("UIStroke", actionBtn); aStroke.Color = Color3.fromRGB(220,180,255); aStroke.Thickness = 2
+local aStroke = Instance.new("UIStroke", actionBtn)
+aStroke.Color = Color3.fromRGB(220, 180, 255)
+aStroke.Thickness = 2
 
 -- ── State
 local catalog = {}
@@ -192,123 +203,149 @@ local TAB_ORDER = { "zundamon", "parrot", "dog", "cat", "ankomon", "cardamon", "
 local tabBtns = {}
 
 local function refreshDetail()
-    local def = catalog[currentKey]
-    if not def then return end
-    portrait.Text = def.emoji
-    nameLbl.Text = def.displayName or currentKey
-    flavor.Text = def.flavor or ""
-    if def.glow then
-        portrait.BackgroundColor3 = def.glow
-        portraitStroke.Color = def.glow
-    end
-    if def.buff then
-        buffBadge.Visible = true
-        buffDesc.Text = def.buff.description
-    else
-        buffBadge.Visible = false
-    end
-    local isOwned = owned[currentKey] == true
-    local isActive = owned.__active == currentKey
-    if def.free or isOwned then
-        if isActive then
-            actionBtn.Text = "✓ Equipped"
-            actionBtn.BackgroundColor3 = Color3.fromRGB(80, 130, 90)
-        else
-            actionBtn.Text = "Equip"
-            actionBtn.BackgroundColor3 = Color3.fromRGB(120, 90, 200)
-        end
-    else
-        if MarketplaceConfig.enabled then
-            actionBtn.Text = ("Welcome %s home • %d Robux"):format(def.displayName or currentKey, def.price or 500)
-            actionBtn.BackgroundColor3 = Color3.fromRGB(108, 164, 125)
-        else
-            actionBtn.Text = "Coming Soon • Preview Companion"
-            actionBtn.BackgroundColor3 = Color3.fromRGB(177, 151, 177)
-        end
-    end
+	local def = catalog[currentKey]
+	if not def then
+		return
+	end
+	portrait.Text = def.emoji
+	nameLbl.Text = def.displayName or currentKey
+	flavor.Text = def.flavor or ""
+	if def.glow then
+		portrait.BackgroundColor3 = def.glow
+		portraitStroke.Color = def.glow
+	end
+	if def.buff then
+		buffBadge.Visible = true
+		buffDesc.Text = def.buff.description
+	else
+		buffBadge.Visible = false
+	end
+	local isOwned = owned[currentKey] == true
+	local isActive = owned.__active == currentKey
+	if def.free or isOwned then
+		if isActive then
+			actionBtn.Text = "✓ Equipped"
+			actionBtn.BackgroundColor3 = Color3.fromRGB(80, 130, 90)
+		else
+			actionBtn.Text = "Equip"
+			actionBtn.BackgroundColor3 = Color3.fromRGB(120, 90, 200)
+		end
+	else
+		if MarketplaceConfig.enabled then
+			actionBtn.Text = ("Welcome %s home • %d Robux"):format(def.displayName or currentKey, def.price or 500)
+			actionBtn.BackgroundColor3 = Color3.fromRGB(108, 164, 125)
+		else
+			actionBtn.Text = "Coming Soon • Preview Companion"
+			actionBtn.BackgroundColor3 = Color3.fromRGB(177, 151, 177)
+		end
+	end
 end
 
 local function refreshTabs()
-    for _, btn in pairs(tabBtns) do
-        local key = btn:GetAttribute("CompKey")
-        if owned.__active == key then
-            btn.BackgroundColor3 = Color3.fromRGB(140, 100, 220)
-            local stroke = btn:FindFirstChildOfClass("UIStroke")
-            if stroke then stroke.Color = Color3.fromRGB(255, 240, 200); stroke.Thickness = 3 end
-        elseif owned[key] then
-            btn.BackgroundColor3 = Color3.fromRGB(70, 50, 100)
-        else
-            btn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
-        end
-    end
+	for _, btn in pairs(tabBtns) do
+		local key = btn:GetAttribute("CompKey")
+		if owned.__active == key then
+			btn.BackgroundColor3 = Color3.fromRGB(140, 100, 220)
+			local stroke = btn:FindFirstChildOfClass("UIStroke")
+			if stroke then
+				stroke.Color = Color3.fromRGB(255, 240, 200)
+				stroke.Thickness = 3
+			end
+		elseif owned[key] then
+			btn.BackgroundColor3 = Color3.fromRGB(70, 50, 100)
+		else
+			btn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+		end
+	end
 end
 
 local function buildTabs()
-    for _, b in pairs(tabBar:GetChildren()) do
-        if b:IsA("TextButton") then b:Destroy() end
-    end
-    tabBtns = {}
-    for i, key in ipairs(TAB_ORDER) do
-        local def = catalog[key]
-        if def then
-            local btn = Instance.new("TextButton", tabBar)
-            btn.Size = UDim2.new(0, 88, 0, 56)
-            btn.Text = def.emoji .. "\n" .. (def.displayName or key)
-            btn.Font = Enum.Font.GothamBold
-            btn.TextSize = 11
-            btn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
-            btn.TextColor3 = Color3.fromRGB(255, 240, 255)
-            btn.BorderSizePixel = 0
-            btn.LayoutOrder = i
-            btn.AutoButtonColor = true
-            btn.ZIndex = 4
-            btn:SetAttribute("CompKey", key)
-            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-            local st = Instance.new("UIStroke", btn); st.Color = Color3.fromRGB(180,140,220); st.Thickness = 1; st.Transparency = 0.4
-            -- Show "500 R$" tag if not free
-            if not def.free then
-                local price = Instance.new("TextLabel", btn)
-                price.Size = UDim2.new(1, 0, 0, 14)
-                price.Position = UDim2.new(0, 0, 1, -14)
-                price.BackgroundTransparency = 1
-                price.Text = MarketplaceConfig.enabled and ((def.price or 500) .. " R$") or "Preview"
-                price.Font = Enum.Font.GothamBold
-                price.TextSize = 10
-                price.TextColor3 = Color3.fromRGB(255, 220, 130)
-                price.ZIndex = 5
-            end
-            btn.MouseButton1Click:Connect(function()
-                currentKey = key
-                refreshDetail()
-                local pos = btn.AbsolutePosition
-                UIHelper.spawnSparkles(panel, pos.X + btn.AbsoluteSize.X/2, pos.Y + btn.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 4)
-            end)
-            tabBtns[key] = btn
-        end
-    end
+	for _, b in pairs(tabBar:GetChildren()) do
+		if b:IsA("TextButton") then
+			b:Destroy()
+		end
+	end
+	tabBtns = {}
+	for i, key in ipairs(TAB_ORDER) do
+		local def = catalog[key]
+		if def then
+			local btn = Instance.new("TextButton", tabBar)
+			btn.Size = UDim2.new(0, 88, 0, 56)
+			btn.Text = def.emoji .. "\n" .. (def.displayName or key)
+			btn.Font = Enum.Font.GothamBold
+			btn.TextSize = 11
+			btn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+			btn.TextColor3 = Color3.fromRGB(255, 240, 255)
+			btn.BorderSizePixel = 0
+			btn.LayoutOrder = i
+			btn.AutoButtonColor = true
+			btn.ZIndex = 4
+			btn:SetAttribute("CompKey", key)
+			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+			local st = Instance.new("UIStroke", btn)
+			st.Color = Color3.fromRGB(180, 140, 220)
+			st.Thickness = 1
+			st.Transparency = 0.4
+			-- Show "500 R$" tag if not free
+			if not def.free then
+				local price = Instance.new("TextLabel", btn)
+				price.Size = UDim2.new(1, 0, 0, 14)
+				price.Position = UDim2.new(0, 0, 1, -14)
+				price.BackgroundTransparency = 1
+				price.Text = MarketplaceConfig.enabled and ((def.price or 500) .. " R$") or "Preview"
+				price.Font = Enum.Font.GothamBold
+				price.TextSize = 10
+				price.TextColor3 = Color3.fromRGB(255, 220, 130)
+				price.ZIndex = 5
+			end
+			btn.MouseButton1Click:Connect(function()
+				currentKey = key
+				refreshDetail()
+				local pos = btn.AbsolutePosition
+				UIHelper.spawnSparkles(
+					panel,
+					pos.X + btn.AbsoluteSize.X / 2,
+					pos.Y + btn.AbsoluteSize.Y / 2,
+					Color3.fromRGB(255, 255, 255),
+					4
+				)
+			end)
+			tabBtns[key] = btn
+		end
+	end
 end
 
 actionBtn.MouseButton1Click:Connect(function()
-    local def = catalog[currentKey]
-    if not def then return end
-    if def.free or owned[currentKey] then
-        -- Equip
-        SetCompanion:FireServer(currentKey)
-        owned.__active = currentKey
-        refreshDetail()
-        refreshTabs()
-    elseif MarketplaceConfig.enabled then
-        -- Purchase
-        PurchaseCompanion:FireServer(currentKey)
-    end
-    local pos = actionBtn.AbsolutePosition
-    UIHelper.spawnSparkles(panel, pos.X + actionBtn.AbsoluteSize.X/2, pos.Y + actionBtn.AbsoluteSize.Y/2, Color3.fromRGB(255,255,255), 5)
+	local def = catalog[currentKey]
+	if not def then
+		return
+	end
+	if def.free or owned[currentKey] then
+		-- Equip
+		SetCompanion:FireServer(currentKey)
+		owned.__active = currentKey
+		refreshDetail()
+		refreshTabs()
+	elseif MarketplaceConfig.enabled then
+		-- Purchase
+		PurchaseCompanion:FireServer(currentKey)
+	end
+	local pos = actionBtn.AbsolutePosition
+	UIHelper.spawnSparkles(
+		panel,
+		pos.X + actionBtn.AbsoluteSize.X / 2,
+		pos.Y + actionBtn.AbsoluteSize.Y / 2,
+		Color3.fromRGB(255, 255, 255),
+		5
+	)
 end)
 
 CompanionOwnedSync.OnClientEvent:Connect(function(compType, isOwned)
-    owned[compType] = isOwned
-    if currentKey == compType then refreshDetail() end
-    refreshTabs()
+	owned[compType] = isOwned
+	if currentKey == compType then
+		refreshDetail()
+	end
+	refreshTabs()
 end)
 
 local shell = CozyModalShell.wrap(panel, {
@@ -325,13 +362,18 @@ local shell = CozyModalShell.wrap(panel, {
 		end)
 		owned = ownedData or {}
 
-		if owned.__active then currentKey = owned.__active end
+		if owned.__active then
+			currentKey = owned.__active
+		end
 		buildTabs()
 		refreshDetail()
 		refreshTabs()
 		panel.Size = UDim2.new(0, 780, 0, 510)
-		TweenService:Create(panel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-			{ Size = UDim2.new(0, 820, 0, 540) }):Play()
+		TweenService:Create(
+			panel,
+			TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			{ Size = UDim2.new(0, 820, 0, 540) }
+		):Play()
 	end,
 	close = function()
 		panel.Visible = false
@@ -350,15 +392,19 @@ local function close()
 end
 
 local function toggle()
-	if panel.Visible then close() else open() end
+	if panel.Visible then
+		close()
+	else
+		open()
+	end
 end
 
 -- Wire close button (after shell is defined)
 closeBtn.MouseButton1Click:Connect(function()
-    UIRouter.close("companions")
-    shell.close()
-    local pos = closeBtn.AbsolutePosition
-    UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255,255,255), 5)
+	UIRouter.close("companions")
+	shell.close()
+	local pos = closeBtn.AbsolutePosition
+	UIHelper.spawnSparkles(panel, pos.X + 20, pos.Y + 20, Color3.fromRGB(255, 255, 255), 5)
 end)
 
 _G.ZundaCompanionShop = { open = open, close = close, toggle = toggle }

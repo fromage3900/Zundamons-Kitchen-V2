@@ -37,24 +37,30 @@ local CHECK_INTERVAL = 0.1
 local accum = CHECK_INTERVAL
 RunService.Heartbeat:Connect(function(dt)
 	accum += dt
-	if accum < CHECK_INTERVAL then return end
+	if accum < CHECK_INTERVAL then
+		return
+	end
 	accum = 0
 
 	local char = player.Character
-	if not char then return end
+	if not char then
+		return
+	end
 	local hrp = char:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
+	if not hrp then
+		return
+	end
 
 	local pos = hrp.Position
 	local active = defaultPreset
 
 	for zone in pairs(zones) do
-		if not zone.Parent then continue end
+		if not zone.Parent then
+			continue
+		end
 		local half = zone.Size / 2
 		local localPos = pos - zone.Position
-		if math.abs(localPos.X) <= half.X and
-		   math.abs(localPos.Y) <= half.Y and
-		   math.abs(localPos.Z) <= half.Z then
+		if math.abs(localPos.X) <= half.X and math.abs(localPos.Y) <= half.Y and math.abs(localPos.Z) <= half.Z then
 			active = presets[zone.Name:sub(#PREFIX + 1)] or defaultPreset
 			break
 		end
