@@ -6,15 +6,68 @@
 	},
 	"children": [
 		{
-			"className": "MeshPart",
-			"name": "Mesh",
+			"className": "Part",
+			"name": "Boulder",
 			"properties": {
-				"MeshId": "rbxassetid://5003626535",
-				"Size": [5.9, 4.8, 5.8],
-				"Position": [50, 4, 30],
+				"Shape": "Ball",
+				"Size": [3.4, 2.6, 3.2],
+				"Position": [50, 3.0, 30],
 				"Anchored": true,
 				"CanCollide": true,
-				"CastShadow": true
+				"Color": [0.55, 0.55, 0.55],
+				"Material": "SmoothPlastic"
+			}
+		},
+		{
+			"className": "Part",
+			"name": "Boulder",
+			"properties": {
+				"Shape": "Ball",
+				"Size": [2.2, 1.8, 2.0],
+				"Position": [51.5, 4.2, 29.2],
+				"Anchored": true,
+				"CanCollide": true,
+				"Color": [0.5, 0.5, 0.5],
+				"Material": "SmoothPlastic"
+			}
+		},
+		{
+			"className": "Part",
+			"name": "Boulder",
+			"properties": {
+				"Shape": "Ball",
+				"Size": [1.8, 1.4, 1.8],
+				"Position": [48.6, 3.6, 31.2],
+				"Anchored": true,
+				"CanCollide": true,
+				"Color": [0.52, 0.52, 0.52],
+				"Material": "SmoothPlastic"
+			}
+		},
+		{
+			"className": "Part",
+			"name": "Boulder",
+			"properties": {
+				"Shape": "Ball",
+				"Size": [1.5, 1.0, 1.5],
+				"Position": [50.4, 5.2, 30.4],
+				"Anchored": true,
+				"CanCollide": true,
+				"Color": [0.48, 0.48, 0.48],
+				"Material": "SmoothPlastic"
+			}
+		},
+		{
+			"className": "Part",
+			"name": "Boulder",
+			"properties": {
+				"Shape": "Ball",
+				"Size": [1.2, 0.9, 1.2],
+				"Position": [49.4, 4.6, 29.4],
+				"Anchored": true,
+				"CanCollide": true,
+				"Color": [0.53, 0.53, 0.53],
+				"Material": "SmoothPlastic"
 			}
 		}
 	]
