@@ -9,8 +9,8 @@
 			"className": "MeshPart",
 			"name": "Mesh",
 			"properties": {
-				"MeshId": "rbxassetid://81332711510127",
-				"Size": [3, 3, 3],
+				"MeshId": "rbxassetid://5003626535",
+				"Size": [5.9, 4.8, 5.8],
 				"Position": [50, 4, 30],
 				"Anchored": true,
 				"CanCollide": true,
