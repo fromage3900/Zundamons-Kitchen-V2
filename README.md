@@ -7,11 +7,13 @@
 [Getting started](GETTING_STARTED.md) · [Contributing](CONTRIBUTING.md) · [Production handoff](docs/PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md) · [UI roadmap](docs/UI_UX_OVERHAUL_PLAN.md) · [Credits](CREDITS.md)
 
 > **Current status:** Phase 4. Core loop verified; endless-gameplay systems are
-> server-wired (Challenge Mode, Daily Challenges, Chef Stats); harvest visuals
-> now use live-verified real meshes (2026-08-12). Active streams: challenge/daily
-> client UI, loop polish, world density. Phase plans live in
+> server-wired and have a live client surface (Challenge Mode + Daily Challenge
+> UI, 2026-08-12); harvest visuals are authored-only, part-built props along the
+> gameplay loop (zero MeshId dependencies). Active streams: loop polish, guest
+> juice, world density. Phase plans live in
 > [docs/PHASE4_PLAN.md](docs/PHASE4_PLAN.md); live playtest findings in
-> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md). Superseded phase docs are in [docs/archive/](docs/archive/).
+> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md); latest session notes in
+> [docs/SESSION_HANDOFF_2026-08-12.md](docs/SESSION_HANDOFF_2026-08-12.md). Superseded phase docs are in [docs/archive/](docs/archive/).
 
 ---
 
