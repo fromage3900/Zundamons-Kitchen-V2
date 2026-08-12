@@ -5,7 +5,9 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local reducedMotion = GuiService.ReducedMotionEnabled
 
-if playerGui:FindFirstChild("ZundaChromaticAberration") then return end
+if playerGui:FindFirstChild("ZundaChromaticAberration") then
+	return
+end
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "ZundaChromaticAberration"
@@ -37,7 +39,9 @@ if not reducedMotion then
 
 	RunService.RenderStepped:Connect(function()
 		local cam = workspace.CurrentCamera
-		if not cam then return end
+		if not cam then
+			return
+		end
 		local vel = cam.CFrame.Position - (cam:GetAttribute("PrevPos") or cam.CFrame.Position)
 		local speed = vel.Magnitude
 		cam:SetAttribute("PrevPos", cam.CFrame.Position)

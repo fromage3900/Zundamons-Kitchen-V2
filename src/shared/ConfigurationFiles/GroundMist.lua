@@ -93,9 +93,13 @@ local function onWeatherChanged(weatherKey)
 		isHeavy = (weatherKey == "fog" or weatherKey == "storm" or weatherKey == "rain")
 	end
 	for _, child in ipairs(FX:GetChildren()) do
-		if not child:IsA("BasePart") then continue end
+		if not child:IsA("BasePart") then
+			continue
+		end
 		for _, e in ipairs(child:GetChildren()) do
-			if not e:IsA("ParticleEmitter") then continue end
+			if not e:IsA("ParticleEmitter") then
+				continue
+			end
 			if weatherKey == "fog" then
 				e.Rate = 14
 				e.Lifetime = NumberRange.new(18, 30)

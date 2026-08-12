@@ -62,7 +62,8 @@ function ProceduralLandscape.generateBiomePlan(biomeName, options)
 		local placed = {}
 
 		for _, assetEntry in ipairs(selectedAssets) do
-			local candidates = PlacementRules.filterBySpacing(zonePlan.candidates, placed, biome.constraints.pathSpacing or 4)
+			local candidates =
+				PlacementRules.filterBySpacing(zonePlan.candidates, placed, biome.constraints.pathSpacing or 4)
 			if #candidates > 0 then
 				local candidate = table.remove(candidates, 1)
 				local assetInfo = resolveAssetInfo(assetEntry.category, assetEntry.asset)

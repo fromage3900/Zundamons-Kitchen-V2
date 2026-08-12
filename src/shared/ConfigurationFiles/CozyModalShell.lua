@@ -12,7 +12,9 @@ local CozyModalShell = {}
 
 -- ── Helpers ──────────────────────────────────────────────────
 local function applyCozyTokens(panel)
-	if not panel then return end
+	if not panel then
+		return
+	end
 
 	local corner = panel:FindFirstChildOfClass("UICorner")
 	if not corner then
@@ -63,9 +65,11 @@ function CozyModalShell.wrap(panel, options)
 		-- this rebuilt Position from Scale only, stripping the Offset component,
 		-- which pushed panels using pixel-offset Position (no AnchorPoint 0.5,0.5)
 		-- off-screen every time they opened.
-		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Normal, UIConfig.EASING.Bounce, Enum.EasingDirection.Out), {
-			Size = originalSize,
-		}):Play()
+		TweenService
+			:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Normal, UIConfig.EASING.Bounce, Enum.EasingDirection.Out), {
+				Size = originalSize,
+			})
+			:Play()
 		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
 			BackgroundTransparency = UIConfig.TRANSPARENCY.Panel,
 		}):Play()
@@ -84,9 +88,11 @@ function CozyModalShell.wrap(panel, options)
 		end
 
 		-- Animate: scale shrink to 0 with smooth Quad easing
-		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth, Enum.EasingDirection.In), {
-			Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0),
-		}):Play()
+		TweenService
+			:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth, Enum.EasingDirection.In), {
+				Size = UDim2.new(originalSize.X.Scale * 0.3, 0, originalSize.Y.Scale * 0.3, 0),
+			})
+			:Play()
 		TweenService:Create(panel, TweenInfo.new(UIConfig.ANIMATION.Fast, UIConfig.EASING.Smooth), {
 			BackgroundTransparency = 1,
 		}):Play()
@@ -104,7 +110,9 @@ function CozyModalShell.wrap(panel, options)
 
 	-- Universal button hover effect: scale up + glow + sound
 	local function setupButtonHover(btn)
-		if btn:GetAttribute("HoverWired") then return end
+		if btn:GetAttribute("HoverWired") then
+			return
+		end
 		btn:SetAttribute("HoverWired", true)
 		local origSize = btn.Size
 		btn.MouseEnter:Connect(function()
@@ -146,7 +154,9 @@ function CozyModalShell.wrap(panel, options)
 end
 
 function CozyModalShell.applyReducedMotion(panel)
-	if not panel then return false end
+	if not panel then
+		return false
+	end
 	return false
 end
 

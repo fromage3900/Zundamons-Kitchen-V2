@@ -40,8 +40,12 @@ end
 local function applySurfaceAppearance(part)
 	-- SurfaceAppearance can only be parented to MeshParts; water made of plain
 	-- Parts keeps its material look instead of erroring out the module load.
-	if not part:IsA("MeshPart") then return end
-	if part:FindFirstChild("ZundaWaterSA") then return end
+	if not part:IsA("MeshPart") then
+		return
+	end
+	if part:FindFirstChild("ZundaWaterSA") then
+		return
+	end
 	local sa = Instance.new("SurfaceAppearance")
 	sa.Name = "ZundaWaterSA"
 	sa.Color = C_teal
@@ -60,9 +64,13 @@ end
 
 local function createCaustics()
 	local playerGui = player:FindFirstChild("PlayerGui")
-	if not playerGui then return end
+	if not playerGui then
+		return
+	end
 	local existing = playerGui:FindFirstChild("ZundaCaustics")
-	if existing then existing:Destroy() end
+	if existing then
+		existing:Destroy()
+	end
 
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "ZundaCaustics"
@@ -71,7 +79,7 @@ local function createCaustics()
 	gui.DisplayOrder = 12
 	gui.Parent = playerGui
 
-	local 	caustic = Instance.new("ImageLabel", gui)
+	local caustic = Instance.new("ImageLabel", gui)
 	caustic.Name = "CausticLayer"
 	caustic.Size = UDim2.new(2, 0, 2, 0)
 	caustic.Position = UDim2.new(-0.5, 0, -0.5, 0)
@@ -125,8 +133,12 @@ end
 
 local function setupWaterDebris()
 	for _, part in ipairs(trackedWater) do
-		if not part.Parent then continue end
-		if part:FindFirstChild("ZundaWaterDebris") then continue end
+		if not part.Parent then
+			continue
+		end
+		if part:FindFirstChild("ZundaWaterDebris") then
+			continue
+		end
 
 		local fx = Instance.new("Folder")
 		fx.Name = "ZundaWaterDebris"
@@ -180,7 +192,9 @@ local fresnelConnection: RBXScriptConnection? = nil
 
 local function setupFresnelGlow()
 	for _, part in ipairs(trackedWater) do
-		if not part.Parent then continue end
+		if not part.Parent then
+			continue
+		end
 		local existing = part:FindFirstChild("ZundaFresnelGlow")
 		if existing then
 			table.insert(activeGlows, existing)
@@ -220,11 +234,15 @@ end
 
 local function setupWaterSparkles()
 	for _, part in ipairs(trackedWater) do
-		if not part.Parent then continue end
+		if not part.Parent then
+			continue
+		end
 		if part:FindFirstChild("ZundaWaterFX") then
 			local fx = part:FindFirstChild("ZundaWaterFX")
 			local e = fx and fx:FindFirstChildOfClass("ParticleEmitter")
-			if e then e.Enabled = true end
+			if e then
+				e.Enabled = true
+			end
 			continue
 		end
 
@@ -287,7 +305,9 @@ task.spawn(function()
 		local hour = Lighting:GetAttribute("CurrentHour") or 12
 		local night = math.max(0, -math.cos(math.rad((hour - 12) * 15)))
 		for _, part in ipairs(trackedWater) do
-			if not part.Parent then continue end
+			if not part.Parent then
+				continue
+			end
 			local sa = part:FindFirstChild("ZundaWaterSA")
 			if sa and sa:IsA("SurfaceAppearance") then
 				sa.Color = hourColor

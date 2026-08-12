@@ -20,7 +20,7 @@ local QuestConfig = {
 		--   difficulty = 1 -- 1-5 scale
 		-- }
 	},
-	
+
 	-- Default quests to initialize on player join
 	default_quests = {
 		{
@@ -33,9 +33,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 25,
 				tier_points = 5,
-				items = {}
+				items = {},
 			},
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_cafe_master",
@@ -47,9 +47,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 100,
 				tier_points = 20,
-				items = {}
+				items = {},
 			},
-			difficulty = 2
+			difficulty = 2,
 		},
 		-- NEW ZUNDA-THEMED QUESTS
 		{
@@ -63,9 +63,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 50,
 				tier_points = 10,
-				items = {"Zunda Mochi"}
+				items = { "Zunda Mochi" },
 			},
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_edamame_harvest",
@@ -78,9 +78,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 75,
 				tier_points = 15,
-				items = {}
+				items = {},
 			},
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_zunda_mochi_master",
@@ -93,9 +93,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 150,
 				tier_points = 30,
-				items = {"Sweet Pea"}
+				items = { "Sweet Pea" },
 			},
-			difficulty = 3
+			difficulty = 3,
 		},
 		{
 			id = "quest_pea_flower_garden",
@@ -108,9 +108,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 100,
 				tier_points = 20,
-				items = {}
+				items = {},
 			},
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_zunda_paradise",
@@ -123,9 +123,9 @@ local QuestConfig = {
 			rewards = {
 				gold = 500,
 				tier_points = 100,
-				items = {}
+				items = {},
 			},
-			difficulty = 5
+			difficulty = 5,
 		},
 		{
 			id = "quest_zundarooms_signal",
@@ -166,7 +166,7 @@ local QuestConfig = {
 			target = 20,
 			target_item = "Apple",
 			rewards = { gold = 80, tier_points = 15, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_wheat_field",
@@ -177,7 +177,7 @@ local QuestConfig = {
 			target = 30,
 			target_item = "Wheat",
 			rewards = { gold = 60, tier_points = 12, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_sweet_pea_search",
@@ -188,7 +188,7 @@ local QuestConfig = {
 			target = 12,
 			target_item = "Sweet Pea",
 			rewards = { gold = 120, tier_points = 20, items = {} },
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_zunda_leaf_walk",
@@ -199,7 +199,7 @@ local QuestConfig = {
 			target = 15,
 			target_item = "Zunda Leaf",
 			rewards = { gold = 90, tier_points = 18, items = {} },
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_gold_prospector",
@@ -210,7 +210,7 @@ local QuestConfig = {
 			target = 5,
 			target_item = "Gold",
 			rewards = { gold = 200, tier_points = 30, items = {} },
-			difficulty = 3
+			difficulty = 3,
 		},
 
 		-- COOKING quests
@@ -223,7 +223,7 @@ local QuestConfig = {
 			target = 5,
 			target_item = "Bread",
 			rewards = { gold = 100, tier_points = 18, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_apple_pie_party",
@@ -234,7 +234,7 @@ local QuestConfig = {
 			target = 4,
 			target_item = "Apple Pie",
 			rewards = { gold = 160, tier_points = 24, items = {} },
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_pea_flower_tea",
@@ -245,7 +245,7 @@ local QuestConfig = {
 			target = 3,
 			target_item = "Pea Flower Tea",
 			rewards = { gold = 180, tier_points = 28, items = {} },
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_royal_stew",
@@ -256,7 +256,7 @@ local QuestConfig = {
 			target = 2,
 			target_item = "Royal Stew",
 			rewards = { gold = 240, tier_points = 35, items = {} },
-			difficulty = 3
+			difficulty = 3,
 		},
 		{
 			id = "quest_perfect_cook_streak",
@@ -266,7 +266,7 @@ local QuestConfig = {
 			type = "cook_perfect",
 			target = 5,
 			rewards = { gold = 300, tier_points = 45, items = {} },
-			difficulty = 3
+			difficulty = 3,
 		},
 
 		-- SERVING / GUEST quests
@@ -278,7 +278,7 @@ local QuestConfig = {
 			type = "serve",
 			target = 3,
 			rewards = { gold = 90, tier_points = 18, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_dinner_rush",
@@ -288,7 +288,7 @@ local QuestConfig = {
 			type = "serve",
 			target = 15,
 			rewards = { gold = 220, tier_points = 32, items = {} },
-			difficulty = 3
+			difficulty = 3,
 		},
 		{
 			id = "quest_legendary_host",
@@ -298,7 +298,7 @@ local QuestConfig = {
 			type = "serve",
 			target = 50,
 			rewards = { gold = 500, tier_points = 80, items = {} },
-			difficulty = 4
+			difficulty = 4,
 		},
 
 		-- ECONOMY quests
@@ -310,7 +310,7 @@ local QuestConfig = {
 			type = "earn_gold",
 			target = 100,
 			rewards = { gold = 25, tier_points = 8, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_gold_hoard",
@@ -320,7 +320,7 @@ local QuestConfig = {
 			type = "earn_gold",
 			target = 1000,
 			rewards = { gold = 150, tier_points = 35, items = {} },
-			difficulty = 3
+			difficulty = 3,
 		},
 		{
 			id = "quest_master_economist",
@@ -330,7 +330,7 @@ local QuestConfig = {
 			type = "earn_gold",
 			target = 5000,
 			rewards = { gold = 500, tier_points = 80, items = {} },
-			difficulty = 5
+			difficulty = 5,
 		},
 
 		-- EXPLORATION quests (uses zone visit / building entry)
@@ -343,7 +343,7 @@ local QuestConfig = {
 			target = 1,
 			target_zone = "Kitchen",
 			rewards = { gold = 30, tier_points = 5, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_visit_pagoda",
@@ -354,7 +354,7 @@ local QuestConfig = {
 			target = 1,
 			target_zone = "Pagoda",
 			rewards = { gold = 60, tier_points = 10, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_visit_ruins",
@@ -365,7 +365,7 @@ local QuestConfig = {
 			target = 1,
 			target_zone = "AncientRuins",
 			rewards = { gold = 100, tier_points = 18, items = {} },
-			difficulty = 2
+			difficulty = 2,
 		},
 		{
 			id = "quest_visit_all_zones",
@@ -375,7 +375,7 @@ local QuestConfig = {
 			type = "visit_zones_unique",
 			target = 5,
 			rewards = { gold = 350, tier_points = 55, items = {} },
-			difficulty = 3
+			difficulty = 3,
 		},
 
 		-- COMPANION / SOCIAL quests
@@ -387,7 +387,7 @@ local QuestConfig = {
 			type = "companion_chat",
 			target = 5,
 			rewards = { gold = 50, tier_points = 12, items = {} },
-			difficulty = 1
+			difficulty = 1,
 		},
 		{
 			id = "quest_meet_elder",
@@ -398,7 +398,7 @@ local QuestConfig = {
 			target = 1,
 			target_npc = "Elder",
 			rewards = { gold = 75, tier_points = 14, items = {} },
-			difficulty = 2
+			difficulty = 2,
 		},
 
 		-- MASTERY quests (long-running)
@@ -412,7 +412,10 @@ local QuestConfig = {
 			rewards = { gold = 600, tier_points = 90, items = {} },
 			difficulty = 4,
 			subtext = "The Chef's Testament demands every dish be tasted. You've mastered the basics — now hunt down every recipe in existence. Each one tells a story. Each one earns a star.",
-			npc_dialogue = { speaker = "chef", lines = { "You think you know cooking? HA. Cook EVERYTHING. Then come back and I MIGHT be impressed." } },
+			npc_dialogue = {
+				speaker = "chef",
+				lines = { "You think you know cooking? HA. Cook EVERYTHING. Then come back and I MIGHT be impressed." },
+			},
 		},
 		{
 			id = "quest_zunda_grand_master",
@@ -424,7 +427,13 @@ local QuestConfig = {
 			rewards = { gold = 700, tier_points = 120, items = {} },
 			difficulty = 5,
 			subtext = "The Zunda spirits have been watching. Every pea you've mashed, every mochi you've pounded — it all leads here. Cook every Zunda dish and claim the title of GRAND MASTER.",
-			npc_dialogue = { speaker = "zundamon", lines = { "YOU'RE SO CLOSE I CAN TASTE IT!!! Literally. I ate a pea. But STILL. COOK ALL THE THINGS 🍡🔥", "ZUNDA PARADISE is the final test. 15 Zunda Peas!!! 10 Edamame!!! 5 Sweet Peas!!! 3 Pea Flowers!!! GO!!! GO!!! GO!!!" } },
+			npc_dialogue = {
+				speaker = "zundamon",
+				lines = {
+					"YOU'RE SO CLOSE I CAN TASTE IT!!! Literally. I ate a pea. But STILL. COOK ALL THE THINGS 🍡🔥",
+					"ZUNDA PARADISE is the final test. 15 Zunda Peas!!! 10 Edamame!!! 5 Sweet Peas!!! 3 Pea Flowers!!! GO!!! GO!!! GO!!!",
+				},
+			},
 			chain_id = "zunda_legend",
 			chain_step = 3,
 		},
@@ -473,7 +482,12 @@ local QuestConfig = {
 			rewards = { gold = 160, tier_points = 28, items = { "Pea Flower Tea" } },
 			difficulty = 3,
 			subtext = "The Pea Flowers bloom only where a Zunda chef once wept tears of joy. Follow the scent of crushed petals and distant happiness. Each flower you pick whispers a recipe from the Old Kitchen.",
-			npc_dialogue = { speaker = "elder", lines = { "Ah, the Pea Flower Pilgrimage... I remember my first bloom. The flowers sing, you know. Not with words — with FLAVOR. Collect 12 and the path forward will reveal itself." } },
+			npc_dialogue = {
+				speaker = "elder",
+				lines = {
+					"Ah, the Pea Flower Pilgrimage... I remember my first bloom. The flowers sing, you know. Not with words — with FLAVOR. Collect 12 and the path forward will reveal itself.",
+				},
+			},
 			chain_id = "great_zunda_hunt",
 			chain_step = 3,
 		},
@@ -487,7 +501,13 @@ local QuestConfig = {
 			rewards = { gold = 400, tier_points = 60, items = { "Zunda Paradise" } },
 			difficulty = 4,
 			subtext = "You've tasted the first fruits. NOW COMES THE HUNT. Zunda Pea. Edamame Pod. Sweet Pea. Pea Flower. Zunda Flower. Zunda Berry. Zunda Mushroom. Zunda Root. Zunda Leaf. COLLECT THEM ALL. The Zunda spirits demand tribute.",
-			npc_dialogue = { speaker = "zundamon", lines = { "THE GREAT HUNT!!! I'M SHAKING!!! 🌱✨", "Every Zunda ingredient has a spirit inside. If you gather ALL 9 types, they'll COMBINE into something LEGENDARY. I'M NOT KIDDING. I SAW IT IN A DREAM. 🔥🔥🔥" } },
+			npc_dialogue = {
+				speaker = "zundamon",
+				lines = {
+					"THE GREAT HUNT!!! I'M SHAKING!!! 🌱✨",
+					"Every Zunda ingredient has a spirit inside. If you gather ALL 9 types, they'll COMBINE into something LEGENDARY. I'M NOT KIDDING. I SAW IT IN A DREAM. 🔥🔥🔥",
+				},
+			},
 			chain_id = "great_zunda_hunt",
 			chain_step = 4,
 		},
@@ -533,7 +553,13 @@ local QuestConfig = {
 			rewards = { gold = 200, tier_points = 30, items = {} },
 			difficulty = 3,
 			subtext = "Royal Stew is not a meal — it's a coronation. The recipe was passed down by the Zunda King himself, who insisted on GOLD in his stew because 'commoners eat from bowls. KINGS EAT FROM BOWLS OF WEALTH.' Two servings. Rule the kitchen.",
-			npc_dialogue = { speaker = "chef", lines = { "Royal Stew, huh? Bold choice. Most beginners CRUMBLE under the pressure of cooking with actual GOLD ORE.", "But you... you have the Zunda glint in your eye. COOK IT. TASTE IT. BECOME IT." } },
+			npc_dialogue = {
+				speaker = "chef",
+				lines = {
+					"Royal Stew, huh? Bold choice. Most beginners CRUMBLE under the pressure of cooking with actual GOLD ORE.",
+					"But you... you have the Zunda glint in your eye. COOK IT. TASTE IT. BECOME IT.",
+				},
+			},
 			chain_id = "culinary_ascension",
 			chain_step = 3,
 		},
@@ -548,7 +574,13 @@ local QuestConfig = {
 			rewards = { gold = 500, tier_points = 80, items = {} },
 			difficulty = 4,
 			subtext = "The Ultimate Feast is not on any menu. It IS the menu. The Zunda monks cooked it only during celestial alignments. 30 Wheat. 20 Apples. 5 Gold. This dish doesn't feed people — it INAUGURATES them. Cook it once. Be forever changed.",
-			npc_dialogue = { speaker = "narrator", lines = { "[ The kitchen grows dark. The stove flickers. Somewhere, a pea rolls across the floor. ]", "[ A voice from the flames whispers: 'You dare to cook the FEAST?' ]" } },
+			npc_dialogue = {
+				speaker = "narrator",
+				lines = {
+					"[ The kitchen grows dark. The stove flickers. Somewhere, a pea rolls across the floor. ]",
+					"[ A voice from the flames whispers: 'You dare to cook the FEAST?' ]",
+				},
+			},
 			chain_id = "culinary_ascension",
 			chain_step = 4,
 		},
@@ -562,7 +594,13 @@ local QuestConfig = {
 			rewards = { gold = 800, tier_points = 120, items = { "Zundamon's Banquet" } },
 			difficulty = 5,
 			subtext = "The final trial. 10 PERFECT cooks in a row. No burnt edges. No undercooked centers. Just FLAWLESS CULINARY DOMINATION. The Zunda spirits will witness. The kitchen will SHAKE. AND YOU WILL RISE.",
-			npc_dialogue = { speaker = "zundamon", lines = { "10 PERFECT COOKS!!! DO YOU HAVE ANY IDEA WHAT THAT MEANS?!?! 🔥🔥🔥", "THE KITCHEN ITSELF WILL RECOGNIZE YOU!!! THE STOVE WILL BOW!!! THE SPATULAS WILL SALUTE!!! GO GO GO!!!" } },
+			npc_dialogue = {
+				speaker = "zundamon",
+				lines = {
+					"10 PERFECT COOKS!!! DO YOU HAVE ANY IDEA WHAT THAT MEANS?!?! 🔥🔥🔥",
+					"THE KITCHEN ITSELF WILL RECOGNIZE YOU!!! THE STOVE WILL BOW!!! THE SPATULAS WILL SALUTE!!! GO GO GO!!!",
+				},
+			},
 			chain_id = "culinary_ascension",
 			chain_step = 5,
 		},
@@ -579,7 +617,13 @@ local QuestConfig = {
 			rewards = { gold = 130, tier_points = 22, items = { "Zunda Berry" } },
 			difficulty = 2,
 			subtext = "Summer in Zunda Village is a riot of color. The Zunda Berries are at their plumpest, the leaves are crisp, and the air smells of sunshine. The Seasonal Salad captures all of it in a bowl. Taste the sun.",
-			npc_dialogue = { speaker = "sakuradamon", lines = { "🌸 SUMMER IS HERE AND THE BERRIES ARE SCREAMING TO BE PICKED!!!", "The Seasonal Salad is a celebration of light itself!!! 3 Zunda Berries + 2 Zunda Leaves = PERFECTION IN A BOWL!!!" } },
+			npc_dialogue = {
+				speaker = "sakuradamon",
+				lines = {
+					"🌸 SUMMER IS HERE AND THE BERRIES ARE SCREAMING TO BE PICKED!!!",
+					"The Seasonal Salad is a celebration of light itself!!! 3 Zunda Berries + 2 Zunda Leaves = PERFECTION IN A BOWL!!!",
+				},
+			},
 			chain_id = "seasons_of_flavor",
 			chain_step = 1,
 		},
@@ -594,7 +638,13 @@ local QuestConfig = {
 			rewards = { gold = 200, tier_points = 32, items = {} },
 			difficulty = 3,
 			subtext = "When snow blankets Zunda Village, the only cure is the Warm Winter Stew. Zunda Roots roasted for hours, Zunda Mushrooms simmered in gold-infused broth. One spoonful and you'll forget the cold exists. 'A hug in a bowl,' the elders call it.",
-			npc_dialogue = { speaker = "elder", lines = { "The cold bites hard this season. But the stew... the stew bites BACK. ❄️🔥", "Zunda Roots from the permafrost. Zunda Mushrooms from the snow-kissed logs. And a pinch of gold because you're WORTH IT." } },
+			npc_dialogue = {
+				speaker = "elder",
+				lines = {
+					"The cold bites hard this season. But the stew... the stew bites BACK. ❄️🔥",
+					"Zunda Roots from the permafrost. Zunda Mushrooms from the snow-kissed logs. And a pinch of gold because you're WORTH IT.",
+				},
+			},
 			chain_id = "seasons_of_flavor",
 			chain_step = 2,
 		},
@@ -637,7 +687,13 @@ local QuestConfig = {
 			rewards = { gold = 100, tier_points = 18, items = {} },
 			difficulty = 2,
 			subtext = "The Village Elder has seen empires rise and fall on the strength of their stews. He carries the Old Knowledge. Three conversations might earn you a secret even the Zunda monks forgot.",
-			npc_dialogue = { speaker = "elder", lines = { "You keep coming back. Good. Most lack the patience for an old man's rambling.", "But YOU... you have the Zunda hunger. Come, sit. I'll tell you about the GOLDEN PEA OF LEGEND... but only after three visits." } },
+			npc_dialogue = {
+				speaker = "elder",
+				lines = {
+					"You keep coming back. Good. Most lack the patience for an old man's rambling.",
+					"But YOU... you have the Zunda hunger. Come, sit. I'll tell you about the GOLDEN PEA OF LEGEND... but only after three visits.",
+				},
+			},
 			chain_id = "friend_of_all",
 			chain_step = 2,
 		},
@@ -667,7 +723,13 @@ local QuestConfig = {
 			rewards = { gold = 250, tier_points = 35, items = {} },
 			difficulty = 3,
 			subtext = "Ankomon challenges you to a test of PURE PROTEIN POWER. 'Each punch,' he says, 'is 5 Edamame Pods + 3 Zunda Peas + 1 Gold of pure RESPECT.' Cook it thrice. Prove your BEAN WORTHY.",
-			npc_dialogue = { speaker = "ankomon", lines = { "🥜🥊 PROTEIN PUNCH!!! THIS ISN'T JUST FOOD IT'S A WORKOUT!!!", "COOK IT THREE TIMES AND I'LL ADMIT YOU HAVE BEAN SPIRIT!!! FAIL AND YOU'RE ON SOUP DUTY FOR A WEEK!!!" } },
+			npc_dialogue = {
+				speaker = "ankomon",
+				lines = {
+					"🥜🥊 PROTEIN PUNCH!!! THIS ISN'T JUST FOOD IT'S A WORKOUT!!!",
+					"COOK IT THREE TIMES AND I'LL ADMIT YOU HAVE BEAN SPIRIT!!! FAIL AND YOU'RE ON SOUP DUTY FOR A WEEK!!!",
+				},
+			},
 		},
 		{
 			id = "quest_cardamon_zen",
@@ -680,7 +742,13 @@ local QuestConfig = {
 			rewards = { gold = 200, tier_points = 30, items = { "Cardamon's Calm Cup" } },
 			difficulty = 2,
 			subtext = "Cardamon whispers: 'Speed means nothing. PRESENCE means everything.' Five dishes, each made with mindfulness and intent. Not rushed. Not forced. JUST. GREAT. Breathe in. Cook out.",
-			npc_dialogue = { speaker = "cardamon", lines = { "🌿🍋 Patience... breathe... C O O K...", "Five great dishes. Not 'good'. GREAT. I'll know the difference. YOUR SOUL WILL KNOW THE DIFFERENCE." } },
+			npc_dialogue = {
+				speaker = "cardamon",
+				lines = {
+					"🌿🍋 Patience... breathe... C O O K...",
+					"Five great dishes. Not 'good'. GREAT. I'll know the difference. YOUR SOUL WILL KNOW THE DIFFERENCE.",
+				},
+			},
 		},
 		{
 			id = "quest_antimon_speed",
@@ -693,7 +761,13 @@ local QuestConfig = {
 			rewards = { gold = 180, tier_points = 28, items = { "Antimon's Speed Soup" } },
 			difficulty = 2,
 			subtext = "Antimon vibrates with impatience. 'THE TIMING BAR IS NOT A SUGGESTION!!!' Three dishes. Under 4 seconds each. NO MISTAKES. SPEED IS FLAVOR. CHAOS IS TECHNIQUE.",
-			npc_dialogue = { speaker = "antimon", lines = { "⚡💨 SPEED SPEED SPEED!!! THE TIMER IS YOUR BEST FRIEND AND WORST ENEMY!!!", "COOK LIKE THE WIND!!! 4 SECONDS!!! MAXIMUM!!!" } },
+			npc_dialogue = {
+				speaker = "antimon",
+				lines = {
+					"⚡💨 SPEED SPEED SPEED!!! THE TIMER IS YOUR BEST FRIEND AND WORST ENEMY!!!",
+					"COOK LIKE THE WIND!!! 4 SECONDS!!! MAXIMUM!!!",
+				},
+			},
 		},
 		{
 			id = "quest_sakuradamon_bloom",
@@ -706,7 +780,13 @@ local QuestConfig = {
 			rewards = { gold = 280, tier_points = 38, items = {} },
 			difficulty = 3,
 			subtext = "Sakuradamon's petals glow brighter when her favorite dish is made. 'Blossom Bites,' she says, 'are not cooked — they're BLOOMED.' 4 Pea Flowers + 3 Zunda Berries. Each one a celebration of impermanent beauty.",
-			npc_dialogue = { speaker = "sakuradamon", lines = { "🌸💥 THE BLOSSOMS ARE ALIGNED!!! IT'S FESTIVAL TIME!!!", "Each Blossom Bite captures a moment of pure spring joy. COOK THREE. LET THE PETALS FALL WHERE THEY MAY." } },
+			npc_dialogue = {
+				speaker = "sakuradamon",
+				lines = {
+					"🌸💥 THE BLOSSOMS ARE ALIGNED!!! IT'S FESTIVAL TIME!!!",
+					"Each Blossom Bite captures a moment of pure spring joy. COOK THREE. LET THE PETALS FALL WHERE THEY MAY.",
+				},
+			},
 		},
 
 		-- ── EXPLORATION QUESTS v2 ────────────────────────────────────
@@ -733,7 +813,13 @@ local QuestConfig = {
 			rewards = { gold = 90, tier_points = 16, items = { "Zunda Root" } },
 			difficulty = 2,
 			subtext = "The Old Well at the village edge is more than it seems. Locals say if you drop a Zunda Pea in and listen carefully, you can hear the recipes of chefs long past. The well KNOWS things.",
-			npc_dialogue = { speaker = "elder", lines = { "The Old Well... be careful near it. Some say it's bottomless. Some say it leads to THE KITCHEN BELOW.", "But if you listen close at midnight, you might hear the sound of perfect timing. Tick. Tock. COOK." } },
+			npc_dialogue = {
+				speaker = "elder",
+				lines = {
+					"The Old Well... be careful near it. Some say it's bottomless. Some say it leads to THE KITCHEN BELOW.",
+					"But if you listen close at midnight, you might hear the sound of perfect timing. Tick. Tock. COOK.",
+				},
+			},
 		},
 		{
 			id = "quest_explore_waterfall",
@@ -757,7 +843,13 @@ local QuestConfig = {
 			rewards = { gold = 500, tier_points = 75, items = { "Golden Harvest Platter" } },
 			difficulty = 4,
 			subtext = "Zunda Village is vast, and every corner hides a culinary secret. 10 locations. 10 stories. 10 chances to find ingredients no one else has touched. Become the Cartographer of Flavor. Map the delicious unknown.",
-			npc_dialogue = { speaker = "narrator", lines = { "[ A scroll unfurls across the map table, revealing uncharted territories... ]", "[ Ink swirls into shapes: 'Here be ZUNDA PEAS.' The map is hungry for discovery. ]" } },
+			npc_dialogue = {
+				speaker = "narrator",
+				lines = {
+					"[ A scroll unfurls across the map table, revealing uncharted territories... ]",
+					"[ Ink swirls into shapes: 'Here be ZUNDA PEAS.' The map is hungry for discovery. ]",
+				},
+			},
 		},
 
 		-- ── ECONOMY / GOLD QUESTS v2 ────────────────────────────────
@@ -797,7 +889,13 @@ local QuestConfig = {
 			rewards = { gold = 500, tier_points = 100, items = { "Ultimate Feast" } },
 			difficulty = 5,
 			subtext = "TEN THOUSAND GOLD. The stuff of Zunda LEGEND. Only the greatest chefs in Zunda Village history have reached this milestone. Your name will be carved into the Golden Spatula of Fame. FOREVER.",
-			npc_dialogue = { speaker = "chef", lines = { "10,000 GOLD?!?!? I'VE BEEN COOKING FOR 40 YEARS AND I HAVEN'T REACHED THAT!!!", "...Who ARE you?!?! Are you THE CHOSEN ONE?!?! The Golden Pea Prophecy... it's REAL?!?!" } },
+			npc_dialogue = {
+				speaker = "chef",
+				lines = {
+					"10,000 GOLD?!?!? I'VE BEEN COOKING FOR 40 YEARS AND I HAVEN'T REACHED THAT!!!",
+					"...Who ARE you?!?! Are you THE CHOSEN ONE?!?! The Golden Pea Prophecy... it's REAL?!?!",
+				},
+			},
 			chain_id = "gold_rush",
 			chain_step = 3,
 		},
@@ -851,7 +949,7 @@ local QuestConfig = {
 			difficulty = 2,
 			subtext = "Petals dance on the wind — Sakuradamon approaches. The blossom spirit carries knowledge of the old ways. Set her as your companion and gain +25% XP from everything you cook and serve.",
 		},
-	}
+	},
 }
 
 return QuestConfig

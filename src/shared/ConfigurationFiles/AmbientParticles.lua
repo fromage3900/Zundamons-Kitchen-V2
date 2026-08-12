@@ -48,8 +48,8 @@ local function makeDustEmitter(pos)
 	e.Speed = NumberRange.new(0.3, 1.8)
 	e.SpreadAngle = Vector2.new(360, 360)
 	e.Acceleration = Vector3.new(0, 0.25, 0)
-	e.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.88), NumberSequenceKeypoint.new(1, 1)})
-	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.6), NumberSequenceKeypoint.new(1, 2.5)})
+	e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.88), NumberSequenceKeypoint.new(1, 1) })
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.6), NumberSequenceKeypoint.new(1, 2.5) })
 	e.LightEmission = 0.12
 	e.LightInfluence = 0.3
 	e.ZOffset = 2
@@ -82,7 +82,7 @@ local function makeFireflyEmitter(pos)
 		NumberSequenceKeypoint.new(0.4, 0.15),
 		NumberSequenceKeypoint.new(1, 0.92),
 	})
-	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.2)})
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0.2) })
 	e.Color = ColorSequence.new(Color3.fromRGB(255, 242, 190), Color3.fromRGB(255, 200, 110))
 	e.LightEmission = 0.2
 	e.LightInfluence = 0.3
@@ -112,8 +112,8 @@ local function makeSakuraEmitter(pos)
 	e.Speed = NumberRange.new(1.5, 5)
 	e.SpreadAngle = Vector2.new(25, 45)
 	e.Acceleration = Vector3.new(1.5, -2, 0.5)
-	e.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.15), NumberSequenceKeypoint.new(1, 1)})
-	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 1.4), NumberSequenceKeypoint.new(1, 0.6)})
+	e.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.15), NumberSequenceKeypoint.new(1, 1) })
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.4), NumberSequenceKeypoint.new(1, 0.6) })
 	e.Color = ColorSequence.new(Color3.fromRGB(255, 178, 198), Color3.fromRGB(255, 218, 228))
 	e.LightEmission = 0.15
 	e.LightInfluence = 0.4
@@ -149,7 +149,7 @@ local function makeBubbleMoteEmitter(pos)
 		NumberSequenceKeypoint.new(0.3, 0.6),
 		NumberSequenceKeypoint.new(1, 1),
 	})
-	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0.1)})
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0.1) })
 	e.Color = ColorSequence.new(Color3.fromRGB(200, 230, 255), Color3.fromRGB(255, 255, 255))
 	e.LightEmission = 0.2
 	e.LightInfluence = 0.3
@@ -183,7 +183,7 @@ local function makeMagicSparkleEmitter(pos)
 		NumberSequenceKeypoint.new(0.3, 0.3),
 		NumberSequenceKeypoint.new(1, 0.95),
 	})
-	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0.1)})
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0.1) })
 	e.Color = ColorSequence.new(Color3.fromRGB(255, 230, 200), Color3.fromRGB(200, 220, 255))
 	e.LightEmission = 0.25
 	e.LightInfluence = 0.3
@@ -273,11 +273,16 @@ end
 
 -- Listen to weather changes to adjust visibility
 local function onWeatherChanged(weatherKey)
-	local isNight = Lighting:GetAttribute("CurrentHour") and (Lighting:GetAttribute("CurrentHour") < 5.5 or Lighting:GetAttribute("CurrentHour") > 19)
+	local isNight = Lighting:GetAttribute("CurrentHour")
+		and (Lighting:GetAttribute("CurrentHour") < 5.5 or Lighting:GetAttribute("CurrentHour") > 19)
 	for _, child in ipairs(FX:GetChildren()) do
-		if not child:IsA("BasePart") then continue end
+		if not child:IsA("BasePart") then
+			continue
+		end
 		for _, e in ipairs(child:GetChildren()) do
-			if not e:IsA("ParticleEmitter") then continue end
+			if not e:IsA("ParticleEmitter") then
+				continue
+			end
 			if child.Name == "Fireflies" then
 				e.Enabled = isNight and (weatherKey ~= "rain" and weatherKey ~= "storm")
 				if e.Enabled then
@@ -288,10 +293,14 @@ local function onWeatherChanged(weatherKey)
 				e.Rate = weatherKey == "cherry_blossom" and 35 or 8
 			elseif child.Name == "DustMotes" then
 				local rate = 8
-				if weatherKey == "rain" or weatherKey == "storm" then rate = 1
-				elseif weatherKey == "fog" then rate = 4
-				elseif weatherKey == "snow" then rate = 2
-				elseif weatherKey == "cherry_blossom" then rate = 10
+				if weatherKey == "rain" or weatherKey == "storm" then
+					rate = 1
+				elseif weatherKey == "fog" then
+					rate = 4
+				elseif weatherKey == "snow" then
+					rate = 2
+				elseif weatherKey == "cherry_blossom" then
+					rate = 10
 				end
 				e.Rate = rate
 			elseif child.Name == "BubbleMotes" then

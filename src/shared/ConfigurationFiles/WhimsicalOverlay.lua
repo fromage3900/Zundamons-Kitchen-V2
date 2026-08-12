@@ -183,27 +183,35 @@ end
 -- ============================================================
 local function enhanceVignette()
 	for _, sg in ipairs(playerGui:GetChildren()) do
-		if not sg:IsA("ScreenGui") then continue end
-		local vignette = sg:FindFirstChild("Vignette")
-		if not vignette then continue end
-		for _, f in ipairs(vignette:GetChildren()) do
-			if not f:IsA("Frame") then continue end
-			local g = f:FindFirstChildOfClass("UIGradient")
-			if not g then continue end
-	task.spawn(function()
-		while f.Parent do
-			local breath = math.sin(os.clock() * 0.2) * 0.05
-			local weather = workspace:GetAttribute("CurrentWeather") or "clear"
-			local isDark = (weather == "rain" or weather == "storm" or weather == "fog")
-			local base = isDark and 0.28 or 0.45
-			g.Transparency = NumberSequence.new({
-				NumberSequenceKeypoint.new(0, base + breath),
-				NumberSequenceKeypoint.new(0.8, 0.75 + breath * 0.5),
-				NumberSequenceKeypoint.new(1, 1),
-			})
-			task.wait(0.15)
+		if not sg:IsA("ScreenGui") then
+			continue
 		end
-	end)
+		local vignette = sg:FindFirstChild("Vignette")
+		if not vignette then
+			continue
+		end
+		for _, f in ipairs(vignette:GetChildren()) do
+			if not f:IsA("Frame") then
+				continue
+			end
+			local g = f:FindFirstChildOfClass("UIGradient")
+			if not g then
+				continue
+			end
+			task.spawn(function()
+				while f.Parent do
+					local breath = math.sin(os.clock() * 0.2) * 0.05
+					local weather = workspace:GetAttribute("CurrentWeather") or "clear"
+					local isDark = (weather == "rain" or weather == "storm" or weather == "fog")
+					local base = isDark and 0.28 or 0.45
+					g.Transparency = NumberSequence.new({
+						NumberSequenceKeypoint.new(0, base + breath),
+						NumberSequenceKeypoint.new(0.8, 0.75 + breath * 0.5),
+						NumberSequenceKeypoint.new(1, 1),
+					})
+					task.wait(0.15)
+				end
+			end)
 			break
 		end
 		break

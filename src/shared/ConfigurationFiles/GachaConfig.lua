@@ -13,7 +13,7 @@ GachaConfig.currencies = {
 
 -- Pity Rules
 GachaConfig.pity = {
-	epicPityCount = 10,     -- Guaranteed 4★ (Epic) or higher every 10 pulls
+	epicPityCount = 10, -- Guaranteed 4★ (Epic) or higher every 10 pulls
 	legendaryPityCount = 50, -- Guaranteed 5★ (Legendary) every 50 pulls
 }
 
@@ -28,7 +28,12 @@ GachaConfig.banners = {
 		featuredItems = { "Zundamon_MagicalGirlForm", "Royal_Gourmet_Crown", "Ankomon_GoldTrim" },
 		pool = {
 			legendary = {
-				{ id = "Zundamon_MagicalGirlForm", type = "outfit", name = "Zunda Magical Girl Dress", icon = "👗✨" },
+				{
+					id = "Zundamon_MagicalGirlForm",
+					type = "outfit",
+					name = "Zunda Magical Girl Dress",
+					icon = "👗✨",
+				},
 				{ id = "Royal_Gourmet_Crown", type = "accessory", name = "Royal Gourmet Crown", icon = "👑" },
 				{ id = "AllCompanions_CosmicAura", type = "effect", name = "Cosmic Gourmet Aura", icon = "🌸" },
 			},

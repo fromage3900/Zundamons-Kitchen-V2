@@ -10,7 +10,14 @@ LandscapeConfig.biomes = {
 		seed = 42,
 		zones = {
 			{ name = "Plaza", type = "central", size = 18, weight = 1.0, maxBuildings = 2, spawnProfile = "plaza" },
-			{ name = "GardenEdge", type = "garden", size = 24, weight = 0.9, maxBuildings = 1, spawnProfile = "garden" },
+			{
+				name = "GardenEdge",
+				type = "garden",
+				size = 24,
+				weight = 0.9,
+				maxBuildings = 1,
+				spawnProfile = "garden",
+			},
 			{ name = "MarketRow", type = "street", size = 16, weight = 0.8, maxBuildings = 3, spawnProfile = "market" },
 			{ name = "PathLoop", type = "path", size = 12, weight = 0.6, maxBuildings = 0, spawnProfile = "path" },
 		},
@@ -45,9 +52,30 @@ LandscapeConfig.biomes = {
 		description = "A busy market square with stalls, lanterns, and food vendors.",
 		seed = 77,
 		zones = {
-			{ name = "MarketSquare", type = "central", size = 20, weight = 1.0, maxBuildings = 3, spawnProfile = "market_square" },
-			{ name = "VendorRow", type = "street", size = 18, weight = 0.95, maxBuildings = 4, spawnProfile = "vendor_row" },
-			{ name = "MarketGarden", type = "garden", size = 16, weight = 0.75, maxBuildings = 1, spawnProfile = "market_garden" },
+			{
+				name = "MarketSquare",
+				type = "central",
+				size = 20,
+				weight = 1.0,
+				maxBuildings = 3,
+				spawnProfile = "market_square",
+			},
+			{
+				name = "VendorRow",
+				type = "street",
+				size = 18,
+				weight = 0.95,
+				maxBuildings = 4,
+				spawnProfile = "vendor_row",
+			},
+			{
+				name = "MarketGarden",
+				type = "garden",
+				size = 16,
+				weight = 0.75,
+				maxBuildings = 1,
+				spawnProfile = "market_garden",
+			},
 		},
 		assetProfiles = {
 			market_square = {
@@ -79,7 +107,14 @@ LandscapeConfig.biomes = {
 		zones = {
 			{ name = "MainWalk", type = "street", size = 24, weight = 1.0, maxBuildings = 2, spawnProfile = "walk" },
 			{ name = "GardenNook", type = "garden", size = 16, weight = 0.8, maxBuildings = 1, spawnProfile = "nook" },
-			{ name = "ViewingPoint", type = "central", size = 14, weight = 0.7, maxBuildings = 1, spawnProfile = "view" },
+			{
+				name = "ViewingPoint",
+				type = "central",
+				size = 14,
+				weight = 0.7,
+				maxBuildings = 1,
+				spawnProfile = "view",
+			},
 		},
 		assetProfiles = {
 			walk = {
@@ -106,9 +141,30 @@ LandscapeConfig.biomes = {
 		description = "A dense forest edge with winding paths, mushrooms, and hidden clearings.",
 		seed = 112,
 		zones = {
-			{ name = "CanopyEdge", type = "garden", size = 22, weight = 1.0, maxBuildings = 1, spawnProfile = "canopy" },
-			{ name = "MushroomRing", type = "path", size = 18, weight = 0.85, maxBuildings = 0, spawnProfile = "mushroom" },
-			{ name = "HiddenClearing", type = "central", size = 16, weight = 0.75, maxBuildings = 1, spawnProfile = "clearing" },
+			{
+				name = "CanopyEdge",
+				type = "garden",
+				size = 22,
+				weight = 1.0,
+				maxBuildings = 1,
+				spawnProfile = "canopy",
+			},
+			{
+				name = "MushroomRing",
+				type = "path",
+				size = 18,
+				weight = 0.85,
+				maxBuildings = 0,
+				spawnProfile = "mushroom",
+			},
+			{
+				name = "HiddenClearing",
+				type = "central",
+				size = 16,
+				weight = 0.75,
+				maxBuildings = 1,
+				spawnProfile = "clearing",
+			},
 		},
 		assetProfiles = {
 			canopy = {
@@ -136,7 +192,14 @@ LandscapeConfig.biomes = {
 		seed = 123,
 		zones = {
 			{ name = "FruitRows", type = "garden", size = 20, weight = 1.0, maxBuildings = 1, spawnProfile = "rows" },
-			{ name = "PicnicNook", type = "central", size = 14, weight = 0.8, maxBuildings = 1, spawnProfile = "picnic" },
+			{
+				name = "PicnicNook",
+				type = "central",
+				size = 14,
+				weight = 0.8,
+				maxBuildings = 1,
+				spawnProfile = "picnic",
+			},
 			{ name = "PathEdge", type = "path", size = 16, weight = 0.75, maxBuildings = 0, spawnProfile = "edge" },
 		},
 		assetProfiles = {
@@ -164,9 +227,30 @@ LandscapeConfig.biomes = {
 		description = "A bright meadow plaza with open lawns, flower beds, and social gathering space.",
 		seed = 134,
 		zones = {
-			{ name = "CenterStage", type = "central", size = 18, weight = 1.0, maxBuildings = 2, spawnProfile = "center" },
-			{ name = "FlowerBeds", type = "garden", size = 20, weight = 0.9, maxBuildings = 1, spawnProfile = "flowers" },
-			{ name = "LanternWalk", type = "street", size = 16, weight = 0.8, maxBuildings = 2, spawnProfile = "lanterns" },
+			{
+				name = "CenterStage",
+				type = "central",
+				size = 18,
+				weight = 1.0,
+				maxBuildings = 2,
+				spawnProfile = "center",
+			},
+			{
+				name = "FlowerBeds",
+				type = "garden",
+				size = 20,
+				weight = 0.9,
+				maxBuildings = 1,
+				spawnProfile = "flowers",
+			},
+			{
+				name = "LanternWalk",
+				type = "street",
+				size = 16,
+				weight = 0.8,
+				maxBuildings = 2,
+				spawnProfile = "lanterns",
+			},
 		},
 		assetProfiles = {
 			center = {
@@ -193,8 +277,22 @@ LandscapeConfig.biomes = {
 		description = "A warm sunset grove with soft lighting, benches, and layered shrubs.",
 		seed = 145,
 		zones = {
-			{ name = "GroveCenter", type = "central", size = 16, weight = 1.0, maxBuildings = 1, spawnProfile = "grove" },
-			{ name = "ShrubRing", type = "garden", size = 20, weight = 0.85, maxBuildings = 1, spawnProfile = "shrubs" },
+			{
+				name = "GroveCenter",
+				type = "central",
+				size = 16,
+				weight = 1.0,
+				maxBuildings = 1,
+				spawnProfile = "grove",
+			},
+			{
+				name = "ShrubRing",
+				type = "garden",
+				size = 20,
+				weight = 0.85,
+				maxBuildings = 1,
+				spawnProfile = "shrubs",
+			},
 			{ name = "GlowPath", type = "street", size = 18, weight = 0.8, maxBuildings = 2, spawnProfile = "glow" },
 		},
 		assetProfiles = {
@@ -222,9 +320,30 @@ LandscapeConfig.biomes = {
 		description = "A golden wheat field with tall grass, scarecrows, and hidden paths through the grain.",
 		seed = 167,
 		zones = {
-			{ name = "GrainCenter", type = "central", size = 22, weight = 1.0, maxBuildings = 2, spawnProfile = "grain" },
-			{ name = "TallGrassRing", type = "garden", size = 26, weight = 0.9, maxBuildings = 0, spawnProfile = "tallgrass" },
-			{ name = "ScarecrowRow", type = "street", size = 18, weight = 0.8, maxBuildings = 2, spawnProfile = "scarecrow" },
+			{
+				name = "GrainCenter",
+				type = "central",
+				size = 22,
+				weight = 1.0,
+				maxBuildings = 2,
+				spawnProfile = "grain",
+			},
+			{
+				name = "TallGrassRing",
+				type = "garden",
+				size = 26,
+				weight = 0.9,
+				maxBuildings = 0,
+				spawnProfile = "tallgrass",
+			},
+			{
+				name = "ScarecrowRow",
+				type = "street",
+				size = 18,
+				weight = 0.8,
+				maxBuildings = 2,
+				spawnProfile = "scarecrow",
+			},
 		},
 		assetProfiles = {
 			grain = {
@@ -251,9 +370,30 @@ LandscapeConfig.biomes = {
 		description = "A shimmering garden with crystalline flora, glowing mushrooms, and luminescent pathways.",
 		seed = 178,
 		zones = {
-			{ name = "CrystalHeart", type = "central", size = 18, weight = 1.0, maxBuildings = 1, spawnProfile = "crystal" },
-			{ name = "GlowShroomRing", type = "garden", size = 22, weight = 0.9, maxBuildings = 0, spawnProfile = "glowshroom" },
-			{ name = "CrystalPath", type = "street", size = 16, weight = 0.8, maxBuildings = 2, spawnProfile = "crystalpath" },
+			{
+				name = "CrystalHeart",
+				type = "central",
+				size = 18,
+				weight = 1.0,
+				maxBuildings = 1,
+				spawnProfile = "crystal",
+			},
+			{
+				name = "GlowShroomRing",
+				type = "garden",
+				size = 22,
+				weight = 0.9,
+				maxBuildings = 0,
+				spawnProfile = "glowshroom",
+			},
+			{
+				name = "CrystalPath",
+				type = "street",
+				size = 16,
+				weight = 0.8,
+				maxBuildings = 2,
+				spawnProfile = "crystalpath",
+			},
 		},
 		assetProfiles = {
 			crystal = {
@@ -280,8 +420,22 @@ LandscapeConfig.biomes = {
 		description = "A serene moonlit garden with soft flora, lantern paths, and reflective clearings.",
 		seed = 156,
 		zones = {
-			{ name = "MoonClearing", type = "central", size = 16, weight = 1.0, maxBuildings = 1, spawnProfile = "moon" },
-			{ name = "LanternPath", type = "street", size = 18, weight = 0.9, maxBuildings = 2, spawnProfile = "lanternpath" },
+			{
+				name = "MoonClearing",
+				type = "central",
+				size = 16,
+				weight = 1.0,
+				maxBuildings = 1,
+				spawnProfile = "moon",
+			},
+			{
+				name = "LanternPath",
+				type = "street",
+				size = 18,
+				weight = 0.9,
+				maxBuildings = 2,
+				spawnProfile = "lanternpath",
+			},
 			{ name = "BloomRing", type = "garden", size = 20, weight = 0.85, maxBuildings = 0, spawnProfile = "bloom" },
 		},
 		assetProfiles = {

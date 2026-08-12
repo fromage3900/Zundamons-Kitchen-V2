@@ -24,10 +24,13 @@ local PALETTE = {
 	stone = Color3.fromRGB(214, 206, 196),
 }
 
+local SCALE_FACTOR = 1.5
+
 local function part(name, size, color, cframe, parent, shape)
+	local scaledSize = size * SCALE_FACTOR
 	local p = Instance.new("Part")
 	p.Name = name
-	p.Size = size
+	p.Size = scaledSize
 	p.Color = color
 	p.CFrame = cframe
 	p.Anchored = true
@@ -38,6 +41,11 @@ local function part(name, size, color, cframe, parent, shape)
 		p.Shape = Enum.PartType.Ball
 	elseif shape == "cylinder" then
 		p.Shape = Enum.PartType.Cylinder
+	else
+		local mesh = Instance.new("SpecialMesh")
+		mesh.MeshType = Enum.MeshType.Brick
+		mesh.Scale = Vector3.new(1, 1, 1)
+		mesh.Parent = p
 	end
 	p.Parent = parent
 	return p
@@ -47,7 +55,14 @@ local function buildStreetLamp(pos: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "StreetLamp"
 	local pole = part("Pole", Vector3.new(0.5, 9, 0.5), PALETTE.stone, CFrame.new(pos + Vector3.new(0, 4.5, 0)), model)
-	local head = part("LampHead", Vector3.new(1.4, 1.4, 1.4), PALETTE.gold, CFrame.new(pos + Vector3.new(0, 9.2, 0)), model, "ball")
+	local head = part(
+		"LampHead",
+		Vector3.new(1.4, 1.4, 1.4),
+		PALETTE.gold,
+		CFrame.new(pos + Vector3.new(0, 9.2, 0)),
+		model,
+		"ball"
+	)
 	head.Material = Enum.Material.Neon
 	head.Transparency = 0.15
 	local light = Instance.new("PointLight")
@@ -64,8 +79,9 @@ local function buildBench(pos: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "Bench"
 	local seat = part("Seat", Vector3.new(4, 0.3, 1.4), PALETTE.wood, CFrame.new(pos + Vector3.new(0, 1.2, 0)), model)
-	local back = part("Back", Vector3.new(4, 1.2, 0.25), PALETTE.wood, CFrame.new(pos + Vector3.new(0, 1.95, -0.6)), model)
-	for _, dx in ipairs({-1.7, 1.7}) do
+	local back =
+		part("Back", Vector3.new(4, 1.2, 0.25), PALETTE.wood, CFrame.new(pos + Vector3.new(0, 1.95, -0.6)), model)
+	for _, dx in ipairs({ -1.7, 1.7 }) do
 		part("Leg" .. dx, Vector3.new(0.3, 1.2, 1.2), PALETTE.stone, CFrame.new(pos + Vector3.new(dx, 0.55, 0)), model)
 	end
 	model.PrimaryPart = seat
@@ -75,11 +91,32 @@ end
 local function buildZundaFlower(pos: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "ZundaFlower"
-	local stem = part("Stem", Vector3.new(0.15, 1.6, 0.15), PALETTE.green, CFrame.new(pos + Vector3.new(0, 0.8, 0)), model, "nocollide")
-	local colors = {PALETTE.pink, PALETTE.gold, Color3.fromRGB(255, 255, 255)}
-	local bloom = part("Bloom", Vector3.new(0.9, 0.9, 0.9), colors[math.random(1, #colors)], CFrame.new(pos + Vector3.new(0, 1.7, 0)), model, "ball")
+	local stem = part(
+		"Stem",
+		Vector3.new(0.15, 1.6, 0.15),
+		PALETTE.green,
+		CFrame.new(pos + Vector3.new(0, 0.8, 0)),
+		model,
+		"nocollide"
+	)
+	local colors = { PALETTE.pink, PALETTE.gold, Color3.fromRGB(255, 255, 255) }
+	local bloom = part(
+		"Bloom",
+		Vector3.new(0.9, 0.9, 0.9),
+		colors[math.random(1, #colors)],
+		CFrame.new(pos + Vector3.new(0, 1.7, 0)),
+		model,
+		"ball"
+	)
 	bloom.CanCollide = false
-	local center = part("Center", Vector3.new(0.35, 0.35, 0.35), PALETTE.gold, CFrame.new(pos + Vector3.new(0, 1.7, 0)), model, "ball")
+	local center = part(
+		"Center",
+		Vector3.new(0.35, 0.35, 0.35),
+		PALETTE.gold,
+		CFrame.new(pos + Vector3.new(0, 1.7, 0)),
+		model,
+		"ball"
+	)
 	center.CanCollide = false
 	model.PrimaryPart = stem
 	return model
@@ -88,11 +125,19 @@ end
 local function buildBerryBush(pos: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "BerryBush"
-	local base = part("Base", Vector3.new(2.6, 1.6, 2.6), PALETTE.green, CFrame.new(pos + Vector3.new(0, 0.8, 0)), model, "ball")
+	local base =
+		part("Base", Vector3.new(2.6, 1.6, 2.6), PALETTE.green, CFrame.new(pos + Vector3.new(0, 0.8, 0)), model, "ball")
 	for i = 1, 5 do
 		local angle = (i / 5) * math.pi * 2
 		local berryPos = pos + Vector3.new(math.cos(angle) * 1.0, 1.0 + math.sin(i) * 0.3, math.sin(angle) * 1.0)
-		local berry = part("Berry" .. i, Vector3.new(0.3, 0.3, 0.3), Color3.fromRGB(200, 60, 90), CFrame.new(berryPos), model, "ball")
+		local berry = part(
+			"Berry" .. i,
+			Vector3.new(0.3, 0.3, 0.3),
+			Color3.fromRGB(200, 60, 90),
+			CFrame.new(berryPos),
+			model,
+			"ball"
+		)
 		berry.CanCollide = false
 		berry.Material = Enum.Material.Neon
 	end
@@ -103,9 +148,23 @@ end
 local function buildZundaMushroom(pos: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "ZundaMushroom"
-	local stem = part("Stem", Vector3.new(0.6, 1.1, 0.6), PALETTE.cream, CFrame.new(pos + Vector3.new(0, 0.55, 0)), model, "cylinder")
+	local stem = part(
+		"Stem",
+		Vector3.new(0.6, 1.1, 0.6),
+		PALETTE.cream,
+		CFrame.new(pos + Vector3.new(0, 0.55, 0)),
+		model,
+		"cylinder"
+	)
 	stem.Orientation = Vector3.new(0, 0, 90)
-	local cap = part("Cap", Vector3.new(1.6, 0.9, 1.6), Color3.fromRGB(230, 90, 90), CFrame.new(pos + Vector3.new(0, 1.25, 0)), model, "ball")
+	local cap = part(
+		"Cap",
+		Vector3.new(1.6, 0.9, 1.6),
+		Color3.fromRGB(230, 90, 90),
+		CFrame.new(pos + Vector3.new(0, 1.25, 0)),
+		model,
+		"ball"
+	)
 	cap.CanCollide = false
 	for i = 1, 3 do
 		local dotPos = pos + Vector3.new(math.random(-5, 5) / 10, 1.55, math.random(-5, 5) / 10)
@@ -127,10 +186,23 @@ local function buildStall(pos: Vector3, roofColor: Color3, name: string): Model
 	local depth = isHall and 8 or 5
 	local height = isHall and 5 or 3.5
 
-	local counter = part("Counter", Vector3.new(width, height * 0.55, depth), PALETTE.cream, CFrame.new(pos + Vector3.new(0, height * 0.275, 0)), model)
-	local roof = part("Roof", Vector3.new(width + 1.4, 0.5, depth + 1.4), roofColor, CFrame.new(pos + Vector3.new(0, height * 0.55 + 0.6, 0)), model, "nocollide")
+	local counter = part(
+		"Counter",
+		Vector3.new(width, height * 0.55, depth),
+		PALETTE.cream,
+		CFrame.new(pos + Vector3.new(0, height * 0.275, 0)),
+		model
+	)
+	local roof = part(
+		"Roof",
+		Vector3.new(width + 1.4, 0.5, depth + 1.4),
+		roofColor,
+		CFrame.new(pos + Vector3.new(0, height * 0.55 + 0.6, 0)),
+		model,
+		"nocollide"
+	)
 	roof.Material = Enum.Material.Fabric
-	for _, corner in ipairs({Vector3.new(1, 1), Vector3.new(1, -1), Vector3.new(-1, 1), Vector3.new(-1, -1)}) do
+	for _, corner in ipairs({ Vector3.new(1, 1), Vector3.new(1, -1), Vector3.new(-1, 1), Vector3.new(-1, -1) }) do
 		local postPos = pos + Vector3.new(corner.X * (width / 2 - 0.3), height * 0.275, corner.Y * (depth / 2 - 0.3))
 		part("Post", Vector3.new(0.35, height * 0.55, 0.35), PALETTE.wood, CFrame.new(postPos), model)
 	end
@@ -164,8 +236,12 @@ local BUILDERS: { [string]: (Vector3) -> Model } = {
 	ZundaFlower = buildZundaFlower,
 	BerryBush = buildBerryBush,
 	ZundaMushroom = buildZundaMushroom,
-	BakeryStall = function(pos) return buildStall(pos, PALETTE.roof, "BakeryStall") end,
-	MarketHall = function(pos) return buildStall(pos, PALETTE.mint, "MarketHall") end,
+	BakeryStall = function(pos)
+		return buildStall(pos, PALETTE.roof, "BakeryStall")
+	end,
+	MarketHall = function(pos)
+		return buildStall(pos, PALETTE.mint, "MarketHall")
+	end,
 }
 
 -- Returns a freshly-built Model for the given asset name at pos, or nil if no

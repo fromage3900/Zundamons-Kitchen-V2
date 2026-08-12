@@ -14,6 +14,8 @@ return {
 	end,
 	revert = function(instance)
 		local origCF = instance:GetAttribute("_mod_spinOrigCF")
-		if origCF then instance.CFrame = origCF end
+		if origCF then
+			instance.CFrame = origCF
+		end
 	end,
 }

@@ -1,8 +1,12 @@
 return {
 	name = "Glow",
 	apply = function(instance, params)
-		if not instance:IsA("BasePart") then return end
-		if instance:FindFirstChild("_modGlow") then return end
+		if not instance:IsA("BasePart") then
+			return
+		end
+		if instance:FindFirstChild("_modGlow") then
+			return
+		end
 		local light = Instance.new("PointLight")
 		light.Name = "_modGlow"
 		light.Brightness = params.brightness or 1.5
@@ -22,8 +26,12 @@ return {
 	end,
 	revert = function(instance)
 		local light = instance:FindFirstChild("_modGlow")
-		if light then light:Destroy() end
+		if light then
+			light:Destroy()
+		end
 		local pe = instance:FindFirstChild("_modGlowPE")
-		if pe then pe:Destroy() end
+		if pe then
+			pe:Destroy()
+		end
 	end,
 }

@@ -1,7 +1,9 @@
 return {
 	name = "Color",
 	apply = function(instance, params)
-		if not instance:IsA("BasePart") then return end
+		if not instance:IsA("BasePart") then
+			return
+		end
 		local origColor = instance:GetAttribute("_mod_origColor")
 		if not origColor then
 			instance:SetAttribute("_mod_origColor", { instance.Color.R, instance.Color.G, instance.Color.B })
@@ -12,7 +14,9 @@ return {
 		end
 	end,
 	revert = function(instance)
-		if not instance:IsA("BasePart") then return end
+		if not instance:IsA("BasePart") then
+			return
+		end
 		local origColor = instance:GetAttribute("_mod_origColor")
 		if origColor then
 			instance.Color = Color3.fromRGB(origColor[1] * 255, origColor[2] * 255, origColor[3] * 255)

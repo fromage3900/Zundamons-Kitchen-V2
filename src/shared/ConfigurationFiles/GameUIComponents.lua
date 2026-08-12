@@ -23,24 +23,24 @@ function GameUIComponents.createRecipeCard(props: {
 	onClick: (() -> ())?,
 }): Frame
 	local p = props or {}
-	
+
 	local card = Instance.new("Frame")
 	card.Name = "RecipeCard"
 	card.Size = p.Size or UDim2.fromOffset(200, 250)
 	card.Position = p.Position or UDim2.new()
 	card.BackgroundColor3 = UIConfig.COLORS.CreamWhite
 	card.BorderSizePixel = 0
-	
+
 	-- Border styling
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = UIConfig.COLORS.WoodLight
 	stroke.Thickness = 3
 	stroke.Parent = card
-	
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 16)
 	corner.Parent = card
-	
+
 	-- Card image placeholder
 	local image = Instance.new("Frame")
 	image.Name = "CardImage"
@@ -49,11 +49,11 @@ function GameUIComponents.createRecipeCard(props: {
 	image.BackgroundColor3 = UIConfig.COLORS.CreamDark
 	image.BorderSizePixel = 0
 	image.Parent = card
-	
+
 	local imageCorner = Instance.new("UICorner")
 	imageCorner.CornerRadius = UDim.new(0, 12)
 	imageCorner.Parent = image
-	
+
 	-- Card content
 	local content = Instance.new("Frame")
 	content.Name = "CardContent"
@@ -61,7 +61,7 @@ function GameUIComponents.createRecipeCard(props: {
 	content.Position = UDim2.new(0, 8, 0, 132)
 	content.BackgroundTransparency = 1
 	content.Parent = card
-	
+
 	local nameLabel = Instance.new("TextLabel")
 	nameLabel.Name = "RecipeName"
 	nameLabel.Size = UDim2.new(1, 0, 0, 24)
@@ -72,7 +72,7 @@ function GameUIComponents.createRecipeCard(props: {
 	nameLabel.TextColor3 = UIConfig.COLORS.TextPrimary
 	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	nameLabel.Parent = content
-	
+
 	local descLabel = Instance.new("TextLabel")
 	descLabel.Name = "Description"
 	descLabel.Size = UDim2.new(1, 0, 1, -24)
@@ -86,11 +86,11 @@ function GameUIComponents.createRecipeCard(props: {
 	descLabel.TextXAlignment = Enum.TextXAlignment.Left
 	descLabel.TextYAlignment = Enum.TextYAlignment.Top
 	descLabel.Parent = content
-	
+
 	-- Rarity badge
 	if p.Rarity then
 		local rarityColor = UIConfig.COLORS["Rarity" .. p.Rarity] or UIConfig.COLORS.RarityCommon
-		
+
 		local badge = Instance.new("TextLabel")
 		badge.Name = "RarityBadge"
 		badge.Size = UDim2.new(0, 60, 0, 24)
@@ -101,12 +101,12 @@ function GameUIComponents.createRecipeCard(props: {
 		badge.TextSize = 12
 		badge.TextColor3 = UIConfig.COLORS.TextWhite
 		badge.Parent = card
-		
+
 		local badgeCorner = Instance.new("UICorner")
 		badgeCorner.CornerRadius = UDim.new(0, 8)
 		badgeCorner.Parent = badge
 	end
-	
+
 	-- Locked state
 	if p.IsLocked then
 		card.BackgroundTransparency = 0.4
@@ -121,18 +121,18 @@ function GameUIComponents.createRecipeCard(props: {
 		lockIcon.TextColor3 = UIConfig.COLORS.TextWhite
 		lockIcon.TextScaled = true
 		lockIcon.Parent = card
-		
+
 		local lockCorner = Instance.new("UICorner")
 		lockCorner.CornerRadius = UDim.new(0, 12)
 		lockCorner.Parent = lockIcon
 	end
-	
+
 	-- Selected state
 	if p.IsSelected then
 		stroke.Color = UIConfig.COLORS.PrimaryGreen
 		stroke.Thickness = 4
 	end
-	
+
 	-- Click handler
 	if p.onClick then
 		local button = Instance.new("TextButton")
@@ -143,11 +143,11 @@ function GameUIComponents.createRecipeCard(props: {
 		button.Parent = card
 		button.MouseButton1Click:Connect(p.onClick)
 	end
-	
+
 	if p.Parent then
 		card.Parent = p.Parent
 	end
-	
+
 	return card
 end
 
@@ -164,23 +164,23 @@ function GameUIComponents.createIngredientCard(props: {
 	onClick: (() -> ())?,
 }): Frame
 	local p = props or {}
-	
+
 	local card = Instance.new("Frame")
 	card.Name = "IngredientCard"
 	card.Size = p.Size or UDim2.fromOffset(100, 120)
 	card.Position = p.Position or UDim2.new()
 	card.BackgroundColor3 = UIConfig.COLORS.CreamWhite
 	card.BorderSizePixel = 0
-	
+
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = UIConfig.COLORS.WoodLight
 	stroke.Thickness = 2
 	stroke.Parent = card
-	
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 16)
 	corner.Parent = card
-	
+
 	-- Icon
 	local icon = Instance.new("TextLabel")
 	icon.Name = "Icon"
@@ -192,7 +192,7 @@ function GameUIComponents.createIngredientCard(props: {
 	icon.TextSize = 32
 	icon.TextColor3 = UIConfig.COLORS.TextPrimary
 	icon.Parent = card
-	
+
 	-- Name
 	local nameLabel = Instance.new("TextLabel")
 	nameLabel.Name = "Name"
@@ -204,7 +204,7 @@ function GameUIComponents.createIngredientCard(props: {
 	nameLabel.TextSize = UIConfig.FONT_SIZES.Small
 	nameLabel.TextColor3 = UIConfig.COLORS.TextPrimary
 	nameLabel.Parent = card
-	
+
 	-- Quantity
 	if p.Quantity then
 		local qtyLabel = Instance.new("TextLabel")
@@ -218,7 +218,7 @@ function GameUIComponents.createIngredientCard(props: {
 		qtyLabel.TextColor3 = UIConfig.COLORS.TextSecondary
 		qtyLabel.Parent = card
 	end
-	
+
 	-- Click handler
 	if p.onClick then
 		local button = Instance.new("TextButton")
@@ -229,11 +229,11 @@ function GameUIComponents.createIngredientCard(props: {
 		button.Parent = card
 		button.MouseButton1Click:Connect(p.onClick)
 	end
-	
+
 	if p.Parent then
 		card.Parent = p.Parent
 	end
-	
+
 	return card
 end
 
@@ -251,23 +251,23 @@ function GameUIComponents.createChefPill(props: {
 	Parent: Instance?,
 }): Frame
 	local p = props or {}
-	
+
 	local pill = Instance.new("Frame")
 	pill.Name = "ChefPill"
 	pill.Size = UDim2.fromOffset(300, 40)
 	pill.Position = p.Position or UDim2.new()
 	pill.BackgroundColor3 = Color3.fromRGB(61, 42, 74)
 	pill.BorderSizePixel = 0
-	
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 20)
 	corner.Parent = pill
-	
+
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = p.TierColor or UIConfig.COLORS.PrimaryGreen
 	stroke.Thickness = 2
 	stroke.Parent = pill
-	
+
 	-- Badge
 	local badge = Instance.new("TextLabel")
 	badge.Name = "Badge"
@@ -279,7 +279,7 @@ function GameUIComponents.createChefPill(props: {
 	badge.TextSize = 24
 	badge.TextColor3 = UIConfig.COLORS.TextWhite
 	badge.Parent = pill
-	
+
 	-- Tier label
 	local tierLabel = Instance.new("TextLabel")
 	tierLabel.Name = "TierLabel"
@@ -292,7 +292,7 @@ function GameUIComponents.createChefPill(props: {
 	tierLabel.TextColor3 = UIConfig.COLORS.TextWhite
 	tierLabel.TextXAlignment = Enum.TextXAlignment.Left
 	tierLabel.Parent = pill
-	
+
 	-- XP bar
 	local xpBar = Instance.new("Frame")
 	xpBar.Name = "XPBar"
@@ -301,32 +301,32 @@ function GameUIComponents.createChefPill(props: {
 	xpBar.BackgroundColor3 = Color3.fromRGB(45, 42, 58)
 	xpBar.BorderSizePixel = 0
 	xpBar.Parent = pill
-	
+
 	local xpCorner = Instance.new("UICorner")
 	xpCorner.CornerRadius = UDim.new(0, 4)
 	xpCorner.Parent = xpBar
-	
+
 	local xpFill = Instance.new("Frame")
 	xpFill.Name = "Fill"
 	xpFill.Size = UDim2.new(0, 0, 1, 0)
 	xpFill.BackgroundColor3 = p.TierColor or UIConfig.COLORS.PrimaryGreen
 	xpFill.BorderSizePixel = 0
 	xpFill.Parent = xpBar
-	
+
 	local fillCorner = Instance.new("UICorner")
 	fillCorner.CornerRadius = UDim.new(0, 4)
 	fillCorner.Parent = xpFill
-	
+
 	-- Set XP progress
 	if p.XP and p.XPNeeded and p.XPNeeded > 0 then
 		local fraction = math.clamp(p.XP / p.XPNeeded, 0, 1)
 		xpFill.Size = UDim2.new(fraction, 0, 1, 0)
 	end
-	
+
 	if p.Parent then
 		pill.Parent = p.Parent
 	end
-	
+
 	return pill
 end
 
@@ -340,7 +340,7 @@ function GameUIComponents.createComboMeter(props: {
 	Parent: Instance?,
 }): Frame
 	local p = props or {}
-	
+
 	local combo = Instance.new("Frame")
 	combo.Name = "ComboMeter"
 	combo.Size = UDim2.fromOffset(220, 70)
@@ -348,16 +348,16 @@ function GameUIComponents.createComboMeter(props: {
 	combo.BackgroundColor3 = Color3.fromRGB(74, 50, 90)
 	combo.BorderSizePixel = 0
 	combo.BackgroundTransparency = 1
-	
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 16)
 	corner.Parent = combo
-	
+
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = UIConfig.COLORS.Warning
 	stroke.Thickness = 2
 	stroke.Parent = combo
-	
+
 	-- Count label
 	local countLabel = Instance.new("TextLabel")
 	countLabel.Name = "Count"
@@ -369,7 +369,7 @@ function GameUIComponents.createComboMeter(props: {
 	countLabel.TextSize = 16
 	countLabel.TextColor3 = UIConfig.COLORS.TextWhite
 	countLabel.Parent = combo
-	
+
 	-- Multiplier label
 	local multLabel = Instance.new("TextLabel")
 	multLabel.Name = "Multiplier"
@@ -381,11 +381,11 @@ function GameUIComponents.createComboMeter(props: {
 	multLabel.TextSize = 18
 	multLabel.TextColor3 = UIConfig.COLORS.Warning
 	multLabel.Parent = combo
-	
+
 	if p.Parent then
 		combo.Parent = p.Parent
 	end
-	
+
 	return combo
 end
 
@@ -401,23 +401,23 @@ function GameUIComponents.createAchievementToast(props: {
 	onDismiss: (() -> ())?,
 }): Frame
 	local p = props or {}
-	
+
 	local toast = Instance.new("Frame")
 	toast.Name = "AchievementToast"
 	toast.Size = UDim2.fromOffset(340, 70)
 	toast.Position = p.Position or UDim2.new(1, 360, 0, 200)
 	toast.BackgroundColor3 = Color3.fromRGB(40, 32, 60)
 	toast.BorderSizePixel = 0
-	
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 14)
 	corner.Parent = toast
-	
+
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = UIConfig.COLORS.Warning
 	stroke.Thickness = 2
 	stroke.Parent = toast
-	
+
 	-- Icon
 	local icon = Instance.new("TextLabel")
 	icon.Name = "Icon"
@@ -429,7 +429,7 @@ function GameUIComponents.createAchievementToast(props: {
 	icon.TextSize = 32
 	icon.TextColor3 = UIConfig.COLORS.Warning
 	icon.Parent = toast
-	
+
 	-- Title
 	local titleLabel = Instance.new("TextLabel")
 	titleLabel.Name = "Title"
@@ -442,7 +442,7 @@ function GameUIComponents.createAchievementToast(props: {
 	titleLabel.TextColor3 = UIConfig.COLORS.Warning
 	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	titleLabel.Parent = toast
-	
+
 	-- Description
 	local descLabel = Instance.new("TextLabel")
 	descLabel.Name = "Description"
@@ -455,19 +455,19 @@ function GameUIComponents.createAchievementToast(props: {
 	descLabel.TextColor3 = Color3.fromRGB(220, 220, 230)
 	descLabel.TextXAlignment = Enum.TextXAlignment.Left
 	descLabel.Parent = toast
-	
+
 	-- Animate in
 	toast.Size = UDim2.fromOffset(0, 70)
 	TweenService:Create(toast, TweenInfo.new(0.35, Enum.EasingStyle.Back), {
 		Size = UDim2.fromOffset(340, 70),
-		Position = UDim2.new(1, -360, 0, 200)
+		Position = UDim2.new(1, -360, 0, 200),
 	}):Play()
-	
+
 	-- Auto dismiss
 	task.delay(4, function()
 		TweenService:Create(toast, TweenInfo.new(0.4), {
 			Size = UDim2.fromOffset(340, 0),
-			Position = UDim2.new(1, 360, 0, 200)
+			Position = UDim2.new(1, 360, 0, 200),
 		}):Play()
 		task.wait(0.5)
 		toast:Destroy()
@@ -475,11 +475,11 @@ function GameUIComponents.createAchievementToast(props: {
 			p.onDismiss()
 		end
 	end)
-	
+
 	if p.Parent then
 		toast.Parent = p.Parent
 	end
-	
+
 	return toast
 end
 
@@ -495,23 +495,23 @@ function GameUIComponents.createLevelUpBanner(props: {
 	onDismiss: (() -> ())?,
 }): Frame
 	local p = props or {}
-	
+
 	local banner = Instance.new("Frame")
 	banner.Name = "LevelUpBanner"
 	banner.Size = UDim2.fromOffset(460, 120)
 	banner.Position = UDim2.new(0.5, -230, 0.3, -60)
 	banner.BackgroundColor3 = Color3.fromRGB(40, 32, 60)
 	banner.BorderSizePixel = 0
-	
+
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 18)
 	corner.Parent = banner
-	
+
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = p.TierColor or UIConfig.COLORS.Warning
 	stroke.Thickness = 3
 	stroke.Parent = banner
-	
+
 	-- Title
 	local titleLabel = Instance.new("TextLabel")
 	titleLabel.Size = UDim2.new(1, 0, 0, 45)
@@ -522,7 +522,7 @@ function GameUIComponents.createLevelUpBanner(props: {
 	titleLabel.TextSize = 32
 	titleLabel.TextColor3 = UIConfig.COLORS.Warning
 	titleLabel.Parent = banner
-	
+
 	-- Subtitle
 	local subTitleLabel = Instance.new("TextLabel")
 	subTitleLabel.Size = UDim2.new(1, 0, 0, 45)
@@ -533,17 +533,17 @@ function GameUIComponents.createLevelUpBanner(props: {
 	subTitleLabel.TextSize = 20
 	subTitleLabel.TextColor3 = UIConfig.COLORS.TextWhite
 	subTitleLabel.Parent = banner
-	
+
 	-- Animate in
 	banner.Size = UDim2.fromOffset(0, 120)
 	TweenService:Create(banner, TweenInfo.new(0.35, Enum.EasingStyle.Back), {
-		Size = UDim2.fromOffset(460, 120)
+		Size = UDim2.fromOffset(460, 120),
 	}):Play()
-	
+
 	-- Auto dismiss
 	task.delay(2.5, function()
 		TweenService:Create(banner, TweenInfo.new(0.4), {
-			Size = UDim2.fromOffset(460, 0)
+			Size = UDim2.fromOffset(460, 0),
 		}):Play()
 		task.wait(0.5)
 		banner:Destroy()
@@ -551,11 +551,11 @@ function GameUIComponents.createLevelUpBanner(props: {
 			p.onDismiss()
 		end
 	end)
-	
+
 	if p.Parent then
 		banner.Parent = p.Parent
 	end
-	
+
 	return banner
 end
 

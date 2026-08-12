@@ -210,22 +210,82 @@ local BlenderPipeline = {
 
 	-- UI icons (for UIAssets.lua)
 	ui_icons = {
-		{ id = "icon_wheat", description = "Wheat icon for inventory", params = { subject = "wheat", style = "kawaii" }, target_slot = "UIAssets.icons.Wheat" },
-		{ id = "icon_zunda_flower", description = "Zunda Flower icon", params = { subject = "flower", color_hex = "#E1B9FF" }, target_slot = "UIAssets.icons['Zunda Flower']" },
-		{ id = "icon_zunda_pea", description = "Zunda Pea icon", params = { subject = "pea", color_hex = "#96E6A0" }, target_slot = "UIAssets.icons['Zunda Pea']" },
-		{ id = "icon_zunda_berry", description = "Zunda Berry icon", params = { subject = "berry", color_hex = "#FF69B4" }, target_slot = "UIAssets.icons['Zunda Berry']" },
-		{ id = "icon_zunda_mushroom", description = "Zunda Mushroom icon", params = { subject = "mushroom", color_hex = "#E1B9FF" }, target_slot = "UIAssets.icons['Zunda Mushroom']" },
-		{ id = "icon_zunda_root", description = "Zunda Root icon", params = { subject = "root", color_hex = "#8B6514" }, target_slot = "UIAssets.icons['Zunda Root']" },
-		{ id = "icon_bread", description = "Bread icon", params = { subject = "bread", color_hex = "#DAA520" }, target_slot = "UIAssets.icons.Bread" },
-		{ id = "icon_apple_pie", description = "Apple Pie icon", params = { subject = "pie", color_hex = "#D2691E" }, target_slot = "UIAssets.icons['Apple Pie']" },
-		{ id = "icon_zunda_mochi", description = "Zunda Mochi icon", params = { subject = "mochi", color_hex = "#96E6A0" }, target_slot = "UIAssets.icons['Zunda Mochi']" },
+		{
+			id = "icon_wheat",
+			description = "Wheat icon for inventory",
+			params = { subject = "wheat", style = "kawaii" },
+			target_slot = "UIAssets.icons.Wheat",
+		},
+		{
+			id = "icon_zunda_flower",
+			description = "Zunda Flower icon",
+			params = { subject = "flower", color_hex = "#E1B9FF" },
+			target_slot = "UIAssets.icons['Zunda Flower']",
+		},
+		{
+			id = "icon_zunda_pea",
+			description = "Zunda Pea icon",
+			params = { subject = "pea", color_hex = "#96E6A0" },
+			target_slot = "UIAssets.icons['Zunda Pea']",
+		},
+		{
+			id = "icon_zunda_berry",
+			description = "Zunda Berry icon",
+			params = { subject = "berry", color_hex = "#FF69B4" },
+			target_slot = "UIAssets.icons['Zunda Berry']",
+		},
+		{
+			id = "icon_zunda_mushroom",
+			description = "Zunda Mushroom icon",
+			params = { subject = "mushroom", color_hex = "#E1B9FF" },
+			target_slot = "UIAssets.icons['Zunda Mushroom']",
+		},
+		{
+			id = "icon_zunda_root",
+			description = "Zunda Root icon",
+			params = { subject = "root", color_hex = "#8B6514" },
+			target_slot = "UIAssets.icons['Zunda Root']",
+		},
+		{
+			id = "icon_bread",
+			description = "Bread icon",
+			params = { subject = "bread", color_hex = "#DAA520" },
+			target_slot = "UIAssets.icons.Bread",
+		},
+		{
+			id = "icon_apple_pie",
+			description = "Apple Pie icon",
+			params = { subject = "pie", color_hex = "#D2691E" },
+			target_slot = "UIAssets.icons['Apple Pie']",
+		},
+		{
+			id = "icon_zunda_mochi",
+			description = "Zunda Mochi icon",
+			params = { subject = "mochi", color_hex = "#96E6A0" },
+			target_slot = "UIAssets.icons['Zunda Mochi']",
+		},
 	},
 
 	-- Particle textures
 	particles = {
-		{ id = "sparkle_green", description = "Zunda-green sparkle for harvest FX", params = { color_hex = "#78C882", shape = "star" }, target_slot = "UIAssets.particles.harvest_sparkle" },
-		{ id = "sparkle_lavender", description = "Lavender sparkle for magic FX", params = { color_hex = "#E1B9FF", shape = "circle" }, target_slot = "UIAssets.particles.craft_magic" },
-		{ id = "sparkle_gold", description = "Gold sparkle for rewards/levelup", params = { color_hex = "#FFD700", shape = "star" }, target_slot = "UIAssets.particles.serve_stars" },
+		{
+			id = "sparkle_green",
+			description = "Zunda-green sparkle for harvest FX",
+			params = { color_hex = "#78C882", shape = "star" },
+			target_slot = "UIAssets.particles.harvest_sparkle",
+		},
+		{
+			id = "sparkle_lavender",
+			description = "Lavender sparkle for magic FX",
+			params = { color_hex = "#E1B9FF", shape = "circle" },
+			target_slot = "UIAssets.particles.craft_magic",
+		},
+		{
+			id = "sparkle_gold",
+			description = "Gold sparkle for rewards/levelup",
+			params = { color_hex = "#FFD700", shape = "star" },
+			target_slot = "UIAssets.particles.serve_stars",
+		},
 	},
 }
 

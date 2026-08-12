@@ -8,26 +8,56 @@ local function norm(name: string): string
 end
 
 local FALLBACK_EMOJI = {
-	Wheat = "🌾", ZundaFlower = "🌸", ZundaPea = "🌱",
-	ZundaBerry = "🍇", ZundaMushroom = "🍄", ZundaRoot = "🌱",
-	Apple = "🍎", Bread = "🍞", Cupcake = "🧁",
-	ApplePie = "🥧", ZundaBread = "🥖", ZundaMochi = "🍡",
-	RoyalStew = "🍲", Bouquet = "💐", CopperOre = "⛰️",
-	GoldOre = "💛", Rock = "⛰️", Wood = "🟫",
-	IronOre = "⚙️", MarbleRock = "💎", PineCone = "🌲",
-	WheatSeed = "🌰", EdamamePod = "🌱", SweetPea = "🍬",
-	PeaFlower = "🌸", EdamameSnack = "🌰", SweetPeaCake = "🍰",
-	PeaFlowerTea = "🍵", ZundaParadise = "✨", Stew = "🍲",
-	Cake = "🎂", SaltedPeaBouquet = "💐", MysteryLoot = "✨",
+	Wheat = "🌾",
+	ZundaFlower = "🌸",
+	ZundaPea = "🌱",
+	ZundaBerry = "🍇",
+	ZundaMushroom = "🍄",
+	ZundaRoot = "🌱",
+	Apple = "🍎",
+	Bread = "🍞",
+	Cupcake = "🧁",
+	ApplePie = "🥧",
+	ZundaBread = "🥖",
+	ZundaMochi = "🍡",
+	RoyalStew = "🍲",
+	Bouquet = "💐",
+	CopperOre = "⛰️",
+	GoldOre = "💛",
+	Rock = "⛰️",
+	Wood = "🟫",
+	IronOre = "⚙️",
+	MarbleRock = "💎",
+	PineCone = "🌲",
+	WheatSeed = "🌰",
+	EdamamePod = "🌱",
+	SweetPea = "🍬",
+	PeaFlower = "🌸",
+	EdamameSnack = "🌰",
+	SweetPeaCake = "🍰",
+	PeaFlowerTea = "🍵",
+	ZundaParadise = "✨",
+	Stew = "🍲",
+	Cake = "🎂",
+	SaltedPeaBouquet = "💐",
+	MysteryLoot = "✨",
 	ZundaLeaf = "🌿",
-	["Zunda Flower"] = "🌸", ["Zunda Pea"] = "🌱",
-	["Zunda Berry"] = "🍇", ["Zunda Mushroom"] = "🍄",
-	["Zunda Root"] = "🌱", ["Apple Pie"] = "🥧",
-	["Zunda Bread"] = "🥖", ["Zunda Mochi"] = "🍡",
-	["Royal Stew"] = "🍲", ["Pine Cone"] = "🌲",
-	["Wheat Seed"] = "🌰", ["Gold Ore"] = "💛",
-	["Copper Ore"] = "⛰️", ["Iron Ore"] = "⚙️",
-	["Marble Rock"] = "💎", ["Wood Log"] = "🟫",
+	["Zunda Flower"] = "🌸",
+	["Zunda Pea"] = "🌱",
+	["Zunda Berry"] = "🍇",
+	["Zunda Mushroom"] = "🍄",
+	["Zunda Root"] = "🌱",
+	["Apple Pie"] = "🥧",
+	["Zunda Bread"] = "🥖",
+	["Zunda Mochi"] = "🍡",
+	["Royal Stew"] = "🍲",
+	["Pine Cone"] = "🌲",
+	["Wheat Seed"] = "🌰",
+	["Gold Ore"] = "💛",
+	["Copper Ore"] = "⛰️",
+	["Iron Ore"] = "⚙️",
+	["Marble Rock"] = "💎",
+	["Wood Log"] = "🟫",
 	["Zunda Leaf"] = "🌿",
 }
 
@@ -93,7 +123,9 @@ function UIHelper.createItemIcon(itemName: string, size: UDim2?, parent: Instanc
 		img.BackgroundTransparency = 1
 		img.BorderSizePixel = 0
 		img.ScaleType = Enum.ScaleType.Fit
-		if parent then img.Parent = parent end
+		if parent then
+			img.Parent = parent
+		end
 		return img
 	end
 
@@ -105,23 +137,45 @@ function UIHelper.createItemIcon(itemName: string, size: UDim2?, parent: Instanc
 	label.TextSize = math.min(sz.X.Offset or 48, 48) * 0.6
 	label.TextColor3 = UIConfig.COLORS.TextPrimary
 	label.BorderSizePixel = 0
-	if parent then label.Parent = parent end
+	if parent then
+		label.Parent = parent
+	end
 	return label
 end
 
 function UIHelper.getCategory(itemName: string): string
 	local catMap = {
-		ZundaFlower = "forage", ZundaPea = "forage", ZundaBerry = "forage",
-		ZundaMushroom = "forage", ZundaRoot = "forage", Apple = "forage",
-		Wheat = "forage", PineCone = "forage", ZundaLeaf = "forage",
-		EdamamePod = "forage", SweetPea = "forage", PeaFlower = "forage",
-		Bouquet = "forage", MysteryLoot = "forage",
-		Rock = "mining", IronOre = "mining", GoldOre = "mining",
-		MarbleRock = "mining", Wood = "mining",
-		Bread = "food", ApplePie = "food", ZundaBread = "food",
-		ZundaMochi = "food", RoyalStew = "food", Cake = "food",
-		Cupcake = "food", Stew = "food", EdamameSnack = "food",
-		SweetPeaCake = "food", PeaFlowerTea = "food", ZundaParadise = "food",
+		ZundaFlower = "forage",
+		ZundaPea = "forage",
+		ZundaBerry = "forage",
+		ZundaMushroom = "forage",
+		ZundaRoot = "forage",
+		Apple = "forage",
+		Wheat = "forage",
+		PineCone = "forage",
+		ZundaLeaf = "forage",
+		EdamamePod = "forage",
+		SweetPea = "forage",
+		PeaFlower = "forage",
+		Bouquet = "forage",
+		MysteryLoot = "forage",
+		Rock = "mining",
+		IronOre = "mining",
+		GoldOre = "mining",
+		MarbleRock = "mining",
+		Wood = "mining",
+		Bread = "food",
+		ApplePie = "food",
+		ZundaBread = "food",
+		ZundaMochi = "food",
+		RoyalStew = "food",
+		Cake = "food",
+		Cupcake = "food",
+		Stew = "food",
+		EdamameSnack = "food",
+		SweetPeaCake = "food",
+		PeaFlowerTea = "food",
+		ZundaParadise = "food",
 		SaltedPeaBouquet = "food",
 	}
 	return catMap[itemName] or catMap[norm(itemName)] or "misc"
@@ -173,14 +227,16 @@ function UIHelper.createCard(name: string, count: number, category: string?, par
 	badgeLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 	badgeLbl.Parent = badge
 
-	if parent then card.Parent = parent end
+	if parent then
+		card.Parent = parent
+	end
 	return card
 end
 
 function UIHelper.spawnSparkles(parent: Instance, x: number, y: number, color: Color3?, count: number?)
 	local TweenS = game:GetService("TweenService")
 	count = count or 8
-	local sparkleChars = {"✨", "⭐", "💫", "🌸", "🍃"}
+	local sparkleChars = { "✨", "⭐", "💫", "🌸", "🍃" }
 	for i = 1, count do
 		local s = Instance.new("TextLabel", parent)
 		s.Size = UDim2.fromOffset(16, 16)

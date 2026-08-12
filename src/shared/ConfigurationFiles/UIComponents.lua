@@ -256,11 +256,13 @@ function UIComponents.animateIn(instance: GuiObject)
 	)
 
 	local tweenService = game:GetService("TweenService")
-	tweenService:Create(instance, TweenInfo.new(
-		UIConfig.ANIMATION.FadeIn,
-		UIConfig.EASING.Smooth,
-		Enum.EasingDirection.Out
-	), { BackgroundTransparency = 0 }):Play()
+	tweenService
+		:Create(
+			instance,
+			TweenInfo.new(UIConfig.ANIMATION.FadeIn, UIConfig.EASING.Smooth, Enum.EasingDirection.Out),
+			{ BackgroundTransparency = 0 }
+		)
+		:Play()
 end
 
 -- Animate a GuiObject out (fade + slide down), then destroy
@@ -275,11 +277,11 @@ function UIComponents.animateOut(instance: GuiObject, callback: (() -> ())?)
 		true
 	)
 
-	local tween = tweenService:Create(instance, TweenInfo.new(
-		UIConfig.ANIMATION.FadeOut,
-		UIConfig.EASING.Smooth,
-		Enum.EasingDirection.In
-	), { BackgroundTransparency = 1 })
+	local tween = tweenService:Create(
+		instance,
+		TweenInfo.new(UIConfig.ANIMATION.FadeOut, UIConfig.EASING.Smooth, Enum.EasingDirection.In),
+		{ BackgroundTransparency = 1 }
+	)
 
 	tween.Completed:Connect(function()
 		instance:Destroy()

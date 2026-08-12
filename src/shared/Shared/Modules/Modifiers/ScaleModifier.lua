@@ -8,6 +8,8 @@ return {
 	end,
 	revert = function(instance)
 		local origSize = instance:GetAttribute("_mod_origSize")
-		if origSize then instance.Size = origSize end
+		if origSize then
+			instance.Size = origSize
+		end
 	end,
 }

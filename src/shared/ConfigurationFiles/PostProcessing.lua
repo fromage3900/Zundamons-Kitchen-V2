@@ -51,7 +51,7 @@ end
 colorCorrection.Brightness = 0.02
 colorCorrection.Contrast = 0.04
 colorCorrection.Saturation = 0.10
-colorCorrection.TintColor = Color3.fromRGB(248, 242, 252)  -- barely-there warm tint
+colorCorrection.TintColor = Color3.fromRGB(248, 242, 252) -- barely-there warm tint
 
 pcall(function()
 	Lighting.Ambient = Color3.fromRGB(175, 168, 195)
@@ -66,21 +66,27 @@ pcall(function()
 end)
 
 local function setupDoF(cam)
-	if not cam then return end
+	if not cam then
+		return
+	end
 	local existing = cam:FindFirstChild("ZundaDepthOfField")
-	if existing then existing:Destroy() end
+	if existing then
+		existing:Destroy()
+	end
 	local existing2 = cam:FindFirstChild("ZundaTiltShift")
-	if existing2 then existing2:Destroy() end
+	if existing2 then
+		existing2:Destroy()
+	end
 
 	-- AAA cinematic DoF: very subtle, focused on character distance (~20 studs).
 	-- The old TiltShift (NearIntensity=0.30) was blurring nearby characters badly.
 	-- Removed entirely — AAA games don't use fake tilt-shift overlays.
 	local dof = Instance.new("DepthOfFieldEffect")
 	dof.Name = "ZundaDepthOfField"
-	dof.InFocusRadius = 25        -- wider focus zone so characters stay sharp
-	dof.FocusDistance = 22         -- character interaction distance
-	dof.FarIntensity = 0.08        -- very subtle background blur
-	dof.NearIntensity = 0.02       -- barely-there foreground blur
+	dof.InFocusRadius = 25 -- wider focus zone so characters stay sharp
+	dof.FocusDistance = 22 -- character interaction distance
+	dof.FarIntensity = 0.08 -- very subtle background blur
+	dof.NearIntensity = 0.02 -- barely-there foreground blur
 	dof.Parent = cam
 end
 
@@ -118,9 +124,13 @@ local SkyConfig = require(RS:WaitForChild("ConfigurationFiles"):WaitForChild("Sk
 local activeTween
 
 local function applyWeatherCC(weatherKey)
-	if activeTween then activeTween:Cancel() end
+	if activeTween then
+		activeTween:Cancel()
+	end
 	local wDef = SkyConfig.weather_types[weatherKey]
-	if not wDef or not wDef.color_correction then return end
+	if not wDef or not wDef.color_correction then
+		return
+	end
 	local cc = wDef.color_correction
 	local goals = {
 		Brightness = cc.brightness or 0.05,

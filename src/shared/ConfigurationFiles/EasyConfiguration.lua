@@ -8,9 +8,9 @@ local Type = require(script.Parent:WaitForChild("Type"))
 local lib = {}
 
 local function Modify(Instance, Values)
-	-- Modifies an Instance by using a table.  
+	-- Modifies an Instance by using a table.
 
-	assert(type(Values) == "table", "Values is not a table");
+	assert(type(Values) == "table", "Values is not a table")
 
 	for Index, Value in next, Values do
 		if type(Index) == "number" then
@@ -23,36 +23,37 @@ local function Modify(Instance, Values)
 end
 
 local function Make(ClassType, Properties)
-	-- Using a syntax hack to create a nice way to Make new items.  
+	-- Using a syntax hack to create a nice way to Make new items.
 
 	return Modify(Instance.new(ClassType), Properties)
 end
 
-local AcceptableTypes = { -- Anything in here has a .Value property. 
-	["StringValue"]         = true;
-	["IntValue"]            = true;
-	["NumberValue"]         = true;
-	["BrickColorValue"]     = true;
-	["BoolValue"]           = true;
-	["Color3Value"]         = true;
-	["Vector3Value"]        = true;
-	["IntConstrainedValue"] = true;
+local AcceptableTypes = { -- Anything in here has a .Value property.
+	["StringValue"] = true,
+	["IntValue"] = true,
+	["NumberValue"] = true,
+	["BrickColorValue"] = true,
+	["BoolValue"] = true,
+	["Color3Value"] = true,
+	["Vector3Value"] = true,
+	["IntConstrainedValue"] = true,
 }
 
 local function TypeIsAcceptable(TypeName)
 	return AcceptableTypes[TypeName]
 end
-lib.TypeIsAcceptable = TypeIsAcceptable;
+lib.TypeIsAcceptable = TypeIsAcceptable
 lib.typeIsAcceptable = TypeIsAcceptable
 
 local function AddSubDataLayer(DataName, Parent)
-	-- For organization of data. Adds another configuration with the name "DataName", if one can't be found, and then returns it. 
+	-- For organization of data. Adds another configuration with the name "DataName", if one can't be found, and then returns it.
 
-	local DataContainer = Parent:FindFirstChild(DataName) or Make("Configuration", {
-		Name = DataName;
-		Parent = Parent;
-		Archivable = true;
-	})
+	local DataContainer = Parent:FindFirstChild(DataName)
+		or Make("Configuration", {
+			Name = DataName,
+			Parent = Parent,
+			Archivable = true,
+		})
 
 	return DataContainer
 end
@@ -60,7 +61,7 @@ lib.AddSubDataLayer = AddSubDataLayer
 lib.addSubDataLayer = AddSubDataLayer
 
 local EasyConfigCache = {}
-setmetatable(EasyConfigCache, {__mode = "k"})
+setmetatable(EasyConfigCache, { __mode = "k" })
 
 local function MakeEasyConfiguration(Configuration)
 	if EasyConfigCache[Configuration] then
@@ -74,7 +75,6 @@ local function MakeEasyConfiguration(Configuration)
 
 		setmetatable(NewConfiguration, {
 			__index = function(_, value)
-
 				if not type(value) == "string" then
 					error("Only Indexing with strings is supported with easyConfiguration", 2)
 				end
@@ -95,12 +95,21 @@ local function MakeEasyConfiguration(Configuration)
 						if values and values.Name and type(values.Name) == "string" then
 							Object = Get(values.Name)
 							if Object and Object.ClassName ~= valueType then
-								print("[EasyConfiguration] - Invalid class '"..Object.ClassName.."' in configuration, being replaced by new data '"..valueType.."'");
+								print(
+									"[EasyConfiguration] - Invalid class '"
+										.. Object.ClassName
+										.. "' in configuration, being replaced by new data '"
+										.. valueType
+										.. "'"
+								)
 								Object:Destroy()
-								Object = nil;
+								Object = nil
 							end
 						else
-							error("[EasyConfiguration] - No values received in the add method of easy configuration. Please give a table of default properties including the name. ", 2)
+							error(
+								"[EasyConfiguration] - No values received in the add method of easy configuration. Please give a table of default properties including the name. ",
+								2
+							)
 						end
 
 						if not Object then
@@ -122,29 +131,42 @@ local function MakeEasyConfiguration(Configuration)
 					if Object and AcceptableTypes[Object.ClassName] then
 						return Object.Value
 					else
-						error("[EasyConfiguration] - " .. (Object and "Object '"..value.."' was a "..Type.getType(Object).." value, and not acceptable, so no return was given" or "Could not find Object '"..value.."' in the configuration"), 2)
+						error(
+							"[EasyConfiguration] - "
+								.. (
+									Object
+										and "Object '" .. value .. "' was a " .. Type.getType(Object) .. " value, and not acceptable, so no return was given"
+									or "Could not find Object '" .. value .. "' in the configuration"
+								),
+							2
+						)
 					end
 				end
-			end;
+			end,
 			__newindex = function(_, value, newValue)
 				if type(value) == "string" then
 					local Object = Get(value)
 					if Object and AcceptableTypes[Object.ClassName] then
-						Object.Value = newValue;
+						Object.Value = newValue
 					else
-						error("[EasyConfiguration] - Value '" .. value .. "' was not accepted, or wasn't in the configuration", 2);
+						error(
+							"[EasyConfiguration] - Value '"
+								.. value
+								.. "' was not accepted, or wasn't in the configuration",
+							2
+						)
 					end
 				else
 					error("[EasyConfiguration] - Index with a string")
 				end
-			end;
+			end,
 		})
 
 		EasyConfigCache[Configuration] = NewConfiguration
-		return NewConfiguration;
+		return NewConfiguration
 	end
 end
-lib.Make = MakeEasyConfiguration;
-lib.MakeEasyConfiguration = MakeEasyConfiguration;
+lib.Make = MakeEasyConfiguration
+lib.MakeEasyConfiguration = MakeEasyConfiguration
 
 return lib

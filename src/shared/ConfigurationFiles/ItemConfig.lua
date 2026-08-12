@@ -12,7 +12,7 @@ local ItemConfig = {
 			icon = "🜻",
 			description = "A beautiful purple flower",
 			rarity = 1,
-			base_value = 10
+			base_value = 10,
 		},
 		zunda_pea = {
 			id = "zunda_pea",
@@ -21,7 +21,7 @@ local ItemConfig = {
 			icon = "🝒",
 			description = "Plump and nutritious",
 			rarity = 1,
-			base_value = 15
+			base_value = 15,
 		},
 		zunda_mushroom = {
 			id = "zunda_mushroom",
@@ -30,7 +30,7 @@ local ItemConfig = {
 			icon = "🝄",
 			description = "A rare forest fungus",
 			rarity = 2,
-			base_value = 25
+			base_value = 25,
 		},
 		zunda_berry = {
 			id = "zunda_berry",
@@ -39,7 +39,7 @@ local ItemConfig = {
 			icon = "🝛",
 			description = "Sweet and tangy",
 			rarity = 2,
-			base_value = 20
+			base_value = 20,
 		},
 		zunda_root = {
 			id = "zunda_root",
@@ -48,9 +48,9 @@ local ItemConfig = {
 			icon = "💀",
 			description = "Earthy and aromatic",
 			rarity = 2,
-			base_value = 22
+			base_value = 22,
 		},
-		
+
 		-- Mineable items
 		copper_ore = {
 			id = "copper_ore",
@@ -59,9 +59,9 @@ local ItemConfig = {
 			icon = "📟",
 			description = "Raw copper",
 			rarity = 1,
-			base_value = 5
-		}
-	}
+			base_value = 5,
+		},
+	},
 }
 
 return ItemConfig

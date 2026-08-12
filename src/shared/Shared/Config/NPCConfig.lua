@@ -7,57 +7,113 @@
 local NPCConfig = {}
 
 NPCConfig.guestTemplates = {
-    female = {
-        meshId = "rbxassetid://116371019810644",
-        scale = 1.0,
-        displayName = "Female Guest",
-    },
-    male = {
-        meshId = "rbxassetid://126615831878923",
-        scale = 1.0,
-        displayName = "Male Guest",
-    },
-    female2 = {
-        meshId = "rbxassetid://128714056103773",
-        scale = 1.0,
-        displayName = "Female Guest 2",
-    },
-    male2 = {
-        meshId = "rbxassetid://79891497553763",
-        scale = 1.0,
-        displayName = "Male Guest 2",
-    },
-    parrot = {
-        meshId = "rbxassetid://100814736457956",
-        scale = 0.8,
-        displayName = "Parrot Guest",
-    },
-    lotus = {
-        meshId = "rbxassetid://73173606400077",
-        scale = 1.0,
-        displayName = "Lotus Guest",
-    },
-    cupcake = {
-        meshId = "rbxassetid://99944485273643",
-        scale = 0.9,
-        displayName = "Cupcake Guest",
-    },
-    zundamon = {
-        meshId = "rbxassetid://86762576656553",
-        scale = 1.0,
-        displayName = "Zundamon Guest",
-    },
+	female = {
+		meshId = "rbxassetid://116371019810644",
+		scale = 1.0,
+		displayName = "Female Guest",
+	},
+	male = {
+		meshId = "rbxassetid://126615831878923",
+		scale = 1.0,
+		displayName = "Male Guest",
+	},
+	female2 = {
+		meshId = "rbxassetid://128714056103773",
+		scale = 1.0,
+		displayName = "Female Guest 2",
+	},
+	male2 = {
+		meshId = "rbxassetid://79891497553763",
+		scale = 1.0,
+		displayName = "Male Guest 2",
+	},
+	parrot = {
+		meshId = "rbxassetid://100814736457956",
+		scale = 0.8,
+		displayName = "Parrot Guest",
+	},
+	lotus = {
+		meshId = "rbxassetid://73173606400077",
+		scale = 1.0,
+		displayName = "Lotus Guest",
+	},
+	cupcake = {
+		meshId = "rbxassetid://99944485273643",
+		scale = 0.9,
+		displayName = "Cupcake Guest",
+	},
+	zundamon = {
+		meshId = "rbxassetid://86762576656553",
+		scale = 1.0,
+		displayName = "Zundamon Guest",
+	},
 }
 
 NPCConfig.companionTemplates = {
-	zundamon = { modelId = "rbxassetid://81331860128238", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = nil, price = 0 },
-	zundacat = { modelId = "rbxassetid://82750515660340", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = nil, price = 0 },
-	zundabunny = { modelId = "rbxassetid://109846743112238", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = nil, price = 0 },
-	tantanmon = { modelId = "rbxassetid://107150527246774", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = nil, price = 0 },
-	ankomon = { modelId = "rbxassetid://110290651922538", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = { stat = "gold", magnitude = 0.15 }, price = 250 },
-	cardamon = { modelId = "rbxassetid://91041813069462", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = { stat = "perfect_window", magnitude = 0.30 }, price = 250 },
-	antimon = { modelId = "rbxassetid://94125444857929", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = { stat = "extra_drop", magnitude = 0.20 }, price = 250 },
-	sakuradamon = { modelId = "rbxassetid://128478553136178", scale = 0.5, followSpeed = 8, sparkleEffect = "rbxassetid://241685484", buff = { stat = "xp", magnitude = 0.25 }, price = 250 },
+	zundamon = {
+		modelId = "rbxassetid://81331860128238",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = nil,
+		price = 0,
+	},
+	zundacat = {
+		modelId = "rbxassetid://82750515660340",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = nil,
+		price = 0,
+	},
+	zundabunny = {
+		modelId = "rbxassetid://109846743112238",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = nil,
+		price = 0,
+	},
+	tantanmon = {
+		modelId = "rbxassetid://107150527246774",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = nil,
+		price = 0,
+	},
+	ankomon = {
+		modelId = "rbxassetid://110290651922538",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = { stat = "gold", magnitude = 0.15 },
+		price = 250,
+	},
+	cardamon = {
+		modelId = "rbxassetid://91041813069462",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = { stat = "perfect_window", magnitude = 0.30 },
+		price = 250,
+	},
+	antimon = {
+		modelId = "rbxassetid://94125444857929",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = { stat = "extra_drop", magnitude = 0.20 },
+		price = 250,
+	},
+	sakuradamon = {
+		modelId = "rbxassetid://128478553136178",
+		scale = 0.5,
+		followSpeed = 8,
+		sparkleEffect = "rbxassetid://241685484",
+		buff = { stat = "xp", magnitude = 0.25 },
+		price = 250,
+	},
 }
 
 NPCConfig.guestSpawnDefaults = {

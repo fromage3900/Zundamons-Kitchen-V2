@@ -58,7 +58,8 @@ glow.Parent = workspace
 
 local onWeatherChanged
 onWeatherChanged = function(weatherKey)
-	local isNight = Lighting:GetAttribute("CurrentHour") and (Lighting:GetAttribute("CurrentHour") < 5.5 or Lighting:GetAttribute("CurrentHour") > 19)
+	local isNight = Lighting:GetAttribute("CurrentHour")
+		and (Lighting:GetAttribute("CurrentHour") < 5.5 or Lighting:GetAttribute("CurrentHour") > 19)
 	local showCircle = (weatherKey == "clear" or weatherKey == "cherry_blossom" or weatherKey == "aurora")
 	circlePart.Transparency = showCircle and 0.5 or 1
 	glow.Transparency = showCircle and 0.8 or 1

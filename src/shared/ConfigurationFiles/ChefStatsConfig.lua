@@ -78,25 +78,30 @@ ChefStatsConfig.stylePoints = {
 
 	-- Style tiers (like Infinity Nikki's style ranks)
 	tiers = {
-		{ name = "Fresh",       minPoints = 0,     color = Color3.fromRGB(200, 200, 200),  badge = "🌱" },
-		{ name = "Stylish",     minPoints = 500,   color = Color3.fromRGB(160, 210, 150),  badge = "🍃" },
-		{ name = "Chic",        minPoints = 2000,  color = Color3.fromRGB(255, 200, 80),   badge = "⭐" },
-		{ name = "Gorgeous",    minPoints = 8000,  color = Color3.fromRGB(255, 150, 200),  badge = "💖" },
-		{ name = "Legendary",   minPoints = 30000, color = Color3.fromRGB(230, 185, 130),  badge = "👑" },
+		{ name = "Fresh", minPoints = 0, color = Color3.fromRGB(200, 200, 200), badge = "🌱" },
+		{ name = "Stylish", minPoints = 500, color = Color3.fromRGB(160, 210, 150), badge = "🍃" },
+		{ name = "Chic", minPoints = 2000, color = Color3.fromRGB(255, 200, 80), badge = "⭐" },
+		{ name = "Gorgeous", minPoints = 8000, color = Color3.fromRGB(255, 150, 200), badge = "💖" },
+		{ name = "Legendary", minPoints = 30000, color = Color3.fromRGB(230, 185, 130), badge = "👑" },
 	},
 
 	-- Outfit unlocks per style tier
 	outfitUnlocks = {
-		{ tier = "Stylish",     outfits = { "Zundapal_PastelDress", "Zundacat_RibbonTail" } },
-		{ tier = "Chic",        outfits = { "Zundamon_ShinyCoat", "Zundabunny_BlossomEars" } },
-		{ tier = "Gorgeous",    outfits = { "Ankomon_GoldTrim", "Cardamon_CrownOfCalm" } },
-		{ tier = "Legendary",   outfits = { "Zundamon_MagicalGirlForm", "AllCompanions_CosmicAura" } },
+		{ tier = "Stylish", outfits = { "Zundapal_PastelDress", "Zundacat_RibbonTail" } },
+		{ tier = "Chic", outfits = { "Zundamon_ShinyCoat", "Zundabunny_BlossomEars" } },
+		{ tier = "Gorgeous", outfits = { "Ankomon_GoldTrim", "Cardamon_CrownOfCalm" } },
+		{ tier = "Legendary", outfits = { "Zundamon_MagicalGirlForm", "AllCompanions_CosmicAura" } },
 	},
 }
 
 -- ── Stat Calculation ─────────────────────────────────────────────────────────
 
-function ChefStatsConfig.calculateStatValue(baseValue: number, points: number, growthPerLevel: number, diminishingFactor: number): number
+function ChefStatsConfig.calculateStatValue(
+	baseValue: number,
+	points: number,
+	growthPerLevel: number,
+	diminishingFactor: number
+): number
 	-- Diminishing returns: each point gives less than the last
 	-- Formula: baseValue + points * growthPerLevel * diminishingFactor^(points/100)
 	local effectiveGrowth = growthPerLevel * (diminishingFactor ^ (points / 100))
@@ -108,9 +113,8 @@ function ChefStatsConfig.getStatBonus(statKey: string, points: number): number
 	if not stat then
 		return 0
 	end
-	local value = ChefStatsConfig.calculateStatValue(
-		stat.baseValue, points, stat.growthPerLevel, stat.diminishingReturns
-	)
+	local value =
+		ChefStatsConfig.calculateStatValue(stat.baseValue, points, stat.growthPerLevel, stat.diminishingReturns)
 	-- Return as a multiplier (1.0 = no bonus, 1.5 = 50% bonus)
 	return value / stat.baseValue
 end
@@ -159,7 +163,10 @@ function ChefStatsConfig.getDefaultStats(): { [string]: number }
 	}
 end
 
-function ChefStatsConfig.getTrainingCost(statKey: string, currentPoints: number): { gold: number, items: { [string]: number } }
+function ChefStatsConfig.getTrainingCost(
+	statKey: string,
+	currentPoints: number
+): { gold: number, items: { [string]: number } }
 	-- Cost increases with points invested (diminishing returns on training)
 	local baseCost = 50
 	local tier = math.floor(currentPoints / 100) + 1

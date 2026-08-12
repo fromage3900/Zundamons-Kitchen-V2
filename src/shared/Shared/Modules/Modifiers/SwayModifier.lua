@@ -18,6 +18,8 @@ return {
 	end,
 	revert = function(instance)
 		local origPos = instance:GetAttribute("_mod_swayOrigPos")
-		if origPos then instance.Position = origPos end
+		if origPos then
+			instance.Position = origPos
+		end
 	end,
 }

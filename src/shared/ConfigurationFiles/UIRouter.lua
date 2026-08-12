@@ -5,9 +5,9 @@
 
 local UIRouter = {}
 
-local openModals = {}      -- actionId -> boolean
-local focusStack = {}      -- ordered list of actionIds
-local listeners = {}       -- actionId -> { onOpen, onClose }
+local openModals = {} -- actionId -> boolean
+local focusStack = {} -- ordered list of actionIds
+local listeners = {} -- actionId -> { onOpen, onClose }
 
 -- ── Public API ───────────────────────────────────────────────
 function UIRouter.open(actionId: string): boolean
@@ -99,7 +99,9 @@ end
 
 -- ── Escape / B / Back handling ───────────────────────────────
 local function onInputBegan(input, processed)
-	if processed then return end
+	if processed then
+		return
+	end
 	if input.KeyCode == Enum.KeyCode.Escape then
 		local current = UIRouter.getCurrent()
 		if current then

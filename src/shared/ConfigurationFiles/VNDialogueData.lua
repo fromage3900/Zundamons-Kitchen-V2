@@ -8,23 +8,23 @@ local RGB = Color3.fromRGB
 
 -- Speaker configurations with companion emojis
 local SPEAKERS = {
-	zundamon    = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) },
-	zundapal    = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }, -- Backward compat alias for zundamon
-	zundacat    = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) },
-	zundabunny  = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) },
-	tantanmon   = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) },
-	ankomon     = { name = "Ankomon", emoji = "🥜", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) },
-	cardamon    = { name = "Cardamon", emoji = "🍋", accent = RGB(235, 205, 125), portrait = RGB(248, 230, 175) },
-	antimon     = { name = "Antimon", emoji = "🌿", accent = RGB(145, 215, 195), portrait = RGB(195, 235, 220) },
+	zundamon = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) },
+	zundapal = { name = "Zundamon", emoji = "🌱", accent = RGB(160, 210, 150), portrait = RGB(180, 220, 170) }, -- Backward compat alias for zundamon
+	zundacat = { name = "Zundacat", emoji = "🐱", accent = RGB(245, 194, 145), portrait = RGB(255, 224, 190) },
+	zundabunny = { name = "Zundabunny", emoji = "🐰", accent = RGB(214, 187, 242), portrait = RGB(236, 218, 250) },
+	tantanmon = { name = "Tantanmon", emoji = "🌶️", accent = RGB(239, 137, 111), portrait = RGB(252, 194, 166) },
+	ankomon = { name = "Ankomon", emoji = "🥜", accent = RGB(220, 150, 150), portrait = RGB(240, 205, 205) },
+	cardamon = { name = "Cardamon", emoji = "🍋", accent = RGB(235, 205, 125), portrait = RGB(248, 230, 175) },
+	antimon = { name = "Antimon", emoji = "🌿", accent = RGB(145, 215, 195), portrait = RGB(195, 235, 220) },
 	sakuradamon = { name = "Sakuradamon", emoji = "🌸", accent = RGB(255, 180, 200), portrait = RGB(255, 220, 230) },
-	dog         = { name = "Dog Companion", emoji = "🐕", accent = RGB(230, 180, 130), portrait = RGB(245, 200, 160) },
-	parrot      = { name = "Parrot Companion", emoji = "🦜", accent = RGB(255, 180, 100), portrait = RGB(255, 210, 150) },
-	cat         = { name = "Cat Companion", emoji = "🐱", accent = RGB(255, 190, 210), portrait = RGB(255, 220, 235) },
-	narrator    = { name = "", emoji = "✨", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) },
-	elder       = { name = "Village Elder", emoji = "🏮", accent = RGB(220, 180, 130), portrait = RGB(230, 200, 160) },
-	ruins       = { name = "Ancient Voice", emoji = "👁", accent = RGB(190, 170, 210), portrait = RGB(210, 195, 220) },
-	chef        = { name = "Head Chef", emoji = "🍳", accent = RGB(230, 185, 130), portrait = RGB(240, 210, 170) },
-	system      = { name = "", emoji = "⭐", accent = RGB(210, 195, 235), portrait = RGB(225, 215, 240) },
+	dog = { name = "Dog Companion", emoji = "🐕", accent = RGB(230, 180, 130), portrait = RGB(245, 200, 160) },
+	parrot = { name = "Parrot Companion", emoji = "🦜", accent = RGB(255, 180, 100), portrait = RGB(255, 210, 150) },
+	cat = { name = "Cat Companion", emoji = "🐱", accent = RGB(255, 190, 210), portrait = RGB(255, 220, 235) },
+	narrator = { name = "", emoji = "✨", accent = RGB(220, 200, 170), portrait = RGB(230, 220, 200) },
+	elder = { name = "Village Elder", emoji = "🏮", accent = RGB(220, 180, 130), portrait = RGB(230, 200, 160) },
+	ruins = { name = "Ancient Voice", emoji = "👁", accent = RGB(190, 170, 210), portrait = RGB(210, 195, 220) },
+	chef = { name = "Head Chef", emoji = "🍳", accent = RGB(230, 185, 130), portrait = RGB(240, 210, 170) },
+	system = { name = "", emoji = "⭐", accent = RGB(210, 195, 235), portrait = RGB(225, 215, 240) },
 }
 
 -- Companion-specific branching dialogue (time + level + bond based)

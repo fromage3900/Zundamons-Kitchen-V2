@@ -122,13 +122,20 @@ local function updateInkWeight(weatherKey, hour)
 	local isNight = hour <= 5 or hour >= 19.5
 
 	local baseWeight = 1.0
-	if weatherKey == "storm" then baseWeight = 3.0
-	elseif weatherKey == "rain" then baseWeight = 2.0
-	elseif weatherKey == "fog" then baseWeight = 1.8
-	elseif weatherKey == "snow" then baseWeight = 1.5
-	elseif weatherKey == "cloudy" then baseWeight = 1.2
-	elseif weatherKey == "cherry_blossom" then baseWeight = 0.8
-	elseif weatherKey == "aurora" then baseWeight = 1.4
+	if weatherKey == "storm" then
+		baseWeight = 3.0
+	elseif weatherKey == "rain" then
+		baseWeight = 2.0
+	elseif weatherKey == "fog" then
+		baseWeight = 1.8
+	elseif weatherKey == "snow" then
+		baseWeight = 1.5
+	elseif weatherKey == "cloudy" then
+		baseWeight = 1.2
+	elseif weatherKey == "cherry_blossom" then
+		baseWeight = 0.8
+	elseif weatherKey == "aurora" then
+		baseWeight = 1.4
 	end
 
 	local nightBoost = isNight and 1.3 or 1.0
@@ -145,7 +152,12 @@ local function updateInkWeight(weatherKey, hour)
 	shadowRamp.ImageTransparency = rampTrans
 
 	-- Hatch on heavy weather only
-	local showHatch = (weatherKey == "storm" or weatherKey == "rain" or weatherKey == "fog" or (weatherKey == "snow" and isNight))
+	local showHatch = (
+		weatherKey == "storm"
+		or weatherKey == "rain"
+		or weatherKey == "fog"
+		or (weatherKey == "snow" and isNight)
+	)
 	hatchCross.Visible = showHatch
 	hatchDiag.Visible = showHatch
 	if showHatch then
@@ -204,7 +216,8 @@ workspace:GetAttributeChangedSignal("CurrentWeather"):Connect(function()
 	updateInkWeight(weather, hour)
 end)
 
-local weatherRE = game:GetService("ReplicatedStorage"):FindFirstChild("RemoteEvents") and game.ReplicatedStorage.RemoteEvents:FindFirstChild("WeatherChanged")
+local weatherRE = game:GetService("ReplicatedStorage"):FindFirstChild("RemoteEvents")
+	and game.ReplicatedStorage.RemoteEvents:FindFirstChild("WeatherChanged")
 if weatherRE then
 	weatherRE.OnClientEvent:Connect(function(wk)
 		task.wait(0.5)

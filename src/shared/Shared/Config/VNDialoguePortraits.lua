@@ -80,7 +80,9 @@ VNDialoguePortraits.portraits = {
 
 function VNDialoguePortraits.getPortrait(speakerKey, expression)
 	local entry = VNDialoguePortraits.portraits[speakerKey]
-	if not entry then return nil end
+	if not entry then
+		return nil
+	end
 	local expr = entry.expressions[expression or "default"] or entry.expressions.default or ""
 	return {
 		full = entry.full or "",
@@ -92,7 +94,9 @@ end
 
 function VNDialoguePortraits.hasPortrait(speakerKey)
 	local entry = VNDialoguePortraits.portraits[speakerKey]
-	if not entry then return false end
+	if not entry then
+		return false
+	end
 	return entry.face ~= nil and entry.face ~= ""
 end
 

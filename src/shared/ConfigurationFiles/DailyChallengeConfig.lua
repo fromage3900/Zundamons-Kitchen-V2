@@ -214,10 +214,10 @@ DailyChallengeConfig.weeklyBoss = {
 -- Completing all 3 daily challenges gives a streak bonus.
 
 DailyChallengeConfig.streakRewards = {
-	{ streak = 1,  reward = { gold = 50,  xp = 40,  style = 10 } },
-	{ streak = 3,  reward = { gold = 150, xp = 100, style = 30, items = { "Zunda Berry" } } },
-	{ streak = 5,  reward = { gold = 300, xp = 200, style = 60, items = { "Sweet Pea" } } },
-	{ streak = 7,  reward = { gold = 500, xp = 300, style = 100, items = { "Zunda Mochi" } } },
+	{ streak = 1, reward = { gold = 50, xp = 40, style = 10 } },
+	{ streak = 3, reward = { gold = 150, xp = 100, style = 30, items = { "Zunda Berry" } } },
+	{ streak = 5, reward = { gold = 300, xp = 200, style = 60, items = { "Sweet Pea" } } },
+	{ streak = 7, reward = { gold = 500, xp = 300, style = 100, items = { "Zunda Mochi" } } },
 	{ streak = 14, reward = { gold = 1000, xp = 500, style = 200, items = { "Pea Flower" } } },
 	{ streak = 30, reward = { gold = 2500, xp = 1000, style = 500, items = { "Zunda Paradise" } } },
 }
@@ -255,9 +255,9 @@ DailyChallengeConfig.dailyVisitor = {
 
 DailyChallengeConfig.dailyResources = {
 	{ resourceType = "Zunda Flower", count = 3, meshHint = "ZundaFlower_Rare" },
-	{ resourceType = "Zunda Pea",    count = 5, meshHint = "ZundaPea_02" },
-	{ resourceType = "Sweet Pea",    count = 3, meshHint = "SweetPea_01" },
-	{ resourceType = "Pea Flower",   count = 2, meshHint = "PeaFlower_01" },
+	{ resourceType = "Zunda Pea", count = 5, meshHint = "ZundaPea_02" },
+	{ resourceType = "Sweet Pea", count = 3, meshHint = "SweetPea_01" },
+	{ resourceType = "Pea Flower", count = 2, meshHint = "PeaFlower_01" },
 }
 
 -- ── Helper Functions ────────────────────────────────────────────────────────
@@ -290,7 +290,9 @@ function DailyChallengeConfig.getWeeklyBoss(): table
 	return DailyChallengeConfig.weeklyBoss[index]
 end
 
-function DailyChallengeConfig.getStreakReward(streak: number): { gold: number, xp: number, style: number, items: { string }? }
+function DailyChallengeConfig.getStreakReward(
+	streak: number
+): { gold: number, xp: number, style: number, items: { string }? }
 	for i = #DailyChallengeConfig.streakRewards, 1, -1 do
 		local reward = DailyChallengeConfig.streakRewards[i]
 		if streak >= reward.streak then
