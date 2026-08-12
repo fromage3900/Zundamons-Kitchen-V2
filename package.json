@@ -5,10 +5,14 @@
   "private": true,
   "scripts": {
     "lint": "npm run lint:stylua && npm run lint:selene",
-    "lint:stylua": "npx @johnnymorganz/stylua-bin --check src",
-    "lint:selene": "selene src",
-    "rojo:build": "rojo build default.project.json -o build/Zundamons-kItchen.rbxl",
-    "rojo:serve": "rojo serve default.project.json"
+    "lint:stylua": "stylua --check src",
+    "lint:selene": "selene --allow-warnings src",
+    "format": "stylua src",
+    "check": "npm run lint && npm run rojo:build",
+    "rojo:build": "rojo build default.project.json -o build/ZundamonsKitchen.rbxl",
+    "rojo:sourcemap": "rojo sourcemap default.project.json -o build/sourcemap.json",
+    "rojo:serve": "rojo serve default.project.json",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "@johnnymorganz/stylua-bin": "2.5.2",

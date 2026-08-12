@@ -1,17 +1,15 @@
-name: CI
+name: Release (Rojo Sync)
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - "v*"
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: write
 
 jobs:
-  lint_and_build:
+  build_and_release:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +25,7 @@ jobs:
       - name: Run StyLua (Formatting Gate)
         run: stylua --check src/
 
-      - name: Run Selene (Lint Gate — errors block, warnings reported)
+      - name: Run Selene (Lint Gate)
         run: selene --allow-warnings src/
 
       - name: Verify Rojo Build
@@ -36,12 +34,10 @@ jobs:
       - name: Generate Sourcemap (Luau-LSP tooling)
         run: rojo sourcemap default.project.json -o build/sourcemap.json
 
-      - name: Upload Rojo Build Artifact
-        uses: actions/upload-artifact@v4
+      - name: Publish Release (Rojo Sync Artifacts)
+        uses: softprops/action-gh-release@v2
         with:
-          name: rojo-build
-          path: |
+          generate_release_notes: true
+          files: |
             build/ZundamonsKitchen.rbxl
             build/sourcemap.json
-          if-no-files-found: error
-          retention-days: 90

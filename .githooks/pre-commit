@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+# Pre-commit gate: formats and lints only STAGED Lua files (fast, scoped).
+# Install once per clone:  git config core.hooksPath .githooks   (or: npm run hooks:install)
+
+set -e
+
+staged_lua=$(git diff --cached --name-only -- '*.lua' '*.luau')
+
+if [ -z "$staged_lua" ]; then
+	exit 0
+fi
+
+# Guard: tools must exist (installed via rokit/aftman/mise)
+command -v stylua >/dev/null 2>&1 || { echo "pre-commit: stylua not found — run 'rokit install'"; exit 1; }
+command -v selene >/dev/null 2>&1 || { echo "pre-commit: selene not found — run 'rokit install'"; exit 1; }
+
+fail=0
+
+for file in $staged_lua; do
+	[ -n "$file" ] || continue
+
+	if ! stylua --check "$file" >/dev/null 2>&1; then
+		echo "pre-commit: $file is not formatted. Run:  stylua \"$file\" && git add \"$file\""
+		fail=1
+	fi
+
+	if ! selene --allow-warnings "$file" >/dev/null 2>&1; then
+		echo "pre-commit: $file has lint errors. Fix them before committing."
+		fail=1
+	fi
+done
+
+if [ "$fail" -ne 0 ]; then
+	echo "pre-commit: gate failed — see errors above. (Warnings are allowed; errors block.)"
+	exit 1
+fi
+
+echo "pre-commit: staged Lua files are formatted and lint-clean."
+exit 0

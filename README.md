@@ -8,7 +8,9 @@
 
 > **Current status:** finishing Phase 3. Active work and the remaining task streams live in
 > [docs/PHASE3_HANDOFF.md](docs/PHASE3_HANDOFF.md); live playtest findings in
-> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md). Superseded phase docs are in [docs/archive/](docs/archive/).
+> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md). Core-loop stability hardening
+> (mirroring the audit in [docs/SHARED_ASSET_HUB.md](docs/SHARED_ASSET_HUB.md)) is
+> tracked alongside. Superseded phase docs are in [docs/archive/](docs/archive/).
 
 ---
 
@@ -77,17 +79,43 @@ wally install
 rojo serve default.project.json --port 34872
 ```
 
-Before committing, run every gate independently:
+Before committing, run every gate independently (or install the pre-commit hook once and let it gate staged Lua files automatically):
 
 ```powershell
-stylua --check <files-you-changed>
-selene <files-you-changed>
-rojo build default.project.json --output build/ZundamonsKitchenV2.rbxlx
+rokit install
+npm run hooks:install
+wally install
+npm run check      # = stylua --check + selene + rojo build (mirrors CI)
 git diff --check -- <files-you-changed>
 git status --short
 ```
 
-Full-source formatting still contains inherited debt. Do not bulk-format unrelated files to make a focused change pass.
+The pre-commit hook (`core.hooksPath .githooks`) formats-checks and lint-checks only staged `.lua`/`.luau` files. Format any file with `stylua <file>` (repo-wide: `npm run format`).
+
+Full-source formatting was adopted as a one-time baseline (StyLua 2.5.2, tabs, 120 col). Do not bulk-format unrelated files to make a focused change pass — the tree is already compliant.
+
+## 🔁 Rojo sync via GitHub
+
+Every push to `main` and every pull request runs the full gate pipeline in CI (StyLua check, Selene errors gate, Rojo build, sourcemap) and uploads the built place as the **`rojo-build`** artifact (90-day retention). Team members can download `ZundamonsKitchen.rbxl` + `sourcemap.json` from the Actions run instead of building locally.
+
+Tagging `vX.Y.Z` triggers the **Release (Rojo Sync)** workflow: the same gates run, then a GitHub Release is published with the built place file and sourcemap attached — a stable, shareable sync point for Studio.
+
+## 🔬 Live playtest notes
+
+Developers, playtesters, and coding agents log findings in
+[docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md) — the single source of truth
+for gameplay feedback. Append raw notes at the bottom; maintainers triage them
+into the issue table. Template:
+
+```markdown
+### YYYY-MM-DD (session N) — <scope>
+- <one observation per bullet, with system + repro path>
+- <errors copied verbatim from Studio Output where possible>
+```
+
+Stability fixes land as small reviewed commits with the playtest entry they
+resolve quoted in the message. Live Studio automation guidance lives in
+[docs/MCP_WORKFLOW.md](docs/MCP_WORKFLOW.md).
 
 ## 🏡 Level designers
 
@@ -117,16 +145,18 @@ Never stage owner source assets accidentally. In particular, do not use `git add
 
 ```text
 src/client/                         controllers, HUD, VN, and player input
-src/server/                         adapters, services, systems, and validation
+src/server/                         services, systems, validation, and dev tools
 src/shared/ConfigurationFiles/      canonical gameplay and UI configuration
+src/shared/RemoteEvents/            RemoteEvent/RemoteFunction/RewardEvent models
 src/shared/components/              Matter component definitions
 src/shared/Models/                  repository-authored reusable models
 src/shared/AssetRegistry.lua        asset ID single source of truth
 src/Workspace/                      Rojo-owned world scaffolding only
+src/Plugins/                        Studio authoring plugins (world decorator, material)
+tools/asset-pipeline/               Open Cloud upload + mesh conversion pipelines
 docs/                               recovery, authoring, production, and UX plans
-docs/ASSET_MANAGEMENT.md           asset collaboration guide
-docs/MCP_WORKFLOW.md               live Studio automation guide
-scripts/                            build and extraction pipelines
+docs/PLAYTEST_NOTES.md              live playtest intake (feed findings here)
+scripts/                            build, audit, and Ollama content workers
 site/                               Zunda-OS creative hub and design reference
 default.project.json                Rojo DataModel mapping
 wally.toml                          Roblox dependencies

@@ -77,9 +77,12 @@ Do not stage `.blend`, `.blend1`, `crucialassets/`, packages, generated places, 
 Report each gate independently:
 
 ```powershell
+# Full gate (mirrors CI):  stylua --check src && selene --allow-warnings src && rojo build
+npm run check
+# Or the pre-commit hook gates only what you stage (npm run hooks:install once):
 stylua --check <changed-luau-files>
-selene <changed-luau-files>
-rojo build default.project.json --output build/ZundamonsKitchenV2.rbxlx
+selene --allow-warnings <changed-luau-files>
+rojo build default.project.json --output build/ZundamonsKitchenV2.rbxl
 git diff --check -- <changed-files>
 ```
 

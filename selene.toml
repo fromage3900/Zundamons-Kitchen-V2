@@ -1,3 +1,14 @@
+# Selene config — Roblox Luau linter (pinned: 0.27.1 in aftman.toml, rokit.toml, mise.toml).
+#
+# Policy: ERRORS block CI and pre-commit. WARNINGS are reported but do not block
+# (CI and hooks run `selene --allow-warnings`). Keep warnings as close to zero
+# as practical; new warning debt is tracked in README.
+#
+# NOTE: the bundled Roblox std in 0.27.1 predates a few current APIs
+# (os.getenv, AudioReceiver, Wedge/Cylinder aliases). Valid newer APIs are
+# annotated with `-- selene: allow(incorrect_standard_library_use)` at the
+# offending line rather than weakening the rule project-wide.
+
 std = "roblox"
 
 [rules]
@@ -8,7 +19,8 @@ unscoped_variables = "deny"
 unused_variable = "allow"
 empty_if = "deny"
 
-# The Iron Gate: Prevent debugging statements from entering production
+# The Iron Gate (off by default): reject print()/warn() before production
+# rollouts. Enable per-branch when the codebase reaches warning parity.
 # [rules.suspicious_function_call]
 # severity = "error"
 # functions = ["print", "warn"]
