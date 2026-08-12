@@ -98,3 +98,10 @@
 - **Guest attributes are client-mutable** (they replicate): `ServingService` clamps `PayAmount` ≤ 500 and `BonusGold` ≤ 200 at serve; guest cap is **per player** in GuestManager.
 - **Style/chef-stat writes go through `PlayerDataService.mutate`** (`EndlessLoopWiring.syncPlayerWardrobe`); direct `data.x +=` writes bypass revision + projection — route new writes through mutate.
 - **Challenge mode scoring**: cooking (`onCookComplete`) never increments guests served (`onGuestServed`); style points are granted once via `syncPlayerWardrobe`, never inside ChallengeModeService.
+
+### 15. Branch State & Repo Hygiene
+- **`main` is the only active branch** (2026-08-12): it is the production baseline and all pushes run CI gates. `codex/*` branches are archived history — never branch from them, never advertise them in docs as live.
+- **One concern per commit**: group by feature area (e.g. `feat(server):`, `assets:`, `chore:`); do not sweep unrelated files (e.g. stray root scratch, temp PNGs, one-off scripts) into feature commits.
+- **Never `git add -A` in a mixed workspace** — owner source assets (`crucialassets/`, root `*.fbx`/`*.blend`) and generated builds can be staged by accident. Stage explicit paths per commit.
+- **Configs cross-reference each other** (`scripts/check_config_crossrefs.py` runs in CI): ScatterConfig variants must exist in `ResourceVisualCatalog`, Mineable/click ids in `ResourceNodeRegistry`, and AGENTS-listed remotes must be declared. Keep them in sync or CI fails.
+- **Owner source assets live in `crucialassets/`** (tracked, never stage casually); everything new of that kind goes there too, not at the repo root.

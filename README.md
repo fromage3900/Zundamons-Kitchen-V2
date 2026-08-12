@@ -6,11 +6,12 @@
 
 [Getting started](GETTING_STARTED.md) · [Contributing](CONTRIBUTING.md) · [Production handoff](docs/PRODUCTION_AND_LEVEL_DESIGN_HANDOFF.md) · [UI roadmap](docs/UI_UX_OVERHAUL_PLAN.md) · [Credits](CREDITS.md)
 
-> **Current status:** finishing Phase 3. Active work and the remaining task streams live in
-> [docs/PHASE3_HANDOFF.md](docs/PHASE3_HANDOFF.md); live playtest findings in
-> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md). Core-loop stability hardening
-> (mirroring the audit in [docs/SHARED_ASSET_HUB.md](docs/SHARED_ASSET_HUB.md)) is
-> tracked alongside. Superseded phase docs are in [docs/archive/](docs/archive/).
+> **Current status:** Phase 4. Core loop verified; endless-gameplay systems are
+> server-wired (Challenge Mode, Daily Challenges, Chef Stats); harvest visuals
+> now use live-verified real meshes (2026-08-12). Active streams: challenge/daily
+> client UI, loop polish, world density. Phase plans live in
+> [docs/PHASE4_PLAN.md](docs/PHASE4_PLAN.md); live playtest findings in
+> [docs/PLAYTEST_NOTES.md](docs/PLAYTEST_NOTES.md). Superseded phase docs are in [docs/archive/](docs/archive/).
 
 ---
 
@@ -44,7 +45,7 @@ Requirements: Git, Roblox Studio, the Rojo Studio plugin, and the pinned command
 ```powershell
 git clone https://github.com/fromage3900/Zundamons-Kitchen-V2.git
 cd Zundamons-Kitchen-V2
-git switch codex/core-production-baseline
+git switch main
 rokit install
 wally install
 rojo serve default.project.json --port 34872
@@ -60,15 +61,14 @@ Then:
 
 If `rokit` is unavailable, follow the alternative setup in [Getting Started](GETTING_STARTED.md).
 
-## 🧺 Choose the right branch
+## 🧺 Branch layout
 
 | Branch | Purpose | Rule |
 | --- | --- | --- |
-| `codex/core-production-baseline` | Stable demo and level-design baseline | Protect it; use reviewed commits only |
-| `codex/expanded-gameplay-experiments` | Pea Wheel, HUD V2, and bounded gameplay prototypes | Never publish directly |
-| `main` | Historical/default integration branch | Do not assume it contains the newest recovery work |
+| `main` | Active production baseline (CI gates + Rojo artifact on every push) | Protected; reviewed commits only |
+| `codex/*` | Archived phase/experiment branches | History only — do not branch from them |
 
-Experimental work returns to production as small reviewed commits. Do not merge the experiment branch wholesale.
+All current work lands on `main` through small reviewed commits. Push directly only for small verified changes; anything substantial goes through a PR that runs the same gates.
 
 ## 🛠 Everyday workflow
 
