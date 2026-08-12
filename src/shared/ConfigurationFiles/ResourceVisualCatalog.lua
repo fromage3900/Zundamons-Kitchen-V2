@@ -30,41 +30,39 @@ local function register(variant: string, assetId: string, assetType: AssetType?,
 	return descriptor
 end
 
--- IDs were previously registered as wrapper-Model asset IDs, which failed
--- ContentProvider:PreloadAsync as SpecialMesh targets (AssetFetchStatus.Failure).
--- Verified live 2026-08-12 in Studio: LoadAsset unwraps each wrapper to a real
--- MeshPart whose MeshId *does* resolve; entries below now point at those
--- verified inner mesh IDs. Seed/SeedLeaf/Leaf/Mature/ZundaLeaf_Default passed
--- directly and are unchanged.
+-- All asset IDs below are meshes confirmed present in the Studio-authored
+-- level (Workspace), verified by Workspace scan 2026-08-12. No external
+-- catalog assets are used: runtime visuals come only from in-level meshes.
+-- tree-high-round / tree-high-crooked / tree / boulder / grass volumes.
 register("Variant1", "rbxassetid://125552534191638", "Mesh", true)
-register("Variant2", "rbxassetid://110321726780139", "Mesh", true)
-register("Rock_Common", "rbxassetid://81332711510127", "Mesh", true)
-register("Rock_Rare", "rbxassetid://81332711510127", "Mesh", true)
-register("GoldOre_Default", "rbxassetid://81332711510127", "Mesh", true)
-register("Wheat_01", "rbxassetid://72200439315451", "Mesh", true)
-register("Wheat_02", "rbxassetid://72200439315451", "Mesh", true)
-register("Wheat_03", "rbxassetid://72200439315451", "Mesh", true)
-register("ZundaFlower_Default", "rbxassetid://72200439315451", "Mesh", true)
-register("ZundaFlower_Rare", "rbxassetid://72200439315451", "Mesh", true)
-register("ZundaPea_01", "rbxassetid://75167715290828", "Mesh", true)
-register("ZundaPea_02", "rbxassetid://75167715290828", "Mesh", true)
-register("ZundaPea_03", "rbxassetid://75167715290828", "Mesh", true)
-register("Mushroom_01", "rbxassetid://95390217986219", "Mesh", true)
-register("Mushroom_02", "rbxassetid://95390217986219", "Mesh", true)
-register("BerryBush_01", "rbxassetid://139306345319488", "Mesh", true)
-register("BerryBush_02", "rbxassetid://139306345319488", "Mesh", true)
-register("BerryBush_03", "rbxassetid://139306345319488", "Mesh", true)
-register("Root_01", "rbxassetid://73466898093060", "Mesh", true)
-register("Root_02", "rbxassetid://73466898093060", "Mesh", true)
-register("Seed", "rbxassetid://132798405534424", "Mesh", true)
-register("SeedLeaf", "rbxassetid://110157288415078", "Mesh", true)
-register("Leaf", "rbxassetid://118786859560292", "Mesh", true)
-register("Mature", "rbxassetid://85258154641863", "Mesh", true)
-register("EdamamePod_Default", "rbxassetid://75167715290828", "Mesh", true)
-register("ZundaLeaf_Default", "rbxassetid://118786859560292", "Mesh", true)
-register("SweetPea_Default", "rbxassetid://75167715290828", "Mesh", true)
-register("PeaFlower_Default", "rbxassetid://72200439315451", "Mesh", true)
-register("SaltedPeaBouquet_Default", "rbxassetid://72200439315451", "Mesh", true)
+register("Variant2", "rbxassetid://86948457117879", "Mesh", true)
+register("Rock_Common", "rbxassetid://5003626535", "Mesh", true)
+register("Rock_Rare", "rbxassetid://5003626535", "Mesh", true)
+register("GoldOre_Default", "rbxassetid://5003626535", "Mesh", true)
+register("Wheat_01", "rbxassetid://2689229176", "Mesh", true)
+register("Wheat_02", "rbxassetid://2689229176", "Mesh", true)
+register("Wheat_03", "rbxassetid://2689229176", "Mesh", true)
+register("ZundaFlower_Default", "rbxassetid://7444202618", "Mesh", true)
+register("ZundaFlower_Rare", "rbxassetid://7444202618", "Mesh", true)
+register("ZundaPea_01", "rbxassetid://431221914", "Mesh", true)
+register("ZundaPea_02", "rbxassetid://431221914", "Mesh", true)
+register("ZundaPea_03", "rbxassetid://431221914", "Mesh", true)
+register("Mushroom_01", "rbxassetid://77467866039933", "Mesh", true)
+register("Mushroom_02", "rbxassetid://77467866039933", "Mesh", true)
+register("BerryBush_01", "rbxassetid://2778147390", "Mesh", true)
+register("BerryBush_02", "rbxassetid://2778147390", "Mesh", true)
+register("BerryBush_03", "rbxassetid://2778147390", "Mesh", true)
+register("Root_01", "rbxassetid://76259466777256", "Mesh", true)
+register("Root_02", "rbxassetid://76259466777256", "Mesh", true)
+register("Seed", "rbxassetid://431221914", "Mesh", true)
+register("SeedLeaf", "rbxassetid://2778147390", "Mesh", true)
+register("Leaf", "rbxassetid://2778147390", "Mesh", true)
+register("Mature", "rbxassetid://2689229176", "Mesh", true)
+register("EdamamePod_Default", "rbxassetid://2778147390", "Mesh", true)
+register("ZundaLeaf_Default", "rbxassetid://2778147390", "Mesh", true)
+register("SweetPea_Default", "rbxassetid://431221914", "Mesh", true)
+register("PeaFlower_Default", "rbxassetid://7444202618", "Mesh", true)
+register("SaltedPeaBouquet_Default", "rbxassetid://7444202618", "Mesh", true)
 
 local defaultsByArchetype: { [string]: string } = {
 	AppleTree = "Variant1",
