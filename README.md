@@ -100,6 +100,18 @@ Every push to `main` and every pull request runs the full gate pipeline in CI (S
 
 Tagging `vX.Y.Z` triggers the **Release (Rojo Sync)** workflow: the same gates run, then a GitHub Release is published with the built place file and sourcemap attached — a stable, shareable sync point for Studio.
 
+## 🧰 Studio authoring plugins (Zunda World Decorator / Material Authoring)
+
+Sources live in `src/Plugins/`. They are **not** auto-installed — build and install
+them explicitly, then restart Studio:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install_plugins.ps1
+```
+
+Both appear under the **Plugins** tab when loaded. Keep them in sync with the
+place by re-running the script after touching `src/Plugins/*.lua`.
+
 ## 🔬 Live playtest notes
 
 Developers, playtesters, and coding agents log findings in
