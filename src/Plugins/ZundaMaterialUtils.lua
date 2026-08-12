@@ -108,9 +108,9 @@ function ZundaMaterialUtils.describeVariant(variant: MaterialVariant?): string?
 		"%s (BaseMaterial=%s, Color=%s, Roughness=%s, Metallic=%s)",
 		variant.Name,
 		tostring(variant.BaseMaterial),
-		tostring(variant.Color),
-		tostring(variant.Roughness),
-		tostring(variant.Metallic)
+		tostring(variant:GetAttribute("PaletteColor")),
+		tostring(variant:GetAttribute("PaletteRoughness")),
+		tostring(variant:GetAttribute("PaletteMetallic"))
 	)
 end
 

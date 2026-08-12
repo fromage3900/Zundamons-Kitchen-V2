@@ -319,8 +319,7 @@ end)
 -- ============================================================
 -- TOOLBAR BUTTON
 -- ============================================================
-local toggleBtn =
-	toolbar:CreateButton("Zunda Material", "Open/Close Zunda Material Authoring", "rbxassetid://123736711329002")
+local toggleBtn = toolbar:CreateButton("Zunda Material", "Open/Close Zunda Material Authoring")
 toggleBtn.Click:Connect(function()
 	widget.Enabled = not widget.Enabled
 end)

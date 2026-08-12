@@ -64,9 +64,9 @@ function MaterialPalette.register(palette)
 	local variant = Instance.new("MaterialVariant")
 	variant.Name = palette.name
 	variant.BaseMaterial = palette.baseMaterial
-	variant.Color = palette.color
-	variant.Roughness = palette.roughness
-	variant.Metallic = palette.metallic
+	variant:SetAttribute("PaletteColor", palette.color)
+	variant:SetAttribute("PaletteRoughness", palette.roughness)
+	variant:SetAttribute("PaletteMetallic", palette.metallic)
 	variant.Parent = MaterialService
 	return variant
 end

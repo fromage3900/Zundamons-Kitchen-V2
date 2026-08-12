@@ -214,8 +214,7 @@ local mainWidget = MainWidget.new(widget, plugin, {
 -- ============================================================
 -- TOOLBAR BUTTONS
 -- ============================================================
-local toggleBtn =
-	toolbar:CreateButton("Toggle Decorator", "Open/Close Zunda World Decorator", "rbxassetid://111378866841838")
+local toggleBtn = toolbar:CreateButton("Toggle Decorator", "Open/Close Zunda World Decorator")
 toggleBtn.Click:Connect(function()
 	widget.Enabled = not widget.Enabled
 end)

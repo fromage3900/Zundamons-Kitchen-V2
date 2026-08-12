@@ -116,9 +116,9 @@ function ZundaPalette.findOrCreateVariant(name: string, spec: any): MaterialVari
 	local variant = Instance.new("MaterialVariant")
 	variant.Name = name
 	variant.BaseMaterial = ZundaPalette.resolveBaseMaterial(spec.baseMaterial)
-	variant.Color = spec.color
-	variant.Roughness = spec.roughness
-	variant.Metallic = spec.metallic
+	variant:SetAttribute("PaletteColor", spec.color)
+	variant:SetAttribute("PaletteRoughness", spec.roughness)
+	variant:SetAttribute("PaletteMetallic", spec.metallic)
 	variant.Parent = MaterialService
 	return variant
 end
