@@ -55,13 +55,15 @@ ProgressionConfig.guest_preferences = {
 }
 
 -- Guest spawning settings
+-- Guests are the heart of the core loop, so they should show up quickly and
+-- often. 15-30s keeps the kitchen busy without overwhelming the player.
 ProgressionConfig.guest_settings = {
 	max_guests_at_once = 3,
-	spawn_interval_min = 30,
-	spawn_interval_max = 60,
-	first_guest_delay = 15,
-	new_player_spawn_interval_min = 15,
-	new_player_spawn_interval_max = 30,
+	spawn_interval_min = 15,
+	spawn_interval_max = 30,
+	first_guest_delay = 8,
+	new_player_spawn_interval_min = 10,
+	new_player_spawn_interval_max = 20,
 	new_player_threshold = 5,
 	guest_patience = 240,
 	patience_warning = 60,
