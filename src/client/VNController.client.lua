@@ -195,6 +195,10 @@ local seqQueue = {} -- pending sequences to play after current
 local seqLines = {}
 local seqIdx = 0
 local completeCb = nil
+-- Bond tier of the currently-interacting companion (1/2/3, from
+-- PlayerDataService.getCompanionBondTier). Drives the default portrait emote
+-- so a freshly-met companion and a lifelong one look distinct in the VN.
+local currentBondTier: number? = nil
 
 local SHOW_POS = UDim2.new(0.5, 0, 1, -(PANEL_H + 18))
 local HIDE_POS = UDim2.new(0.5, 0, 1, PANEL_H + 80) -- push well below screen
@@ -220,7 +224,7 @@ local DEFAULT_SPEAKER = {
 	portrait = Color3.fromRGB(180, 220, 170),
 }
 
-local function setSpeaker(key)
+local function setSpeaker(key, emote)
 	local sp = (SPEAKERS and (SPEAKERS[key] or SPEAKERS.zundamon or SPEAKERS.zundapal)) or DEFAULT_SPEAKER
 	pEmoji.Text = sp.emoji or "🌱"
 	portrait.BackgroundColor3 = sp.portrait or DEFAULT_SPEAKER.portrait
@@ -230,7 +234,21 @@ local function setSpeaker(key)
 	-- Prefer an uploaded Zundamon character image when one is configured;
 	-- otherwise fall back to the emoji portrait. (Roblox can't play the source
 	-- GIFs directly — upload frames as image assets into VNPortraitConfig.)
-	local img = VNPortraitConfig.getSpeakerImage(key)
+	-- A per-line `emote` key overrides the speaker default; if no emote is given
+	-- but a companion bond tier is known, fall back to that tier's default emote.
+	local img = ""
+	if emote and emote ~= "" then
+		img = VNPortraitConfig.getEmoteImage(emote)
+	end
+	if img == "" then
+		img = VNPortraitConfig.getSpeakerImage(key)
+	end
+	if img == "" and currentBondTier then
+		local tierEmote = VNPortraitConfig.getBondTierEmote(currentBondTier)
+		if tierEmote ~= "" then
+			img = VNPortraitConfig.getEmoteImage(tierEmote)
+		end
+	end
 	if img ~= "" then
 		pImage.Image = img
 		pImage.Visible = true
@@ -357,16 +375,17 @@ local function showLine(idx)
 		return
 	end
 	local entry = seqLines[idx]
-	local speakerKey, text
+	local speakerKey, text, emote
 	if type(entry) == "string" then
 		text = entry
 		speakerKey = seqLines._defaultSpeaker or "zundamon"
 	else
 		speakerKey = entry.speaker or "zundamon"
 		text = entry.text or ""
+		emote = entry.emote
 	end
 	print("[VN.showLine] Speaker:", speakerKey, "Text:", text)
-	setSpeaker(speakerKey)
+	setSpeaker(speakerKey, emote)
 	typeThread = task.spawn(function()
 		typeWrite(text)
 	end)
@@ -729,7 +748,7 @@ local function buildCompanionTree(compType, bondTier)
 		table.insert(greetingLines, { speaker = speakerKey, text = l })
 	end
 	if bondLine then
-		table.insert(greetingLines, { speaker = speakerKey, text = bondLine })
+		table.insert(greetingLines, { speaker = speakerKey, text = bondLine, emote = "joyful" })
 	end
 
 	return {
@@ -763,6 +782,7 @@ RE:WaitForChild("OpenCompanionVN").OnClientEvent:Connect(function(compType, emoj
 		closePanel(true)
 		return
 	end
+	currentBondTier = type(bondTier) == "number" and bondTier or nil
 	_G.ZundaVN.showBranching(buildCompanionTree(compType, bondTier))
 end)
 
@@ -771,12 +791,17 @@ local qcRE = RE:FindFirstChild("QuestCompleted")
 if qcRE then
 	qcRE.OnClientEvent:Connect(function(quest)
 		local lines = {
-			{ speaker = "zundamon", text = 'Quest complete! 🎉  "' .. quest.title .. '"' },
+			{ speaker = "zundamon", text = 'Quest complete! 🎉  "' .. quest.title .. '"', emote = "joyful" },
 			{
 				speaker = "zundamon",
 				text = "You did it, " .. player.Name .. "! ✨ +" .. (quest.reward or 0) .. " gold~",
+				emote = "excited",
 			},
-			{ speaker = "zundamon", text = quest.unlock_hint or "Keep exploring — new surprises await!" },
+			{
+				speaker = "zundamon",
+				text = quest.unlock_hint or "Keep exploring — new surprises await!",
+				emote = "content",
+			},
 		}
 		_G.ZundaVN.show("zundamon", lines)
 	end)
@@ -786,10 +811,10 @@ end
 task.spawn(function()
 	local showVNEv = RE:WaitForChild("ShowVNDialogue", 10) :: RemoteEvent?
 	if showVNEv then
-		showVNEv.OnClientEvent:Connect(function(speakerTag, message)
+		showVNEv.OnClientEvent:Connect(function(speakerTag, message, emote)
 			if type(message) == "string" and message ~= "" then
 				local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
-				_G.ZundaVN.show(speaker, { message })
+				_G.ZundaVN.show(speaker, { { speaker = speaker, text = message, emote = emote } })
 			elseif type(message) == "table" then
 				local speaker = (type(speakerTag) == "string" and SPEAKERS[speakerTag]) and speakerTag or "zundamon"
 				_G.ZundaVN.show(speaker, message)

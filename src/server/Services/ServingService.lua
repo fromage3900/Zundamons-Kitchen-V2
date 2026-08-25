@@ -182,6 +182,7 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	local serveData = PlayerDataService.get(player)
 	local activeComp = serveData and serveData.active_companion
 	if type(activeComp) == "string" and activeComp ~= "" then
+		local bondTier = PlayerDataService.getCompanionBondTier(player, activeComp)
 		PlayerDataService.addCompanionBond(player, activeComp, 2)
 		local reactionData = require(ReplicatedStorage.ConfigurationFiles.VNDialogueData)
 		local reactionLine = reactionData.getServeReaction(activeComp)
@@ -189,7 +190,15 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 			reactionLine = reactionLine:gsub("{player}", player.Name)
 			local ev = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialogue")
 			if ev and ev:IsA("RemoteEvent") then
-				ev:FireClient(player, activeComp, reactionLine)
+				-- React with a bond-tier-appropriate portrait emote: freshly-met
+				-- companions use the neutral emote, close ones the joyful one.
+				local portraitCfg = require(ReplicatedStorage.ConfigurationFiles.VNPortraitConfig)
+				local emote = portraitCfg.getBondTierEmote(bondTier) or ""
+				if emote ~= "" then
+					ev:FireClient(player, activeComp, reactionLine, emote)
+				else
+					ev:FireClient(player, activeComp, reactionLine)
+				end
 			end
 		end
 	end
