@@ -187,9 +187,12 @@ local function spawnPopup(kind, text, color)
 
 	-- A3 visual juice: pop-in with a little back-ease overshoot so reward
 	-- numbers snap onto screen instead of just fading in softly.
-	lbl.Scale = Vector2.new(0.2, 0.2)
-	local popTween = TweenService:Create(lbl, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Scale = Vector2.new(1, 1),
+	-- TextLabel has no .Scale; scale the pop-in via a UIScale child instead.
+	local scale = Instance.new("UIScale")
+	scale.Scale = 0.2
+	scale.Parent = lbl
+	local popTween = TweenService:Create(scale, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Scale = 1,
 	})
 	popTween:Play()
 
