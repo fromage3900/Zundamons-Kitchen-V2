@@ -174,6 +174,25 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	guest:SetAttribute("ServingState", "settled")
 	showDialogue(player, guest, "served", result.gold)
 	PlayerDataService.checkAndUnlockTiers(player)
+	-- Serve-time companion bond + reaction (Phase-4 "Nikki x Uma" loop):
+	-- serving a guest with an active companion accrues per-companion bond XP
+	-- (distinct from the flat companion_affection/chats counters) and the
+	-- active companion pops a short VN reaction line through the same
+	-- ShowVNDialogue pipeline guests already use. No new UI, no new remotes.
+	local serveData = PlayerDataService.get(player)
+	local activeComp = serveData and serveData.active_companion
+	if type(activeComp) == "string" and activeComp ~= "" then
+		PlayerDataService.addCompanionBond(player, activeComp, 2)
+		local reactionData = require(ReplicatedStorage.ConfigurationFiles.VNDialogueData)
+		local reactionLine = reactionData.getServeReaction(activeComp)
+		if reactionLine then
+			reactionLine = reactionLine:gsub("{player}", player.Name)
+			local ev = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialogue")
+			if ev and ev:IsA("RemoteEvent") then
+				ev:FireClient(player, activeComp, reactionLine)
+			end
+		end
+	end
 	local guestType = guest:GetAttribute("MeshType") or guest:GetAttribute("GuestType") or "normal"
 	GuestService.removeGuestByInstance(guest, "served")
 	ServingService.GuestServed:Fire(player, guestType, recipe, quality)

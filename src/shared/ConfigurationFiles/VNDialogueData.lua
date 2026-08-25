@@ -256,6 +256,57 @@ local COMPANION_DIALOGUE = {
 	},
 }
 
+-- Serve-time companion reaction lines (short VN pops on guest served).
+-- Reuses the ShowVNDialogue pipeline: keyed by compType with a DEFAULT
+-- fallback so any companion without a bespoke entry still reacts.
+local SERVE_REACTIONS = {
+	zundamon = {
+		"Delicious! That guest is going to remember our dish! ✨",
+		"Another happy customer, {player}! The kitchen is thriving! 🍽️",
+	},
+	zundacat = {
+		"Purrr... that serve was purrfect! 🐱",
+		"The guest licked the plate clean! Excellent work! 🍽️",
+	},
+	ankomon = {
+		"Profit and pride! That gold lands right on the ledger! 💰",
+	},
+	cardamon = {
+		"A perfect window — the timing never slips with me! ⏱️",
+	},
+	antimon = {
+		"Extra drops from good serves mean a fuller pouch! 🎒",
+	},
+	sakuradamon = {
+		"Each served dish is a petal of your legend! 🌸",
+	},
+	tantanmon = {
+		"Fast hands, happy guests! Speed is kindness! ⚡",
+	},
+	dog = {
+		"Woof! That was a great serve! 🐕",
+	},
+	parrot = {
+		"Squawk! Another guest fed! Polly is impressed! 🦜",
+	},
+	cat = {
+		"Meow... acceptable. The guest was pleased. 🐱",
+	},
+	DEFAULT = {
+		"Hooray! The guest is satisfied! ✨",
+		"Wonderful serve, chef! 🍽️",
+	},
+}
+
+-- Look up a serve-time reaction line for a companion (falls back to DEFAULT).
+local function getServeReaction(compType: string): string?
+	local pool = SERVE_REACTIONS[compType] or SERVE_REACTIONS.DEFAULT
+	if pool and #pool > 0 then
+		return pool[math.random(1, #pool)]
+	end
+	return nil
+end
+
 -- Side dialogue triggers (item/lore discoveries)
 local SIDE_DIALOGUES = {
 	zunda_pea = {
@@ -278,6 +329,7 @@ local VNDialogueData = {}
 VNDialogueData.SPEAKERS = SPEAKERS
 VNDialogueData.COMPANION_DIALOGUE = COMPANION_DIALOGUE
 VNDialogueData.SIDE_DIALOGUES = SIDE_DIALOGUES
+VNDialogueData.getServeReaction = getServeReaction
 
 function VNDialogueData.getSpeaker(id: string)
 	return SPEAKERS[id] or SPEAKERS.zundamon
