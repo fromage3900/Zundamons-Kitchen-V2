@@ -180,8 +180,13 @@ local function playHarvestAnimation()
 	local anim = Instance.new("Animation")
 	anim.AnimationId = ANIMATION_ID
 
-	local track = animator:LoadAnimation(anim)
-	if track then
+	-- Guard LoadAnimation: a bad/missing animation asset makes LoadAnimation
+	-- throw (placeholder IDs like 2510798496 error-spam every harvest). Degrade
+	-- to no animation rather than erroring the whole harvest.
+	local okLoad, track = pcall(function()
+		return animator:LoadAnimation(anim)
+	end)
+	if okLoad and track then
 		track.Priority = Enum.AnimationPriority.Action
 		track:Play()
 		harvestAnimTrack = track
@@ -414,7 +419,7 @@ end
 local function getOrAttachBillboardGui(node: Instance): BillboardGui?
 	local targetPart = if node:IsA("BasePart")
 		then node
-		else (node.PrimaryPart or node:FindFirstChildWhichIsA("BasePart"))
+		else ((node:IsA("Model") and node.PrimaryPart) or node:FindFirstChildWhichIsA("BasePart"))
 	if not targetPart then
 		return nil
 	end
@@ -542,7 +547,7 @@ end
 local function bindMineableNode(node: Instance)
 	local pos = if node:IsA("BasePart")
 		then node.Position
-		else (node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)
+		else (node:IsA("Model") and node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)
 
 	node:GetAttributeChangedSignal("Health"):Connect(function()
 		local health = node:GetAttribute("Health")

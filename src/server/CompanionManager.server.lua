@@ -434,15 +434,29 @@ local function buildCompanion(player, compType)
 			if idleAnimId and idleAnimId ~= "" then
 				local idleAnim = Instance.new("Animation")
 				idleAnim.AnimationId = idleAnimId
-				idleTrack = animator:LoadAnimation(idleAnim)
-				idleTrack.Priority = Enum.AnimationPriority.Core
+				-- Guard LoadAnimation: a bad/missing animation asset makes
+				-- LoadAnimation throw (e.g. "Argument 3 missing or nil" with a
+				-- placeholder ID) and error-spams every companion build. Degrade
+				-- to no idle track instead of crashing the build.
+				local okIdle, track = pcall(function()
+					return animator:LoadAnimation(idleAnim)
+				end)
+				if okIdle and track then
+					idleTrack = track
+					idleTrack.Priority = Enum.AnimationPriority.Core
+				end
 			end
 
 			if walkAnimId and walkAnimId ~= "" then
 				local walkAnim = Instance.new("Animation")
 				walkAnim.AnimationId = walkAnimId
-				walkTrack = animator:LoadAnimation(walkAnim)
-				walkTrack.Priority = Enum.AnimationPriority.Core
+				local okWalk, track = pcall(function()
+					return animator:LoadAnimation(walkAnim)
+				end)
+				if okWalk and track then
+					walkTrack = track
+					walkTrack.Priority = Enum.AnimationPriority.Core
+				end
 			end
 
 			print(
