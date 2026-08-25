@@ -221,6 +221,18 @@ local DEFAULTS: {
 			end,
 			callback = nil :: (() -> ())?,
 		},
+		{
+			id = "photomode",
+			label = "Photo Mode",
+			icon = "📸",
+			description = "Enter Zunda photo mode",
+			defaultKey = Enum.KeyCode.P,
+			category = "System",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
 	}
 
 -- ── Initialization ───────────────────────────────────────────
@@ -339,6 +351,7 @@ function UI_ActionRegistry.getOrderedSliceList(): { string }
 		"challenge",
 		"collection",
 		"compendium",
+		"photomode",
 		"materials",
 		"map",
 		"companions",
