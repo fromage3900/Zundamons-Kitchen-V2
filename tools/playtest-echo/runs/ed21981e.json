@@ -1,0 +1,178 @@
+{
+  "duration_s": 65.765,
+  "started_at": "2026-08-25T05:46:38Z",
+  "errors": [],
+  "session_id": "ed21981e-8d58-4a40-bbb2-7c613bf5e311",
+  "warnings": [],
+  "state_samples": [
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 5.221
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 13.202
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 18.466
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 23.491
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 28.498
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 33.499
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 38.516
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 43.531
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 48.647
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 53.649
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 58.664
+    },
+    {
+      "players": [
+        {
+          "name": "tekashiwannaminaj",
+          "user_id": 1601688119
+        },
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 63.68
+    }
+  ]
+}

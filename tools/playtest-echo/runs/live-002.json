@@ -1,0 +1,126 @@
+{
+  "duration_s": 0,
+  "started_at": "2026-08-25T05:23:59Z",
+  "errors": [],
+  "session_id": "83de875a-6243-49c8-9b78-b87b8083a659",
+  "warnings": [],
+  "state_samples": [
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    },
+    {
+      "players": [
+        {
+          "name": "fromage3900",
+          "user_id": 3930496852
+        }
+      ],
+      "at_s": 0
+    }
+  ]
+}

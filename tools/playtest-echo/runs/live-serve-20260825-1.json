@@ -1,0 +1,24 @@
+{
+  "session_id": "live-serve-20260825-1",
+  "started_at": "2026-08-25T05:40:00Z",
+  "duration_s": 56.0,
+  "errors": [
+    { "at_s": 6.0, "script": "GatheringNodes", "message": "PrimaryPart is not a valid member of Folder \"Workspace.GameplayLoopArea.GatheringNodes.ZundaBerry\"" },
+    { "at_s": 12.0, "script": "CompanionManager", "message": "Argument 3 missing or nil" },
+    { "at_s": 13.0, "script": "CompanionManager", "message": "Argument 3 missing or nil" },
+    { "at_s": 20.0, "script": "ZundaHUD", "message": "Scale is not a valid member of TextLabel \"Players.fromage3900.PlayerGui.ZundaHUD.PopupRoot.TextLabel\"" },
+    { "at_s": 21.0, "script": "ZundaHUD", "message": "Scale is not a valid member of TextLabel \"Players.fromage3900.PlayerGui.ZundaHUD.PopupRoot.TextLabel\"" },
+    { "at_s": 25.0, "script": "ZundaHUD", "message": "Scale is not a valid member of TextLabel \"Players.fromage3900.PlayerGui.ZundaHUD.PopupRoot.TextLabel\"" },
+    { "at_s": 26.0, "script": "ZundaHUD", "message": "Scale is not a valid member of TextLabel \"Players.fromage3900.PlayerGui.ZundaHUD.PopupRoot.TextLabel\"" },
+    { "at_s": 30.0, "script": "HUD", "message": "Unable to assign property Font. EnumItem, number, or string expected, got Font" },
+    { "at_s": 31.0, "script": "DailyReturnToast", "message": "Players.fromage3900.PlayerScripts.DailyReturnToast:102: attempt to index nil with 'Text'" },
+    { "at_s": 48.0, "script": "ZundaHUD", "message": "Scale is not a valid member of TextLabel \"Players.fromage3900.PlayerGui.ZundaHUD.PopupRoot.TextLabel\"" },
+    { "at_s": 55.0, "script": "ZundaHUD", "message": "Scale is not a valid member of TextLabel \"Players.fromage3900.PlayerGui.ZundaHUD.PopupRoot.TextLabel\"" }
+  ],
+  "warnings": [],
+  "state_samples": [
+    { "at_s": 0, "players": [{ "name": "fromage3900", "user_id": 3930496852 }, { "name": "tekashiwannaminaj", "user_id": 1601688119 }] },
+    { "at_s": 30, "players": [{ "name": "fromage3900", "user_id": 3930496852 }, { "name": "tekashiwannaminaj", "user_id": 1601688119 }] },
+    { "at_s": 56, "players": [{ "name": "fromage3900", "user_id": 3930496852 }, { "name": "tekashiwannaminaj", "user_id": 1601688119 }] }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "verified_at": "2026-08-25T02:05:57.152276-04:00",
+  "method": "injected LocalScript via execute_luau target=client-1 (real game VM require cache)",
+  "place": "place:102953611950557",
+  "issues": [
+    "PLAYTEST_NOTES #3 keybinds",
+    "PLAYTEST_NOTES #4 settings close"
+  ],
+  "result": {
+    "ok": true,
+    "settingsGuiFound": true,
+    "reverseMapConsistent": true,
+    "settingsToggle": {
+      "before": false,
+      "afterClose": false,
+      "works": true,
+      "afterOpen": true
+    },
+    "actions": {
+      "map": {
+        "key": "M",
+        "hasCallback": true
+      },
+      "challenge": {
+        "key": "L",
+        "hasCallback": true
+      },
+      "companions": {
+        "key": "(none)",
+        "hasCallback": true
+      },
+      "cook": {
+        "key": "K",
+        "hasCallback": true
+      },
+      "compendium": {
+        "key": "C",
+        "hasCallback": true
+      },
+      "inventory": {
+        "key": "I",
+        "hasCallback": true
+      },
+      "daily": {
+        "key": "N",
+        "hasCallback": true
+      },
+      "materials": {
+        "key": "(none)",
+        "hasCallback": true
+      },
+      "wardrobe": {
+        "key": "(none)",
+        "hasCallback": true
+      },
+      "collection": {
+        "key": "(none)",
+        "hasCallback": true
+      },
+      "quests": {
+        "key": "J",
+        "hasCallback": true
+      },
+      "peawheel": {
+        "key": "Tab",
+        "hasCallback": true
+      },
+      "settings": {
+        "key": "(none)",
+        "hasCallback": true
+      }
+    },
+    "legacyOverlaysAlive": []
+  }
+}
