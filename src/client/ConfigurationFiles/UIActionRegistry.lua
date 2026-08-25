@@ -202,8 +202,7 @@ local DEFAULTS: {
 			label = "Challenge",
 			icon = "🏆",
 			description = "Open Challenge Mode & Daily Challenges",
-			-- No default key: every obvious letter is already claimed. Button-only.
-			defaultKey = nil :: Enum.KeyCode?,
+			defaultKey = Enum.KeyCode.L,
 			category = "Progression",
 			isAvailable = function()
 				return true
@@ -325,6 +324,7 @@ function UI_ActionRegistry.getOrderedSliceList(): { string }
 		"inventory",
 		"cook",
 		"quests",
+		"challenge",
 		"compendium",
 		"materials",
 		"map",

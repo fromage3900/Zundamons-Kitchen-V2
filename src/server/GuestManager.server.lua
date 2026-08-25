@@ -224,6 +224,42 @@ local function countGuestsForPlayer(player)
 	return count
 end
 
+-- Update the patience bar on a guest's order bubble so players can see urgency.
+-- Runs in its own thread; exits when the guest is served or times out.
+local function startPatienceLoop(guest: Model, billBg: Frame, maxPatience: number)
+	local patienceBg = billBg:FindFirstChild("PatienceBg")
+	local patienceFill = patienceBg and patienceBg:FindFirstChild("PatienceFill") :: Frame
+	if not patienceFill then
+		return
+	end
+
+	local colors = CONFIG.patience_colors
+	local warning = CONFIG.guest_settings.patience_warning
+	local critical = CONFIG.guest_settings.patience_critical
+
+	while guest.Parent do
+		local spawnTime = guest:GetAttribute("SpawnTime") :: number?
+		local elapsed = os.clock() - (spawnTime or os.clock())
+		local remaining = math.max(0, maxPatience - elapsed)
+		local ratio = remaining / maxPatience
+
+		patienceFill.Size = UDim2.new(ratio, 0, 1, 0)
+
+		local color = colors.normal
+		if remaining <= critical then
+			color = colors.critical
+		elseif remaining <= warning then
+			color = colors.warning
+		end
+		patienceFill.BackgroundColor3 = color
+
+		if remaining <= 0 then
+			break
+		end
+		task.wait(0.25)
+	end
+end
+
 local function createGuest(player)
 	if countGuestsForPlayer(player) >= CONFIG.guest_settings.max_guests_at_once then
 		return nil
@@ -528,6 +564,12 @@ local function createGuest(player)
 	payLabel.TextScaled = true
 	payLabel.Font = Enum.Font.Gotham
 	payLabel.Parent = bg
+	payLabel.Parent = bg
+
+	-- Drive the patience bar so it shrinks + changes color as the guest waits.
+	task.spawn(startPatienceLoop, guest, bg, patience)
+
+	-- Assign personality type for roaming behavior. Guests are mostly roamers now
 	-- Assign personality type for roaming behavior. Guests are mostly roamers now
 	-- (they wander a small radius around their serving slot so they feel alive
 	-- and "milling about" instead of frozen) with a few stationary. Patrol is

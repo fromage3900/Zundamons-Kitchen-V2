@@ -79,6 +79,7 @@ local NIKKI_PASTELS = {
 	Color3.fromRGB(255, 255, 224), -- pastel lemon
 	Color3.fromRGB(176, 224, 230), -- pastel sky
 	Color3.fromRGB(230, 190, 255), -- pastel lilac
+	Color3.fromRGB(255, 160, 122), -- pastel coral
 }
 
 -- ── Public state helpers ─────────────────────────────────────
@@ -203,10 +204,13 @@ local function buildWheelGui()
 	tooltipLabel.Visible = false
 	tooltipLabel.Parent = wheelFrame
 
-	-- Build 8 Radial Slices centered around wheelFrame
+	-- Build radial slices centered around wheelFrame. The slice count is driven by
+	-- ActionRegistry.getOrderedSliceList(), so spacing is calculated dynamically.
 	sliceButtons = {}
 	local sliceList = ActionRegistry.getOrderedSliceList()
 	local radius = 125
+	local count = #sliceList
+	local angleStep = count > 0 and (360 / count) or 45
 
 	for i, actionId in ipairs(sliceList) do
 		local def = ActionRegistry.getAction(actionId)
@@ -232,8 +236,8 @@ local function buildWheelGui()
 		stroke.Thickness = 2.5
 		stroke.Transparency = 0.2
 
-		-- Position evenly at 45° intervals starting from top (-90°)
-		local angle = math.rad(-90 + (i - 1) * 45)
+		-- Position evenly around the wheel starting from top (-90°)
+		local angle = math.rad(-90 + (i - 1) * angleStep)
 		local x = math.cos(angle) * radius
 		local y = math.sin(angle) * radius
 		btn.Position = UDim2.new(0.5, x, 0.5, y)
