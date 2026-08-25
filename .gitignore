@@ -47,3 +47,8 @@ mcp_req.json
 test_terminal_sim.js
 tools/asset-pipeline/upload-results.json
 tools/asset-pipeline/converted/
+
+# Substance Painter local working copy + transient paint-lock
+# (The shareable source asset lives in crucialassets/, which is tracked.)
+/zundapal_lowpolybake.spp
+*.painter_lock
