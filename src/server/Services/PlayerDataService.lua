@@ -319,6 +319,10 @@ createDefaultData = function(): { [string]: any }
 		zundarooms_escapes = 0,
 		gathered_items = {},
 		companions_set = {},
+		custom_companions = {}, -- [id] = {name, emoji, glow, sparkleColors, buff,
+		-- displayName, flavor, persona, signature_recipes, synergy_gold} — player-created
+		-- / AI-generated companions, persisted per-player. Base body is shared
+		-- (recolored), so no new meshes are needed to add a companion.
 		companion_bond = {}, -- [compType] = bond XP, per-companion (not the flat
 		-- global companion_affection/companion_chats counters above, which
 		-- don't distinguish which companion you were with)
@@ -393,6 +397,7 @@ local function backfillLoadedData(loaded: { [string]: any })
 	if loaded.placed_furniture == nil then
 		loaded.placed_furniture = {}
 	end
+	loaded.custom_companions = loaded.custom_companions or {}
 end
 
 function PlayerDataService.loadPlayer(player: Player)

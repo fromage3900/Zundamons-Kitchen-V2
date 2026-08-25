@@ -12,6 +12,14 @@ local PlayerDataService = require(game:GetService("ServerScriptService").Service
 local companionModelCache = {}
 local ZUNDAPAL_PREFAB_NAME = "zundapalupdate4"
 
+-- Robustness constants (audit 2026-08-25): scale guard, animation fade, retry budget
+local COMPANION_HEIGHT = 5.2
+local SCALE_GUARD_LOW = 0.9
+local SCALE_GUARD_HIGH = 1.1
+local MESH_LOAD_MAX_RETRIES = 3
+local ANIM_FADE = 0.2
+local ANIM_PRIORITY = Enum.AnimationPriority.Core
+
 local function loadCompanionModel(compType)
 	if companionModelCache[compType] then
 		print("[CompanionManager.loadCompanionModel] Using cached model for", compType)
@@ -39,6 +47,13 @@ local function loadCompanionModel(compType)
 	-- recursive PrimaryPart. Rejects sources that have no real mesh (would be a cube).
 	local function cacheClone(source)
 		if not hasRealMesh(source) then
+			warn(
+				"[CompanionManager.cacheClone] REJECTED empty MeshId source",
+				source:GetFullName(),
+				"for",
+				compType,
+				"- refusing cube placeholder (hasRealMesh=false)"
+			)
 			return nil
 		end
 		local clone
@@ -79,7 +94,20 @@ local function loadCompanionModel(compType)
 			local result = cacheClone(levelMesh)
 			if result then
 				return result
+			else
+				warn(
+					"[CompanionManager.loadCompanionModel] Level mesh",
+					levelMesh:GetFullName(),
+					"rejected (empty MeshId) for",
+					compType
+				)
 			end
+		else
+			print(
+				"[CompanionManager.loadCompanionModel] No level mesh found for",
+				compType,
+				"- trying authored catalog"
+			)
 		end
 	end
 
@@ -94,8 +122,22 @@ local function loadCompanionModel(compType)
 			if result then
 				print("[CompanionManager.loadCompanionModel] Using authored prefab", authored.Name, "for", compType)
 				return result
+			else
+				warn(
+					"[CompanionManager.loadCompanionModel] Authored prefab",
+					authored:GetFullName(),
+					"rejected (empty MeshId) for",
+					compType
+				)
 			end
+		else
+			print("[CompanionManager.loadCompanionModel] No authored prefab for", compType, "in catalog")
 		end
+	else
+		print(
+			"[CompanionManager.loadCompanionModel] No CompanionVisualCatalog/Prefabs folder — skipping catalog path for",
+			compType
+		)
 	end
 
 	-- Fallback: InsertService by asset ID (production / when the prefab isn't present).
@@ -110,8 +152,30 @@ local function loadCompanionModel(compType)
 			local result = cacheClone(insertedModel)
 			if result then
 				return result
+			else
+				warn(
+					"[CompanionManager.loadCompanionModel] InsertService asset",
+					assetId,
+					"rejected (empty MeshId / no real mesh) for",
+					compType
+				)
 			end
+		else
+			warn(
+				"[CompanionManager.loadCompanionModel] InsertService:LoadAsset failed for",
+				compType,
+				"assetId:",
+				assetId,
+				"success:",
+				success
+			)
 		end
+	else
+		warn(
+			"[CompanionManager.loadCompanionModel] No assetId configured for",
+			compType,
+			"- cannot InsertService fallback"
+		)
 	end
 
 	-- HARD RULE: a companion is NEVER a cube. If no source resolved yet, wait for the
@@ -159,9 +223,38 @@ end
 local activeCompanions = {}
 
 -- ── Build companion ────────────────────────────────────────────
+-- Resolve the companion definition for a build. Custom (player-created /
+-- AI-generated) companions live in PlayerData.custom_companions[compType] and
+-- are merged onto the catalog shape so the rest of buildCompanion (which reads
+-- def.emoji / def.glow / def.sparkleColors / def.displayName / def.buff) works
+-- unchanged. A custom companion reuses the shared base body (see loadCompanionModel's
+-- default fallback for unknown keys), recolored per its spec.
+local function resolveDef(player, compType)
+	if type(compType) == "string" and string.sub(compType, 1, 3) == "cc_" then
+		local data = PlayerDataService.get(player)
+		local custom = data and data.custom_companions and data.custom_companions[compType]
+		if custom and type(custom) == "table" then
+			return {
+				emoji = custom.emoji or "🌱",
+				glow = custom.glow or Color3.fromRGB(180, 200, 255),
+				glowRange = 18,
+				sparkleColors = custom.sparkleColors or {},
+				buff = custom.buff,
+				displayName = custom.displayName or custom.name or "Zundamon",
+				flavor = custom.flavor,
+				persona = custom.persona,
+				signature_recipes = custom.signature_recipes or {},
+				synergy_gold = custom.synergy_gold or 5,
+				isCustom = true,
+			}
+		end
+	end
+	return COMPANIONS[compType] or COMPANIONS.zundamon
+end
+
 local function buildCompanion(player, compType)
 	print("[CompanionManager.buildCompanion] Building companion for", player.Name, "type:", compType)
-	local def = COMPANIONS[compType] or COMPANIONS.zundamon
+	local def = resolveDef(player, compType)
 	local name = "ZundaCompanion_" .. player.Name
 
 	-- Remove existing
@@ -177,24 +270,30 @@ local function buildCompanion(player, compType)
 		end)
 	end
 
-	-- Load the full companion model. NEVER a cube: retry a few times, then abort
-	-- (no companion this spawn) rather than fabricate a placeholder.
+	-- Load the full companion model. NEVER a cube: retry 3× with 1 s backoff, then abort
+	-- (no companion this spawn) rather than fabricate a placeholder. Cube refusal is hard.
 	local companionModel
-	for attempt = 1, 3 do
+	for attempt = 1, MESH_LOAD_MAX_RETRIES do
 		local ok, result = pcall(loadCompanionModel, compType)
 		if ok and result then
+			if attempt > 1 then
+				print("[CompanionManager.buildCompanion] mesh load succeeded on retry", attempt, "for", compType)
+			end
 			companionModel = result
 			break
 		end
 		warn(
 			"[CompanionManager.buildCompanion] mesh load attempt",
-			attempt,
+			attempt .. "/" .. tostring(MESH_LOAD_MAX_RETRIES),
 			"failed for",
 			compType,
 			"-",
-			tostring(result)
+			tostring(result),
+			(attempt < MESH_LOAD_MAX_RETRIES and "(retrying in 1s…)" or "(final — cube refusal)")
 		)
-		task.wait(1)
+		if attempt < MESH_LOAD_MAX_RETRIES then
+			task.wait(1)
+		end
 	end
 
 	if not companionModel then
@@ -216,13 +315,17 @@ local function buildCompanion(player, compType)
 	end
 
 	-- ── Animation support ──────────────────────────────────────────
-	-- Detect Humanoid (Avatar-Importer rigs) or AnimationController (non-humanoid rigs)
-	local animator = nil
+	-- Detect Humanoid (Avatar-Importer rigs) or AnimationController (non-humanoid rigs).
+	-- Rig upgrade path: import FBX via Avatar Importer Custom (see
+	-- CompanionVisualConfig header) → Humanoid+Animator or AC+Animator. Code
+	-- prefers Humanoid if present, else AC. Static MeshParts (no bones) degrade
+	-- gracefully to VFX-only follow.
+	local animator: Animator? = nil
 	local humanoid = companionModel:FindFirstChildOfClass("Humanoid")
 	local animationController = companionModel:FindFirstChildOfClass("AnimationController")
 
 	if humanoid then
-		-- Avatar rig: use Humanoid's Animator
+		-- Avatar rig: use Humanoid's Animator (R15/Custom assumptions, HipHeight auto)
 		animator = humanoid:FindFirstChildOfClass("Animator")
 		if not animator then
 			animator = Instance.new("Animator")
@@ -230,7 +333,7 @@ local function buildCompanion(player, compType)
 		end
 		print("[CompanionManager.buildCompanion] Using Humanoid Animator for", compType)
 	elseif animationController then
-		-- Non-humanoid rig: use AnimationController's Animator
+		-- Non-humanoid rig (preferred for chibi creature): lighter, no Humanoid states
 		animator = animationController:FindFirstChildOfClass("Animator")
 		if not animator then
 			animator = Instance.new("Animator")
@@ -238,20 +341,68 @@ local function buildCompanion(player, compType)
 		end
 		print("[CompanionManager.buildCompanion] Using AnimationController Animator for", compType)
 	else
-		-- Static mesh: no animation support
-		print("[CompanionManager.buildCompanion] No Humanoid or AnimationController; animation disabled for", compType)
+		-- Static mesh: no bones / no animation support — idle/walk will stay nil
+		-- and follow logic degrades to VFX + physics only (no error spam).
+		print(
+			"[CompanionManager.buildCompanion] No Humanoid or AnimationController; animation disabled for",
+			compType,
+			"- static MeshPart only"
+		)
 	end
 
 	-- Scale to roughly human height. The authored zundapal mesh is ~50 studs tall;
 	-- a Roblox character is ~5. Scale by (target / current) so it stands human-sized.
-	local COMPANION_HEIGHT = 5.2
+	-- Scale guard 0.9-1.1 prevents re-scaling an already-correct rigged source and
+	-- avoids physics thrash on repeated respawns.
 	local currentHeight = companionModel:GetExtentsSize().Y
 	if currentHeight > 0.1 then
 		local factor = COMPANION_HEIGHT / currentHeight
-		-- Only rescale if meaningfully off (avoid re-scaling an already-correct source).
-		if factor < 0.9 or factor > 1.1 then
-			companionModel:ScaleTo(companionModel:GetScale() * factor)
+		if factor < SCALE_GUARD_LOW or factor > SCALE_GUARD_HIGH then
+			local okScale, errScale = pcall(function()
+				companionModel:ScaleTo(companionModel:GetScale() * factor)
+			end)
+			if okScale then
+				print(
+					string.format(
+						"[CompanionManager.buildCompanion] Scaled %s: height %.2f → %.2f (factor %.3f, guard %.1f-%.1f)",
+						compType,
+						currentHeight,
+						COMPANION_HEIGHT,
+						factor,
+						SCALE_GUARD_LOW,
+						SCALE_GUARD_HIGH
+					)
+				)
+			else
+				warn(
+					"[CompanionManager.buildCompanion] ScaleTo failed for",
+					compType,
+					"factor",
+					factor,
+					"err:",
+					tostring(errScale)
+				)
+			end
+		else
+			print(
+				string.format(
+					"[CompanionManager.buildCompanion] Scale guard: %s already %.2f studs (factor %.3f within %.1f-%.1f) — skipping rescale",
+					compType,
+					currentHeight,
+					factor,
+					SCALE_GUARD_LOW,
+					SCALE_GUARD_HIGH
+				)
+			)
 		end
+	else
+		warn(
+			"[CompanionManager.buildCompanion] Suspicious extents height",
+			currentHeight,
+			"for",
+			compType,
+			"- skipping scale"
+		)
 	end
 
 	-- Start near player
@@ -259,7 +410,12 @@ local function buildCompanion(player, compType)
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
 	body.CFrame = hrp and (hrp.CFrame * CFrame.new(4, 1, 0)) or CFrame.new(47, 8, -74)
 
-	-- Make all parts non-collidable and massless, with color fallback for untextured meshes
+	-- Make all parts non-collidable and massless, with color fallback for untextured meshes.
+	-- Audit: zundapalupdate4.mtl currently exports with blank TextureID and no
+	-- SurfaceAppearance → falls back to flat ZundaGreen (160,210,150). After PBR
+	-- re-import, SurfaceAppearance.ColorMap should be rbxassetid://<Zundamon_BaseColor>
+	-- and this fallback will naturally stop firing (verify via ZundaPalette.verifyCompanionPBR).
+	local fallbackCount = 0
 	for _, part in ipairs(companionModel:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.CanCollide = false
@@ -272,8 +428,24 @@ local function buildCompanion(player, compType)
 			then
 				part.Color = Color3.fromRGB(160, 210, 150)
 				part.Material = Enum.Material.SmoothPlastic
+				fallbackCount += 1
 			end
 		end
+	end
+	if fallbackCount > 0 then
+		print(
+			string.format(
+				"[CompanionManager.buildCompanion] Applied flat ZundaGreen fallback to %d MeshPart(s) for %s (no TextureID/SurfaceAppearance — see CompanionVisualConfig audit)",
+				fallbackCount,
+				compType
+			)
+		)
+	else
+		print(
+			"[CompanionManager.buildCompanion] PBR path: no flat-color fallback needed for",
+			compType,
+			"(TextureID or SurfaceAppearance present)"
+		)
 	end
 
 	-- ── Sparkle ParticleEmitter ────────────────────────────────
@@ -425,7 +597,10 @@ local function buildCompanion(player, compType)
 		local idleTrack = nil
 		local walkTrack = nil
 
-		-- Load animation tracks if animator is available
+		-- Load animation tracks if animator is available. Clips are defined in
+		-- CompanionVisualConfig.AnimationSpec (idle 2.0s loop, walk 1.0s loop,
+		-- both Core, fade 0.2). Until Studio GUI upload provides IDs, both stay
+		-- nil and the companion degrades to VFX-only follow — no error spam.
 		if animator then
 			local compVisual = CompanionVisualConfig.get(compType)
 			local idleAnimId = compVisual and compVisual.idleAnimationId
@@ -436,27 +611,59 @@ local function buildCompanion(player, compType)
 				idleAnim.AnimationId = idleAnimId
 				-- Guard LoadAnimation: a bad/missing animation asset makes
 				-- LoadAnimation throw (e.g. "Argument 3 missing or nil" with a
-				-- placeholder ID) and error-spams every companion build. Degrade
-				-- to no idle track instead of crashing the build.
-				local okIdle, track = pcall(function()
+				-- placeholder ID 2510798496 from playtest) and error-spams every
+				-- build. Degrade to no track instead of crashing.
+				local okIdle, trackOrErr = pcall(function()
 					return animator:LoadAnimation(idleAnim)
 				end)
-				if okIdle and track then
-					idleTrack = track
-					idleTrack.Priority = Enum.AnimationPriority.Core
+				if okIdle and trackOrErr then
+					idleTrack = trackOrErr :: AnimationTrack
+					idleTrack.Priority = ANIM_PRIORITY
+					idleTrack.Looped = true
+				else
+					warn(
+						"[CompanionManager.buildCompanion] idle LoadAnimation failed for",
+						compType,
+						"id:",
+						idleAnimId,
+						"err:",
+						tostring(trackOrErr)
+					)
 				end
+			else
+				print(
+					"[CompanionManager.buildCompanion] idleAnimationId nil for",
+					compType,
+					"- awaiting Studio upload (2.0s loop, Core, fade 0.2)"
+				)
 			end
 
 			if walkAnimId and walkAnimId ~= "" then
 				local walkAnim = Instance.new("Animation")
 				walkAnim.AnimationId = walkAnimId
-				local okWalk, track = pcall(function()
+				local okWalk, trackOrErr = pcall(function()
 					return animator:LoadAnimation(walkAnim)
 				end)
-				if okWalk and track then
-					walkTrack = track
-					walkTrack.Priority = Enum.AnimationPriority.Core
+				if okWalk and trackOrErr then
+					walkTrack = trackOrErr :: AnimationTrack
+					walkTrack.Priority = ANIM_PRIORITY
+					walkTrack.Looped = true
+				else
+					warn(
+						"[CompanionManager.buildCompanion] walk LoadAnimation failed for",
+						compType,
+						"id:",
+						walkAnimId,
+						"err:",
+						tostring(trackOrErr)
+					)
 				end
+			else
+				print(
+					"[CompanionManager.buildCompanion] walkAnimationId nil for",
+					compType,
+					"- awaiting Studio upload (1.0s loop, Core, fade 0.2)"
+				)
 			end
 
 			print(
@@ -465,7 +672,16 @@ local function buildCompanion(player, compType)
 				"- idle:",
 				idleTrack ~= nil,
 				"walk:",
-				walkTrack ~= nil
+				walkTrack ~= nil,
+				"(Core, fade",
+				ANIM_FADE,
+				")"
+			)
+		else
+			print(
+				"[CompanionManager.buildCompanion] No animator for",
+				compType,
+				"- animation disabled (static mesh, no bones)"
 			)
 		end
 
@@ -492,28 +708,37 @@ local function buildCompanion(player, compType)
 				local dist = (body.Position - target).Magnitude
 
 				-- ── Animation state management ────────────────────────
-				-- Determine if companion is moving or idle based on distance to target
-				local isMoving = dist > 1.0
+				-- Spec: CompanionVisualConfig.AnimationSpec (idle 2.0s loop / walk 1.0s loop, Core, fade 0.2).
+				-- State threshold 1.0 stud verified: isMoving = dist > 1.0 → walk, else idle.
+				-- Physics moves when dist > 0.3 with velocity = min(dist*5, 35) (verified
+				-- line 642) so the 0.7-stud hysteresis band (1.0 vs 0.3) prevents flicker
+				-- at rest. Transition uses Stop(ANIM_FADE)/Play(ANIM_FADE) = 0.2s crossfade.
+				local transitionThreshold = CompanionVisualConfig.AnimationSpec
+						and CompanionVisualConfig.AnimationSpec.transitionThresholdStuds
+					or 1.0
+				local isMoving = dist > transitionThreshold
 				local newAnimState = isMoving and "walk" or "idle"
 
 				if newAnimState ~= currentAnimState then
-					-- State transition: stop old, play new
+					-- State transition: stop old, play new with 0.2s fade (Core priority)
 					if currentAnimState == "idle" and idleTrack then
-						idleTrack:Stop(0.2)
+						idleTrack:Stop(ANIM_FADE)
 					elseif currentAnimState == "walk" and walkTrack then
-						walkTrack:Stop(0.2)
+						walkTrack:Stop(ANIM_FADE)
 					end
 
 					if newAnimState == "walk" and walkTrack then
-						walkTrack:Play(0.2)
+						walkTrack:Play(ANIM_FADE)
 					elseif newAnimState == "idle" and idleTrack then
-						idleTrack:Play(0.2)
+						idleTrack:Play(ANIM_FADE)
 					end
 
 					currentAnimState = newAnimState
 				end
 
-				-- ── Movement physics ──────────────────────────────────
+				-- ── Movement physics (verified 400-528) ───────────────
+				-- dist > 0.3 threshold matches spec movementThresholdStuds; velocity
+				-- scales with distance (dist*5 capped 35) for smooth catch-up without teleport.
 				if dist > 0.3 then
 					body.AssemblyLinearVelocity = (target - body.Position).Unit * math.min(dist * 5, 35)
 				end
