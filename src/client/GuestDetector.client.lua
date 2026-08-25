@@ -152,9 +152,21 @@ local function startDetection(character)
 					local recipe = nearbyGuest:GetAttribute("PreferredRecipe")
 					local pay = nearbyGuest:GetAttribute("PayAmount")
 					print("[Guest Nearby] " .. (recipe or "?") .. " (" .. (pay or "?") .. " gold)")
-					mouse.Icon = "rbxasset://textures/Cursors/MouseLockedCursor.png"
+					-- Zunda cursor set: point at the servable guest.
+					local zc = _G.ZundaCursors
+					if zc then
+						zc.setCursor("person")
+					else
+						local CursorConfig = require(RS.ConfigurationFiles.CursorConfig)
+						mouse.Icon = CursorConfig.getCursor("person")
+					end
 				else
-					mouse.Icon = ""
+					local zc = _G.ZundaCursors
+					if zc then
+						zc.restore()
+					else
+						mouse.Icon = ""
+					end
 				end
 			end
 		end

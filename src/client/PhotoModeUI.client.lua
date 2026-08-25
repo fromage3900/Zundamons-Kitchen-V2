@@ -173,6 +173,12 @@ local function enterPhotoMode()
 	rotation = 35
 	updateCamera()
 
+	-- Swap to the Zunda "move" grab cursor while in photo mode.
+	local zc = _G.ZundaCursors
+	if zc then
+		zc.setCursor("move")
+	end
+
 	heartbeatConn = RunService.Heartbeat:Connect(updateCamera)
 
 	inputHandler = UserInputService.InputBegan:Connect(function(input, gameProcessed)
@@ -214,6 +220,12 @@ function exitPhotoMode()
 
 	setHudVisible(true)
 	frame.Visible = false
+
+	-- Restore the cursor that was active before Photo Mode opened.
+	local zc = _G.ZundaCursors
+	if zc then
+		zc.pop()
+	end
 end
 _G.exitPhotoMode = exitPhotoMode
 

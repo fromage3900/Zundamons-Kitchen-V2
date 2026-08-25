@@ -124,6 +124,12 @@ local function playCinematic(recipeName: string)
 		zsc.play("perfect_cook")
 	end
 
+	-- Swap to the Zunda "cross"/"working" cursor for the spectacle duration.
+	local zc = _G.ZundaCursors
+	if zc then
+		zc.setCursor("cross")
+	end
+
 	-- Flash in
 	TweenService:Create(overlay, TweenInfo.new(0.12), { BackgroundTransparency = 0.2 }):Play()
 	TweenService:Create(vignette, TweenInfo.new(0.25), { BackgroundTransparency = 0.7 }):Play()
@@ -168,6 +174,12 @@ local function playCinematic(recipeName: string)
 		overlay.Visible = false
 		circle.Size = UDim2.new(0, 0, 0, 0)
 		isPlaying = false
+
+		-- Restore the prior cursor after the perfect-cook beat.
+		local zc = _G.ZundaCursors
+		if zc then
+			zc.pop()
+		end
 	end)
 end
 

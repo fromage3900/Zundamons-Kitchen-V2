@@ -107,6 +107,12 @@ local function showCard(kind: string, name: string, extra: string?)
 	title.TextTransparency = 0
 	subtitle.TextTransparency = 0
 
+	-- Zunda "link" pointer while the clickable milestone card is up.
+	local zc = _G.ZundaCursors
+	if zc then
+		zc.setCursor("link")
+	end
+
 	local centerX = overlay.AbsoluteSize.X / 2
 	local centerY = overlay.AbsoluteSize.Y / 2
 	if UIHelper and UIHelper.spawnSparkles then
@@ -137,6 +143,13 @@ local function showCard(kind: string, name: string, extra: string?)
 		overlay.Visible = false
 		card.Visible = false
 		isShowing = false
+
+		-- Restore the cursor when the milestone card goes away.
+		local zc = _G.ZundaCursors
+		if zc then
+			zc.pop()
+		end
+
 		if #queue > 0 then
 			local nextItem = table.remove(queue, 1)
 			showCard(nextItem.kind, nextItem.name, nextItem.extra)
