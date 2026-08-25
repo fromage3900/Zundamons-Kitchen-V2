@@ -51,3 +51,7 @@ Legend: 🔍 investigating · 🔧 fixing · ✅ fixed (code) · 🎮 needs Stud
 - GuestManager capped guests globally, starving late joiners → cap is per player now
 - Mineable respawn used `task.wait` inside an attribute-changed handler (blocked signal dispatch; destroyed-node error) → `task.delay` + pcall
 - Matter loop had no error isolation → systems wrapped in pcall in ServerMain; one failing system can no longer kill the heartbeat
+
+### 2026-08-24 (visual juice batch — A3)
+- Added ChefPill scale-punch on every XP gain (back-ease size bump + sparkles), a second + third radial sparkle burst behind the level-up banner (gold + pink fan) for a fuller "ding", and a back-ease scale pop-in on all floating reward number pop-ups (serve gold/XP, bonus, item).
+- All client-only (HudScript.client.lua); reuses existing `UIHelper.spawnSparkles` + reward events. Serve/reward numbers were already floating via `RewardCore.settle` → `PopupEvent`; these changes make them snap instead of softly fading. Verify in Play: gain XP (pill punches), level up (triple burst + punch), serve a guest (numbers pop in).

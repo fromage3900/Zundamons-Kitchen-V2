@@ -78,6 +78,26 @@ local badge = pill:FindFirstChild("Badge") or pill:FindFirstChildWhichIsA("TextL
 local tierLabel = pill:FindFirstChild("TierLabel") or badge
 local xpFill = pill:FindFirstChild("XPBar") and pill.XPBar:FindFirstChild("Fill")
 
+-- ChefPill "punch" (A3 visual juice): a quick back-out size bump + a couple of
+-- sparkles so every XP gain reads as a tactile reward, not just the bar filling.
+-- Shared by the XP-update and level-up paths so both feel consistent.
+local PILL_BASE_SIZE = UDim2.new(0, 240, 0, 54)
+local PILL_BASE_POS = UDim2.new(0, 16, 0, 16)
+local function punchPill(color: Color3?)
+	if not pill then
+		return
+	end
+	-- Nudge position to keep the pill visually centred while it grows (anchor
+	-- stays top-left), then back-ease to rest.
+	pill.Position = UDim2.new(0, 16 - 14, 0, 16 - 3)
+	pill.Size = UDim2.new(0, 240 * 1.12, 0, 54 * 1.12)
+	UIHelper.spawnSparkles(gui, 30, 45, color or UIConfig.GAME_COLORS.SparkleGold, 4)
+	TweenService:Create(pill, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Position = PILL_BASE_POS,
+		Size = PILL_BASE_SIZE,
+	}):Play()
+end
+
 -- ComboMeter (top-centre)
 local combo = gui:FindFirstChild("ComboMeter")
 if not combo then
@@ -165,6 +185,14 @@ local function spawnPopup(kind, text, color)
 		lbl.Size = UDim2.new(0, 240, 0, 48)
 	end
 
+	-- A3 visual juice: pop-in with a little back-ease overshoot so reward
+	-- numbers snap onto screen instead of just fading in softly.
+	lbl.Scale = Vector2.new(0.2, 0.2)
+	local popTween = TweenService:Create(lbl, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Scale = Vector2.new(1, 1),
+	})
+	popTween:Play()
+
 	local upTween = TweenService:Create(lbl, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 		Position = lbl.Position - UDim2.new(0, 0, 0, 90),
 	})
@@ -184,6 +212,7 @@ end
 PopupEvent.OnClientEvent:Connect(spawnPopup)
 
 ChefLevelUpdate.OnClientEvent:Connect(function(level, xp, xpNeeded, tierName, tierColor, tierBadge)
+	punchPill(tierColor)
 	badge.Text = tierBadge or "🌱"
 	tierLabel.Text = (tierName or "Chef") .. " · Lv " .. level
 	local frac = (xpNeeded > 0) and math.clamp(xp / xpNeeded, 0, 1) or 0
@@ -237,6 +266,7 @@ end)
 
 LevelUpEvent.OnClientEvent:Connect(function(level, tierName, tierColor, tierBadge)
 	playRewardSound("LevelUp")
+	punchPill(tierColor or UIConfig.GAME_COLORS.SparkleGold)
 	-- Big level-up banner
 	local banner = Instance.new("Frame")
 	banner.Size = UDim2.new(0, 460, 0, 120)
@@ -278,6 +308,22 @@ LevelUpEvent.OnClientEvent:Connect(function(level, tierName, tierColor, tierBadg
 		banner.AbsolutePosition.Y + 60,
 		tierColor or UIConfig.GAME_COLORS.SparkleGold,
 		15
+	)
+	-- Fuller celebratory burst fanning out behind the banner so the level-up
+	-- moment reads as a real "ding" rather than a single sparkle line.
+	UIHelper.spawnSparkles(
+		gui,
+		banner.AbsolutePosition.X + 230,
+		banner.AbsolutePosition.Y + 60,
+		Color3.fromRGB(255, 220, 120),
+		14
+	)
+	UIHelper.spawnSparkles(
+		gui,
+		banner.AbsolutePosition.X + 230,
+		banner.AbsolutePosition.Y + 60,
+		Color3.fromRGB(255, 160, 220),
+		10
 	)
 	banner.Size = UDim2.new(0, 0, 0, 120)
 	TweenService:Create(banner, TweenInfo.new(0.35, Enum.EasingStyle.Back), { Size = UDim2.new(0, 460, 0, 120) }):Play()
