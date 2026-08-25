@@ -52,7 +52,7 @@ if not toast then
 	icon.Position = UDim2.new(0, 10, 0, 14)
 	icon.BackgroundTransparency = 1
 	icon.Text = "🔥"
-	icon.Font = FONTS.Body
+	icon.FontFace = FONTS.Body
 	icon.TextSize = 26
 
 	local streak = Instance.new("TextLabel", toast)
@@ -61,7 +61,7 @@ if not toast then
 	streak.Position = UDim2.new(0, 50, 0, 8)
 	streak.BackgroundTransparency = 1
 	streak.Text = "Streak: 0 / 7"
-	streak.Font = FONTS.Heading
+	streak.FontFace = FONTS.Heading
 	streak.TextSize = 14
 	streak.TextColor3 = Color3.fromRGB(255, 200, 80)
 	streak.TextXAlignment = Enum.TextXAlignment.Left
@@ -72,7 +72,7 @@ if not toast then
 	nextLbl.Position = UDim2.new(0, 50, 0, 28)
 	nextLbl.BackgroundTransparency = 1
 	nextLbl.Text = "Come back tomorrow!"
-	nextLbl.Font = FONTS.Body
+	nextLbl.FontFace = FONTS.Body
 	nextLbl.TextSize = 12
 	nextLbl.TextColor3 = Color3.fromRGB(220, 210, 255)
 	nextLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -83,7 +83,7 @@ if not toast then
 	reward.Position = UDim2.new(0, 50, 0, 44)
 	reward.BackgroundTransparency = 1
 	reward.Text = ""
-	reward.Font = FONTS.Body
+	reward.FontFace = FONTS.Body
 	reward.TextSize = 11
 	reward.TextColor3 = Color3.fromRGB(160, 210, 150)
 	reward.TextXAlignment = Enum.TextXAlignment.Left
@@ -99,12 +99,24 @@ local function showPreview(preview)
 	local rewardLabel = toast:FindFirstChild("Reward")
 	local icon = toast:FindFirstChild("Icon")
 
-	streakLabel.Text = string.format("Streak: %d / %d", preview.streak, preview.maxStreak or 7)
-	nextLabel.Text =
-		string.format("Next: %s · %s %s", preview.nextDayName, preview.nextChallengeIcon, preview.nextChallengeTitle)
-	rewardLabel.Text = preview.todayClaimed and ("Day reward: " .. preview.rewardText)
-		or "Finish today's challenges to keep it!"
-	icon.Text = preview.todayClaimed and "✅" or "🔥"
+	if streakLabel then
+		streakLabel.Text = string.format("Streak: %d / %d", preview.streak, preview.maxStreak or 7)
+	end
+	if nextLabel then
+		nextLabel.Text = string.format(
+			"Next: %s · %s %s",
+			preview.nextDayName,
+			preview.nextChallengeIcon,
+			preview.nextChallengeTitle
+		)
+	end
+	if rewardLabel then
+		rewardLabel.Text = preview.todayClaimed and ("Day reward: " .. preview.rewardText)
+			or "Finish today's challenges to keep it!"
+	end
+	if icon then
+		icon.Text = preview.todayClaimed and "✅" or "🔥"
+	end
 
 	toast.Visible = true
 	toast.Position = UDim2.new(0, 16, 0, 68)
