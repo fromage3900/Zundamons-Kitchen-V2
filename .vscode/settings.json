@@ -1,0 +1,55 @@
+{
+  // Team-shared editor settings. Read this whole file once:
+  //  - *.lua/*.luau are formatted by StyLua on save (matches stylua.toml).
+  //  - Luau LSP auto-generates sourcemap.json from the Rojo project so you get
+  //    Roblox intellisense without running a separate watcher.
+  //  - Only ONE clone drives Rojo/Studio (see AGENTS.md §16). Always
+  //    git pull && confirm `main` before serving. Never serve a diverged clone.
+
+  // --- Formatting ---
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": false
+  },
+  "[luau]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": false
+  },
+  "[json]": {
+    "editor.insertSpaces": false
+  },
+
+  // --- Luau Language Server (Roblox types + Rojo sourcemap) ---
+  "luau-lsp.sourcemap.enabled": true,
+  "luau-lsp.sourcemap.autogenerate": true,
+  "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
+  "luau-lsp.sourcemap.includeNonScripts": true,
+  "luau-lsp.platform.type": "roblox",
+  "luau-lsp.diagnostics.globals": [
+    "string",
+    "table",
+    "_G"
+  ],
+
+  // --- Editor niceties ---
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "editor.tabSize": 4,
+  "files.exclude": {
+    "**/node_modules": true,
+    "Packages": true,
+    "ServerPackages": true,
+    "build": true,
+    "build-library": true,
+    "lib": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "Packages": true,
+    "ServerPackages": true,
+    "build": true,
+    "crucialassets": true
+  }
+}

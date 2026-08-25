@@ -1,0 +1,36 @@
+{
+  // RPC-invokable build/format/lint/serve tasks so the whole pipeline lives in VSCode.
+  // These are the same commands as package.json scripts (single source of truth there;
+  // tasks are just keybinds/Status Bar conveniences). Prefer `npm run` for CI parity.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "zunda: build",
+      "type": "shell",
+      "command": "npm run rojo:build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "zunda: serve (connect Studio to this)",
+      "type": "shell",
+      "command": "npm run rojo:serve",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "panel": "dedicated", "focus": true }
+    },
+    {
+      "label": "zunda: check (lint + build)",
+      "type": "shell",
+      "command": "npm run check",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "zunda: format (all src)",
+      "type": "shell",
+      "command": "npm run format",
+      "problemMatcher": []
+    }
+  ]
+}

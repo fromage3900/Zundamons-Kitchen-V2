@@ -1,0 +1,29 @@
+﻿# EditorConfig — matches StyLua/Selene toolchain, universal posture.
+# Applies in VS Code, VS, Zed, Sublime, etc. even without our .vscode committed.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Luau/StyLua: tabs, 4 wide (matches stylua.toml).
+[*.lua]
+indent_style = tab
+indent_size = 4
+max_line_length = 120
+
+[*.luau]
+indent_style = tab
+indent_size = 4
+max_line_length = 120
+
+# Data/scripting markup uses spaces (2).
+[*.{json,json5,yml,yaml,toml}]
+indent_style = space
+indent_size = 2
+
+# Markdown/prose keep their own; don't auto-chomp blank lines.
+[*.md]
+trim_trailing_whitespace = false

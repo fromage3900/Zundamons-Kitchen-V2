@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# commit-msg hook: enforce Conventional Commits.
+set -e
+msg="$1"
+if [ -z "$msg" ] || [ ! -f "$msg" ]; then exit 0; fi
+subject=$(grep -v '^#' "$msg" | grep -v '^[[:space:]]*$' | head -n 1)
+if ! printf '%s' "$subject" | grep -qE '^(feat|fix|docs|chore|refactor|perf|test|revert|assets|build|ci)(\([a-z0-9_.-]+\))?!?: .+$'; then
+    echo "commit-msg: '$subject' is not a Conventional Commit." >&2
+    exit 1
+fi
+exit 0

@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+# pre-push hook: full safety gate before push.
+# Runs npm run check (stylua + selene + rojo build), warns on stale main.
+# Install: git config core.hooksPath .githooks   (or: npm run hooks:install)
+# Bypass: SKIP_ZUNDA_PUSH=1 git push
+set -e
+if [ -n "$SKIP_ZUNDA_PUSH" ]; then echo "pre-push: SKIP_ZUNDA_PUSH set, bypassing."; exit 0; fi
+git fetch origin --quiet 2>/dev/null || true
+behind=$(git rev-list --count HEAD..@{u} 2>/dev/null || echo 0)
+if [ "$behind" -gt 0 ] 2>/dev/null; then
+    echo "pre-push: WARNING - local main is $behind behind origin/main. Pull first." >&2
+    exit 1
+fi
+if ! command -v npm >/dev/null 2>&1; then echo "pre-push: npm not found."; exit 1; fi
+if ! npm run check >/dev/null; then
+    echo "pre-push: npm run check FAILED (stylua/selene/rojo build). Fix first." >&2
+    exit 1
+fi
+echo "pre-push: gates passed."
+exit 0

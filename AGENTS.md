@@ -105,3 +105,19 @@
 - **Never `git add -A` in a mixed workspace** — owner source assets (`crucialassets/`, root `*.fbx`/`*.blend`) and generated builds can be staged by accident. Stage explicit paths per commit.
 - **Configs cross-reference each other** (`scripts/check_config_crossrefs.py` runs in CI): ScatterConfig variants must exist in `ResourceVisualCatalog`, Mineable/click ids in `ResourceNodeRegistry`, and AGENTS-listed remotes must be declared. Keep them in sync or CI fails.
 - **Owner source assets live in `crucialassets/`** (tracked, never stage casually); everything new of that kind goes there too, not at the repo root.
+
+### 16. Single Authoritative Clone + Rojo Process Discipline
+- **EXACTLY ONE authoritative clone drives Rojo/Studio** — currently `G:\Zundamons-kItchen-V2`, kept in sync with `origin/main`. Every `rojo serve` must run from that copy. Syncing Studio from an older/orphaned second clone overwrites the game with stale scripts and looks exactly like "everything broke" — that is a repo/process failure, NOT a code bug, so do not chase a phantom regression before ruling it out.
+- **`main` is the only branch ever served.** Before serving, run `git fetch origin` and confirm `git status -sb` shows `## main...origin/main` with no ahead/behind, and a clean tree. Never serve a branch that has diverged or is behind.
+- **Exactly one `rojo serve` at a time.** The `pre-push` hook catches stale pushes, but always run `scripts/rojo-health.ps1` to verify no duplicate serves before starting a session.
+- **Never reflexively `git reset --hard` on a "stale/diverged" claim.** Confirm the local tree is genuinely behind and that no unique local work exists (compare `git log` against `origin/main`) before any hard reset.
+- **Electra/session handoff:** if another collaborator acts as its own "the project," reconcile to ONE clone before serving.
+
+### 17. VSCode & Git Pipeline (team-shared, new collaborators inherit on clone)
+- **VSCode is the recommended editor** and ships team-shared config in-repo: `.vscode/extensions.json` (Luau LSP, StyLua, Selene, EditorConfig), `.vscode/settings.json` (StyLua format-on-save, Luau LSP auto-sourcemap), `.vscode/tasks.json` (build/serve/check/format), plus a root `.editorconfig` mirroring `stylua.toml`.
+- **Luau LSP** (`JohnnyMorganz.luau-lsp`) auto-generates `sourcemap.json` from `default.project.json` for Roblox intellisense — no separate watcher needed.
+- **Git hooks** (install: `npm run hooks:install`; uninstall: `npm run hooks:uninstall`):
+  1. `.githooks/pre-commit` — StyLua + Selene on staged `.lua` only (fast).
+  2. `.githooks/commit-msg` — enforces Conventional Commits format.
+  3. `.githooks/pre-push` — runs full `npm run check` **and** warns if local main is behind origin.
+- **Never** commit with `--no-verify` outside genuine emergencies.

@@ -12,7 +12,8 @@
     "rojo:build": "rojo build default.project.json -o build/ZundamonsKitchen.rbxl",
     "rojo:sourcemap": "rojo sourcemap default.project.json -o build/sourcemap.json",
     "rojo:serve": "rojo serve default.project.json",
-    "hooks:install": "git config core.hooksPath .githooks"
+    "hooks:install": "git config core.hooksPath .githooks",
+    "hooks:uninstall": "git config --unset core.hooksPath"
   },
   "devDependencies": {
     "@johnnymorganz/stylua-bin": "2.5.2",

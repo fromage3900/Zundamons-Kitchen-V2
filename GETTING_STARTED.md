@@ -36,16 +36,17 @@ Do not rely on the npm Rojo package for gameplay work; the repository’s Roblox
 git status --short --branch
 git log -5 --oneline
 git remote -v
+git fetch && git status -sb   # confirm `## main...origin/main`
 ```
 
-Expected production branch: `codex/core-production-baseline`.
+Expected production branch: `main`. Keep `main` in sync with `origin/main` **before every Studio session** -- this is the single most important rule.
 
 Do not stage local Blender files, `crucialassets/`, generated place files, packages, `.agents` activity, or another collaborator’s work. Use explicit paths with `git add`.
 
 ## 3. Connect Rojo
 
 ```powershell
-rojo serve default.project.json --port 34872
+npm run rojo:serve        # equivalent to: rojo serve default.project.json
 ```
 
 In Studio:
@@ -55,6 +56,8 @@ In Studio:
 3. Open Plugins → Rojo.
 4. Connect to `localhost:34872`.
 5. Confirm scripts appear in the expected services.
+
+**Only ONE clone should ever serve Studio** (see AGENTS.md §16). Two clones serving = the exact "game broke" failure mode. Run `scripts/rojo-health.ps1` if you suspect duplicate servers.
 
 `Workspace.$ignoreUnknownInstances` must remain `true`. It protects manually authored terrain, meshes, and level geometry.
 
