@@ -27,6 +27,8 @@ CompanionConfig.companions = {
 		displayName = "Zundamon",
 		flavor = "Your village guide and cherished spirit companion.",
 		llmPersona = "You are Zundamon, the village guide and companion who walks beside the player.",
+		signature_recipes = { ["Zunda Mochi"] = true, ["Zunda Bread"] = true, ["Zunda Paradise"] = true },
+		synergy_gold = 5,
 	},
 	dog = {
 		emoji = "🐕",
@@ -43,6 +45,8 @@ CompanionConfig.companions = {
 		displayName = "Dog",
 		flavor = "A faithful furry friend.",
 		llmPersona = "You are a loyal dog companion beside the player.",
+		signature_recipes = { ["Bread"] = true, ["Apple Pie"] = true, ["Golden Harvest Platter"] = true },
+		synergy_gold = 5,
 	},
 	parrot = {
 		emoji = "🦜",
@@ -59,6 +63,8 @@ CompanionConfig.companions = {
 		displayName = "Parrot",
 		flavor = "A colourful chatterbox.",
 		llmPersona = "You are a chatty parrot companion beside the player.",
+		signature_recipes = { ["Seasonal Salad"] = true, ["Sweet Pea Cake"] = true, ["Pea Flower Tea"] = true },
+		synergy_gold = 5,
 	},
 	cat = {
 		emoji = "🐱",
@@ -75,6 +81,8 @@ CompanionConfig.companions = {
 		displayName = "Cat",
 		flavor = "A purring little menace.",
 		llmPersona = "You are a cat companion beside the player.",
+		signature_recipes = { ["Fancy Pie"] = true, ["Royal Stew"] = true, ["Warm Winter Stew"] = true },
+		synergy_gold = 5,
 	},
 	ankomon = {
 		emoji = "🥜",
@@ -91,6 +99,8 @@ CompanionConfig.companions = {
 		displayName = "Ankomon",
 		flavor = "A red bean spirit. Sweetens every payday.",
 		llmPersona = "Your Ankomon form grants the player bonus gold when serving guests.",
+		signature_recipes = { ["Ankomon's Protein Punch"] = true, ["Edamame Snack"] = true, ["Ultimate Feast"] = true },
+		synergy_gold = 8,
 	},
 	cardamon = {
 		emoji = "🍋",
@@ -108,6 +118,8 @@ CompanionConfig.companions = {
 		displayName = "Cardamon",
 		flavor = "A cardamom seedling. Steadies your hands.",
 		llmPersona = "Your Cardamon form helps the player land perfect cooks.",
+		signature_recipes = { ["Cardamon's Calm Cup"] = true, ["Pea Flower Tea"] = true, ["Bread"] = true },
+		synergy_gold = 8,
 	},
 	antimon = {
 		emoji = "🌿",
@@ -125,6 +137,8 @@ CompanionConfig.companions = {
 		displayName = "Antimon",
 		flavor = "A minty wisp. Whispers where to dig.",
 		llmPersona = "Your Antimon form helps the player find extra gather drops.",
+		signature_recipes = { ["Antimon's Speed Soup"] = true, ["Seasonal Salad"] = true, ["Edamame Snack"] = true },
+		synergy_gold = 8,
 	},
 	sakuradamon = {
 		emoji = "🌸",
@@ -142,6 +156,12 @@ CompanionConfig.companions = {
 		displayName = "Sakuradamon",
 		flavor = "A blossom spirit. Carries good lessons on the breeze.",
 		llmPersona = "Your Sakuradamon form grants bonus chef XP.",
+		signature_recipes = {
+			["Sakuradamon's Blossom Bites"] = true,
+			["Sweet Pea Cake"] = true,
+			["Pea Flower Tea"] = true,
+		},
+		synergy_gold = 8,
 	},
 	tantanmon = {
 		emoji = "🌶️",
@@ -159,6 +179,8 @@ CompanionConfig.companions = {
 		displayName = "Tantanmon",
 		flavor = "Spicy little firework.",
 		llmPersona = "You are in your spicy tan companion form.",
+		signature_recipes = { ["Royal Stew"] = true, ["Ankomon's Protein Punch"] = true, ["Warm Winter Stew"] = true },
+		synergy_gold = 8,
 	},
 }
 

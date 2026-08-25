@@ -307,6 +307,61 @@ local function getServeReaction(compType: string): string?
 	return nil
 end
 
+-- Signature-dish synergy lines (short VN pop when active companion's favorite
+-- recipe is served). Falls back to a generic cozy line so every companion
+-- without a bespoke entry still celebrates the bonus.
+local SERVE_SYNERGIES = {
+	zundamon = {
+		"A true Zunda classic! My heart is dancing like a fresh pea pod! 🌱✨",
+		"You cooked that just like a village elder would be proud of, {player}! 🍡",
+	},
+	dog = {
+		"Woof! Homestyle comfort food is the best comfort food! 🐕🍞",
+		"That warm smell makes me want to wag my tail twice as fast!",
+	},
+	parrot = {
+		"Squawk! Colorful ingredients make a colorful plate! 🦜🥗",
+		"Bright and crunchy — just how a parrot likes it!",
+	},
+	cat = {
+		"Meow... a refined choice. This dish has *depth*. 🐱🥧",
+		"Elegant plating. The guest will remember this one.",
+	},
+	ankomon = {
+		"Bean power! That protein will keep the kitchen running strong! 🥜💪",
+		"A hearty serve is a profitable serve, {player}! 💰",
+	},
+	cardamon = {
+		"A calm, steady recipe — the perfect canvas for a perfect cook. 🍵",
+		"My leaves are practically humming with that warm aroma!",
+	},
+	antimon = {
+		"Fresh from the earth! Every gather was worth it for this bowl. 🌿",
+		"Quick, light, and bright — just like a good foraging run!",
+	},
+	sakuradamon = {
+		"Each petal-shaped bite is a little poem on a plate! 🌸",
+		"This dish blooms with kindness, {player}!",
+	},
+	tantanmon = {
+		"Spice that warms the soul! Now that is a flavor with *fire*! 🌶️🔥",
+		"Fast hands + bold broth = unstoppable kitchen energy! ⚡",
+	},
+	DEFAULT = {
+		"A perfect match for today! That synergy tastes like victory! ✨",
+		"This dish and your companion are in harmony! 🍽️",
+	},
+}
+
+-- Look up a signature-dish synergy line for a companion (falls back to DEFAULT).
+local function getServeSynergy(compType: string): string?
+	local pool = SERVE_SYNERGIES[compType] or SERVE_SYNERGIES.DEFAULT
+	if pool and #pool > 0 then
+		return pool[math.random(1, #pool)]
+	end
+	return nil
+end
+
 -- Side dialogue triggers (item/lore discoveries)
 local SIDE_DIALOGUES = {
 	zunda_pea = {
@@ -330,6 +385,7 @@ VNDialogueData.SPEAKERS = SPEAKERS
 VNDialogueData.COMPANION_DIALOGUE = COMPANION_DIALOGUE
 VNDialogueData.SIDE_DIALOGUES = SIDE_DIALOGUES
 VNDialogueData.getServeReaction = getServeReaction
+VNDialogueData.getServeSynergy = getServeSynergy
 
 function VNDialogueData.getSpeaker(id: string)
 	return SPEAKERS[id] or SPEAKERS.zundamon

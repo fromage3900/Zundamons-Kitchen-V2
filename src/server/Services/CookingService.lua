@@ -215,7 +215,8 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 	local totalNotes = CraftConfig.difficulty[recipeName] and CraftConfig.difficulty[recipeName].notes
 		or CraftConfig.defaultDifficulty.notes
 
-	-- Companion perfect_window buff (Cardamon)
+	-- Companion perfect_window buff (Cardamon) plus a small signature-dish bonus
+	-- for any active companion whose favored recipe is being cooked.
 	local data = PlayerDataService.get(player)
 	local activeComp = data and data.active_companion
 	local def = activeComp and CompanionConfig.companions[activeComp]
@@ -223,6 +224,9 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 	local perfectWindow = BASE_PERFECT_WINDOW
 	if buff and buff.stat == "perfect_window" and buff.magnitude > 0 then
 		perfectWindow = BASE_PERFECT_WINDOW * (1 + buff.magnitude)
+	end
+	if def and def.signature_recipes and def.signature_recipes[recipeName] == true then
+		perfectWindow = perfectWindow * 1.10
 	end
 
 	local firstTargetAt = workspace:GetServerTimeNow() + START_DELAY

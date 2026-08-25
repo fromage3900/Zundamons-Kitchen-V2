@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local NPCConfig = require(ReplicatedStorage.Shared.Config.NPCConfig)
+local CompanionConfig = require(ReplicatedStorage.ConfigurationFiles.CompanionConfig)
 local ChefLevelConfig = require(ReplicatedStorage.ConfigurationFiles.ChefLevelConfig)
 local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
 local RewardCore = require(ServerScriptService.Services.RewardCore)
@@ -20,6 +21,7 @@ local RATE_LIMIT = 0.25
 -- while keeping every legit guest payout untouched.
 local MAX_PAY_AMOUNT = 500
 local MAX_CHALLENGE_BONUS = 200
+local MAX_SYNERGY_BONUS = 25
 local lastServeAt: { [number]: number } = {}
 local ServingService = {}
 ServingService.GuestServed = Instance.new("BindableEvent")
@@ -134,8 +136,18 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	else
 		challengeBonus = math.min(challengeBonus, MAX_CHALLENGE_BONUS)
 	end
+	-- Companion dish-synergy bonus: active companion's signature recipes grant
+	-- extra gold on serve, plus a small bond XP bump and a themed reaction line.
+	local activeComp = data.active_companion
+	local compDef = activeComp and CompanionConfig.companions[activeComp]
+	local isSynergy = compDef and compDef.signature_recipes and compDef.signature_recipes[recipe] == true
+	local synergyBonus = 0
+	if isSynergy then
+		synergyBonus = math.min(compDef.synergy_gold or 0, MAX_SYNERGY_BONUS)
+	end
+
 	local result = RewardCore.settle(player, {
-		gold = qualityPay + challengeBonus,
+		gold = qualityPay + challengeBonus + synergyBonus,
 		xp = ChefLevelConfig.xpRewards.serveGuest,
 		reason = "serve",
 		combo = true,
@@ -180,12 +192,18 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	-- active companion pops a short VN reaction line through the same
 	-- ShowVNDialogue pipeline guests already use. No new UI, no new remotes.
 	local serveData = PlayerDataService.get(player)
-	local activeComp = serveData and serveData.active_companion
-	if type(activeComp) == "string" and activeComp ~= "" then
-		local bondTier = PlayerDataService.getCompanionBondTier(player, activeComp)
-		PlayerDataService.addCompanionBond(player, activeComp, 2)
+	local serveActiveComp = serveData and serveData.active_companion
+	if type(serveActiveComp) == "string" and serveActiveComp ~= "" then
+		local bondTier = PlayerDataService.getCompanionBondTier(player, serveActiveComp)
+		PlayerDataService.addCompanionBond(player, serveActiveComp, 2)
+
+		-- Extra synergy reward for serving the active companion's signature dish.
+		if isSynergy and serveActiveComp == activeComp then
+			PlayerDataService.addCompanionBond(player, serveActiveComp, 1)
+		end
+
 		local reactionData = require(ReplicatedStorage.ConfigurationFiles.VNDialogueData)
-		local reactionLine = reactionData.getServeReaction(activeComp)
+		local reactionLine = reactionData.getServeReaction(serveActiveComp)
 		if reactionLine then
 			reactionLine = reactionLine:gsub("{player}", player.Name)
 			local ev = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialogue")
@@ -195,9 +213,21 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 				local portraitCfg = require(ReplicatedStorage.ConfigurationFiles.VNPortraitConfig)
 				local emote = portraitCfg.getBondTierEmote(bondTier) or ""
 				if emote ~= "" then
-					ev:FireClient(player, activeComp, reactionLine, emote)
+					ev:FireClient(player, serveActiveComp, reactionLine, emote)
 				else
-					ev:FireClient(player, activeComp, reactionLine)
+					ev:FireClient(player, serveActiveComp, reactionLine)
+				end
+			end
+		end
+
+		-- Synergy-specific VN line when a signature dish was served.
+		if isSynergy and serveActiveComp == activeComp then
+			local synergyLine = reactionData.getServeSynergy and reactionData.getServeSynergy(serveActiveComp)
+			if synergyLine then
+				synergyLine = synergyLine:gsub("{player}", player.Name)
+				local ev = ReplicatedStorage.RemoteEvents:FindFirstChild("ShowVNDialogue")
+				if ev and ev:IsA("RemoteEvent") then
+					ev:FireClient(player, serveActiveComp, synergyLine)
 				end
 			end
 		end
@@ -205,7 +235,17 @@ function ServingService.serve(player: Player, guest: any, dishName: any): (boole
 	local guestType = guest:GetAttribute("MeshType") or guest:GetAttribute("GuestType") or "normal"
 	GuestService.removeGuestByInstance(guest, "served")
 	ServingService.GuestServed:Fire(player, guestType, recipe, quality)
-	return true, "served", { recipe = recipe, quality = quality, gold = result.gold, xp = result.xp }
+	return true,
+		"served",
+		{
+			recipe = recipe,
+			quality = quality,
+			gold = result.gold,
+			xp = result.xp,
+			synergy = isSynergy,
+			synergyBonus = synergyBonus,
+			companion = activeComp,
+		}
 end
 
 function ServingService.onGuestTimeout(player: Player, guestType: string?)
