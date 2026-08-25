@@ -113,6 +113,11 @@ local RE = RS:WaitForChild("RemoteEvents")
 local cookResultEv = RE:FindFirstChild("CookingResult")
 if cookResultEv then
 	cookResultEv.OnClientEvent:Connect(function(data)
+		-- Advance tutorial past the cook step
+		local ta = RS:FindFirstChild("TutorialAdvance")
+		if ta then
+			ta:Fire("cook")
+		end
 		local recipe = data.recipe or ""
 		local quality = data.quality or "ok"
 		titleLbl.Text = "🍳 " .. recipe

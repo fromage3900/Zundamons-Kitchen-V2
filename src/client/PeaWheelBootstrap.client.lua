@@ -7,6 +7,12 @@ local Players = game:GetService("Players")
 local playerScripts = Players.LocalPlayer:WaitForChild("PlayerScripts")
 local ActionRegistry = require(playerScripts:WaitForChild("ConfigurationFiles"):WaitForChild("UIActionRegistry"))
 
+-- Re-entry guard: prevent duplicate callback registrations across Studio reloads.
+if rawget(_G, "_PeaWheelVerified") then
+	return
+end
+rawset(_G, "_PeaWheelVerified", true)
+
 local EXPECTED_ACTIONS = {
 	"inventory",
 	"cook",
@@ -14,6 +20,7 @@ local EXPECTED_ACTIONS = {
 	"challenge",
 	"collection",
 	"compendium",
+	"photomode",
 	"materials",
 	"map",
 	"companions",

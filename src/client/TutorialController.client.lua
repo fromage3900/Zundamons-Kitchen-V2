@@ -19,24 +19,24 @@ local STEPS = {
 		title = "🌿  Gather Ingredients",
 		desc = "Walk up to glowing plants, rocks, and trees to harvest materials. Each node gives different resources!",
 		target = nil,
-		waitFor = nil,
-		auto = 5,
+		waitFor = "harvest",
+		auto = nil,
 	},
 	{
 		id = "craft",
 		title = "🍳  Cook Dishes (K)",
 		desc = "Press K to open the crafting panel. Combine ingredients to make dishes — the better your timing, the better the result!",
 		target = nil,
-		waitFor = nil,
-		auto = 5,
+		waitFor = "cook",
+		auto = nil,
 	},
 	{
 		id = "serve",
 		title = "🍽️  Serve Guests!",
 		desc = "Guests will arrive at your kitchen and ask for a dish. Walk up to them (look for the golden ! beacon) and click to serve them. They pay gold and XP!",
 		target = nil,
-		waitFor = nil,
-		auto = 5,
+		waitFor = "serve",
+		auto = nil,
 	},
 	{
 		id = "challenge",
@@ -296,6 +296,21 @@ nextBtn.MouseButton1Click:Connect(function()
 end)
 
 skipBtn.MouseButton1Click:Connect(dismiss)
+
+-- Gameplay systems fire this to advance past waitFor-gated steps.
+local tutorialAdvance = RS:FindFirstChild("TutorialAdvance")
+if not tutorialAdvance then
+	tutorialAdvance = Instance.new("BindableEvent")
+	tutorialAdvance.Name = "TutorialAdvance"
+	tutorialAdvance.Parent = RS
+end
+tutorialAdvance.Event:Connect(function(action)
+	local step = STEPS[currentStep]
+	if step and step.waitFor == action then
+		print("[Tutorial] Advance signal:", action, "-> step", currentStep + 1)
+		showStep(currentStep + 1)
+	end
+end)
 
 -- Automatically advance for timed steps
 local autoTimer

@@ -108,6 +108,8 @@ listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 listFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
 local currentGuest = nil
+local feedbackLabel: TextLabel? = nil
+local showServeFeedback: (string) -> () = nil :: any
 
 -- Filter to only the dish the guest wants, using the reactive projection.
 local function buildDishList(guest, playerData)
@@ -195,10 +197,47 @@ serveButton.MouseButton1Click:Connect(function()
 	local ok, result = pcall(function()
 		return serveGuestRF:InvokeServer(currentGuest, dish)
 	end)
-	-- Always close the UI, even if the serve fails, so the black
-	-- backdrop never gets stuck on screen.
-	hide()
+	if ok and type(result) == "table" and result[1] == true then
+		local ta = RS:FindFirstChild("TutorialAdvance")
+		if ta then
+			ta:Fire("serve")
+		end
+		hide()
+	else
+		local reason = "Serve failed"
+		if ok and type(result) == "table" then
+			reason = result[2] or reason
+		elseif not ok then
+			reason = tostring(result)
+		end
+		showServeFeedback(reason)
+	end
 end)
+
+showServeFeedback = function(text)
+	if feedbackLabel and feedbackLabel.Parent then
+		feedbackLabel:Destroy()
+	end
+	feedbackLabel = Instance.new("TextLabel", panel)
+	feedbackLabel.Name = "ServeFeedback"
+	feedbackLabel.Size = UDim2.new(1, -20, 0, 28)
+	feedbackLabel.Position = UDim2.new(0, 10, 1, -88)
+	feedbackLabel.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
+	feedbackLabel.BackgroundTransparency = 0.1
+	feedbackLabel.Text = "⚠ " .. text
+	feedbackLabel.FontFace = UIConfig.FONTS.Body
+	feedbackLabel.TextSize = UIConfig.FONT_SIZES.Body
+	feedbackLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	feedbackLabel.BorderSizePixel = 0
+	feedbackLabel.TextWrapped = true
+	Instance.new("UICorner", feedbackLabel).CornerRadius = UIConfig.CORNER_RADIUS.Small
+	task.delay(3, function()
+		if feedbackLabel and feedbackLabel.Parent then
+			feedbackLabel:Destroy()
+			feedbackLabel = nil
+		end
+	end)
+end
 
 -- Keep the dish list fresh while the panel is open.
 playerStateChanged.OnClientEvent:Connect(function(projection)

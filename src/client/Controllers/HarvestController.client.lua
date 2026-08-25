@@ -311,6 +311,11 @@ local function completeHarvest()
 		and ReplicatedStorage.RemoteEvents:WaitForChild("HarvestNode", 5)
 	if RE_Harvest then
 		RE_Harvest:FireServer(harvestTargetNode)
+		-- Advance tutorial past the harvest step
+		local ta = ReplicatedStorage:FindFirstChild("TutorialAdvance")
+		if ta then
+			ta:Fire("harvest")
+		end
 	else
 		warn("[HarvestController] HarvestNode remote not found — harvest completion skipped")
 	end
