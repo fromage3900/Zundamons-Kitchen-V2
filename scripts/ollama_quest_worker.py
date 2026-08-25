@@ -189,9 +189,13 @@ def parse_single_quest(block: str) -> dict:
 
     # Extract numeric fields
     for field in ["target", "target_item", "target_zone", "target_npc", "target_companion", "quality", "max_cook_time"]:
-        match = re.search(rf'{field}\s*=\s*"?(\w+)"?', block)
+        match = re.search(rf'{field}\s*=\s*"?(.+?)"?\s*,', block)
         if match:
-            quest[field] = match.group(1)
+            quest[field] = match.group(1).strip()
+
+    # Coerce target to int (parser captures it as string; formatter needs a number)
+    if "target" in quest and quest["target"].isdigit():
+        quest["target"] = int(quest["target"])
 
     # Extract difficulty
     match = re.search(r'difficulty\s*=\s*(\d+)', block)

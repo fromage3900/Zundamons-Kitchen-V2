@@ -23,7 +23,7 @@ python scripts/verify_m1_companions_oracle.py
 | Worker | Requested | Result | Output file |
 |---|---|---|---|
 | `ollama_recipe_worker.py` | 20 | **9 recipes** (valid Lua, companion-themed) | `scripts/ollama_output/generated_recipes_100h.lua` |
-| `ollama_quest_worker.py` | 25 | pending (qwen3.8-27b) | `scripts/ollama_output/generated_quests_100h.lua` |
+| `ollama_quest_worker.py` | 12 | **~12 quests** (valid Lua, chain-gated) | `scripts/ollama_output/generated_quests_100h.lua` |
 | `ollama_dialogue_worker.py` | 40 | **60 dialogue lines** (6+ speakers × slots) | `scripts/ollama_output/generated_dialogue_100h.lua` |
 
 ### ⚠️ Model fix discovered (IMPORTANT for future runs)
@@ -31,11 +31,17 @@ The content workers' **default models are broken** on this machine:
 - `ollama_recipe_worker` → `deepseek-coder:6.6b` default: generated nothing parseable.
 - `ollama_quest_worker` / `ollama_dialogue_worker` → `llama3.1:8b` / `gemma4:12b`: **404** (not pulled).
 
-**Working model: `qwen2.5-coder:7b`** (recipes ✅, dialogue ✅). For the harder quest
-Lua format, `qwen3.8-27b` is being tried.
+**Working model: `qwen2.5-coder:7b`** (recipes ✅, dialogue ✅, quests ✅ after a worker fix).
 
 **Fix:** always pass `--model qwen2.5-coder:7b` (or pull the intended models). Consider
 updating the `MODEL_PRESETS` in `scripts/ollama_client.py` to models actually installed.
+
+### ⚠️ Quest worker bug fixed
+`scripts/ollama_quest_worker.py` crashed at format time with
+`TypeError: %d format: a real number is required, not str` — the parser captured
+`target` as a string, but `format_lua_output` did `%d`. Fixed: coerce `target` to int
+in `parse_single_quest`. After the fix, quest generation succeeded (~12 quests).
+(This is a fix to the worker tool; it's committed separately.)
 
 ### Review notes
 - Recipes generated 9/20 (model under-filled count); **2 duplicate existing names**

@@ -98,6 +98,12 @@ function errorKey(entry) {
 	return `${script}\u0000${normalize(message)}`;
 }
 
+function zrKey(ev) {
+	const status = typeof ev.status === "string" ? ev.status : "?";
+	const memories = Array.isArray(ev.memories) ? ev.memories.length : 0;
+	return `ZundaroomsStatus\u0000${status}\u0000${memories}`;
+}
+
 function indexErrors(run) {
 	const index = new Map();
 	for (const entry of run.errors) {
@@ -119,6 +125,19 @@ function indexErrors(run) {
 			index.set(key, { script, message: message.trim(), count: 1 });
 		}
 	}
+
+	if (run.zundarooms_status_events) {
+		for (const ev of run.zundarooms_status_events) {
+			const key = zrKey(ev);
+			const existing = index.get(key);
+			if (existing) {
+				existing.count += 1;
+			} else {
+				index.set(key, { script: "ZundaroomsStatus", message: "", count: 1 });
+			}
+		}
+	}
+
 	return index;
 }
 

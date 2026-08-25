@@ -156,6 +156,12 @@ function buildSection(trace, previousRun) {
 	if (regressionBlock !== "") {
 		lines.push(regressionBlock.replace(/\n+$/, ""), "");
 	}
+
+	const zrBlock = buildZundaroomsSection(trace);
+	if (zrBlock !== "") {
+		lines.push(zrBlock, "");
+	}
+
 	lines.push(
 		`Warnings captured: ${trace.warnings.length} · State samples: ${trace.state_samples.length}`,
 		"",
@@ -193,6 +199,29 @@ function loadPreviousRunSummary(previous, entries, currentSessionId) {
 		if (typeof message === "string") previous.signatures.add(message.trim());
 	});
 	return previous;
+}
+
+function buildZundaroomsSection(trace) {
+	const events = trace.zundarooms_status_events;
+	if (!Array.isArray(events) || events.length === 0) {
+		return "";
+	}
+
+	const lines = [
+		"### Zundarooms status events",
+		"",
+		"| at_s | status | memories carried |",
+		"| --- | --- | --- |",
+	];
+
+	for (const ev of events) {
+		const at = typeof ev.at_s === "number" ? formatDuration(ev.at_s) : "?";
+		const status = typeof ev.status === "string" ? ev.status : "?";
+		const memories = Array.isArray(ev.memories) ? ev.memories.length : 0;
+		lines.push(`| ${at} | ${status} | ${memories} |`);
+	}
+
+	return lines.join("\n");
 }
 
 function buildRegressionSection(trace, previousRun) {

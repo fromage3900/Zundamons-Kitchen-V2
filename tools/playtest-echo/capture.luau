@@ -1,6 +1,7 @@
 local HttpService = game:GetService("HttpService")
 local LogService = game:GetService("LogService")
 local Players = game:GetService("Players")
+local ZRStatus = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ZundaroomsStatus")
 
 local SAMPLE_INTERVAL_S = 5
 
@@ -287,6 +288,18 @@ function PlaytestEcho.start()
 	running = true
 	samplerGeneration += 1
 
+	-- ZRStatus timeline buffer (client-context; server→client RE not heard in server context)
+	if ZRStatus then
+		_G.PlaytestEcho.zrEvents = {}
+		_G.PlaytestEcho.zrConnection = ZRStatus.OnClientEvent:Connect(function(status, memories)
+			table.insert(_G.PlaytestEcho.zrEvents, {
+				at_s = roundSeconds(elapsedSeconds()),
+				status = status,
+				memories = memories,
+			})
+		end)
+	end
+
 	local generation = samplerGeneration
 	messageConnection = LogService.MessageOut:Connect(captureMessage)
 	captureStateSample()
@@ -313,6 +326,12 @@ function PlaytestEcho.stop()
 		running = false
 		samplerGeneration += 1
 		disconnectMessageListener()
+
+		-- disconnect ZRStatus listener
+		if ZRStatus and _G.PlaytestEcho.zrConnection then
+			_G.PlaytestEcho.zrConnection:Disconnect()
+			_G.PlaytestEcho.zrConnection = nil
+		end
 	end
 
 	return PlaytestEcho.dump()
@@ -321,6 +340,11 @@ end
 function PlaytestEcho.dump()
 	assert(sessionId ~= nil, "PlaytestEcho.start() must be called before dump()")
 
+	local zrEvents = nil
+	if ZRStatus and rawget(_G, "PlaytestEcho") == PlaytestEcho and _G.PlaytestEcho.zrEvents then
+		zrEvents = deepCopy(_G.PlaytestEcho.zrEvents)
+	end
+
 	return {
 		session_id = sessionId,
 		started_at = startedAt,
@@ -328,6 +352,7 @@ function PlaytestEcho.dump()
 		errors = deepCopy(errors),
 		warnings = deepCopy(warnings),
 		state_samples = deepCopy(stateSamples),
+		zundarooms_status_events = zrEvents,
 	}
 end
 
