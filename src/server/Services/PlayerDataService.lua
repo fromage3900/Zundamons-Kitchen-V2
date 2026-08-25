@@ -467,6 +467,43 @@ function PlayerDataService.savePlayer(player: Player)
 	print("[PlayerDataService] Profile released for " .. player.Name)
 end
 
+-- Read-only aggregate used by the Collection Tracker panel. Intentionally does
+-- not mutate or bump revision; it reflects the latest loaded profile data.
+function PlayerDataService.getCollectionSnapshot(player: Player): { [string]: any }
+	local data = PlayerDataService.get(player)
+	if not data then
+		return {}
+	end
+
+	local unlockedRecipes = data.recipes_unlocked
+	local recipesCurrent = type(unlockedRecipes) == "table" and #unlockedRecipes or 0
+
+	local companionBonds = data.companion_bond or {}
+	local companionsCurrent = 0
+	for _ in pairs(companionBonds) do
+		companionsCurrent += 1
+	end
+
+	local achievements = data.achievements or {}
+	local achievementsCurrent = 0
+	for _ in pairs(achievements) do
+		achievementsCurrent += 1
+	end
+
+	local zonesVisited = data.zones_visited or {}
+	local biomesCurrent = 0
+	for _ in pairs(zonesVisited) do
+		biomesCurrent += 1
+	end
+
+	return {
+		companions = companionsCurrent,
+		achievements = achievementsCurrent,
+		recipes = recipesCurrent,
+		biomes = biomesCurrent,
+	}
+end
+
 function PlayerDataService.checkAndUnlockTiers(player: Player)
 	local unlocks = {}
 	local ok = PlayerDataService.mutate(player, "tier_unlock", function(data)

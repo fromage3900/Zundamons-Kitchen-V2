@@ -12,6 +12,8 @@
     "rojo:build": "rojo build default.project.json -o build/ZundamonsKitchen.rbxl",
     "rojo:sourcemap": "rojo sourcemap default.project.json -o build/sourcemap.json",
     "rojo:serve": "rojo serve default.project.json",
+    "playtest:echo": "node tools/playtest-echo/echo_to_notes.mjs",
+    "playtest:compare": "node tools/playtest-echo/compare_runs.mjs",
     "hooks:install": "git config core.hooksPath .githooks",
     "hooks:uninstall": "git config --unset core.hooksPath"
   },

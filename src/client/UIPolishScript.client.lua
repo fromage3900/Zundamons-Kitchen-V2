@@ -5,34 +5,14 @@ local UIS = game:GetService("UserInputService")
 local RunSvc = game:GetService("RunService")
 local Tween = game:GetService("TweenService")
 local player = Players.LocalPlayer
-local gui = require(game:GetService("ReplicatedStorage").ConfigurationFiles.ClientGuiBootstrap).createScreenGui(
-	player,
-	"UIPolishGui",
-	90
-)
+local RS = game:GetService("ReplicatedStorage")
+local UIConfig = require(RS.ConfigurationFiles.UIConfig)
+local gui = require(RS.ConfigurationFiles.ClientGuiBootstrap).createScreenGui(player, "UIPolishGui", 90)
 
 -- ── FONT CONSTANTS ──────────────────────────────────────────────────────────
 -- Applied to every panel on first load via applyFonts()
-local F = {
-	heading = Enum.Font.FredokaOne, -- round, friendly restaurant logo
-	subhead = Enum.Font.GothamBlack, -- bold, weighty menu-section headers
-	body = Enum.Font.Gotham, -- clean body text
-}
--- Merriweather as premium subhead via new font API (graceful fallback)
-local function setSubheadFont(obj, size)
-	local ok = pcall(function()
-		obj.FontFace =
-			Font.new("rbxasset://fonts/families/Merriweather.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-	end)
-	if not ok then
-		obj.Font = F.subhead
-	end
-	if size then
-		obj.TextSize = size
-	end
-end
+local FONTS = UIConfig.FONTS
 
--- Label classifiers by name patterns
 local function classifyLabel(obj)
 	local n = obj.Name:lower()
 	if n:find("title") or n:find("heading") or n:find("name") or obj.TextSize >= 24 then
@@ -51,28 +31,37 @@ local function applyFontsToGui(root)
 			if obj.Font ~= Enum.Font.Code then
 				local cls = classifyLabel(obj)
 				if cls == "heading" then
-					obj.Font = F.heading
+					obj.FontFace = FONTS.Title
 				elseif cls == "subhead" then
-					setSubheadFont(obj)
+					obj.FontFace = FONTS.Heading
 				else
-					obj.Font = F.body
+					obj.FontFace = FONTS.Body
 				end
 			end
 		end
 	end
 end
 
--- Apply fonts to every ScreenGui in PlayerGui
+-- Apply fonts to every ScreenGui in PlayerGui, including future ones.
 local function applyAllFonts()
 	local pg = player:WaitForChild("PlayerGui")
 	for _, sg in ipairs(pg:GetChildren()) do
-		if sg:IsA("ScreenGui") and sg.Name ~= "UIPolish" then
+		if sg:IsA("ScreenGui") and sg.Name ~= "UIPolishGui" then
 			pcall(applyFontsToGui, sg)
 		end
 	end
 end
 
-task.delay(2, applyAllFonts) -- wait for other GUIs to load first
+task.delay(2, applyAllFonts)
+
+local pg = player:WaitForChild("PlayerGui")
+pg.ChildAdded:Connect(function(sg)
+	if sg:IsA("ScreenGui") then
+		task.delay(0.5, function()
+			pcall(applyFontsToGui, sg)
+		end)
+	end
+end)
 
 -- ── SPARKLE PARTICLES ───────────────────────────────────────────────────────
 -- Pool of sparkle frames reused for performance
@@ -154,7 +143,7 @@ local function spawnSparkles(screenX, screenY)
 		lbl.AnchorPoint = Vector2.new(0.5, 0.5)
 		lbl.BackgroundTransparency = 1
 		lbl.Text = STAR_SHAPES[math.random(#STAR_SHAPES)]
-		lbl.Font = Enum.Font.GothamBold
+		lbl.FontFace = FONTS.Heading
 		lbl.TextSize = math.random(14, 22)
 		lbl.TextColor3 = SPARKLE_COLORS[math.random(#SPARKLE_COLORS)]
 		lbl.ZIndex = 999

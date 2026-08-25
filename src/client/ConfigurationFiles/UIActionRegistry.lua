@@ -94,10 +94,22 @@ local DEFAULTS: {
 		},
 		{
 			id = "compendium",
-			label = "Collection",
+			label = "Compendium",
 			icon = "📖",
 			description = "Open recipe & item compendium",
 			defaultKey = Enum.KeyCode.C,
+			category = "Reference",
+			isAvailable = function()
+				return true
+			end,
+			callback = nil :: (() -> ())?,
+		},
+		{
+			id = "collection",
+			label = "Collection",
+			icon = "📚",
+			description = "Track your progress across companions, achievements, recipes, and biomes",
+			defaultKey = nil :: Enum.KeyCode?,
 			category = "Reference",
 			isAvailable = function()
 				return true
@@ -325,6 +337,7 @@ function UI_ActionRegistry.getOrderedSliceList(): { string }
 		"cook",
 		"quests",
 		"challenge",
+		"collection",
 		"compendium",
 		"materials",
 		"map",

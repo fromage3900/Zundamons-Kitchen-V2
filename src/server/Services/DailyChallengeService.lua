@@ -17,6 +17,7 @@ local DailyChallengeService = {}
 
 local challengeEvent = nil
 local challengeStatus = nil
+local dailyPreviewEvent = nil
 
 local function getRemotes()
 	if not challengeEvent then
@@ -33,8 +34,14 @@ local function getRemotes()
 			challengeStatus.Name = "DailyChallengeStatus"
 			challengeStatus.Parent = RE
 		end
+		dailyPreviewEvent = RE:FindFirstChild("DailyPreviewData")
+		if not dailyPreviewEvent then
+			dailyPreviewEvent = Instance.new("RemoteEvent")
+			dailyPreviewEvent.Name = "DailyPreviewData"
+			dailyPreviewEvent.Parent = RE
+		end
 	end
-	return challengeEvent, challengeStatus
+	return challengeEvent, challengeStatus, dailyPreviewEvent
 end
 
 local function getTodayKey(): string
@@ -49,7 +56,7 @@ function DailyChallengeService.initializeDay(player: Player)
 
 	local today = getTodayKey()
 	if data.daily_challenge_date ~= today then
-		-- New day — generate fresh challenges inside a mutation so the
+		-- New day â€” generate fresh challenges inside a mutation so the
 		-- revision bumps and the client projection updates.
 		PlayerDataService.mutate(player, "daily_challenge_init", function(d)
 			local challenges = DailyChallengeConfig.selectDailyChallenges()
@@ -62,7 +69,7 @@ function DailyChallengeService.initializeDay(player: Player)
 		end)
 	end
 
-	local _, status = getRemotes()
+	local _, status, preview = getRemotes()
 	status:FireClient(player, {
 		type = "daily_update",
 		challenges = data.daily_challenges,
@@ -71,6 +78,7 @@ function DailyChallengeService.initializeDay(player: Player)
 		streak = data.daily_streak,
 		weeklyBoss = DailyChallengeConfig.getWeeklyBoss(),
 	})
+	preview:FireClient(player, DailyChallengeService.getPreview(player))
 end
 
 function DailyChallengeService.updateProgress(player: Player, metric: string, amount: number)
@@ -106,7 +114,7 @@ function DailyChallengeService.updateProgress(player: Player, metric: string, am
 	end
 
 	if changed then
-		local _, status = getRemotes()
+		local _, status, _ = getRemotes()
 		status:FireClient(player, {
 			type = "progress_update",
 			progress = progress,
@@ -186,14 +194,62 @@ function DailyChallengeService.claimReward(player: Player, challengeIndex: numbe
 		end)
 	end
 
-	local _, status = getRemotes()
+	local _, status, preview = getRemotes()
 	status:FireClient(player, {
 		type = "reward_claimed",
 		challengeIndex = challengeIndex,
 		streak = data.daily_streak,
 	})
+	preview:FireClient(player, DailyChallengeService.getPreview(player))
 
 	return true
+end
+
+function DailyChallengeService.getPreview(player: Player): { [string]: any }
+	local data = PlayerDataService.get(player)
+	if not data then
+		return {}
+	end
+
+	local streak = data.daily_streak or 0
+	local maxStreak = 7
+	local todayClaimed = true
+	if data.daily_challenges then
+		for i = 1, 3 do
+			if not (data.daily_challenge_claimed or {})[i] then
+				todayClaimed = false
+				break
+			end
+		end
+	else
+		todayClaimed = false
+	end
+
+	local tomorrowTime = os.time() + 86400
+	local nextDayName = os.date("%A", tomorrowTime)
+	local dayOfYear = tonumber(os.date("%j", tomorrowTime)) or 1
+	local pool = DailyChallengeConfig.dailyPool
+	local nextIndex = (dayOfYear % #pool) + 1
+	local nextChallenge = pool[nextIndex]
+
+	local nextStreak = streak + (todayClaimed and 1 or 0)
+	local nextReward = DailyChallengeConfig.getStreakReward(nextStreak)
+	local rewardText = string.format(
+		"%d Gold%s",
+		nextReward.gold,
+		(nextReward.style and nextReward.style > 0) and (", " .. nextReward.style .. " Style") or ""
+	)
+
+	return {
+		streak = streak,
+		maxStreak = maxStreak,
+		todayClaimed = todayClaimed,
+		nextDayName = nextDayName,
+		nextChallengeId = nextChallenge.id,
+		nextChallengeTitle = nextChallenge.title,
+		nextChallengeIcon = nextChallenge.icon,
+		rewardText = rewardText,
+	}
 end
 
 function DailyChallengeService.spawnDailyVisitor(player: Player)
@@ -222,7 +278,7 @@ function DailyChallengeService.spawnDailyVisitor(player: Player)
 		return false
 	end
 
-	local _, status = getRemotes()
+	local _, status, _ = getRemotes()
 	status:FireClient(player, {
 		type = "visitor_spawned",
 		visitor = visitor,
@@ -255,7 +311,7 @@ function DailyChallengeService.spawnDailyResources(player: Player)
 		return false
 	end
 
-	local _, status = getRemotes()
+	local _, status, _ = getRemotes()
 	status:FireClient(player, {
 		type = "resources_spawned",
 		resources = DailyChallengeConfig.dailyResources,
@@ -310,7 +366,7 @@ function DailyChallengeService.updateWeeklyProgress(player: Player, metric: stri
 		end)
 	end
 
-	local _, status = getRemotes()
+	local _, status, _ = getRemotes()
 	status:FireClient(player, {
 		type = "weekly_update",
 		boss = boss,
@@ -352,7 +408,7 @@ function DailyChallengeService.claimWeeklyReward(player: Player)
 		return false
 	end
 
-	local _, status = getRemotes()
+	local _, status, _ = getRemotes()
 	status:FireClient(player, {
 		type = "weekly_claimed",
 		boss = boss,
@@ -361,7 +417,7 @@ function DailyChallengeService.claimWeeklyReward(player: Player)
 	return true
 end
 
--- ── Player Join ─────────────────────────────────────────────────────────────
+-- â”€â”€ Player Join â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Players.PlayerAdded:Connect(function(player)
 	task.spawn(function()

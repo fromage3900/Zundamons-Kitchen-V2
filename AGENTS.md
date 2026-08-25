@@ -32,7 +32,7 @@
 - **DailyChallengeConfig** (`src/shared/ConfigurationFiles/DailyChallengeConfig.lua`): Config for daily challenge pool, weekly boss, streak rewards, daily visitor (Nikki the Drifter), and daily resources.
 - **ChefStatsConfig** (`src/shared/ConfigurationFiles/ChefStatsConfig.lua`): Chef stat system inspired by Infinity Nikki's style stats. Stats: Speed, Precision, Charisma, Stamina with diminishing returns. Style points system with outfit unlocks.
 - **EndlessLoopWiring** (`src/server/systems/EndlessLoopWiring.server.lua`, lowercase `systems/`): Wires together all new systems, connecting them to existing GuestManager, CookingService, and ServingSystem. Daily-challenge player join init is owned by **DailyChallengeService.PlayerAdded alone** — never duplicate it (double-grant window). **Do not re-add the dead `IngredientGathered`/`GoldEarned` listener**; those remotes do not exist.
-- RemoteEvents required: `ChallengeMode`, `ChallengeModeStatus`, `DailyChallenge`, `DailyChallengeStatus`, `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock`.
+- RemoteEvents required: `ChallengeMode`, `ChallengeModeStatus`, `DailyChallenge`, `DailyChallengeStatus`, `DailyPreviewData`, `ChefStatsUpdate`, `StylePointsUpdate`, `OutfitUnlock`, `CollectionSnapshot`. RemoteFunctions: `GetCollectionSnapshot`.
 - Server wiring is functional; the **client surface (challenge/daily UI) is not built yet** — status remotes fire into the void by design until Phase 4 UI.
 
 ### 7. Infinity Nikki Aesthetic
@@ -121,3 +121,19 @@
   2. `.githooks/commit-msg` — enforces Conventional Commits format.
   3. `.githooks/pre-push` — runs full `npm run check` **and** warns if local main is behind origin.
 - **Never** commit with `--no-verify` outside genuine emergencies.
+
+### 18. Zundamon Voice (VO) Pipeline — VOICEVOX
+- **Four stages, in order.** Each is a script in `scripts/`; none of them is hand-edited output:
+  1. `voiceline_manifest.py` — **the line script** (the only file you author). Moment → Japanese text → VOICEVOX style → prosody.
+  2. `voicevox_voiceline_worker.py` — renders every line to WAV (lossless master) **and** derives an MP3. Writes `voicevox_output/manifest.json`.
+  3. `upload_audio.py` — uploads the MP3s via Open Cloud, writes `asset_id` back into the manifest. Resumable and checkpointed per clip.
+  4. `emit_voice_config.py` — generates `src/shared/ConfigurationFiles/VoiceConfig.lua` from the manifest.
+- **`VoiceConfig.lua` is GENERATED — never hand-edit it.** Change the manifest and re-run stages 2–4. `emit_voice_config.py --check` fails if the file is stale (CI-ready).
+- **Roblox rejects WAV.** Audio uploads must be MP3/OGG; the worker derives MP3 via ffmpeg for exactly this reason. Uploaded audio also passes through moderation and may not play immediately.
+- **Japanese VO over English UI is deliberate**: VOICEVOX synthesizes Japanese only and Zundamon is canonically Japanese-voiced. Do not "fix" this by dropping the VO.
+- **Voice is a single channel with barge-in** (`ZundaSoundController.playVoice`): a new line stops the previous one. Overlapping character voice is the fastest way to make VO feel broken.
+- **Every moment is cooldown-throttled** in `VoiceConfig.Cooldowns`. High-frequency moments (serve, cook) get long cooldowns; ceremonial ones (level_up, tier_up) get 0. When adding a call site, pick the cooldown deliberately — VO spam is the main failure mode.
+- **Keep gameplay lines under ~2.5s.** The worker warns above that. Ceremonial and ambient/ASMR lines may exceed it; rhythm-minigame lines must not, or they talk over the next note.
+- **Voice loads defensively**: `ZundaSoundController` requires `VoiceConfig` in a `pcall`, so a missing or malformed generated file degrades voice to silent instead of killing all UI SFX.
+- **Attribution is mandatory** (`CREDITS.md`): VOICEVOX:ずんだもん; character rights SSS LLC.
+- Generation needs the local engine — `python scripts/voicevox_client.py --serve` (auto-started by the worker). Upload needs `ROBLOX_OPEN_CLOUD_API_KEY` + `ROBLOX_CREATOR_USER_ID`; `upload_audio.py --check` diagnoses a bad key.

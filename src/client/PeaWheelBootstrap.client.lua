@@ -11,6 +11,8 @@ local EXPECTED_ACTIONS = {
 	"inventory",
 	"cook",
 	"quests",
+	"challenge",
+	"collection",
 	"compendium",
 	"materials",
 	"map",

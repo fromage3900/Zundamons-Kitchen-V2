@@ -121,9 +121,14 @@ def main() -> int:
         "ChallengeModeStatus",
         "DailyChallenge",
         "DailyChallengeStatus",
+        "DailyPreviewData",
         "ChefStatsUpdate",
         "StylePointsUpdate",
         "OutfitUnlock",
+        "CollectionSnapshot",
+    ]
+    required_remote_functions = [
+        "GetCollectionSnapshot",
     ]
     all_src = "".join(
         p.read_text(encoding="utf-8", errors="ignore")
@@ -133,6 +138,10 @@ def main() -> int:
     for remote in required_remotes:
         if f'"{remote}"' not in all_src:
             issues.append(f"Remote '{remote}' (AGENTS-listed) is never declared in src/")
+
+    for remote in required_remote_functions:
+        if f'"{remote}"' not in all_src:
+            issues.append(f"RemoteFunction '{remote}' (AGENTS-listed) is never declared in src/")
 
     if issues:
         print(f"check_config_crossrefs: {len(issues)} violation(s)")
