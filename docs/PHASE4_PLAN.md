@@ -36,7 +36,17 @@ extended/rotating quests) and impact.
 
 ### A — Reward Feel / "Juice" (HIGHEST — the dopamine ask)
 The systems fire correctly but land flat. Make every reward *feel* earned.
-1. **Full UI SFX overhaul** (`SoundConfig` + the 26-letter `SoundService` bank all point at ~1-2 placeholder IDs). Map distinct Nomagician samples per action **by frequency band + use-case** so nothing is repetitive or fatiguing: soft high ticks for hovers, warm mid clicks for confirms, low rounded tones for panel open/close, sparkle stingers for rewards. ASMR-cozy target. Source new samples via `tools/asset-pipeline` when a slot is empty. (Task #27. User is also supplying custom click SFX.)
+1. ~~**Full UI SFX overhaul**~~ — **DONE / claim was stale (verified in Studio 2026-08-25).**
+   The letter bank is fully populated: `SoundService` holds **33 Sounds with 33 distinct
+   asset IDs, 0 duplicated IDs**. The "~1-2 placeholder IDs" reading came from counting
+   `rbxassetid` literals inside `SoundConfig.lua`, which only covers `ZoneAmbient` /
+   `Companion` / `Bubbles` / `AmbientLoop` — the a–w letters live as `Sound` objects in
+   `SoundService`, not in the module. Two real (much smaller) defects remain:
+   (a) `a` and `h2` each exist **twice** in `SoundService`, so `getSound`'s `FindFirstChild`
+   makes one of each pair unreachable and playback non-deterministic — dedupe them;
+   (b) `SoundConfig.Companion.pet/greeting/buff` all share `rbxassetid://4612374495` —
+   now superseded by Zundamon VO (see AGENTS.md §18).
+   Original text: (`SoundConfig` + the 26-letter `SoundService` bank all point at ~1-2 placeholder IDs). Map distinct Nomagician samples per action **by frequency band + use-case** so nothing is repetitive or fatiguing: soft high ticks for hovers, warm mid clicks for confirms, low rounded tones for panel open/close, sparkle stingers for rewards. ASMR-cozy target. Source new samples via `tools/asset-pipeline` when a slot is empty. (Task #27. User is also supplying custom click SFX.)
 2. **Reward-moment stingers** — a dedicated, satisfying audio+visual beat on: perfect cook, guest served, fish caught, quest complete, level-up, tier-up, Zundarooms escape. Bubbles SFX already wired to cook/fish; extend to the rest, each with its own signature.
 3. **Visual juice layer** — number pop-ups (+25 Gold floats), a brief scale-punch on the ChefPill at XP gain, particle burst on level-up, subtle hit-stop on perfect cook. Reuse the `UIHelper.spawnSparkles` + `FloatingRating` patterns already in the codebase.
 4. **Streak/combo feedback** — cooking already tracks combo; surface it loudly (escalating pitch, combo counter flourish).

@@ -80,6 +80,25 @@ def mineable_ids() -> set:
     return {k.strip('"[]') for k in re.findall(r'^\t(\w+|\["[^"]+"\])\s*=\s*\{', m.group(1), re.MULTILINE)} if m else set()
 
 
+def companion_keys() -> set:
+    text = (SRC / "shared/ConfigurationFiles/CompanionConfig.lua").read_text(encoding="utf-8")
+    m = re.search(r"CompanionConfig\.companions\s*=\s*\{(.*?)\n\}", text, re.DOTALL)
+    if not m:
+        return set()
+    return {k for k in re.findall(r'^\t([a-zA-Z0-9_]+)\s*=\s*\{', m.group(1), re.MULTILINE)}
+
+
+def texture_config_keys() -> set:
+    texture_file = SRC / "shared/ConfigurationFiles/DamonTextureConfig.lua"
+    if not texture_file.exists():
+        return set()
+    text = texture_file.read_text(encoding="utf-8")
+    m = re.search(r"DamonTextureConfig\.textures\s*=\s*\{(.*?)\n\}", text, re.DOTALL)
+    if not m:
+        return set()
+    return {k for k in re.findall(r'^\t([a-zA-Z0-9_]+)\s*=', m.group(1), re.MULTILINE)}
+
+
 def main() -> int:
     variants = catalog_variants()
     defaults = catalog_defaults((SRC / "shared/ConfigurationFiles/ResourceVisualCatalog.lua").read_text(encoding="utf-8"))
@@ -143,12 +162,22 @@ def main() -> int:
         if f'"{remote}"' not in all_src:
             issues.append(f"RemoteFunction '{remote}' (AGENTS-listed) is never declared in src/")
 
+    # 5. CompanionConfig vs DamonTextureConfig
+    comp_keys = companion_keys()
+    tex_keys = texture_config_keys()
+    for ckey in sorted(comp_keys):
+        if ckey not in tex_keys:
+            issues.append(
+                f"CompanionConfig: companion '{ckey}' has no entry in DamonTextureConfig.textures "
+                f"(run damon_texture_gen.py and emit_damon_texture_config.py)"
+            )
+
     if issues:
         print(f"check_config_crossrefs: {len(issues)} violation(s)")
         for issue in issues:
             print(f"  - {issue}")
         return 1
-    print("check_config_crossrefs: OK — catalog, scatter, registry, mineables, remotes in sync")
+    print("check_config_crossrefs: OK — catalog, scatter, registry, mineables, remotes, damon textures in sync")
     return 0
 
 
