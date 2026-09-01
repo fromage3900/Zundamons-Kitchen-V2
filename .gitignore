@@ -41,6 +41,8 @@ Desktop.ini
 # Ollama content workers output
 scripts/ollama_output/
 scripts/__pycache__/
+**/__pycache__/
+tools/playtest-log-full.json
 
 # Scratch / one-off dev junk
 mcp_req.json
@@ -52,3 +54,12 @@ tools/asset-pipeline/converted/
 # (The shareable source asset lives in crucialassets/, which is tracked.)
 /zundapal_lowpolybake.spp
 *.painter_lock
+# Substance Painter autosaves (owner working files, never committed)
+*_autosave_*.spp
+
+# Generated Zundamon VO audio. Regenerable from voiceline_manifest.py via
+# voicevox_voiceline_worker.py, so the ~5MB of renders stays out of git.
+# manifest.json IS tracked — it carries the Roblox asset IDs, which are the
+# only part that cannot be regenerated.
+scripts/voicevox_output/*.wav
+scripts/voicevox_output/*.mp3

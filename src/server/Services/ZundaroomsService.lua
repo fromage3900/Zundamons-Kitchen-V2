@@ -23,6 +23,15 @@ type Session = {
 	exit: BasePart,
 	startedAt: number,
 	lastStepAt: number,
+	-- Depth progression (see ZundaroomsConfig): deeper runs are longer,
+	-- faster, and pay more. All per-session so mid-run config edits and
+	-- fragment speed penalties never leak across sessions.
+	depth: number,
+	segmentCount: number,
+	entitySpeed: number,
+	timeout: number,
+	-- Memory fragments picked up THIS run. Only persisted on escape.
+	fragmentsCollected: { string },
 }
 
 local ZundaroomsService = {}
@@ -136,12 +145,180 @@ local function unlocked(player: Player): boolean
 		)
 end
 
+-- Depth = how far this player has pushed into the rooms. Derived from
+-- persisted escapes, clamped by config. Depth 0 == the original encounter.
+local function depthFor(player: Player): number
+	local data = PlayerDataService.get(player)
+	local escapes = data and (data.zundarooms_escapes or 0) or 0
+	return math.clamp(escapes, 0, Config.maxDepth)
+end
+
+-- Pick fragment memories for a run, preferring lore the player has not
+-- recovered yet so the collection fills out across runs.
+local function pickMemories(player: Player, count: number): { { id: string, text: string } }
+	local data = PlayerDataService.get(player)
+	local seen: { [string]: boolean } = {}
+	if data and data.zundarooms_memories then
+		for _, id in ipairs(data.zundarooms_memories) do
+			seen[id] = true
+		end
+	end
+	local fresh = {}
+	local dupes = {}
+	for _, memory in ipairs(Config.memories) do
+		table.insert(seen[memory.id] and dupes or fresh, memory)
+	end
+	local pool = {}
+	for _, list in { fresh, dupes } do
+		-- Fisher-Yates within each tier; fresh lore always outranks dupes.
+		for i = #list, 2, -1 do
+			local j = math.random(i)
+			list[i], list[j] = list[j], list[i]
+		end
+		for _, memory in ipairs(list) do
+			table.insert(pool, memory)
+		end
+	end
+	local picked = {}
+	for i = 1, math.min(count, #pool) do
+		table.insert(picked, pool[i])
+	end
+	return picked
+end
+
+-- Spawn the run's picked memory fragments along the corridor. Each fragment
+-- is a top-level neon cover with a SurfaceGui label that survives the whole
+-- run and pays gold/XP + speeds the entity on pickup. The entity's base speed
+-- is passed in so the fragment can compute the per-run speed penalty without
+-- reaching back into Config.
+local function CreateFragments(
+	folder: Instance,
+	slotX: number,
+	corridorLength: number,
+	runtime: Instance,
+	runMemories: { { id: string, text: string } }
+): { Model }
+	local pickups: { Model } = {}
+	local spacing = corridorLength / math.max(1, #runMemories)
+	for i, memory in ipairs(runMemories) do
+		local offset = (i - 1 + 0.5) * spacing
+		local z = offset - corridorLength / 2
+		local cover = Instance.new("Part")
+		cover.Name = "Fragment_" .. memory.id
+		cover.Size = Vector3.new(1.2, 1.2, 3)
+		cover.CFrame = CFrame.new(Vector3.new(slotX, Config.roomY, z))
+		cover.Anchored = true
+		cover.CanCollide = false
+		cover.CanQuery = false
+		cover.Material = Enum.Material.Neon
+		cover.Color = Color3.fromRGB(220, 235, 200)
+		cover.Transparency = 0.0
+		cover.Parent = folder
+
+		local gui = Instance.new("SurfaceGui")
+		gui.Face = Enum.NormalId.Top
+		gui.Adornee = cover
+		gui.LightInfluence = 0.0
+		gui.Parent = cover
+
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, -4, 0, 32)
+		label.Position = UDim2.new(0, 4, 0, 4)
+		label.BackgroundTransparency = 1
+		label.TextColor3 = Color3.fromRGB(18, 20, 14)
+		label.Font = Enum.Font.GothamBold
+		label.TextSize = 12
+		label.TextWrapped = true
+		label.Text = memory.text
+		label.Parent = gui
+
+		local glow = Instance.new("PointLight")
+		glow.Color = Color3.fromRGB(220, 235, 200)
+		glow.Range = 6
+		glow.Parent = cover
+
+		local idx = #pickups + 1
+		pickups[idx] = cover
+	end
+	return pickups
+end
+
+-- Pick up one fragment: read the memory id from the part name, record it in the
+-- session's collected set, award gold/XP immediately, and speed the entity for
+-- the rest of this run. Fragment visuals are NOT re-parented across sessions, so
+-- session.entitySpeed is the authoritative per-session speed to add the bonus to.
+local function PickupFragment(session: Session, fragment: Instance)
+	if not session.fragmentsCollected then
+		session.fragmentsCollected = {}
+	end
+	-- names are "Fragment_<id>" (e.g. "Fragment_hum")
+	local memoryId = fragment.Name:match("^Fragment_(.+)$")
+	if not memoryId then
+		return
+	end
+	if table.find(session.fragmentsCollected, memoryId) then
+		return
+	end
+	table.insert(session.fragmentsCollected, memoryId)
+	-- immediate reward (fair even if the player gets caught later)
+	local payload = {
+		gold = Config.fragmentGold,
+		xp = Config.fragmentXP,
+		reason = "zundarooms_fragment",
+		popupItem = "Zundarooms Memory",
+	}
+	RewardCore.settle(session.player, payload, function(data)
+		data.zundarooms_escapes = data.zundarooms_escapes or 0
+		return true
+	end)
+	-- speed the entity for the rest of this run
+	session.entitySpeed = session.entitySpeed + Config.fragmentEntitySpeedBonus
+	-- destroy the visual so it does not double-collect
+	if fragment.Parent then
+		fragment:Destroy()
+	end
+end
+
+-- Clear any leftover fragment visuals from a session that ends without an
+-- escape (caught / timeout / leave / retry). Runs from cleanup AFTER the
+-- room folder is destroyed, so it operates on session.fragmentsCollected
+-- ids and re-derives the parts from the destroyed folder's former children.
+local function ClearFragments(session: Session)
+	-- session.fragmentsCollected holds ids, but the visual parts are gone
+	-- once session.room is destroyed. This is a no-op on the happy path;
+	-- kept for correctness if future code re-parents fragments out of the
+	-- room before destruction.
+	if not session.room.Parent then
+		return
+	end
+	for _, child in ipairs(session.room:GetChildren()) do
+		if child.Name:match("^Fragment_") then
+			child:Destroy()
+		end
+	end
+end
+
+local ZundaroomsCollectionHistory = {}
+function ZundaroomsCollectionHistory.merge(session: Session)
+	local data = PlayerDataService.get(session.player)
+	if not data then
+		return
+	end
+	data.zundarooms_memories = data.zundarooms_memories or {}
+	for _, id in ipairs(session.fragmentsCollected) do
+		if not table.find(data.zundarooms_memories, id) then
+			table.insert(data.zundarooms_memories, id)
+		end
+	end
+end
+
 local function cleanup(userId: number)
 	local session = sessions[userId]
 	if not session then
 		return
 	end
 	sessions[userId] = nil
+	ClearFragments(session)
 	if session.room.Parent then
 		session.room:Destroy()
 	end
@@ -159,21 +336,21 @@ local function finish(session: Session, outcome: string)
 		return
 	end
 	if outcome == "escaped" then
-		RewardCore.settle(session.player, {
-			gold = Config.escapeGold,
-			xp = Config.escapeXP,
-			reason = "zundarooms_escape",
-			popupItem = "Zundarooms Memory",
-		}, function(data)
-			data.zundarooms_escapes = (data.zundarooms_escapes or 0) + 1
-			data.zones_visited = data.zones_visited or {}
-			data.zones_visited.Zundarooms = true
-			data.locations_unlocked = data.locations_unlocked or {}
-			addUnique(data.locations_unlocked, "Zundarooms")
-			return true
-		end)
+		local escapedMemories: { { id: string, text: string } } = {}
+		for _, id in ipairs(session.fragmentsCollected) do
+			for _, m in ipairs(Config.memories) do
+				if m.id == id then
+					table.insert(escapedMemories, m)
+					break
+				end
+			end
+		end
+		statusEvent:FireClient(session.player, "escaped", escapedMemories)
+		returnPlayer(session)
+		cleanup(session.player.UserId)
+		return
 	end
-	statusEvent:FireClient(session.player, outcome)
+	statusEvent:FireClient(session.player, "caught")
 	returnPlayer(session)
 	cleanup(session.player.UserId)
 end
@@ -281,17 +458,39 @@ local function buildSegment(folder: Instance, slotX: number, baseZ: number, pref
 end
 
 local function createRoom(player: Player, origin: CFrame): Session
+	local depth = depthFor(player)
+	-- Run geometry from config, then pushed out by depth. Entity speed and
+	-- timeout are per-session fields so mid-run config edits do not touch
+	-- a running player, and the fragment speed penalty is local to this run.
+	local segmentCount = Config.segmentCount + math.max(0, depth * Config.depthSegmentsPerLevel)
+	local entitySpeed = Config.entitySpeed + depth * Config.depthEntitySpeedPerLevel
+	-- Extra head start for a longer corridor, so the entity is never unfairly
+	-- faster on deeper runs just because the corridor grew.
+	local timeout = Config.sessionTimeout
+		+ math.max(0, segmentCount - Config.segmentCount) * Config.depthTimeoutPerSegment
 	local slot = player.UserId % 1000
-	local slotX = slot * (Config.roomWidth * (Config.segmentCount + 2))
+	local slotX = slot * (Config.roomWidth * (segmentCount + 2))
 	local folder = Instance.new("Folder")
 	folder.Name = "Room_" .. player.UserId
 	folder.Parent = runtime
 
 	local prefab = getSegmentPrefab()
-	local corridorLength = Config.roomLength * Config.segmentCount
-	for segIndex = 0, Config.segmentCount - 1 do
+	local corridorLength = Config.roomLength * segmentCount
+	for segIndex = 0, segmentCount - 1 do
 		buildSegment(folder, slotX, segIndex * Config.roomLength, prefab)
 	end
+
+	-- Memory fragments spawned mid-corridor. Touching one pays gold/XP and
+	-- speeds the entity for the rest of the run (it notices you). Picked from
+	-- the player's incompleted set so the fragment collection fills out across
+	-- runs rather than repeatedly dropping the same ones.
+	-- Session starts with an EMPTY collected set so the first touch actually
+	-- pays gold/XP + speeds the entity (see PickupFragment for the guard).
+	local runMemories = pickMemories(player, Config.fragmentsPerRun)
+	local picked = CreateFragments(folder, slotX, corridorLength, runtime, runMemories)
+
+	-- The catchDistance is unchanged between runs.
+	local catchDistance = Config.catchDistance
 
 	local backWall = part(
 		folder,
@@ -327,7 +526,7 @@ local function createRoom(player: Player, origin: CFrame): Session
 	entity.CanCollide = false
 	attachEntityVisual(entity, folder)
 	local now = os.clock()
-	local session = {
+	local session: Session = {
 		player = player,
 		origin = origin,
 		room = folder,
@@ -335,6 +534,14 @@ local function createRoom(player: Player, origin: CFrame): Session
 		exit = exit,
 		startedAt = now,
 		lastStepAt = now,
+		depth = depth,
+		segmentCount = segmentCount,
+		entitySpeed = entitySpeed,
+		timeout = timeout,
+		catchDistance = catchDistance,
+		-- The run's picked memories: full text pairs, so the escape result
+		-- can persist both ids and the text once for the in-game journal.
+		fragmentsCollected = {},
 	}
 	exit.Touched:Connect(function(hit)
 		local touchingPlayer = Players:GetPlayerFromCharacter(hit.Parent)
@@ -342,6 +549,17 @@ local function createRoom(player: Player, origin: CFrame): Session
 			finish(session, "escaped")
 		end
 	end)
+	-- fragment touch attribution (distinguish player touches from tag overlap)
+	local fragmentTouches: { [Instance]: boolean } = {}
+	for _, f in ipairs(picked) do
+		f.Touched:Connect(function(hit)
+			local touchingPlayer = Players:GetPlayerFromCharacter(hit.Parent)
+			if touchingPlayer and touchingPlayer == player and not fragmentTouches[f] then
+				fragmentTouches[f] = true
+				PickupFragment(session, f)
+			end
+		end)
+	end
 	return session
 end
 
@@ -428,13 +646,13 @@ RunService.Heartbeat:Connect(function()
 		local dt = math.clamp(now - session.lastStepAt, 0, 0.1)
 		session.lastStepAt = now
 		local offset = root.Position - session.entity.Position
-		if offset.Magnitude <= Config.catchDistance then
+		if offset.Magnitude <= session.catchDistance then
 			finish(session, "caught")
-		elseif now - session.startedAt >= Config.sessionTimeout then
+		elseif now - session.startedAt >= session.timeout then
 			finish(session, "timeout")
 		elseif offset.Magnitude > 0 then
 			session.entity.CFrame =
-				CFrame.lookAt(session.entity.Position + offset.Unit * Config.entitySpeed * dt, root.Position)
+				CFrame.lookAt(session.entity.Position + offset.Unit * session.entitySpeed * dt, root.Position)
 		end
 		if not sessions[userId] then
 			continue
