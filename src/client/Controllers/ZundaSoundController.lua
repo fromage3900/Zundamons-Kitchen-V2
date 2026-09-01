@@ -9,6 +9,21 @@ local SoundService = game:GetService("SoundService")
 
 local SoundConfig = require(ReplicatedStorage.ConfigurationFiles.SoundConfig)
 
+-- Zundamon character voice (VOICEVOX). Loaded defensively: VoiceConfig is a
+-- generated file, and a missing or malformed one must not take down UI SFX for
+-- the whole session -- voice degrades to silent, everything else keeps working.
+local VoiceConfig: any = nil
+do
+	local ok, mod = pcall(function()
+		return require(ReplicatedStorage.ConfigurationFiles:WaitForChild("VoiceConfig", 5))
+	end)
+	if ok then
+		VoiceConfig = mod
+	else
+		warn("[ZundaSoundController] VoiceConfig unavailable — voice disabled: " .. tostring(mod))
+	end
+end
+
 local ZundaSoundController = {}
 
 -- Master SoundGroup so the Settings volume slider can scale ALL game audio at
@@ -156,6 +171,73 @@ function ZundaSoundController.playBubbles()
 	s.Parent = SoundService
 	s:Play()
 	game:GetService("Debris"):AddItem(s, 3)
+end
+
+-- ── Zundamon voice (VO) ──────────────────────────────────────────────────────
+-- Single voice channel: a new line stops the previous one. Overlapping character
+-- voice is the fastest way to make VO feel broken, so barge-in is deliberate
+-- rather than letting clips stack.
+
+local currentVoice: Sound? = nil
+local lastPlayedAt: { [string]: number } = {}
+
+-- Play the Zundamon voice line for `moment` (e.g. "cook_perfect").
+-- No-ops when voice is disabled, the moment has no uploaded clips yet, or the
+-- moment is still inside its cooldown. Returns true if a line actually started.
+function ZundaSoundController.playVoice(moment: string): boolean
+	if not VoiceConfig or not VoiceConfig.Enabled then
+		return false
+	end
+
+	local cooldown = VoiceConfig.getCooldown(moment)
+	local now = os.clock()
+	local last = lastPlayedAt[moment]
+	if cooldown > 0 and last and (now - last) < cooldown then
+		return false
+	end
+
+	local assetId = VoiceConfig.pick(moment)
+	if not assetId then
+		return false -- not uploaded yet; silent by design
+	end
+
+	-- Barge-in: cut any line still playing before starting the next.
+	if currentVoice and currentVoice.Parent then
+		currentVoice:Stop()
+		currentVoice:Destroy()
+	end
+
+	local s = Instance.new("Sound")
+	s.Name = "ZundaVoice_" .. moment
+	s.SoundId = assetId
+	s.Volume = VoiceConfig.MasterVolume
+	s.SoundGroup = masterGroup
+	s.Parent = SoundService
+	s:Play()
+
+	currentVoice = s
+	lastPlayedAt[moment] = now
+
+	-- 10s ceiling covers the longest ceremonial line with plenty of headroom.
+	game:GetService("Debris"):AddItem(s, 10)
+	return true
+end
+
+-- Play a voice line after a delay -- used to let a reward SFX land first so the
+-- stinger and the voice don't compete for the same instant.
+function ZundaSoundController.playVoiceDelayed(moment: string, delaySeconds: number)
+	task.delay(delaySeconds, function()
+		ZundaSoundController.playVoice(moment)
+	end)
+end
+
+-- Stop any voice line currently playing (e.g. when a cutscene takes over).
+function ZundaSoundController.stopVoice()
+	if currentVoice and currentVoice.Parent then
+		currentVoice:Stop()
+		currentVoice:Destroy()
+	end
+	currentVoice = nil
 end
 
 -- Expose globally for easy access

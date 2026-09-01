@@ -102,6 +102,66 @@ local SoundConfig = {
 	BubblesVolume = 0.5,
 }
 
+-- Letters we have already warned about (duplicate OR missing). Warnings fire
+-- once per letter, not once per play, so a misconfigured place reports the
+-- problem without flooding the log on every button hover.
+local warnedLetters: { [string]: boolean } = {}
+
+-- Resolve a letter to its Sound, deterministically.
+--
+-- SoundService can legitimately end up with two Sounds sharing a name (the place
+-- currently has two `a` and two `h2`, each pair holding DIFFERENT SoundIds).
+-- `FindFirstChild` returns whichever happens to come first in child order, so
+-- which sample plays could change between sessions. We instead collect every
+-- exact match and pick by lowest SoundId, which is arbitrary but STABLE — the
+-- same sample plays every time — and warn so the duplicate gets cleaned up in
+-- the place.
+local function resolveLetter(letter: string): Sound?
+	local matches: { Sound } = {}
+	for _, child in ipairs(game.SoundService:GetChildren()) do
+		if child:IsA("Sound") and child.Name == letter then
+			table.insert(matches, child)
+		end
+	end
+
+	if #matches == 0 then
+		if not warnedLetters[letter] then
+			warnedLetters[letter] = true
+			warn(
+				string.format(
+					"[SoundConfig] no Sound named '%s' in SoundService — that action will be silent.",
+					letter
+				)
+			)
+		end
+		return nil
+	end
+
+	if #matches > 1 then
+		table.sort(matches, function(a, b)
+			return a.SoundId < b.SoundId
+		end)
+		if not warnedLetters[letter] then
+			warnedLetters[letter] = true
+			local ids = {}
+			for _, s in ipairs(matches) do
+				table.insert(ids, s.SoundId)
+			end
+			warn(
+				string.format(
+					"[SoundConfig] %d Sounds named '%s' in SoundService (%s). "
+						.. "Using the lowest SoundId for stable playback — remove the extras in Studio.",
+					#matches,
+					letter,
+					table.concat(ids, ", ")
+				)
+			)
+		end
+	end
+
+	return matches[1]
+end
+
 -- Helper: get the Sound object for a UI action
 function SoundConfig.getSound(actionName: string): Sound?
 	local letter = SoundConfig.SoundMap[actionName]
@@ -114,19 +174,12 @@ function SoundConfig.getSound(actionName: string): Sound?
 		letter = letter[math.random(1, #letter)]
 	end
 
-	local sound = game.SoundService:FindFirstChild(letter)
-	if sound and sound:IsA("Sound") then
-		return sound
-	end
-
-	-- Fallback: try to find any sound with the letter in its name
-	for _, child in ipairs(game.SoundService:GetChildren()) do
-		if child:IsA("Sound") and string.find(child.Name, letter) then
-			return child
-		end
-	end
-
-	return nil
+	-- Exact name match only. The previous fallback used an unanchored
+	-- `string.find(child.Name, letter)`, which matched any name CONTAINING the
+	-- letter — so a missing `a` would silently resolve to "zunda" and a missing
+	-- `b` to "bubbles", playing a 4-minute music bed as a button click. A
+	-- missing letter must fail loudly instead of grabbing an unrelated sound.
+	return resolveLetter(letter)
 end
 
 -- Helper: get volume for a sound (MasterVolume * per-sound volume)
