@@ -15,10 +15,19 @@ local CookingSession = Matter.component("CookingSession")
 		nextExpected = number,
 		perfectHits = number,
 		greatHits = number,
+		goodHits = number,
 		okHits = number,
 		misses = number,
+		currentCombo = number,
+		maxCombo = number,
+		totalScore = number,
+		chart = table?,
+		windows = { perfect: number, great: number, good: number }?,
+		hitRecords = { table }?,
 		settled = boolean,
-		perfectWindow = number, -- custom per-player (companion buff), defaults to BASE_PERFECT_WINDOW
+		perfectWindow = number?, -- custom per-player (companion buff)
+		greatWindow = number?,
+		okWindow = number?,
 	}
 ]]
 

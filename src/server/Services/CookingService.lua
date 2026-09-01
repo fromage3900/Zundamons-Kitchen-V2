@@ -1,6 +1,6 @@
 --!strict
--- Server-authoritative cooking sessions. Ingredients are journaled as a
--- reservation; clients submit only session and note-index intent.
+-- Server-authoritative cooking sessions with dynamic multi-lane rhythm evaluation.
+-- Ingredients are journaled as a reservation; clients submit note-hit intent.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -13,14 +13,17 @@ local ChefLevelConfig = require(ReplicatedStorage.ConfigurationFiles.ChefLevelCo
 local PlayerDataService = require(ServerScriptService.Services.PlayerDataService)
 local RewardCore = require(ServerScriptService.Services.RewardCore)
 local CompanionConfig = require(ReplicatedStorage.ConfigurationFiles.CompanionConfig)
+local RhythmEngine = require(ReplicatedStorage.Rhythm.RhythmEngine)
+local RhythmScoreEvaluator = require(ReplicatedStorage.Rhythm.RhythmScoreEvaluator)
+local RhythmBeatmapConfig = require(ReplicatedStorage.ConfigurationFiles.RhythmBeatmapConfig)
 
 local cookingResult = ReplicatedStorage.RemoteEvents:WaitForChild("CookingResult") :: RemoteEvent
 
 local START_DELAY = 2.0
 local NOTE_INTERVAL = 1.0
-local BASE_PERFECT_WINDOW = 0.2
-local GREAT_WINDOW = 0.42
-local OK_WINDOW = 0.72
+local BASE_PERFECT_WINDOW = 0.12
+local GREAT_WINDOW = 0.28
+local OK_WINDOW = 0.45
 local BEGIN_COOLDOWN = 1.0
 local MAX_STATION_DISTANCE = 24
 
@@ -79,16 +82,6 @@ local function refund(player: Player, sessionId: string): boolean
 	return ok
 end
 
-local function qualityFor(session: any): string
-	if session.perfectHits == session.totalNotes or session.perfectHits >= math.ceil(session.totalNotes * 0.6) then
-		return "perfect"
-	end
-	if session.perfectHits + session.greatHits + session.okHits >= math.ceil(session.totalNotes * 0.5) then
-		return "great"
-	end
-	return "ok"
-end
-
 local function finish(world: any, entityId: any, session: any)
 	if session.settled then
 		return
@@ -103,15 +96,33 @@ local function finish(world: any, entityId: any, session: any)
 		return
 	end
 
-	local quality = qualityFor(session)
+	-- Evaluate performance metrics via RhythmScoreEvaluator
+	local evalResult = RhythmScoreEvaluator.evaluate({
+		perfectHits = session.perfectHits,
+		greatHits = session.greatHits,
+		goodHits = session.goodHits or session.okHits,
+		misses = session.misses,
+		totalNotes = session.totalNotes,
+		maxCombo = session.maxCombo,
+		totalScore = session.totalScore,
+		hitRecords = session.hitRecords,
+	})
+
+	local quality = evalResult.quality
+	local grade = evalResult.grade
+
 	local dishAmount = 1
 	if quality == "perfect" and math.random() < 0.35 then
 		dishAmount += 1
 	end
-	local bonusGold = quality == "perfect" and 25 or quality == "great" and 10 or 0
+
+	local baseBonusGold = quality == "perfect" and 25 or quality == "great" and 10 or 0
+	local goldMultiplier = evalResult.goldBonusMultiplier or 1.0
+	local finalBonusGold = math.floor(baseBonusGold * goldMultiplier)
+
 	local xp = quality == "perfect" and ChefLevelConfig.xpRewards.craftPerfect or ChefLevelConfig.xpRewards.craftSuccess
 	local reward = RewardCore.settle(player, {
-		gold = bonusGold,
+		gold = finalBonusGold,
 		xp = xp,
 		reason = quality == "perfect" and "perfect" or "craft",
 		combo = quality ~= "ok",
@@ -143,15 +154,36 @@ local function finish(world: any, entityId: any, session: any)
 		return true
 	end)
 
+	local metrics = {
+		grade = grade,
+		quality = reward.ok and quality or "failed",
+		accuracy = evalResult.accuracy,
+		score = evalResult.totalScore,
+		maxCombo = evalResult.maxCombo,
+		stylePoints = evalResult.stylePoints,
+		statXP = evalResult.statXP,
+		counts = evalResult.counts,
+		dishCount = reward.ok and dishAmount or 0,
+		bonusGold = reward.ok and reward.gold or 0,
+	}
+
 	cookingResult:FireClient(player, {
 		sessionId = session.sessionId,
 		recipe = session.recipeId,
 		quality = reward.ok and quality or "failed",
+		grade = grade,
+		score = evalResult.totalScore,
+		accuracy = evalResult.accuracy,
+		maxCombo = evalResult.maxCombo,
 		bonusGold = reward.ok and reward.gold or 0,
 		dishCount = reward.ok and dishAmount or 0,
+		stylePoints = evalResult.stylePoints,
+		statXP = evalResult.statXP,
+		counts = evalResult.counts,
 	})
+
 	if reward.ok then
-		CookingService.CookCompleted:Fire(player, session.recipeId, quality)
+		CookingService.CookCompleted:Fire(player, session.recipeId, quality, metrics)
 	end
 	world:despawn(entityId)
 end
@@ -212,38 +244,63 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 		return { ok = false, reason = "ingredients_unavailable" }
 	end
 
-	local totalNotes = CraftConfig.difficulty[recipeName] and CraftConfig.difficulty[recipeName].notes
-		or CraftConfig.defaultDifficulty.notes
-
-	-- Companion perfect_window buff (Cardamon) plus a small signature-dish bonus
-	-- for any active companion whose favored recipe is being cooked.
+	-- Precision stat & companion buffs calculation
 	local data = PlayerDataService.get(player)
+	local precisionPoints = (data and data.chef_stats and data.chef_stats.precision) or 0
+	local baseWindows = RhythmEngine.getTimingWindows(precisionPoints)
+
 	local activeComp = data and data.active_companion
 	local def = activeComp and CompanionConfig.companions[activeComp]
 	local buff = def and def.buff
-	local perfectWindow = BASE_PERFECT_WINDOW
+	local perfectWindow = baseWindows.perfect
 	if buff and buff.stat == "perfect_window" and buff.magnitude > 0 then
-		perfectWindow = BASE_PERFECT_WINDOW * (1 + buff.magnitude)
+		perfectWindow = perfectWindow * (1 + buff.magnitude)
 	end
 	if def and def.signature_recipes and def.signature_recipes[recipeName] == true then
 		perfectWindow = perfectWindow * 1.10
 	end
+	local greatWindow = baseWindows.great
+	local goodWindow = baseWindows.good
 
-	local firstTargetAt = workspace:GetServerTimeNow() + START_DELAY
+	local cookingDuration = CraftConfig.cookingTimes[recipeName]
+		or (CraftConfig.difficulty[recipeName] and (CraftConfig.difficulty[recipeName].notes * NOTE_INTERVAL))
+		or 8.0
+	local chart = RhythmBeatmapConfig.getChart(recipeName, cookingDuration, "normal")
+
+	local serverTimeNow = workspace:GetServerTimeNow()
+	local startDelay = chart.startDelay or START_DELAY
+	local firstTargetAt = serverTimeNow + startDelay
+	local totalNotes = chart.totalNotes or #chart.notes
+	local noteInterval = 60 / chart.bpm
+
 	local entityId = activeWorld:spawn(CookingSession({
 		sessionId = sessionId,
 		playerId = player.UserId,
 		recipeId = recipeName,
-		startTime = workspace:GetServerTimeNow(),
+		startTime = serverTimeNow,
 		firstTargetAt = firstTargetAt,
-		noteInterval = NOTE_INTERVAL,
+		startDelay = startDelay,
+		noteInterval = noteInterval,
 		totalNotes = totalNotes,
-		perfectWindow = perfectWindow,
 		nextExpected = 1,
 		perfectHits = 0,
 		greatHits = 0,
+		goodHits = 0,
 		okHits = 0,
 		misses = 0,
+		currentCombo = 0,
+		maxCombo = 0,
+		totalScore = 0,
+		chart = chart,
+		hitRecords = {},
+		windows = {
+			perfect = perfectWindow,
+			great = greatWindow,
+			good = goodWindow,
+		},
+		perfectWindow = perfectWindow,
+		greatWindow = greatWindow,
+		okWindow = goodWindow,
 		settled = false,
 	}))
 	activeByPlayer[player.UserId] = { entityId = entityId, sessionId = sessionId }
@@ -251,20 +308,25 @@ function CookingService.begin(player: Player, recipeName: any, requestedPosition
 		ok = true,
 		sessionId = sessionId,
 		recipe = recipeName,
+		chart = chart,
 		totalNotes = totalNotes,
 		firstTargetAt = firstTargetAt,
-		noteInterval = NOTE_INTERVAL,
-		-- Send the authoritative timing windows so the client can never drift
-		-- from the server's hit detection. The client uses these to compute
-		-- its own hit quality and to know when a note is a miss.
+		startTime = serverTimeNow,
+		startDelay = startDelay,
+		noteInterval = noteInterval,
 		perfectWindow = perfectWindow,
-		greatWindow = GREAT_WINDOW,
-		okWindow = OK_WINDOW,
-		startDelay = START_DELAY,
+		greatWindow = greatWindow,
+		okWindow = goodWindow,
+		goodWindow = goodWindow,
+		windows = {
+			perfect = perfectWindow,
+			great = greatWindow,
+			good = goodWindow,
+		},
 	}
 end
 
-function CookingService.hit(player: Player, sessionId: any, noteIndex: any)
+function CookingService.hit(player: Player, sessionId: any, noteIndex: any, laneId: any?)
 	if type(sessionId) ~= "string" or type(noteIndex) ~= "number" or noteIndex % 1 ~= 0 then
 		return
 	end
@@ -277,30 +339,99 @@ function CookingService.hit(player: Player, sessionId: any, noteIndex: any)
 			continue
 		end
 		local nextSession = table.clone(session)
+		nextSession.hitRecords = session.hitRecords and table.clone(session.hitRecords) or {}
 		local now = workspace:GetServerTimeNow()
+
+		local okWindow = nextSession.okWindow or (nextSession.windows and nextSession.windows.good) or OK_WINDOW
+		local greatWindow = nextSession.greatWindow
+			or (nextSession.windows and nextSession.windows.great)
+			or GREAT_WINDOW
+		local perfectWindow = nextSession.perfectWindow
+			or (nextSession.windows and nextSession.windows.perfect)
+			or BASE_PERFECT_WINDOW
+
+		local function getNoteTargetTime(idx: number): number
+			if nextSession.chart and nextSession.chart.notes and nextSession.chart.notes[idx] then
+				return nextSession.startTime + nextSession.chart.notes[idx].targetTime
+			else
+				return nextSession.firstTargetAt + (idx - 1) * nextSession.noteInterval
+			end
+		end
+
+		-- Advance expired unhit notes before noteIndex
 		while nextSession.nextExpected <= nextSession.totalNotes do
-			local target = nextSession.firstTargetAt + (nextSession.nextExpected - 1) * nextSession.noteInterval
-			if now <= target + OK_WINDOW then
+			local target = getNoteTargetTime(nextSession.nextExpected)
+			if now <= target + okWindow then
 				break
 			end
 			nextSession.misses += 1
+			nextSession.currentCombo = 0
+			table.insert(nextSession.hitRecords, {
+				noteIndex = nextSession.nextExpected,
+				judgment = "MISS",
+				offset = now - target,
+				score = 0,
+			})
 			nextSession.nextExpected += 1
 		end
+
 		if noteIndex ~= nextSession.nextExpected or noteIndex > nextSession.totalNotes then
 			return
 		end
-		local target = nextSession.firstTargetAt + (noteIndex - 1) * nextSession.noteInterval
-		local difference = math.abs(now - target)
-		if difference > OK_WINDOW then
+
+		local targetTime = getNoteTargetTime(noteIndex)
+		local difference = now - targetTime
+		local absDiff = math.abs(difference)
+
+		if absDiff > okWindow then
+			if now > targetTime + okWindow then
+				nextSession.misses += 1
+				nextSession.currentCombo = 0
+				table.insert(nextSession.hitRecords, {
+					noteIndex = noteIndex,
+					judgment = "MISS",
+					offset = difference,
+					score = 0,
+				})
+				nextSession.nextExpected += 1
+				activeWorld:insert(entityId, CookingSession(nextSession))
+			end
 			return
 		end
-		if difference <= (session.perfectWindow or BASE_PERFECT_WINDOW) then
+
+		local judgment: string
+		local baseScore: number
+		if absDiff <= perfectWindow then
+			judgment = "PERFECT"
+			baseScore = RhythmEngine.BASE_SCORES.PERFECT
 			nextSession.perfectHits += 1
-		elseif difference <= GREAT_WINDOW then
+			nextSession.currentCombo += 1
+		elseif absDiff <= greatWindow then
+			judgment = "GREAT"
+			baseScore = RhythmEngine.BASE_SCORES.GREAT
 			nextSession.greatHits += 1
+			nextSession.currentCombo += 1
 		else
+			judgment = "GOOD"
+			baseScore = RhythmEngine.BASE_SCORES.GOOD
+			nextSession.goodHits = (nextSession.goodHits or 0) + 1
 			nextSession.okHits += 1
+			nextSession.currentCombo += 1
 		end
+
+		nextSession.maxCombo = math.max(nextSession.maxCombo, nextSession.currentCombo)
+		local mult = RhythmEngine.getComboMultiplier(nextSession.currentCombo)
+		local hitScore = math.floor(baseScore * mult)
+		nextSession.totalScore = (nextSession.totalScore or 0) + hitScore
+
+		table.insert(nextSession.hitRecords, {
+			noteIndex = noteIndex,
+			laneId = laneId,
+			judgment = judgment,
+			offset = difference,
+			score = hitScore,
+		})
+
 		nextSession.nextExpected += 1
 		activeWorld:insert(entityId, CookingSession(nextSession))
 		return
@@ -326,11 +457,33 @@ function CookingService.step(world: any)
 			activeByPlayer[session.playerId] = nil
 			continue
 		end
-		local finishAt = session.firstTargetAt + (session.totalNotes - 1) * session.noteInterval + OK_WINDOW
+
+		local function getNoteTargetTime(idx: number): number
+			if session.chart and session.chart.notes and session.chart.notes[idx] then
+				return session.startTime + session.chart.notes[idx].targetTime
+			else
+				return session.firstTargetAt + (idx - 1) * session.noteInterval
+			end
+		end
+
+		local okWindow = session.okWindow or (session.windows and session.windows.good) or OK_WINDOW
+		local lastTargetAt = getNoteTargetTime(session.totalNotes)
+		local finishAt = lastTargetAt + okWindow + 0.5
+
 		if now >= finishAt then
 			local complete = table.clone(session)
-			complete.misses += complete.totalNotes - complete.nextExpected + 1
-			complete.nextExpected = complete.totalNotes + 1
+			complete.hitRecords = session.hitRecords and table.clone(session.hitRecords) or {}
+			while complete.nextExpected <= complete.totalNotes do
+				complete.misses += 1
+				table.insert(complete.hitRecords, {
+					noteIndex = complete.nextExpected,
+					judgment = "MISS",
+					offset = 0,
+					score = 0,
+				})
+				complete.nextExpected += 1
+			end
+			complete.currentCombo = 0
 			finish(world, entityId, complete)
 		end
 	end

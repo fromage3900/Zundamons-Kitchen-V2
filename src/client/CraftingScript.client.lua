@@ -79,6 +79,36 @@ if not gui or not panel or not scroll then
 	local layout = Instance.new("UIListLayout", scroll)
 	layout.Padding = UDim.new(0, 8)
 	layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	-- Dynamic UIScale for responsive viewport scaling
+	local panelScale = Instance.new("UIScale", panel)
+	panelScale.Name = "PanelScale"
+	panelScale.Scale = 1
+
+	local function updatePanelScale()
+		local camera = workspace.CurrentCamera
+		local viewportSize = camera and camera.ViewportSize or Vector2.new(1920, 1080)
+		local viewW = viewportSize.X
+		local viewH = viewportSize.Y
+		if viewW <= 0 or viewH <= 0 then
+			return
+		end
+		local scaleH = (viewH * 0.90) / 520
+		local scaleW = (viewW * 0.90) / 460
+		local fitScale = math.min(scaleH, scaleW)
+		panelScale.Scale = math.clamp(fitScale, 0.55, 1.15)
+	end
+
+	updatePanelScale()
+	if workspace.CurrentCamera then
+		workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updatePanelScale)
+	end
+	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+		if workspace.CurrentCamera then
+			workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updatePanelScale)
+			updatePanelScale()
+		end
+	end)
 end
 
 local craftFunc = RS:WaitForChild("RemoteFunctions"):WaitForChild("CraftFunction")
@@ -103,6 +133,11 @@ for recipeName, ings in pairs(craftConfig.recipes) do
 		ings.locked = nil
 	end
 	table.insert(RECIPES, recipeEntry)
+end
+
+-- Toggle panel
+local function setOpen(state: boolean)
+	panel.Visible = state
 end
 
 -- Helper: build ingredient labels with icons
@@ -205,6 +240,7 @@ local function buildRecipeCard(recipe)
 			if ok and type(result) == "table" and result.ok then
 				if _G.TimedCooking and _G.TimedCooking.start then
 					craftBtn.Text = "Cooking\u{2026}"
+					setOpen(false)
 					_G.TimedCooking.start(recipe.name, result, function(quality)
 						craftBtn.Text = quality:upper() .. "!"
 						if quality == "perfect" then
@@ -237,11 +273,6 @@ end
 -- Build all recipe cards once on load
 for _, r in ipairs(RECIPES) do
 	buildRecipeCard(r)
-end
-
--- Toggle panel
-local function setOpen(state)
-	panel.Visible = state
 end
 
 closeBtn.MouseButton1Click:Connect(function()

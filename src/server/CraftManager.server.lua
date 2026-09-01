@@ -12,8 +12,8 @@ craftFunction.OnServerInvoke = function(player, recipeName, requestedPosition)
 end
 
 local cookingHit = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("CookingHit") :: RemoteEvent
-cookingHit.OnServerEvent:Connect(function(player, sessionId, noteIndex)
-	CookingService.hit(player, sessionId, noteIndex)
+cookingHit.OnServerEvent:Connect(function(player, sessionId, noteIndex, laneId)
+	CookingService.hit(player, sessionId, noteIndex, laneId)
 end)
 
 print("[CraftManager] Authoritative cooking adapter online")

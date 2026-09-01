@@ -56,6 +56,9 @@
       },
       "components": {
         "$path": "src/shared/components"
+      },
+      "Rhythm": {
+        "$path": "src/shared/Rhythm"
       }
     },
     "Lighting": {
