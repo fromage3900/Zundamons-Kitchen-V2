@@ -16,6 +16,32 @@ local VNPortraitConfig = {}
 VNPortraitConfig.speakerImages = {
 	zundamon = "",
 	zundapal = "",
+	ankomon = "",
+	cardamon = "",
+	antimon = "",
+	sakuradamon = "",
+	tantanmon = "",
+	dog = "",
+	parrot = "",
+	cat = "",
+	sumimon = "",
+	kagamon = "",
+	suzurimon = "",
+	wasabimon = "",
+	yurimon = "",
+	kinakomon = "",
+	kuroyurimon = "",
+	matchamon = "",
+	shisomon = "",
+	karintomon = "",
+	tsukimidamon = "",
+	hoshidamon = "",
+	-- Canon companions
+	kiritandamon = "",
+	itakodamon = "",
+	zunkodamon = "",
+	zunabunny = "",
+	nanonadamon = "",
 }
 
 -- Emote-keyed variants: each Zundamon expression maps to an uploaded decal.
@@ -45,6 +71,52 @@ VNPortraitConfig.emoteImages = {
 	content = "", -- 7a
 	serious = "", -- 7b
 	serious_point = "", -- 7c
+	-- Melancholic / sad
+	sad = "",
+}
+
+-- Canon companion emote maps (for future expansion when each companion has dedicated emote spritesheets)
+VNPortraitConfig.companionEmotes = {
+	kiritandamon = {
+		neutral = "",
+		happy = "",
+		serious = "",
+		confident = "",
+		presenting = "",
+		surprised = "",
+	},
+	itakodamon = {
+		neutral = "",
+		serious = "",
+		content = "",
+		emphatic = "",
+		surprised = "",
+		sad = "",
+	},
+	zunkodamon = {
+		neutral = "",
+		excited = "",
+		emphatic = "",
+		confident = "",
+		happy = "",
+		serious = "",
+	},
+	zunabunny = {
+		neutral = "",
+		excited = "",
+		joyful = "",
+		happy = "",
+		surprised = "",
+		emphatic = "",
+	},
+	nanonadamon = {
+		neutral = "",
+		content = "",
+		serious = "",
+		sad = "",
+		presenting = "",
+		emphatic = "",
+	},
 }
 
 -- Bond tier (1/2/3) -> default emote for that tier's dialogue, so the portrait

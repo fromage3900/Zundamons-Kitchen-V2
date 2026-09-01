@@ -132,4 +132,80 @@ ProgressionConfig.milestones = {
 	},
 }
 
+-- ── Prestige System ───────────────────────────────────────────────────────────
+-- After completing all 5 milestone tiers (Peak Season reached), players may
+-- Prestige: milestone progress resets but companions, recipes, and cosmetics
+-- are kept. Each Prestige tier adds a permanent +10% gold multiplier (stacks,
+-- up to 5×). A cosmetic badge is awarded at each tier.
+--
+-- Prestige requirements (each tier):
+--   Must have reached "Peak Season" milestone in current prestige cycle.
+--   Must have served the specified total lifetime guests.
+
+ProgressionConfig.prestige = {
+	enabled = true,
+	max_tier = 5, -- Maximum prestige tier (5× gold multiplier)
+	gold_per_tier = 0.10, -- +10% per tier (additive; tier 5 = +50% total)
+
+	tiers = {
+		{
+			tier = 1,
+			displayName = "Zunda Star ★",
+			emoji = "⭐",
+			gold_mult = 1.10,
+			badge = "prestige_star_1",
+			guests_required = 200,
+		},
+		{
+			tier = 2,
+			displayName = "Zunda Star ★★",
+			emoji = "🌟",
+			gold_mult = 1.20,
+			badge = "prestige_star_2",
+			guests_required = 500,
+		},
+		{
+			tier = 3,
+			displayName = "Zunda Star ★★★",
+			emoji = "💫",
+			gold_mult = 1.30,
+			badge = "prestige_star_3",
+			guests_required = 1000,
+		},
+		{
+			tier = 4,
+			displayName = "Zunda Radiance",
+			emoji = "✨",
+			gold_mult = 1.40,
+			badge = "prestige_radiance",
+			guests_required = 2000,
+		},
+		{
+			tier = 5,
+			displayName = "Zunda Legend",
+			emoji = "🏆",
+			gold_mult = 1.50,
+			badge = "prestige_legend",
+			guests_required = 5000,
+		},
+	},
+
+	-- What is KEPT on prestige (not reset)
+	kept_on_prestige = {
+		"companions", -- all unlocked companions
+		"recipes", -- all unlocked recipes
+		"cosmetics", -- all earned cosmetics + badges
+		"chef_stats", -- Speed, Precision, Charisma, Stamina
+		"gacha_currency", -- Zunda Gems and Whim Tickets
+		"bond_tiers", -- all companion bond levels
+	},
+
+	-- What RESETS on prestige
+	reset_on_prestige = {
+		"milestone_tier", -- back to Village Loop
+		"guests_served", -- session counter
+		"xp", -- player XP level
+	},
+}
+
 return ProgressionConfig
