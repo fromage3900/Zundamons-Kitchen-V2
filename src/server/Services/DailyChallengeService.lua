@@ -56,7 +56,7 @@ function DailyChallengeService.initializeDay(player: Player)
 
 	local today = getTodayKey()
 	if data.daily_challenge_date ~= today then
-		-- New day â€” generate fresh challenges inside a mutation so the
+		-- New day — generate fresh challenges inside a mutation so the
 		-- revision bumps and the client projection updates.
 		PlayerDataService.mutate(player, "daily_challenge_init", function(d)
 			local challenges = DailyChallengeConfig.selectDailyChallenges()
@@ -417,7 +417,7 @@ function DailyChallengeService.claimWeeklyReward(player: Player)
 	return true
 end
 
--- â”€â”€ Player Join â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── Player Join ─────────────────────────────────────────────────────────────
 
 -- Initialise one player's daily state. Split out of the PlayerAdded handler so
 -- the backfill below can reuse it.

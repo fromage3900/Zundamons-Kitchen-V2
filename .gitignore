@@ -43,6 +43,7 @@ scripts/ollama_output/
 scripts/__pycache__/
 **/__pycache__/
 tools/playtest-log-full.json
+.git.bak-corrupt/
 
 # Scratch / one-off dev junk
 mcp_req.json

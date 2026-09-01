@@ -220,7 +220,10 @@ if ServingService and ServingService.GuestServed then
 		local styleGain = ChefStatsConfig.stylePoints.sources.serving_flawless or 8
 		local statGains = { charisma = 2, stamina = 1 }
 		if quality == "perfect" then
-			DailyChallengeService.updateProgress(player, "perfect", 1)
+			-- "perfect" daily progress is cook-owned (updated in the CookCompleted
+			-- handler above); crediting it here too completed "N perfect dishes"
+			-- dailies at half their intended count. Perfect serves still earn the
+			-- style/stat bonus below.
 			styleGain += 5
 			statGains.charisma += 1
 		end

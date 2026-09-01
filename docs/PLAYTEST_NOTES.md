@@ -151,6 +151,14 @@ daily completes at half its intended count. This is the same pattern already fix
 in this file (guestsServed double-count, style-point double-credit) — the lesson wasn't
 generalised to `perfectCooks`/score.
 
+> **✅ RESOLVED (2026-09-01).** Design call made: cook quality is scored once by
+> `onCookComplete`; `onGuestServed` now awards `guest_served` (20) plus distinct
+> `perfect_serve` (25) / `great_serve` (10) bonuses — no `perfect_cook`/`great_cook`
+> re-credit, no `perfectCooks` bump on serve. `updateProgress(player, "perfect", 1)`
+> is cook-owned (serve handler no longer fires it); perfect serves keep their
+> style/stat bonus. Also repaired 64 mojibake comment separators in
+> `DailyChallengeService.lua` (cp1252 round-trip artifacts → `─`/`—`).
+
 **Open — cosmetic: mojibake in `DailyChallengeService.lua`.**
 Comment separators are double-encoded (`U+00E2 U+201D U+20AC` where `─` U+2500 belongs) —
 64 occurrences, comments only. Same root event as the BOM: the file was saved once through

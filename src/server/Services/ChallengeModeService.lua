@@ -46,6 +46,8 @@ ChallengeModeService.waveConfig = {
 -- ── Score Calculation ───────────────────────────────────────────────────────
 ChallengeModeService.scoreValues = {
 	guest_served = 20,
+	perfect_serve = 25,
+	great_serve = 10,
 	perfect_cook = 50,
 	great_cook = 25,
 	combo_5 = 30,
@@ -318,14 +320,15 @@ function ChallengeModeService.onGuestServed(player: Player, quality: string)
 	session.currentCombo = session.currentCombo + 1
 	session.maxCombo = math.max(session.maxCombo, session.currentCombo)
 
-	-- Score by quality
+	-- Cook quality is scored by onCookComplete when the dish is finished.
+	-- The serve awards guest_served plus a distinct serve-quality bonus —
+	-- never perfect_cook/great_cook again (that double-counted one dish), and
+	-- never a perfectCooks increment (perfectCooks counts cooks, not serves).
+	session.score = session.score + ChallengeModeService.scoreValues.guest_served
 	if quality == "perfect" then
-		session.score = session.score + ChallengeModeService.scoreValues.perfect_cook
-		session.perfectCooks = session.perfectCooks + 1
+		session.score = session.score + ChallengeModeService.scoreValues.perfect_serve
 	elseif quality == "great" then
-		session.score = session.score + ChallengeModeService.scoreValues.great_cook
-	else
-		session.score = session.score + ChallengeModeService.scoreValues.guest_served
+		session.score = session.score + ChallengeModeService.scoreValues.great_serve
 	end
 
 	-- Combo bonuses
