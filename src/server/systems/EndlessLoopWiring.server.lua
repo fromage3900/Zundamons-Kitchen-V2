@@ -179,21 +179,30 @@ end
 -- ─── Connect CookingService to ChallengeMode ───────────────────────────────
 -- When a dish is cooked with quality, notify the challenge mode and update stats
 if CookingService and CookingService.CookCompleted then
-	CookingService.CookCompleted.Event:Connect(function(player, recipeName, quality)
+	CookingService.CookCompleted.Event:Connect(function(player, recipeName, quality, metrics)
 		ChallengeModeService.onCookComplete(player, quality)
 		-- Update daily challenge progress
 		DailyChallengeService.updateProgress(player, "cook", 1)
 
 		local styleGain = 0
 		local statGains = {}
-		if quality == "perfect" then
-			DailyChallengeService.updateProgress(player, "perfect", 1)
-			styleGain = ChefStatsConfig.stylePoints.sources.perfect_cook or 10
-			statGains.precision = 2
-			statGains.speed = 1
-		elseif quality == "great" then
-			styleGain = ChefStatsConfig.stylePoints.sources.great_cook or 5
-			statGains.precision = 1
+
+		if metrics and type(metrics) == "table" then
+			styleGain = metrics.stylePoints or 0
+			statGains = metrics.statXP or {}
+			if quality == "perfect" or (metrics.grade and metrics.grade == "S") then
+				DailyChallengeService.updateProgress(player, "perfect", 1)
+			end
+		else
+			if quality == "perfect" then
+				DailyChallengeService.updateProgress(player, "perfect", 1)
+				styleGain = ChefStatsConfig.stylePoints.sources.perfect_cook or 10
+				statGains.precision = 2
+				statGains.speed = 1
+			elseif quality == "great" then
+				styleGain = ChefStatsConfig.stylePoints.sources.great_cook or 5
+				statGains.precision = 1
+			end
 		end
 
 		syncPlayerWardrobe(player, styleGain, statGains)

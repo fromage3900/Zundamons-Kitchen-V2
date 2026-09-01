@@ -51,15 +51,26 @@ MaterialPalette.palettes = {
 }
 
 function MaterialPalette.registerAll()
+	local count = 0
 	for _, palette in pairs(MaterialPalette.palettes) do
 		MaterialPalette.register(palette)
+		count += 1
 	end
-	print("[MaterialPalette] Registered " .. #MaterialPalette.palettes .. " material palettes")
+	print("[MaterialPalette] Registered " .. count .. " material palettes")
 end
 
 function MaterialPalette.register(palette)
 	if not MaterialService then
 		return
+	end
+	-- Idempotent like ZundaPalette: reuse existing, update in place.
+	local existing = MaterialService:FindFirstChild(palette.name)
+	if existing and existing:IsA("MaterialVariant") then
+		existing.BaseMaterial = palette.baseMaterial
+		existing:SetAttribute("PaletteColor", palette.color)
+		existing:SetAttribute("PaletteRoughness", palette.roughness)
+		existing:SetAttribute("PaletteMetallic", palette.metallic)
+		return existing
 	end
 	local variant = Instance.new("MaterialVariant")
 	variant.Name = palette.name

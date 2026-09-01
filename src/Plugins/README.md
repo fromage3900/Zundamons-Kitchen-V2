@@ -111,37 +111,38 @@ palette (AGENTS.md §7), creates persistent `MaterialVariant`s in `MaterialServi
 > ⚠️ Same rule as the decorator: never leave the plugin Model inside the place
 > — use the Plugins Folder install flow, not "drag into place".
 
-## Palette (MaterialService is the source of truth)
+## Palette (MaterialService is the source of truth — git is the durable hub)
 
-| Variant | Color | Base material | Roughness | Metallic |
-|---|---|---|---|---|
-| ZundaGreen | RGB(160, 210, 150) | SmoothPlastic | 0.6 | 0.1 |
-| ZundaGold | RGB(255, 200, 80) | SmoothPlastic | 0.4 | 0.2 |
-| ZundaPink | RGB(255, 150, 200) | SmoothPlastic | 0.5 | 0.1 |
-| ZundaMint | RGB(145, 215, 195) | SmoothPlastic | 0.6 | 0.1 |
-| MochiCream | RGB(255, 245, 235) | SmoothPlastic | 0.7 | 0.05 |
-| EdamameDeep | RGB(90, 140, 90) | SmoothPlastic | 0.65 | 0.1 |
+| Variant | Hex | RGB | Base | Rough | Metal |
+|---|---|---|---|---|---|
+| ZundaGreen | `#a0d296` | 160,210,150 | SmoothPlastic | 0.6 | 0.1 |
+| ZundaGold | `#ffc850` | 255,200,80 | SmoothPlastic | 0.4 | 0.2 |
+| ZundaPink | `#ff96c8` | 255,150,200 | SmoothPlastic | 0.5 | 0.1 |
+| ZundaMint | `#91d7c3` | 145,215,195 | SmoothPlastic | 0.6 | 0.1 |
+| MochiCream | `#fff5eb` | 255,245,235 | SmoothPlastic | 0.7 | 0.05 |
+| EdamameDeep | `#5a8c5a` | 90,140,90 | SmoothPlastic | 0.65 | 0.1 |
 
-## Workflow
+Site bridge: `site/style.css` exposes matching `--palette-*` CSS vars (`--palette-zunda-green: #a0d296` etc) for the landing page; `src/shared/ConfigurationFiles/UIConfig.lua` `COLORS.Zundamon*` mirror the same hex. See `docs/SHARED_ASSET_HUB.md` Palette Mapping for the full audit.
 
-1. Select parts/models in the viewport
-2. Pick a palette entry (swatch grid)
-3. Toggle **MaterialVariant** (persistent variant, recommended) vs direct paint
-4. Toggle **Suggested attributes** (e.g. `Reflectance`)
-5. Click **Apply to Selection**
-6. Click **Export Config** and paste the snippet into `src/Plugins/ZundaPalette.lua`
-   (or any Rojo-owned shared config) to make it durable in git
+## Workflow — for artists & level painters
+
+1. **Edit the source, not the place.** Open `src/Plugins/ZundaPalette.lua` and edit the `color` / `roughness` / `metallic` there. Never hand-edit a `MaterialVariant` in the Studio Explorer — it will be overwritten on next Register and is not versioned.
+2. **Register (idempotent).** In Studio: Plugins → Zunda Material → the plugin auto-calls `ZundaPalette.registerAll()` on open (and you can re-click the toolbar). `findOrCreateVariant` re-uses an existing `MaterialVariant` by name and **updates** its `BaseMaterial` + `Palette*` attributes in place — running Register twice creates no duplicates and propagates palette edits (idempotency verified).
+3. **Paint.** Select parts/models in the viewport → pick a palette entry (swatch grid) → toggle **MaterialVariant** (persistent variant, recommended) vs direct paint → toggle **Suggested attributes** (e.g. `Reflectance`) → **Apply to Selection**. The selection is painted via `ZundaMaterialUtils.applyToSelection`, which respects `createVariant` + `applyAttributes`.
+4. **MaterialService persistence.** `MaterialVariant`s live in `MaterialService`, which is **outside the Rojo sync tree** (`default.project.json` maps `ReplicatedStorage`, `Workspace`, `ServerScriptService`, `StarterPlayer`, `Lighting`, `ServerStorage` — not `MaterialService`), so Rojo never touches it. Variants therefore persist with the `.rbxl` and survive `rojo serve` without `$ignoreUnknownInstances` (though level geometry in `Workspace`/`Models` does use that flag). Save the place after Register.
+5. **Export for git durability.** Click **Export Config** and paste the snippet into `src/Plugins/ZundaPalette.lua` (or any Rojo-owned shared config) to make the palette edit durable in git. Commit the `.lua`, not the `.rbxl` diff.
+6. **Companion PBR check.** The Zundapal mesh (`MeshId rbxassetid://124750913039753`) should have a `SurfaceAppearance` with `ColorMap` = `Zundamon_BaseColor`. If `TextureID` is blank and no `SurfaceAppearance`, `CompanionManager` falls back to flat `Color 160,210,150` (≈ ZundaGreen) so the companion reads as pastel instead of white — verify in Studio: select `Workspace.Meshes/zundapalupdate4` or the CompanionVisualCatalog prefab, confirm `SurfaceAppearance.ColorMap` is set and `MeshId` is non-empty. `ZundaPalette.verifyCompanionPBR()` is a playtest helper for this.
+7. **Reload.** Re-open the place or re-run `Register` after pulling a palette change — variants update in place.
 
 ## Architecture
 
 ```
 src/Plugins/
-├── ZundaMaterialAuthoring.plugin.lua  # Entry point + dock widget UI
+├── ZundaMaterialAuthoring.plugin.lua  # Entry point + dock widget UI (calls registerAll idempotently)
 ├── material-plugin.project.json       # Rojo build config
-├── ZundaPalette.lua                   # Canonical palette data + MaterialVariant hub
-└── ZundaMaterialUtils.lua             # Apply / export / selection utilities
+├── ZundaPalette.lua                   # Canonical palette data + MaterialVariant hub (SSOT)
+├── ZundaMaterialUtils.lua             # Apply / export / selection utilities
+└── MaterialPalette.lua                # Legacy terrain palettes (now also idempotent; was duplicate-create)
 ```
 
-Variants live in `MaterialService` (persists with the place, survives Rojo sync
-through `$ignoreUnknownInstances`); the palette table lives in git. Both point
-at the same canonical hex values in `ZundaPalette.lua`.
+Variants live in `MaterialService` (persists with the place — see persistence note above); the palette table lives in git at `ZundaPalette.lua`. Both point at the same canonical hex values. **Never** edit `MaterialService` variants by hand — edit `ZundaPalette.lua`, re-run Register, save the place.

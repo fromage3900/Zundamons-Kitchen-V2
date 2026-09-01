@@ -270,6 +270,11 @@ end)
 LevelUpEvent.OnClientEvent:Connect(function(level, tierName, tierColor, tierBadge)
 	playRewardSound("LevelUp")
 	punchPill(tierColor or UIConfig.GAME_COLORS.SparkleGold)
+	-- Zundamon congratulates the player once the fanfare has had a beat to play.
+	-- Level-up has no cooldown in VoiceConfig: it is rare and always worth voicing.
+	if _G.ZundaSoundController then
+		_G.ZundaSoundController.playVoiceDelayed("level_up", 0.45)
+	end
 	-- Big level-up banner
 	local banner = Instance.new("Frame")
 	banner.Size = UDim2.new(0, 460, 0, 120)

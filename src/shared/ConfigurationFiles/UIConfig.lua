@@ -5,9 +5,9 @@
 -- Merged with DesignSystemConfig (Windsurf) — single source of truth.
 
 local UIConfig = {
-	-- Brand colors
+	-- Brand colors -- Primary now SSOT: ZundaPalette.ZundaGreen (160,210,150), was 100,200,80 drift 70
 	COLORS = {
-		Primary = Color3.fromRGB(100, 200, 80), -- Zundamon green
+		Primary = Color3.fromRGB(160, 210, 150), -- SSOT ZundaPalette.ZundaGreen (was 100,200,80)
 		PrimaryDark = Color3.fromRGB(60, 140, 50),
 		Secondary = Color3.fromRGB(255, 200, 80), -- Warm gold
 		SecondaryDark = Color3.fromRGB(200, 150, 40),
@@ -52,26 +52,31 @@ local UIConfig = {
 		RarityEpic = Color3.fromRGB(184, 159, 247),
 		RarityLegendary = Color3.fromRGB(255, 207, 80),
 
-		-- Zundamon Brand Colors
-		ZundamonGreen = Color3.fromRGB(124, 184, 124),
-		PeaGreen = Color3.fromRGB(143, 201, 143),
+		-- Zundamon Brand Colors — aligned to ZundaPalette.lua SSOT (AGENTS.md §7/13)
+		-- ZundaGreen 160,210,150 / ZundaGold 255,200,80 / ZundaPink 255,150,200 / ZundaMint 145,215,195
+		ZundamonGreen = Color3.fromRGB(160, 210, 150), -- was 124,184,124 — now matches ZundaPalette.ZundaGreen
+		ZundamonMint = Color3.fromRGB(145, 215, 195), -- SSOT ZundaPalette.ZundaMint (was missing)
+		ZundamonPink = Color3.fromRGB(255, 150, 200), -- was 232,152,168 — now matches ZundaPalette.ZundaPink
+		ZundamonGold = Color3.fromRGB(255, 200, 80), -- SSOT ZundaPalette.ZundaGold
+		EdamameDeep = Color3.fromRGB(90, 140, 90), -- SSOT ZundaPalette.EdamameDeep
+		PeaGreen = Color3.fromRGB(143, 201, 143), -- nature tone, intentionally distinct from ZundaGreen (delta 17)
 		PeaLight = Color3.fromRGB(184, 224, 184),
 		PeaDark = Color3.fromRGB(110, 175, 110),
-		ZundamonPink = Color3.fromRGB(232, 152, 168),
-		ZundamonGold = Color3.fromRGB(255, 200, 80),
 
 		-- Website Zen Edamame Palette (site/style.css token bridge)
-		ZundaDark = Color3.fromRGB(46, 125, 50), -- #2e7d32 deep edamame
-		ZundaPrimary = Color3.fromRGB(76, 175, 80), -- #4caf50 fresh green
-		Sprout = Color3.fromRGB(139, 195, 74), -- #8bc34a bright sprout
-		MintCanvas = Color3.fromRGB(232, 245, 233), -- #e8f5e9 soft mint bg
+		-- Web dark greens are intentionally darker than pastel SSOT for contrast/readability;
+		-- see docs/SHARED_ASSET_HUB.md Palette Mapping. Pastel SSOT remains ZundaPalette.
+		ZundaDark = Color3.fromRGB(46, 125, 50), -- #2e7d32 deep edamame (web brand, drift 44 vs EdamameDeep intentional)
+		ZundaPrimary = Color3.fromRGB(76, 175, 80), -- #4caf50 fresh green (web brand, drift 84 vs ZundaGreen intentional)
+		Sprout = Color3.fromRGB(139, 195, 74), -- #8bc34a bright sprout (web brand, drift 76 vs ZundaGreen intentional)
+		MintCanvas = Color3.fromRGB(232, 245, 233), -- #e8f5e9 soft mint bg (web canvas, drift 99 vs ZundaMint intentional)
 		PeaAccent = Color3.fromRGB(200, 230, 201), -- #c8e6c9 pastel highlight
-		MochiCream = Color3.fromRGB(241, 248, 233), -- #f1f8e9 warm cream
+		MochiCream = Color3.fromRGB(255, 245, 235), -- SSOT ZundaPalette.MochiCream #fff5eb (was #f1f8e9 241,248,233 drift 14)
 		SurfaceHighlight = Color3.fromRGB(255, 255, 255), -- light bevel
 		SurfaceShadow = Color3.fromRGB(27, 94, 32), -- dark bevel
 
-		-- Kitchen Theme
-		KitchenCream = Color3.fromRGB(252, 248, 240),
+		-- Kitchen Theme -- unified MochiCream vs KitchenCream (both #fff5eb 255,245,235); was 252,248,240 drift 5 now exact
+		KitchenCream = Color3.fromRGB(255, 245, 235), -- SSOT ZundaPalette.MochiCream (was 252,248,240)
 		KitchenWood = Color3.fromRGB(196, 180, 148),
 	},
 
@@ -195,11 +200,11 @@ local UIConfig = {
 		ComboWarm = Color3.fromRGB(255, 180, 80),
 	},
 
-	-- Visual effects (shadows, glows)
+	-- Visual effects (shadows, glows) -- Glow now SSOT ZundaPalette.ZundaGreen (was 100,200,80 drift 70)
 	EFFECTS = {
 		ButtonShadow = { Color = Color3.fromRGB(0, 0, 0), Transparency = 0.85, Offset = Vector2.new(0, 4), Size = 12 },
 		PanelShadow = { Color = Color3.fromRGB(0, 0, 0), Transparency = 0.9, Offset = Vector2.new(0, 8), Size = 16 },
-		Glow = { Color = Color3.fromRGB(100, 200, 80), Transparency = 0.7, Offset = Vector2.new(0, 0), Size = 8 },
+		Glow = { Color = Color3.fromRGB(160, 210, 150), Transparency = 0.7, Offset = Vector2.new(0, 0), Size = 8 },
 		HUDGlow = { Color = Color3.fromRGB(120, 200, 130), Transparency = 0.6, Offset = Vector2.new(0, 0), Size = 6 },
 	},
 
@@ -230,7 +235,7 @@ local UIConfig = {
 		Colors = {
 			Slice = Color3.fromRGB(60, 50, 70),
 			SliceHover = Color3.fromRGB(100, 200, 80),
-			SliceActive = Color3.fromRGB(124, 184, 124),
+			SliceActive = Color3.fromRGB(160, 210, 150), -- matches ZundaPalette.ZundaGreen (was 124,184,124)
 			Stroke = Color3.fromRGB(200, 160, 240),
 			StrokeDim = Color3.fromRGB(100, 90, 110),
 			Center = Color3.fromRGB(30, 25, 20),

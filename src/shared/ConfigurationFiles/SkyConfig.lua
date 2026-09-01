@@ -28,7 +28,14 @@ SkyConfig.lighting = {
 }
 
 -- ============================================================
--- SKY
+-- SKY — Dreamy nebula SSOT (Brennan's Purple/BlueNebula + Starfield)
+-- AGENTS.md §10 references Kenney Day as the *alternate* cubemap set; the
+-- live default is this softer nebula (softer purple on 3/5 faces breaks up
+-- the crystal tiling). DayNightSky.SKYBOX_SETS mirrors these IDs for its
+-- day/morning/night swap — keep them in sync when editing.
+-- 2K upgrade path: re-upload each face at 2048×2048 RGBA, keep same asset name
+-- convention (PurpleNebula_01_2K etc), swap IDs here + in DayNightSky SKYBOX_SETS,
+-- haze can then drop to ~3.0 since faceting is texture-resolved not haze-softened.
 -- ============================================================
 SkyConfig.sky = {
 	sun_angular_size = 24,
@@ -37,7 +44,7 @@ SkyConfig.sky = {
 	skybox_bk = "rbxassetid://129075140128878", -- PurpleNebula_01
 	skybox_dn = "rbxassetid://119372168213953", -- BlueNebula_01
 	skybox_ft = "rbxassetid://129075140128878", -- PurpleNebula_01
-	skybox_lf = "rbxassetid://129075140128878", -- PurpleNebula_01
+	skybox_lf = "rbxassetid://119372168213953", -- BlueNebula_01 (was PurpleNebula_01 — now matches DayNightSky day.lf for alternating mix that breaks faceted tiling)
 	skybox_rt = "rbxassetid://129075140128878", -- PurpleNebula_01
 	skybox_up = "rbxassetid://133511173179472", -- Starfield_05
 	sun_texture = "rbxassetid://123736711329002",
@@ -52,9 +59,13 @@ SkyConfig.atmosphere = {
 	-- Old value was RGB(55, 120, 210) — very blue. Now warmer/neutral.
 	decay = Color3.fromRGB(100, 130, 195),
 	glare = 0.35,
-	-- Bumped 3.5 -> 5 (2026-07-24): softens the faceted nebula skybox into a
-	-- gentler haze instead of a crisp, hard-edged crystal pattern.
-	haze = 5.0,
+	-- Was 3.5 -> 5.0 (2026-07-24) to soften faceted nebula shards. Now that
+	-- Skybox mixes Purple/Blue per-face (see SkyConfig.sky + DayNightSky day set),
+	-- the tiling is broken geometrically so haze can ease back slightly.
+	-- 5.0 washed distant silhouettes; 4.5 retains softness without milky veil.
+	-- Infinity Nikki refs: haze 4–5 for dreamy coastal haze (not 2 nor 7).
+	-- 2K cubemap upgrade (see sky header) would allow 3.0–3.5.
+	haze = 4.5,
 }
 
 -- ============================================================

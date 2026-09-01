@@ -14,12 +14,21 @@
   --sakura-hot: #ff477e;
 
   /* --- 🫛 Zunda Edamame Mint Palette --- */
-  --zunda-light: #f1f8e9;
-  --zunda-soft: #a5d6a7;
+  /* SSOT: src/Plugins/ZundaPalette.lua — ZundaGreen #a0d296 (160,210,150), MochiCream #fff5eb (255,245,235), EdamameDeep #5a8c5a (90,140,90) */
+  /* Web brand greens are intentionally darker than pastel SSOT for readability; see docs/SHARED_ASSET_HUB.md Palette Mapping. */
+  --zunda-light: #fff5eb; /* was #f1f8e9 (241,248,233) — now SSOT MochiCream #fff5eb (255,245,235); was drift 14 */
+  --zunda-soft: #a5d6a7; /* web soft (165,214,167) drift 17 vs ZundaGreen intentional — keep for web contrast */
   --zunda-leaf: #8bc34a;
   --zunda-base: #4caf50;
   --zunda-deep: #2e7d32;
   --zunda-dark: #1b5e20;
+  /* Palette bridge vars — use these when you need exact SSOT in CSS */
+  --palette-zunda-green: #a0d296; /* 160,210,150 */
+  --palette-zunda-gold: #ffc850; /* 255,200,80 */
+  --palette-zunda-pink: #ff96c8; /* 255,150,200 */
+  --palette-zunda-mint: #91d7c3; /* 145,215,195 */
+  --palette-mochi-cream: #fff5eb; /* 255,245,235 */
+  --palette-edamame-deep: #5a8c5a; /* 90,140,90 */
 
   /* --- ✨ Pearl Lavender & Cream Accents --- */
   --lavender-pearl: #e8dff5;

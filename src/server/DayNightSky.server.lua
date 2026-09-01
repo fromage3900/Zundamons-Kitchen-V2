@@ -122,7 +122,7 @@ local SKYBOX_SETS = {
 		bk = "rbxassetid://129075140128878", -- PurpleNebula_01 (soft dawn)
 		dn = "rbxassetid://119372168213953", -- BlueNebula_01
 		ft = "rbxassetid://129075140128878", -- PurpleNebula_01
-		lf = "rbxassetid://129075140128878", -- PurpleNebula_01
+		lf = "rbxassetid://119372168213953", -- BlueNebula_01 (now alternating like day — breaks faceting; was Purple)
 		rt = "rbxassetid://129075140128878", -- PurpleNebula_01
 		up = "rbxassetid://133353217310274", -- Starfield_03
 	},

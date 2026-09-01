@@ -419,13 +419,33 @@ end
 
 -- â”€â”€ Player Join â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-Players.PlayerAdded:Connect(function(player)
+-- Initialise one player's daily state. Split out of the PlayerAdded handler so
+-- the backfill below can reuse it.
+local function initPlayerDaily(player: Player)
 	task.spawn(function()
 		task.wait(3)
+		-- The player can leave during the 3s wait (or between server start and
+		-- the backfill); initialising a departed player writes state nobody owns.
+		if not player.Parent then
+			return
+		end
 		DailyChallengeService.initializeDay(player)
 		DailyChallengeService.spawnDailyVisitor(player)
 		DailyChallengeService.spawnDailyResources(player)
 	end)
-end)
+end
+
+Players.PlayerAdded:Connect(initPlayerDaily)
+
+-- Backfill players who joined BEFORE this module was required.
+--
+-- This module is loaded lazily by EndlessLoopWiring, so on a fast join -- always
+-- in Studio Play, and for the first joiner on a live server -- the player is
+-- already in Players by the time the connection above is made, and PlayerAdded
+-- never fires for them. Without this, their daily state stays nil forever:
+-- no challenges, no streak, no claimable reward. Verified in Studio 2026-08-25.
+for _, player in ipairs(Players:GetPlayers()) do
+	initPlayerDaily(player)
+end
 
 return DailyChallengeService
