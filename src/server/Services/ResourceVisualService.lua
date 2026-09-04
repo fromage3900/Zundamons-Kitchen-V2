@@ -53,7 +53,11 @@ end
 
 local function preparePart(part: BasePart, root: BasePart)
 	part.Anchored = false
-	part.CanCollide = false
+	-- Preserve collision on mineable nodes (rocks/ores) so players can't walk through
+	-- The Mineable tag is on the root node, not the visual child part
+	if not CollectionService:HasTag(root, "Mineable") then
+		part.CanCollide = false
+	end
 	part.CanQuery = false
 	part.CanTouch = false
 	part.Massless = true

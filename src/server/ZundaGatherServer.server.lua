@@ -151,8 +151,17 @@ local function bindNode(node)
 	if not cd then
 		return
 	end
-	-- Store original size for respawn
-	node:SetAttribute("_origSize", node.Size)
+
+	-- Initialize availability so the node is harvestable from the start.
+	-- Without this, Available stays nil and the harvest handler early-returns,
+	-- making every node unharvestable.
+	if node:GetAttribute("Available") == nil then
+		node:SetAttribute("Available", true)
+		-- Set gathering range proportional to mesh size (min 8, max 24)
+		local size = node:IsA("Model") and node:GetExtentsSize() or node.Size
+		local maxDim = math.max(size.X, size.Y, size.Z)
+		cd.MaxActivationDistance = math.clamp(maxDim + 4, 8, 24)
+	end
 
 	-- Initialize CarrotPlot growth stage
 	if node:GetAttribute("ResourceType") == "CarrotPlot" then

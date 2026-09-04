@@ -10,7 +10,7 @@ local configFiles = RS:WaitForChild("ConfigurationFiles")
 local toolsConfig = require(configFiles:WaitForChild("ToolsConfig"))
 local toolList = toolsConfig.tools
 
-local HIT_RADIUS = 8 -- studs within which a swing connects
+local HIT_RADIUS = 16 -- studs within which a swing connects
 local SWING_DURATION = 0.5
 
 -- Soft, cozy-ASMR hit sounds keyed by ToolsConfig's HitSound name (AxeHit/
@@ -105,7 +105,10 @@ function findHitTargets(handle, toolType)
 		return targets
 	end
 	local origin = handle.Position
+	print(string.format("[Tools] findHitTargets: toolType=%s, origin=%s", toolType, tostring(origin)))
+	local mineableCount = 0
 	for _, node in pairs(CollectionService:GetTagged("Mineable")) do
+		mineableCount = mineableCount + 1
 		if node.Parent and canToolHitNode(node, toolType) then
 			local nodePos = if node:IsA("BasePart")
 				then node.Position
@@ -115,11 +118,20 @@ function findHitTargets(handle, toolType)
 					or Vector3.zero
 				)
 			local dist = (nodePos - origin).Magnitude
+			print(
+				string.format(
+					"[Tools]   node=%s, dist=%s, withinRange=%s",
+					node.Name,
+					dist,
+					tostring(dist <= HIT_RADIUS)
+				)
+			)
 			if dist <= HIT_RADIUS then
 				table.insert(targets, { node = node, dist = dist })
 			end
 		end
 	end
+	print(string.format("[Tools]   total Mineable nodes: %d, targets found: %d", mineableCount, #targets))
 	table.sort(targets, function(a, b)
 		return a.dist < b.dist
 	end)

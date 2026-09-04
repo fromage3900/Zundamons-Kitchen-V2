@@ -149,12 +149,20 @@ local function playHarvestSound(position: Vector3)
 	sound.SoundId = SOUND_ID
 	sound.Volume = SOUND_VOLUME
 	sound.Pitch = math.random(90, 110) / 100
-	sound.Parent = workspace
-	sound.Position = position
+	-- Sound objects don't have .Position — parent to a Part for 3D audio
+	local anchor = Instance.new("Part")
+	anchor.Name = "HarvestSFX_Anchor"
+	anchor.Size = Vector3.new(1, 1, 1)
+	anchor.Position = position
+	anchor.Transparency = 1
+	anchor.CanCollide = false
+	anchor.Anchored = true
+	anchor.Parent = workspace
+	sound.Parent = anchor
 	sound:Play()
 
 	task.delay(sound.TimeLength + 0.5, function()
-		sound:Destroy()
+		anchor:Destroy()
 	end)
 
 	return sound
@@ -180,8 +188,10 @@ local function playHarvestAnimation()
 	local anim = Instance.new("Animation")
 	anim.AnimationId = ANIMATION_ID
 
-	local track = animator:LoadAnimation(anim)
-	if track then
+	local ok, track = pcall(function()
+		return animator:LoadAnimation(anim)
+	end)
+	if ok and track then
 		track.Priority = Enum.AnimationPriority.Action
 		track:Play()
 		harvestAnimTrack = track
@@ -542,7 +552,8 @@ end
 local function bindMineableNode(node: Instance)
 	local pos = if node:IsA("BasePart")
 		then node.Position
-		else (node.PrimaryPart and node.PrimaryPart.Position or Vector3.zero)
+		elseif node:IsA("Model") and node.PrimaryPart then node.PrimaryPart.Position
+		else node:GetPivot().Position
 
 	node:GetAttributeChangedSignal("Health"):Connect(function()
 		local health = node:GetAttribute("Health")

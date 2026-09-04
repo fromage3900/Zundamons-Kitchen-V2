@@ -252,13 +252,11 @@ local function showStep(idx)
 
 	for i, dot in ipairs(dots) do
 		dot.BackgroundColor3 = i == idx and C.button or Color3.fromRGB(210, 200, 185)
-		dot:TweenSize(
-			UDim2.new(i == idx and 14 or 10, 0, 10, 0),
-			Enum.EasingDirection.Out,
-			Enum.EasingStyle.Back,
-			0.2,
-			true
-		)
+		Tween:Create(
+			dot,
+			TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			{ Size = UDim2.new(i == idx and 14 or 10, 0, 10, 0) }
+		):Play()
 	end
 
 	local isLast = idx == #STEPS
@@ -338,6 +336,12 @@ task.spawn(function()
 	if tutorialDone then
 		print("[Tutorial] Tutorial already completed, skipping")
 		player:SetAttribute("OnboardingActive", false)
+		if overlay then
+			overlay:Destroy()
+		end
+		if gui then
+			gui:Destroy()
+		end
 		return
 	end
 	task.wait(1.5)
